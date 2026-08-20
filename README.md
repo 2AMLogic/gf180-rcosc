@@ -6,8 +6,10 @@ open PDK — designed by AI agents driving
 [klayout-tools](https://github.com/2AMLogic/klayout-tools) and the
 open-source xschem + ngspice flow.
 
-**Status: just opened.** Nothing is designed yet — the first work item is the
-spec itself.
+**Status: spec ratified.** The target spec (frequency, trim math, PVT
+accuracy budget) is ratified — see below and
+[`spec/`](spec/README.md). Nothing is designed yet; schematic entry and
+PVT-corner simulation are the next work items.
 
 **Built agent-native.** Every specification, decision record, testbench, and
 line of documentation here is produced by AI agents working from a ratified
@@ -42,26 +44,41 @@ The sibling analog canaries on this PDK
 ([gf180-bandgap](https://github.com/2AMLogic/gf180-bandgap),
 [gf180-temp-por](https://github.com/2AMLogic/gf180-temp-por)) are the style
 reference for spec, decision-record, and evidence conventions — not the
-circuit source. Topology selection (relaxation vs. ring-with-RC-reference)
-is part of the spec work, decided by decision record.
+circuit source. Topology selection (relaxation oscillator vs.
+ring-with-RC-reference) was part of the spec work, decided in
+[`spec/decision-records/0001`](spec/decision-records/0001-relaxation-oscillator-topology.md);
+future spec changes go through their own decision record in `spec/`.
 
-## Target specification (DRAFT — engineering to ratify, see issue #1)
+## Target specification (RATIFIED 2026-08-20, see issue #1)
 
-| Parameter | Target | Notes |
+Ratified per
+[`spec/decision-records/0002-target-spec-ratification.md`](spec/decision-records/0002-target-spec-ratification.md),
+which derives every row below from cited public precedents or an explicit,
+flagged engineering assumption and shows the trim-math arithmetic. This
+table supersedes the prior DRAFT.
+
+| Parameter | Target | Basis |
 |---|---|---|
-| Output frequency | TBD by spec (MHz-class) | derived from the anchor use case |
-| Trim interface | digital, range and resolution TBD | trim math must be explicit in the spec |
-| Post-trim accuracy | crystal-less full-speed-USB class | with optional runtime discipline (e.g. USB SOF) |
-| Free-running accuracy over PVT | TBD from shipped-part precedents | PVT-corner spread is required evidence |
-| Supply / Iq / startup | TBD | ratified with the spec |
+| Output frequency | 48.000 MHz | matches the crystal-less full-speed-USB precedent (e.g. ST HSI48) — explicit engineering choice, see DR-0002 |
+| Trim interface | 8-bit digital trim, ±35% range (31.2–64.8 MHz), ~0.27%/code (~132 kHz/code LSB), single-point trim at test | range covers the assumed ±30% untrimmed process spread (flagged assumption, pending gf180mcu device data) plus margin; full arithmetic in DR-0002 |
+| Free-running, untrimmed (process spread, fixed T/V) | ±30% | explicit engineering assumption — not yet confirmed against gf180mcu-specific device data, flagged in DR-0002 |
+| Free-running, post-trim (single-point trim, full PVT: process + −40…+85 °C + VDD ±10%) | ±2% (20,000 ppm) worst-case | budget breakdown (quantization, trim-DAC mismatch, comparator offset, temperature drift, supply drift) in DR-0002; temperature drift is the largest flagged risk |
+| Runtime-disciplined (reserved, not designed in this issue) | ≤ ±0.25% (2,500 ppm) — USB full-speed compliance | precedented by ST's CRS peripheral and Silicon Labs' crystal-less USB parts using SOF-based correction; closes the gap from ±2% free-running — see DR-0002 "Consequences" |
+| Supply | 3.3 V core (3.0–3.6 V) | explicit engineering choice, matches gf180mcu's 3.3V-primary flavor and sibling canary `gf180-bandgap`'s own supply scope |
+| Quiescent current (Iq) | < 200 µA (running) | explicit engineering target, flagged — pending schematic-phase confirmation |
+| Startup time | ≤ 10 µs to within trimmed accuracy | explicit engineering target, flagged — motivated by the RC-vs-crystal startup-time precedent |
+| Temperature range | −40 °C to +85 °C (industrial) | explicit engineering choice, standard industrial MCU/oscillator range |
 
 An oscillator spec without its trim math is not a spec: every accuracy claim
-must show both the PVT-corner spread and the trim range/resolution that
-covers it.
+above shows both the PVT-corner spread and the trim range/resolution that
+covers it — see DR-0002 for the full arithmetic and error-budget breakdown.
+Several rows carry explicit, flagged engineering assumptions (not yet
+confirmed against gf180mcu-specific device data) rather than invented
+precision; DR-0002 states exactly which and what would supersede them.
 
 Maturity ladder: spec ratified → schematic simulated across PVT → layout
 DRC/LVS-clean → post-layout re-verification → shuttle seat → measured
-silicon. **Current position: pre-spec.**
+silicon. **Current position: spec ratified, pre-schematic.**
 
 ## Repo layout
 
