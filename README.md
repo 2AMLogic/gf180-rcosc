@@ -49,32 +49,41 @@ ring-with-RC-reference) was part of the spec work, decided in
 [`spec/decision-records/0001`](spec/decision-records/0001-relaxation-oscillator-topology.md);
 future spec changes go through their own decision record in `spec/`.
 
-## Target specification (RATIFIED 2026-08-20, see issue #1)
+## Target specification (RATIFIED 2026-08-20, see issues #1 and #3)
 
 Ratified per
 [`spec/decision-records/0002-target-spec-ratification.md`](spec/decision-records/0002-target-spec-ratification.md),
-which derives every row below from cited public precedents or an explicit,
-flagged engineering assumption and shows the trim-math arithmetic. This
-table supersedes the prior DRAFT.
+as corrected by
+[`spec/decision-records/0003-pdk-sourced-process-spread-tcr-and-iq.md`](spec/decision-records/0003-pdk-sourced-process-spread-tcr-and-iq.md),
+which together derive every row below from cited public precedents or an
+explicit, flagged engineering assumption and show the trim-math arithmetic.
+DR-0003 supersedes DR-0002 for four rows (process spread, trim range/
+resolution, post-trim accuracy, Iq) against gf180mcu's own published
+electrical-specification tables; all other rows are DR-0002's, re-verified.
 
 | Parameter | Target | Basis |
 |---|---|---|
-| Output frequency | 48.000 MHz | matches the crystal-less full-speed-USB precedent (e.g. ST HSI48) — explicit engineering choice, see DR-0002 |
-| Trim interface | 8-bit digital trim, ±35% range (31.2–64.8 MHz), ~0.27%/code (~132 kHz/code LSB), single-point trim at test | range covers the assumed ±30% untrimmed process spread (flagged assumption, pending gf180mcu device data) plus margin; full arithmetic in DR-0002 |
-| Free-running, untrimmed (process spread, fixed T/V) | ±30% | explicit engineering assumption — not yet confirmed against gf180mcu-specific device data, flagged in DR-0002 |
-| Free-running, post-trim (single-point trim, full PVT: process + −40…+85 °C + VDD ±10%) | ±2% (20,000 ppm) worst-case | budget breakdown (quantization, trim-DAC mismatch, comparator offset, temperature drift, supply drift) in DR-0002; temperature drift is the largest flagged risk |
-| Runtime-disciplined (reserved, not designed in this issue) | ≤ ±0.25% (2,500 ppm) — USB full-speed compliance | precedented by ST's CRS peripheral and Silicon Labs' crystal-less USB parts using SOF-based correction; closes the gap from ±2% free-running — see DR-0002 "Consequences" |
+| Output frequency | 48.000 MHz | matches the crystal-less full-speed-USB precedent — ST `DS9826` Rev 6 Table 43 (`fHSI48` typ 48 MHz) and Silicon Labs CP2102N Rev 1.5 Table 3.5 (`fOSC` typ 48 MHz); explicit engineering choice, see DR-0002, citations verified in DR-0003 |
+| Trim interface | 8-bit digital trim, ±40% range (28.8–67.2 MHz), 0.314%/code (150.6 kHz/code LSB), half-LSB ±0.157%, single-point trim at test | range covers the sourced untrimmed spread (required pull −32.3%/+38.4%) with margin; full arithmetic in DR-0003 §"Row 2" |
+| Free-running, untrimmed (process spread, fixed T/V) | ±35% first-order (−27.7%/+47.6% exact in frequency) | **sourced** from gf180mcu-pdk `docs/analog/spice/elec_specs/`: poly-resistor spread ±20% (§5.1, §6.1A/B) + MIM-cap spread ±15.33% (§6.2(a)), summed worst-case as independent process modules — DR-0003 |
+| Free-running, post-trim, **at calibration point** (T = 27 °C, process, VDD ±10%) | ±1.1% (≈10,600 ppm) worst-case | quantization ±0.157% + three flagged assumptions inherited from DR-0002 (trim-DAC mismatch, comparator offset, supply drift) — DR-0003 flags this as still optimistic vs. ST's shipped `ACC_HSI48` = −2.8/+2.9% at 25 °C |
+| Free-running, post-trim, **full temperature range** (−40…+85 °C, VDD ±10%) | **+8% / −9%** worst-case | dominated by gf180mcu's published poly-resistor TCR of −1200 ppm/K (§6.1A), trimmed at 27 °C: ΔR/R = −6.96% at +85 °C (58 K) so f rises +6.84%, ΔR/R = +8.04% at −40 °C (67 K) so f falls −7.91%, plus the ±1.1% above — DR-0003. **Open item: whether the design adds active TC compensation or relies on runtime discipline is not yet decided** |
+| Runtime-disciplined (reserved, not designed) | ≤ ±0.25% (2,500 ppm) — USB full-speed compliance | USB 2.0 Rev 2.0 §7.1.11 `TFDRATE`, verified verbatim; the clause covers temperature and supply, with no pre-/post-discipline distinction. Precedented by ST's CRS peripheral (`RM0091` Rev 10 §7, SOF-based) and Silicon Labs' crystal-less USB parts — see DR-0003 |
 | Supply | 3.3 V core (3.0–3.6 V) | explicit engineering choice, matches gf180mcu's 3.3V-primary flavor and sibling canary `gf180-bandgap`'s own supply scope |
-| Quiescent current (Iq) | < 200 µA (running) | explicit engineering target, flagged — pending schematic-phase confirmation |
-| Startup time | ≤ 10 µs to within trimmed accuracy | explicit engineering target, flagged — motivated by the RC-vs-crystal startup-time precedent |
+| Quiescent current (Iq) | < 500 µA (running) | anchored to ST `DS9826` Rev 6 Table 43 `IDDA(HSI48)` = 312 µA typ / 350 µA max, with headroom for gf180mcu's older 180 nm node — DR-0003 |
+| Startup time | ≤ 10 µs to within trimmed accuracy | looser than the shipped precedent ST `DS9826` Rev 6 Table 43 `tsu(HSI48)` ≤ 6 µs max — DR-0002, citation verified in DR-0003 |
 | Temperature range | −40 °C to +85 °C (industrial) | explicit engineering choice, standard industrial MCU/oscillator range |
 
 An oscillator spec without its trim math is not a spec: every accuracy claim
 above shows both the PVT-corner spread and the trim range/resolution that
-covers it — see DR-0002 for the full arithmetic and error-budget breakdown.
-Several rows carry explicit, flagged engineering assumptions (not yet
-confirmed against gf180mcu-specific device data) rather than invented
-precision; DR-0002 states exactly which and what would supersede them.
+covers it — see DR-0003 for the current arithmetic and error-budget
+breakdown, and DR-0002 for the rows it did not change. **The free-running
+accuracy claim must always be quoted with its temperature condition**:
+≈±1% holds only at the calibration temperature, and the full-range figure
+is roughly ±8–9%. Several rows still carry explicit, flagged engineering
+assumptions (trim-DAC mismatch, comparator offset, supply drift) rather
+than invented precision; DR-0003 states exactly which, and what would
+supersede them.
 
 Maturity ladder: spec ratified → schematic simulated across PVT → layout
 DRC/LVS-clean → post-layout re-verification → shuttle seat → measured
