@@ -9,6 +9,14 @@ __pycache__/
 # (append-only record trail), so they escape the *.log rule.
 !sim/*/corners/**/*.log
 sim/build/
+
+# design/netlist/: derived from design/*.sch by design/regen-netlist.sh
+# (issue #6). pdk_include.spice embeds this machine's absolute PDK_ROOT
+# path, so it is regenerated per-machine, not committed. smoke_test.log is
+# append-only evidence (CLAUDE.md) and is force-added despite the blanket
+# *.log rule above.
+design/netlist/pdk_include.spice
+!design/netlist/smoke_test.log
 # synthesis / P&R scratch
 flow/build/
 # local klt install, created by the setup script

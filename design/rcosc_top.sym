@@ -1,0 +1,41 @@
+v {xschem version=3.4.7 file_version=1.2
+* rcosc_top symbol -- gf180-rcosc oscillator block (issue #6)
+* Pins: vdd, vss, clk, t0..t7 (t7=MSB)
+}
+G {}
+K {type=subcircuit
+format="@spiceprefix@name @pinlist rcosc_top"
+template="name=x1
+spiceprefix=X"
+}
+V {}
+S {}
+E {}
+L 4 -60 -260.0 60 -260.0 {}
+L 4 -60 260.0 60 260.0 {}
+L 4 -60 -260.0 -60 260.0 {}
+L 4 60 -260.0 60 260.0 {}
+B 5 -66 218.0 -62 222.0 {name=vdd dir=inout pinnumber=1}
+T {vdd} -54 215.0 0 0 0.2 0.2 {}
+B 5 -66 174.0 -62 178.0 {name=vss dir=inout pinnumber=2}
+T {vss} -54 171.0 0 0 0.2 0.2 {}
+B 5 -66 130.0 -62 134.0 {name=clk dir=inout pinnumber=3}
+T {clk} -54 127.0 0 0 0.2 0.2 {}
+B 5 -66 86.0 -62 90.0 {name=t0 dir=inout pinnumber=4}
+T {t0} -54 83.0 0 0 0.2 0.2 {}
+B 5 -66 42.0 -62 46.0 {name=t1 dir=inout pinnumber=5}
+T {t1} -54 39.0 0 0 0.2 0.2 {}
+B 5 -66 -2.0 -62 2.0 {name=t2 dir=inout pinnumber=6}
+T {t2} -54 -5.0 0 0 0.2 0.2 {}
+B 5 -66 -46.0 -62 -42.0 {name=t3 dir=inout pinnumber=7}
+T {t3} -54 -49.0 0 0 0.2 0.2 {}
+B 5 -66 -90.0 -62 -86.0 {name=t4 dir=inout pinnumber=8}
+T {t4} -54 -93.0 0 0 0.2 0.2 {}
+B 5 -66 -134.0 -62 -130.0 {name=t5 dir=inout pinnumber=9}
+T {t5} -54 -137.0 0 0 0.2 0.2 {}
+B 5 -66 -178.0 -62 -174.0 {name=t6 dir=inout pinnumber=10}
+T {t6} -54 -181.0 0 0 0.2 0.2 {}
+B 5 -66 -222.0 -62 -218.0 {name=t7 dir=inout pinnumber=11}
+T {t7} -54 -225.0 0 0 0.2 0.2 {}
+T {@name} -58 265.0 0 0 0.2 0.2 {}
+T {rcosc_top} -35 0 0 0 0.2 0.2 {}
