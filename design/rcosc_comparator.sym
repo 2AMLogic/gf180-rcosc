@@ -1,0 +1,31 @@
+v {xschem version=3.4.7 file_version=1.2
+* rcosc_comparator symbol -- 5T diff-pair comparator + buffer (issue #6)
+* Pins: vdd, vss, ibias, inp, inn, out
+}
+G {}
+K {type=subcircuit
+format="@spiceprefix@name @pinlist rcosc_comparator"
+template="name=x1
+spiceprefix=X"
+}
+V {}
+S {}
+E {}
+L 4 -60 -150.0 60 -150.0 {}
+L 4 -60 150.0 60 150.0 {}
+L 4 -60 -150.0 -60 150.0 {}
+L 4 60 -150.0 60 150.0 {}
+B 5 -66 108.0 -62 112.0 {name=vdd dir=inout pinnumber=1}
+T {vdd} -54 105.0 0 0 0.2 0.2 {}
+B 5 -66 64.0 -62 68.0 {name=vss dir=inout pinnumber=2}
+T {vss} -54 61.0 0 0 0.2 0.2 {}
+B 5 -66 20.0 -62 24.0 {name=ibias dir=inout pinnumber=3}
+T {ibias} -54 17.0 0 0 0.2 0.2 {}
+B 5 -66 -24.0 -62 -20.0 {name=inp dir=inout pinnumber=4}
+T {inp} -54 -27.0 0 0 0.2 0.2 {}
+B 5 -66 -68.0 -62 -64.0 {name=inn dir=inout pinnumber=5}
+T {inn} -54 -71.0 0 0 0.2 0.2 {}
+B 5 -66 -112.0 -62 -108.0 {name=out dir=inout pinnumber=6}
+T {out} -54 -115.0 0 0 0.2 0.2 {}
+T {@name} -58 155.0 0 0 0.2 0.2 {}
+T {rcosc_comparator} -35 0 0 0 0.2 0.2 {}

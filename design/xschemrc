@@ -1,0 +1,67 @@
+#### Project-local xschem configuration for gf180-rcosc (issue #6).
+####
+#### Resets XSCHEM_LIBRARY_PATH so this repo's xschem invocations are
+#### reproducible regardless of any machine-local ~/.xschem/xschemrc
+#### (which can silently point at stale/unrelated directories -- the same
+#### hazard the sibling canary gf180-bandgap documented in its own
+#### design/xschemrc).
+####
+#### Load explicitly (independent of cwd) with:
+####   xschem --rcfile design/xschemrc ...
+#### design/regen-netlist.sh always does this.
+
+set XSCHEM_LIBRARY_PATH {}
+append XSCHEM_LIBRARY_PATH :${XSCHEM_SHAREDIR}/xschem_library/devices
+
+#### PDK_ROOT / PDK: resolve the gf180mcu install. Same order as
+#### `klt pdk find` (see docs in README): explicit env first, then the
+#### usual volare/ciel/system install locations.
+if {[info exists env(PDK_ROOT)] && $env(PDK_ROOT) ne {}} {
+    set GF180_ROOT $env(PDK_ROOT)
+} else {
+    set GF180_ROOT {}
+    foreach candidate [list [file join $env(HOME) .volare] \
+                            [file join $env(HOME) .ciel] \
+                            /usr/share/pdk /usr/local/share/pdk \
+                            [file join $env(HOME) share pdk] /opt/pdk] {
+        if { [file isdir [file join $candidate gf180mcuC libs.tech xschem]] } {
+            set GF180_ROOT $candidate
+            break
+        }
+    }
+}
+
+if { [info exists env(PDK)] && $env(PDK) ne {} } {
+    set GF180_VARIANT $env(PDK)
+} else {
+    set GF180_VARIANT {gf180mcuC}
+}
+
+if { $GF180_ROOT eq {} } {
+    puts stderr "xschemrc: no gf180mcu install found."
+    puts stderr "xschemrc: set PDK_ROOT (see design/README.md) and restart xschem."
+} else {
+    set env(PDK_ROOT) $GF180_ROOT
+    set PDK_ROOT $GF180_ROOT
+    # The PDK ships its own xschemrc; it adds the gf180mcu device symbol
+    # library (referenced from our schematics as "symbols/<device>.sym").
+    set pdk_xschemrc [file join $GF180_ROOT $GF180_VARIANT libs.tech xschem xschemrc]
+    if { [file exists $pdk_xschemrc] } {
+        source $pdk_xschemrc
+    } else {
+        puts stderr "xschemrc: $pdk_xschemrc not found; gf180mcu symbols unavailable."
+    }
+}
+
+#### ------------------------------------------------------- repo libraries ---
+set REPO_ROOT [file dirname [file normalize [info script]]]
+append XSCHEM_LIBRARY_PATH :${XSCHEM_SHAREDIR}/xschem_library/devices
+append XSCHEM_LIBRARY_PATH :$REPO_ROOT
+
+# Netlists land next to the schematics they came from (design/netlist/), not
+# in /tmp, so the ngspice fragment a testbench includes is reviewable in git.
+set netlist_dir [file join $REPO_ROOT netlist]
+file mkdir $netlist_dir
+
+# Start on an empty sheet rather than the PDK's demo top-level.
+set XSCHEM_START_WINDOW {}
