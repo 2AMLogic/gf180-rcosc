@@ -106,3 +106,113 @@ t_first_rise = 7.759860e-09
 t_second_rise = 5.738393e-08
 ngspice-46 done
 -- smoke test complete --
+====================================================================
+gf180-rcosc smoke test run: 2026-09-05T18:57:02Z
+ngspice: ** ngspice-47 : Circuit level simulation program
+Trim code under test: 0x80 (t7=1, t0..t6=0) -- see design/smoke_test.sch
+NOT a PVT-corner or accuracy claim -- functional/DC sanity only.
+====================================================================
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+Warning from checkvalid: vector vc is not available or has zero length.
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: ** sch_path: /users/rwalters/github/gf180-rcosc/.loom/worktrees/issue-11/design/smoke_test.sch
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vdd                                        3.3
+xxdut.xxbias.xrba.11                   3.29907
+xxdut.xxbias.xrba.21                   2.20093
+xxdut.vh                                   2.2
+xxdut.xxbias.xrbb.11                   2.19907
+xxdut.xxbias.xrbb.21                   1.10093
+xxdut.vl                                   1.1
+xxdut.xxbias.xrbc.11                   1.09907
+xxdut.xxbias.xrbc.21               0.000925394
+xxdut.xxbias.xrbias.11                 3.29907
+xxdut.xxbias.xrbias.21                 1.08389
+xxdut.ibias                            1.08295
+xxdut.xxtrim.xrfix.11                  3.29971
+xxdut.xxtrim.xrfix.21                   2.8304
+xxdut.xxtrim.c1                        2.83011
+xxdut.xxtrim.xr0.11                    2.82982
+xxdut.xxtrim.xr0.21                    2.82736
+xxdut.xxtrim.c2                        2.82707
+t0                                           0
+xxdut.xxtrim.xr1.11                    2.82678
+xxdut.xxtrim.xr1.21                    2.82187
+xxdut.xxtrim.c3                        2.82158
+t1                                           0
+xxdut.xxtrim.xr2.11                    2.82129
+xxdut.xxtrim.xr2.21                    2.81148
+xxdut.xxtrim.c4                        2.81119
+t2                                           0
+xxdut.xxtrim.xr3.11                    2.81089
+xxdut.xxtrim.xr3.21                    2.79127
+xxdut.xxtrim.c5                        2.79098
+t3                                           0
+xxdut.xxtrim.xr4.11                    2.79069
+xxdut.xxtrim.xr4.21                    2.75144
+xxdut.xxtrim.c6                        2.75115
+t4                                           0
+xxdut.xxtrim.xr5.11                    2.75086
+xxdut.xxtrim.xr5.21                    2.67237
+xxdut.xxtrim.c7                        2.67207
+t5                                           0
+xxdut.xxtrim.xr6.11                    2.67178
+xxdut.xxtrim.xr6.21                     2.5148
+xxdut.xxtrim.c8                         2.5145
+t6                                           0
+xxdut.xxtrim.xr7.11                    2.51422
+xxdut.xxtrim.xr7.21                    2.20528
+xxdut.vc                               2.20499
+t7                                         3.3
+xxdut.xxcmph.tail                      1.03325
+xxdut.xxcmph.dp                        1.47816
+xxdut.xxcmph.dn                        1.90502
+xxdut.cmph_out                         1.42867
+xxdut.xxcmpl.tail                     0.960161
+xxdut.xxcmpl.dp                            3.3
+xxdut.xxcmpl.dn                        1.62533
+xxdut.cmpl_out                     4.20669e-09
+clk                                    0.66347
+xxdut.qbar                             1.36857
+xxdut.mid1                             2.67758
+xxdut.mid2                             3.10452
+vt7#branch                                   0
+vt6#branch                                   0
+vt5#branch                                   0
+vt4#branch                                   0
+vt3#branch                                   0
+vt2#branch                                   0
+vt1#branch                                   0
+vt0#branch                                   0
+vdd#branch                        -0.000494525
+
+ Reference value :  5.84084e-09 Reference value :  2.82382e-07 Reference value :  5.61644e-07 Reference value :  8.46463e-07 Reference value :  1.12143e-06 Reference value :  1.39525e-06 Reference value :  1.67624e-06 Reference value :  1.95645e-06 Reference value :  2.23684e-06 Reference value :  2.52807e-06 Reference value :  2.81073e-06 Reference value :  3.09291e-06 Reference value :  3.37348e-06 Reference value :  3.65225e-06 Reference value :  3.93389e-06
+No. of Data Rows : 20596
+t_first_rise        =  5.59150e-09
+t_second_rise       =  5.50954e-08
+t_first_rise = 5.591497e-09
+t_second_rise = 5.509537e-08
+ngspice-47 done
+-- smoke test complete --

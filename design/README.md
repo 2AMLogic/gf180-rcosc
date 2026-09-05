@@ -125,11 +125,25 @@ Using the **same poly-resistor flavor** (`ppolyf_u_1k`, gf180mcu §6.1A) for
 the threshold divider as for the timing/trim resistor is a deliberate,
 qualitative TC-tracking choice — process and temperature shifts move both
 the RC time constant and the comparator thresholds together, to first
-order. **This is not a quantified compensation claim.** DR-0003's
-+8%/−9% full-temperature-range figure assumes no active TC compensation;
-whether this ratiometric/flavor-matching choice measurably helps is
-schematic-refinement and PVT-corner-phase work, explicitly out of scope
-here.
+order. **This is not a quantified compensation claim.**
+
+Whether this design adds *active* TC compensation on top of that qualitative
+choice, or relies entirely on runtime discipline, is resolved by
+[`spec/decision-records/0004`](../spec/decision-records/0004-no-active-tc-compensation-runtime-discipline.md):
+**no active compensation is added.** DR-0004 found no PDK-published resistor,
+diffusion, or capacitor flavor with a positive TCR at a sheet resistance
+usable for this design's several-tens-of-kΩ timing resistor (gf180mcu's only
+characterized positive-TCR devices are interconnect — metal, contacts, and
+vias, §5.7 — which would need on the order of 10⁵–10⁶ squares to cancel the
+timing resistor's TCR, wholly impractical for this die), and judged a
+closed-loop or bandgap-referenced compensation circuit out of scope for a
+canary block verifying the PDK/tooling flow rather than competing on TC spec
+with a production part. `design/rcosc_bias.sch` and
+`design/rcosc_trim_bank.sch` are therefore **unchanged** by DR-0004.
+DR-0003's +8%/−9% full-temperature-range figure stands as the free-running
+spec; closing the remaining gap to USB full-speed compliance is entirely the
+job of the ratified spec's reserved "Runtime-disciplined" stage (SOF-based,
+still undesigned) — see DR-0004 for the full alternatives analysis.
 
 ## Device selection
 
