@@ -1,0 +1,159 @@
+====================================================================
+gf180-rcosc PVT corner run: ss_T+027C_V3p3_code0x00
+run id      : 20260905T211140Z
+process     : ss (fets=ss res=res_ss mimcap=mimcap_ss)
+temperature : 27 C
+supply      : 3.3 V
+trim code   : 0x00 (0)
+transient   : tran 200p 4000n, f = 20 periods / (t[rise=25] - t[rise=5])
+wall clock  : 80.6 s
+exit status : 0
+====================================================================
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: ** sch_path: /users/rwalters/github/gf180-rcosc/.loom/worktrees/issue-12/design/pvt_tb.sch
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vdd                                        3.3
+xxdut.xxbias.xrba.11                   3.29922
+xxdut.xxbias.xrba.21                   2.19039
+xxdut.vh                               2.18961
+xxdut.xxbias.xrbb.11                   2.18883
+xxdut.xxbias.xrbb.21                   1.07772
+xxdut.vl                               1.07694
+xxdut.xxbias.xrbc.11                   1.07618
+xxdut.xxbias.xrbc.21               0.000755203
+xxdut.xxbias.xrbias.11                 3.29925
+xxdut.xxbias.xrbias.21                 1.16059
+xxdut.ibias                            1.15984
+xxdut.xxtrim.xrfix.11                  3.29941
+xxdut.xxtrim.xrfix.21                  2.15943
+xxdut.xxtrim.c1                        2.15884
+xxdut.xxtrim.xr0.11                    2.15819
+xxdut.xxtrim.xr0.21                    2.15162
+xxdut.xxtrim.c2                        2.15097
+t0                                           0
+xxdut.xxtrim.xr1.11                    2.15029
+xxdut.xxtrim.xr1.21                    2.13662
+xxdut.xxtrim.c3                        2.13594
+t1                                           0
+xxdut.xxtrim.xr2.11                    2.13524
+xxdut.xxtrim.xr2.21                    2.10678
+xxdut.xxtrim.c4                        2.10607
+t2                                           0
+xxdut.xxtrim.xr3.11                    2.10534
+xxdut.xxtrim.xr3.21                    2.04596
+xxdut.xxtrim.c5                        2.04522
+t3                                           0
+xxdut.xxtrim.xr4.11                    2.04445
+xxdut.xxtrim.xr4.21                    1.91981
+xxdut.xxtrim.c6                        1.91904
+t4                                           0
+xxdut.xxtrim.xr5.11                    1.91821
+xxdut.xxtrim.xr5.21                    1.65227
+xxdut.xxtrim.c7                        1.65144
+t5                                           0
+xxdut.xxtrim.xr6.11                    1.65052
+xxdut.xxtrim.xr6.21                    1.05598
+xxdut.xxtrim.c8                        1.05505
+t6                                           0
+xxdut.xxtrim.xr7.11                    1.05387
+xxdut.xxtrim.xr7.21                  -0.471278
+xxdut.vc                              -0.47246
+t7                                           0
+xxdut.xxcmph.tail                     0.864403
+xxdut.xxcmph.dp                        3.29521
+xxdut.xxcmph.dn                        1.56025
+xxdut.cmph_out                      -0.0184924
+xxdut.xxcmpl.tail                    0.0770463
+xxdut.xxcmpl.dp                       0.895543
+xxdut.xxcmpl.dn                        2.30811
+xxdut.cmpl_out                         3.25244
+clk                                   0.197181
+xxdut.qbar                             2.35712
+xxdut.mid1                             2.91418
+xxdut.mid2                              1.4105
+vt7#branch                        -6.26324e-07
+vt6#branch                        -3.28921e-07
+vt5#branch                        -1.89257e-07
+vt4#branch                        -1.43214e-07
+vt3#branch                        -1.25935e-07
+vt2#branch                        -1.18672e-07
+vt1#branch                        -1.15408e-07
+vt0#branch                        -1.13869e-07
+vdd#branch                        -0.000234438
+
+ Reference value :  0.00000e+00
+ Reference value :  9.13360e-08
+ Reference value :  1.87801e-07
+ Reference value :  2.84813e-07
+ Reference value :  3.72525e-07
+ Reference value :  4.63259e-07
+ Reference value :  5.56428e-07
+ Reference value :  6.51211e-07
+ Reference value :  7.41340e-07
+ Reference value :  8.32176e-07
+ Reference value :  9.26246e-07
+ Reference value :  1.02082e-06
+ Reference value :  1.11267e-06
+ Reference value :  1.20851e-06
+ Reference value :  1.30163e-06
+ Reference value :  1.39648e-06
+ Reference value :  1.48254e-06
+ Reference value :  1.57812e-06
+ Reference value :  1.67093e-06
+ Reference value :  1.76559e-06
+ Reference value :  1.85264e-06
+ Reference value :  1.94413e-06
+ Reference value :  2.03832e-06
+ Reference value :  2.13580e-06
+ Reference value :  2.22001e-06
+ Reference value :  2.31500e-06
+ Reference value :  2.40572e-06
+ Reference value :  2.50347e-06
+ Reference value :  2.59294e-06
+ Reference value :  2.68805e-06
+ Reference value :  2.78430e-06
+ Reference value :  2.87846e-06
+ Reference value :  2.97078e-06
+ Reference value :  3.06361e-06
+ Reference value :  3.16141e-06
+ Reference value :  3.25174e-06
+ Reference value :  3.34513e-06
+ Reference value :  3.44163e-06
+ Reference value :  3.53963e-06
+ Reference value :  3.62907e-06
+ Reference value :  3.72552e-06
+ Reference value :  3.82237e-06
+ Reference value :  3.91377e-06
+No. of Data Rows : 20297
+ta                  =  3.71026e-07
+tb                  =  1.84585e-06
+ta = 3.710258e-07
+tb = 1.845853e-06
+period = 7.374136e-08
+fosc = 1.356091e+07
+ngspice-46 done
+
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Warning: True gmin stepping failed
+Note: Starting source stepping
+Warning: singular matrix:  check node xxdut.vl
+
+Warning: source stepping failed
+Note: Transient op started
+Note: Transient op finished successfully

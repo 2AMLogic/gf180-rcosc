@@ -1,0 +1,161 @@
+====================================================================
+gf180-rcosc PVT corner run: ss_T+027C_V3p3_code0xFF
+run id      : 20260905T211140Z
+process     : ss (fets=ss res=res_ss mimcap=mimcap_ss)
+temperature : 27 C
+supply      : 3.3 V
+trim code   : 0xFF (255)
+transient   : tran 200p 4000n, f = 20 periods / (t[rise=25] - t[rise=5])
+wall clock  : 82.7 s
+exit status : 0
+====================================================================
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: ** sch_path: /users/rwalters/github/gf180-rcosc/.loom/worktrees/issue-12/design/pvt_tb.sch
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vdd                                        3.3
+xxdut.xxbias.xrba.11                   3.29922
+xxdut.xxbias.xrba.21                   2.19132
+xxdut.vh                               2.19054
+xxdut.xxbias.xrbb.11                   2.18977
+xxdut.xxbias.xrbb.21                   1.09149
+xxdut.vl                               1.09072
+xxdut.xxbias.xrbc.11                   1.08995
+xxdut.xxbias.xrbc.21               0.000764869
+xxdut.xxbias.xrbias.11                 3.29925
+xxdut.xxbias.xrbias.21                 1.16193
+xxdut.ibias                            1.16118
+xxdut.xxtrim.xrfix.11                  3.29878
+xxdut.xxtrim.xrfix.21                 0.944426
+xxdut.xxtrim.c1                       0.943206
+xxdut.xxtrim.xr0.11                   0.942533
+xxdut.xxtrim.xr0.21                   0.935745
+xxdut.xxtrim.c2                       0.935071
+t0                                         3.3
+xxdut.xxtrim.xr1.11                   0.934536
+xxdut.xxtrim.xr1.21                   0.923751
+xxdut.xxtrim.c3                       0.923217
+t1                                         3.3
+xxdut.xxtrim.xr2.11                   0.922852
+xxdut.xxtrim.xr2.21                   0.908157
+xxdut.xxtrim.c4                       0.907793
+t2                                         3.3
+xxdut.xxtrim.xr3.11                   0.907576
+xxdut.xxtrim.xr3.21                     0.8901
+xxdut.xxtrim.c5                       0.889883
+t3                                         3.3
+xxdut.xxtrim.xr4.11                   0.889767
+xxdut.xxtrim.xr4.21                   0.870934
+xxdut.xxtrim.c6                       0.870818
+t4                                         3.3
+xxdut.xxtrim.xr5.11                   0.870759
+xxdut.xxtrim.xr5.21                   0.851713
+xxdut.xxtrim.c7                       0.851654
+t5                                         3.3
+xxdut.xxtrim.xr6.11                   0.851626
+xxdut.xxtrim.xr6.21                   0.833382
+xxdut.xxtrim.c8                       0.833354
+t6                                         3.3
+xxdut.xxtrim.xr7.11                   0.833342
+xxdut.xxtrim.xr7.21                   0.817759
+xxdut.vc                              0.817747
+t7                                         3.3
+xxdut.xxcmph.tail                     0.866429
+xxdut.xxcmph.dp                        3.29934
+xxdut.xxcmph.dn                        1.56901
+xxdut.cmph_out                     -0.00266674
+xxdut.xxcmpl.tail                    0.0083863
+xxdut.xxcmpl.dp                        0.02106
+xxdut.xxcmpl.dn                          2.329
+xxdut.cmpl_out                         3.31705
+clk                                 -0.0404722
+xxdut.qbar                             3.28311
+xxdut.mid1                             3.27649
+xxdut.mid2                             2.85439
+vt7#branch                         3.76996e-07
+vt6#branch                        -3.49003e-07
+vt5#branch                        -2.13241e-07
+vt4#branch                         7.95806e-08
+vt3#branch                         2.40788e-07
+vt2#branch                         1.74869e-07
+vt1#branch                        -1.33069e-07
+vt0#branch                        -6.20732e-07
+vdd#branch                        -0.000107943
+
+ Reference value :  0.00000e+00
+ Reference value :  9.12271e-08
+ Reference value :  1.78093e-07
+ Reference value :  2.73976e-07
+ Reference value :  3.62363e-07
+ Reference value :  4.52855e-07
+ Reference value :  5.39120e-07
+ Reference value :  6.27118e-07
+ Reference value :  7.22106e-07
+ Reference value :  8.07965e-07
+ Reference value :  9.01062e-07
+ Reference value :  9.85736e-07
+ Reference value :  1.07750e-06
+ Reference value :  1.16096e-06
+ Reference value :  1.25028e-06
+ Reference value :  1.34079e-06
+ Reference value :  1.43180e-06
+ Reference value :  1.52355e-06
+ Reference value :  1.61009e-06
+ Reference value :  1.70660e-06
+ Reference value :  1.78916e-06
+ Reference value :  1.88067e-06
+ Reference value :  1.96946e-06
+ Reference value :  2.06680e-06
+ Reference value :  2.15465e-06
+ Reference value :  2.24799e-06
+ Reference value :  2.33639e-06
+ Reference value :  2.42990e-06
+ Reference value :  2.51562e-06
+ Reference value :  2.60788e-06
+ Reference value :  2.70002e-06
+ Reference value :  2.78986e-06
+ Reference value :  2.88131e-06
+ Reference value :  2.96933e-06
+ Reference value :  3.06545e-06
+ Reference value :  3.15482e-06
+ Reference value :  3.24901e-06
+ Reference value :  3.33687e-06
+ Reference value :  3.43270e-06
+ Reference value :  3.52415e-06
+ Reference value :  3.61812e-06
+ Reference value :  3.73047e-06
+ Reference value :  3.81401e-06
+ Reference value :  3.90954e-06
+ Reference value :  3.99869e-06
+No. of Data Rows : 20406
+ta                  =  2.92049e-07
+tb                  =  1.52367e-06
+ta = 2.920494e-07
+tb = 1.523668e-06
+period = 6.158093e-08
+fosc = 1.623879e+07
+ngspice-46 done
+
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Warning: True gmin stepping failed
+Note: Starting source stepping
+Warning: singular matrix:  check node xxdut.vl
+
+Warning: source stepping failed
+Note: Transient op started
+Note: Transient op finished successfully

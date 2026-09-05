@@ -1,0 +1,158 @@
+====================================================================
+gf180-rcosc PVT corner run: rc_f_T+027C_V3p6_code0x80
+run id      : 20260905T211140Z
+process     : rc_f (fets=typical res=res_ff mimcap=mimcap_ff)
+temperature : 27 C
+supply      : 3.6 V
+trim code   : 0x80 (128)
+transient   : tran 200p 4000n, f = 20 periods / (t[rise=25] - t[rise=5])
+wall clock  : 97.4 s
+exit status : 0
+====================================================================
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: ** sch_path: /users/rwalters/github/gf180-rcosc/.loom/worktrees/issue-12/design/pvt_tb.sch
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vdd                                        3.6
+xxdut.xxbias.xrba.11                   3.59874
+xxdut.xxbias.xrba.21                   2.40126
+xxdut.vh                                   2.4
+xxdut.xxbias.xrbb.11                   2.39874
+xxdut.xxbias.xrbb.21                   1.20126
+xxdut.vl                                   1.2
+xxdut.xxbias.xrbc.11                   1.19874
+xxdut.xxbias.xrbc.21                0.00126137
+xxdut.xxbias.xrbias.11                 3.59872
+xxdut.xxbias.xrbias.21                 1.16218
+xxdut.ibias                             1.1609
+xxdut.xxtrim.xrfix.11                   3.5996
+xxdut.xxtrim.xrfix.21                  3.08231
+xxdut.xxtrim.c1                        3.08191
+xxdut.xxtrim.xr0.11                     3.0815
+xxdut.xxtrim.xr0.21                     3.0788
+xxdut.xxtrim.c2                         3.0784
+t0                                           0
+xxdut.xxtrim.xr1.11                      3.078
+xxdut.xxtrim.xr1.21                    3.07259
+xxdut.xxtrim.c3                        3.07219
+t1                                           0
+xxdut.xxtrim.xr2.11                    3.07178
+xxdut.xxtrim.xr2.21                    3.06097
+xxdut.xxtrim.c4                        3.06057
+t2                                           0
+xxdut.xxtrim.xr3.11                    3.06017
+xxdut.xxtrim.xr3.21                    3.03854
+xxdut.xxtrim.c5                        3.03813
+t3                                           0
+xxdut.xxtrim.xr4.11                    3.03773
+xxdut.xxtrim.xr4.21                    2.99447
+xxdut.xxtrim.c6                        2.99407
+t4                                           0
+xxdut.xxtrim.xr5.11                    2.99367
+xxdut.xxtrim.xr5.21                    2.90715
+xxdut.xxtrim.c7                        2.90675
+t5                                           0
+xxdut.xxtrim.xr6.11                    2.90635
+xxdut.xxtrim.xr6.21                    2.73331
+xxdut.xxtrim.c8                        2.73291
+t6                                           0
+xxdut.xxtrim.xr7.11                    2.73253
+xxdut.xxtrim.xr7.21                    2.40654
+xxdut.vc                               2.40616
+t7                                         3.6
+xxdut.xxcmph.tail                      1.16524
+xxdut.xxcmph.dp                        1.61446
+xxdut.xxcmph.dn                        2.08977
+xxdut.cmph_out                         1.55627
+xxdut.xxcmpl.tail                      1.07827
+xxdut.xxcmpl.dp                            3.6
+xxdut.xxcmpl.dn                        1.75573
+xxdut.cmpl_out                      4.8553e-09
+clk                                   0.679097
+xxdut.qbar                             1.48372
+xxdut.mid1                             2.88361
+xxdut.mid2                             3.36481
+vt7#branch                                   0
+vt6#branch                                   0
+vt5#branch                                   0
+vt4#branch                                   0
+vt3#branch                                   0
+vt2#branch                                   0
+vt1#branch                                   0
+vt0#branch                                   0
+vdd#branch                         -0.00064816
+
+ Reference value :  0.00000e+00
+ Reference value :  7.84480e-08
+ Reference value :  1.54642e-07
+ Reference value :  2.32323e-07
+ Reference value :  3.15145e-07
+ Reference value :  3.92443e-07
+ Reference value :  4.78319e-07
+ Reference value :  5.59593e-07
+ Reference value :  6.37169e-07
+ Reference value :  7.18919e-07
+ Reference value :  7.99552e-07
+ Reference value :  8.80502e-07
+ Reference value :  9.64440e-07
+ Reference value :  1.04502e-06
+ Reference value :  1.12807e-06
+ Reference value :  1.21361e-06
+ Reference value :  1.30011e-06
+ Reference value :  1.38276e-06
+ Reference value :  1.46590e-06
+ Reference value :  1.55176e-06
+ Reference value :  1.63297e-06
+ Reference value :  1.71450e-06
+ Reference value :  1.79768e-06
+ Reference value :  1.88448e-06
+ Reference value :  1.96550e-06
+ Reference value :  2.04280e-06
+ Reference value :  2.12402e-06
+ Reference value :  2.20503e-06
+ Reference value :  2.28655e-06
+ Reference value :  2.36915e-06
+ Reference value :  2.44771e-06
+ Reference value :  2.53171e-06
+ Reference value :  2.61216e-06
+ Reference value :  2.69554e-06
+ Reference value :  2.77642e-06
+ Reference value :  2.85386e-06
+ Reference value :  2.93115e-06
+ Reference value :  3.01512e-06
+ Reference value :  3.09474e-06
+ Reference value :  3.17781e-06
+ Reference value :  3.26024e-06
+ Reference value :  3.34278e-06
+ Reference value :  3.42594e-06
+ Reference value :  3.50330e-06
+ Reference value :  3.58624e-06
+ Reference value :  3.66755e-06
+ Reference value :  3.74632e-06
+ Reference value :  3.82976e-06
+ Reference value :  3.90725e-06
+ Reference value :  3.98814e-06
+No. of Data Rows : 20654
+ta                  =  1.52393e-07
+tb                  =  8.92596e-07
+ta = 1.523928e-07
+tb = 8.925959e-07
+period = 3.701015e-08
+fosc = 2.701961e+07
+ngspice-46 done
+
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
