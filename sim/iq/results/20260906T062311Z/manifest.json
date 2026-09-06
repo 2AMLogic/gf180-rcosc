@@ -1,0 +1,64 @@
+{
+  "runid": "20260906T062311Z",
+  "git_sha": "7404fc80780f1415f72ec6aaca7f012ed80db126",
+  "dirty_tree": true,
+  "ngspice": "** ngspice-46 : Circuit level simulation program",
+  "pdk_root": "/Users/rwalters/.volare",
+  "target_ua": 500.0,
+  "netlist": "design/netlist/smoke_test.spice",
+  "corner": {
+    "process": "tt",
+    "temp_c": 27,
+    "vdd_v": 3.3
+  },
+  "points": [
+    {
+      "variant": "as-committed",
+      "code": 0,
+      "iq_op_ua": 467.1338,
+      "iq_run_ua": 136.447,
+      "f_mhz": 26.505934678774576,
+      "log": "as-committed_code0x00.log"
+    },
+    {
+      "variant": "as-committed",
+      "code": 128,
+      "iq_op_ua": 467.1776,
+      "iq_run_ua": 157.269,
+      "f_mhz": 35.955702574428315,
+      "log": "as-committed_code0x80.log"
+    },
+    {
+      "variant": "as-committed",
+      "code": 255,
+      "iq_op_ua": 467.1776,
+      "iq_run_ua": 218.54,
+      "f_mhz": 51.94138726095924,
+      "log": "as-committed_code0xFF.log"
+    },
+    {
+      "variant": "pre-22",
+      "code": 0,
+      "iq_op_ua": 914.3975,
+      "iq_run_ua": 470.403,
+      "f_mhz": 29.507229271171436,
+      "log": "pre-22_code0x00.log"
+    },
+    {
+      "variant": "pre-22",
+      "code": 128,
+      "iq_op_ua": 914.9895,
+      "iq_run_ua": 502.311,
+      "f_mhz": 42.06771218954028,
+      "log": "pre-22_code0x80.log"
+    },
+    {
+      "variant": "pre-22",
+      "code": 255,
+      "iq_op_ua": 914.9895,
+      "iq_run_ua": 605.502,
+      "f_mhz": 65.9204254767942,
+      "log": "pre-22_code0xFF.log"
+    }
+  ]
+}

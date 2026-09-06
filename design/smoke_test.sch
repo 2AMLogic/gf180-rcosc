@@ -7,6 +7,12 @@ v {xschem version=3.4.7 file_version=1.2
 * free-runs several times faster than the original, so 4000n simulated
 * more periods than the rise=1/rise=2 measurement needs -- 400n keeps
 * >5x margin over the slowest expected code-0x80 period.
+*
+* tran window re-extended 400n -> 1200n (issue #22) to fit the 20-whole-
+* period averaging window the new running-Iq measurement needs (rising
+* edges 5..25, the same startup-skipping convention sim/pvt/pvt_sweep.py
+* uses). The rise=1/rise=2 measurements issue #16 added are unchanged and
+* still reported, so the existing evidence line stays comparable.
 }
 G {}
 K {}
@@ -97,10 +103,27 @@ print v(vdd) v(vc) v(vh) v(vl) v(ibias) v(clk)
 * positive quiescent-current figure in microamps.
 let iq_ua = -1e6*i(vdd)
 print iq_ua
-tran 200p 400n
+tran 200p 1200n
 meas tran t_first_rise when v(clk)=1.65 rise=1
 meas tran t_second_rise when v(clk)=1.65 rise=2
 print t_first_rise t_second_rise
+* Running quiescent current (issue #22). DR-0003 Row 4's target is stated
+* as '< 500 uA (running)', and its anchor -- ST DS9826's IDDA(HSI48), 312
+* uA typ -- is a datasheet supply-current figure for an oscillator that is
+* oscillating. The .op figure above is NOT that quantity: a relaxation
+* oscillator has no stable DC operating point, so the DC solve converges
+* on the unstable equilibrium, which pins the charge-complete comparator
+* XCMPH at its own output inverter's trip point -- holding that buffer,
+* and the SR-latch NOR gate its mid-rail output drives, in full crowbar
+* conduction, a state the running circuit occupies only in transit
+* (measured: sim/iq/corners/). iq_run_ua below is the
+* quantity Row 4 actually names: -i(vdd) averaged over 20 whole periods
+* (rising edges 5..25, startup skipped). Both are printed, never one
+* without the other -- see DR-0008.
+let ivdd_ua = -1e6*i(vdd)
+meas tran t_avg_start when v(clk)=1.65 rise=5
+meas tran t_avg_end when v(clk)=1.65 rise=25
+meas tran iq_run_ua AVG ivdd_ua FROM=$&t_avg_start TO=$&t_avg_end
 quit
 .endc
 "}
