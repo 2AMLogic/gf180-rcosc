@@ -14,6 +14,10 @@ v {xschem version=3.4.7 file_version=1.2
 *
 * NOT yet corner-simulated or offset-budgeted -- schematic-phase sizing
 * only, per this issue's non-goals (no PVT/DRC/LVS claims here).
+*
+* RBIAS re-sized issue #16: L=200u -> L=25u (~8x higher tail-current
+* reference) to shrink comparator propagation delay -- see
+* design/README.md "Trim bank sizing" / root cause writeup.
 }
 G {}
 K {}
@@ -41,7 +45,7 @@ N 400 -30 400 -50 {}
 C {lab_pin.sym} 400 -50 0 0 {name=l8 lab=vss}
 N 380 0 360 0 {}
 C {lab_pin.sym} 360 0 0 0 {name=l9 lab=vss}
-C {symbols/ppolyf_u_1k.sym} 600 0 0 0 {name=RBIAS model=ppolyf_u_1k W=2u L=200u m=1}
+C {symbols/ppolyf_u_1k.sym} 600 0 0 0 {name=RBIAS model=ppolyf_u_1k W=2u L=25u m=1}
 N 600 30 600 50 {}
 C {lab_pin.sym} 600 50 0 0 {name=l10 lab=vdd}
 N 600 -30 600 -50 {}

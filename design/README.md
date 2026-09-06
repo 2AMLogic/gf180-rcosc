@@ -59,24 +59,28 @@ maturity ladder: schematic simulated across PVT is a later increment).
 
 The smoke test drives `VDD = 3.3 V` and trim code `0x80` (`t7 = 1`,
 `t0..t6 = 0`) and runs an `.op` (prints the bias/threshold node voltages)
-followed by a 4 µs transient measuring two consecutive rising edges of
-`clk`. As of this issue's last run:
+followed by a transient measuring two consecutive rising edges of `clk`
+(the window was shortened from the original 4 µs to 400 ns in issue #16 —
+the re-sized schematic free-runs several times faster than the original, so
+4 µs simulated far more periods than the two-edge measurement needs). As of
+issue #16's last run (post-resize; see "Trim bank sizing" below for the
+resizing itself):
 
 - `.op`: `vh = 2.200 V` (exactly 2/3 · VDD), `vl = 1.100 V` (exactly
-  1/3 · VDD), `ibias ≈ 1.083 V` — the ratiometric bias generator is
-  producing sane, non-degenerate threshold and bias nodes.
-- Transient: `clk` **free-runs** (confirms the topology oscillates, not
-  just a DC sanity check) — measured period ≈ 49.6 ns (≈ 20.2 MHz) at
-  code `0x80`. This is **lower than the ≈ 40 MHz the first-order
-  `f ≈ 1/(R·C·ln 3)` hand estimate predicts** at that code (see "Trim bank
-  sizing" below) — expected, and explicitly **not** treated as an accuracy
-  result: the hand estimate ignores comparator propagation delay, the
-  discharge switch's finite on-resistance, and the differential comparator
-  pair's real (non-ideal) switching behavior, none of which are budgeted or
-  corner-simulated in this issue. Closing this gap between hand estimate
-  and simulated behavior is schematic-refinement / PVT-corner-phase work
-  (later increment), not something this issue's non-goals permit fixing
-  by adjusting the ratified spec.
+  1/3 · VDD) — the ratiometric bias generator is producing sane,
+  non-degenerate threshold nodes.
+- Transient: `clk` **free-runs** — measured period ≈ 23.8 ns (≈ 42.0 MHz)
+  at code `0x80`, using the same first-two-rising-edges methodology as the
+  original issue #6 measurement. This is **not** a steady-state accuracy
+  figure (see the caveat issue #6 already carried forward, and "Trim bank
+  sizing" below for the steady-state, corner-simulated numbers this issue
+  adds): the first two edges include a few cycles of startup transient
+  before the oscillator settles, and this design's higher post-resize
+  bias current makes that startup transient more visible in a short,
+  few-edge window than it was pre-resize. It remains a useful bring-up
+  sanity check (confirms free-running oscillation and sane bias nodes),
+  not a substitute for the reference-corner steady-state and PVT-corner
+  results below.
 
 ## Topology
 
@@ -90,8 +94,8 @@ switched-resistor bank directly setting the RC time constant.
 
 - **`XTRIM` (`rcosc_trim_bank`)** charges `C_TIMING` continuously from
   `VDD` through the trimmed resistance (the RC element).
-- **`CTIMING`** (`cap_mim_1f0fF`, 200 fF) is the timing capacitor, at node
-  `vc`.
+- **`CTIMING`** (`cap_mim_1f0fF`, 200 fF, unchanged by issue #16) is the
+  timing capacitor, at node `vc`.
 - **`XCMPH`** compares `vc` against `vh` (2/3 · VDD) — fires when the
   charge phase completes.
 - **`XCMPL`** compares `vl` (1/3 · VDD) against `vc` — fires when the
@@ -117,9 +121,16 @@ a row in the ratified target spec, see
 divide the supply into `vh = 2/3 · VDD` and `vl = 1/3 · VDD` — **ratiometric**
 to the supply (DR-0001's "simpler ratiometric scheme" option, explicitly
 left open by that record rather than a bandgap-style reference). A fourth
-resistor of the same flavor plus a diode-connected `nfet_03v3` generate a
-current reference (`ibias`) that both comparator instances in
+resistor of the same flavor (`RBIAS`) plus a diode-connected `nfet_03v3`
+generate a current reference (`ibias`) that both comparator instances in
 `rcosc_top.sch` mirror into their own tail current sources.
+
+**`RBIAS` re-sized issue #16**: `L = 200 µm → 25 µm` (~8× higher tail
+current). This raises comparator bandwidth/slew and so reduces
+comparator propagation delay — one of the two root-cause mechanisms this
+issue's "Trim bank sizing" section identifies for the pre-#16 frequency
+shortfall. The threshold-divider resistors (`RBA`/`RBB`/`RBC`) are
+unchanged: only the current-reference leg is re-sized.
 
 Using the **same poly-resistor flavor** (`ppolyf_u_1k`, gf180mcu §6.1A) for
 the threshold divider as for the timing/trim resistor is a deliberate,
@@ -172,73 +183,177 @@ variable segment down to `RFIX` alone (`R_min`) — verified at the schematic
 level (8 switches present, one per bit) and exercised functionally by the
 `t7`-only smoke-test code (`0x80`) above.
 
-Sized against the ratified ±40% / 28.8–67.2 MHz range
-([DR-0003](../spec/decision-records/0003-pdk-sourced-process-spread-tcr-and-iq.md)
-"Row 2") using the topology's own nominal charge-time relationship,
-`f ≈ 1/(R·C·ln 3)` (time to charge from ≈0 V to `V_H = 2/3·VDD` through `R`
-into `C`, ignoring finite discharge time and comparator delay — a
-first-order hand estimate, not a simulated result):
+### Root cause of the pre-#16 frequency/trim-range shortfall (issue #16)
+
+Issue #12's PVT campaign ([DR-0005](../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md))
+found the pre-#16 schematic realized only 17.7–21.4 MHz (reference corner)
+against a 48.000 MHz target — a ~2.3× shortfall — and a compressed
+trim-bank endpoint ratio (1.2058 realized vs. 2.3333 intended). This issue
+root-caused that gap by instrumenting the transient directly (measuring
+node-crossing timestamps on `vc`, `cmph_out`, `cmpl_out`, and `clk`, not
+just the oscillation period) at the reference corner, code `0x80`:
+
+1. **The discharge phase does not stop at `V_L`.** `MDISCH` is a strong,
+   low-`R_on` switch (`nfet_03v3`, `W=20µm`): its own discharge time
+   constant (`R_on · C_TIMING`, tens of picoseconds) is far *faster* than
+   `XCMPL`'s propagation delay (measured ≈2.4 ns at the pre-#16 bias
+   point). By the time `cmpl_out` registers `vc` crossing `V_L` and the
+   latch turns `MDISCH` back off, `vc` has already been pulled to ≈0 V —
+   well past the intended `V_L = 1/3·VDD` stopping point. This means the
+   *next* charge phase must traverse the **full `0 V → V_H` range**, not
+   the `V_L → V_H` partial swing the `ln 3` hand estimate's charge-time
+   term implicitly assumes is being avoided by design.
+2. **Comparator + latch propagation delay is a fixed-ish per-cycle
+   overhead the closed form does not budget**, and it is large relative
+   to the target period: at the pre-#16 bias point, `XCMPH`'s measured
+   delay (vc crossing `V_H` to `cmph_out` crossing mid-rail) was ≈4.1 ns
+   and the latch's own set/reset delay another ≈0.3–0.5 ns per edge —
+   several nanoseconds added to *every* half-cycle against a 20.8 ns
+   target period at 48.000 MHz. Because this overhead is roughly
+   independent of the trim resistance while the RC charge term scales
+   with it, the overhead dominates the period at every code, compressing
+   the realized frequency range and the trim-bank ratio well below what
+   the `R_max/R_min = 2.3333` sizing intended.
+3. **Increasing bias current alone cannot restore the intended `V_L`-bounded
+   discharge floor** — confirmed by direct simulation: even at the ~8×
+   higher comparator tail current this issue ultimately adopts (see
+   "Re-sizing methodology" below), `vc` still discharges to ≈0 V every cycle,
+   because `MDISCH`'s own RC time constant is orders of magnitude faster
+   than any propagation delay reachable at a practical bias current. The
+   correct fix is therefore **not** "make the comparator instantaneous"
+   but to re-derive the trim-bank's R sizing treating the realized
+   sawtooth as a `0 V → V_H` charge (not `V_L → V_H`) plus whatever
+   residual delay simulation shows, using the *simulated* charge-time
+   relationship rather than the `ln 3` closed form.
+
+### Re-sizing methodology and result (issue #16)
+
+Two changes, both simulation-derived rather than formula-derived:
+
+- **`rcosc_bias.sch`'s `RBIAS`: `L = 200 µm → 25 µm`** (~8× higher
+  comparator tail current — see "Bias generator" above). This does not
+  restore the `V_L`-bounded discharge (point 3 above), but it does reduce
+  the fixed comparator+latch delay overhead (point 2), which matters at
+  the fast (small-R) end of the trim range where that overhead would
+  otherwise be a large fraction of the period.
+- **`rcosc_trim_bank.sch`'s `RFIX`/`R0..R7`: re-derived from simulated
+  transient data**, not `f ≈ 1/(R·C·ln 3)`. Method: hold `C_TIMING`
+  and the new `RBIAS` fixed, sweep `RFIX` alone (all other trim bits at
+  `0xFF`, i.e. shorted) across several decades, and directly measure the
+  realized free-running frequency at the reference corner (`tt`, 27 °C,
+  3.3 V) for each swept value using the same skip-5-startup-edges /
+  average-20-cycles methodology `sim/pvt/pvt_sweep.py` uses. Four real
+  (not extrapolated-only) data points were measured this way (`R`, steady-state `f`):
+  `8.6 kΩ → 83.5 MHz`, `32.4 kΩ → 65.5 MHz`, `56.4 kΩ → 50.1 MHz`,
+  `90.0 kΩ → 33.6 MHz` — a quadratic fit through these (period vs. `R`,
+  residuals < 0.1 ns) was then solved for the `R` values whose *simulated*
+  (not `ln 3`-predicted) frequency lands near the ratified endpoints,
+  rounding to:
 
 ```
-C_TIMING = 200 fF (cap_mim_1f0fF, W=20u L=10u -> area = 200 um^2)
+C_TIMING = 200 fF (cap_mim_1f0fF, W=20u L=10u -> area = 200 um^2, UNCHANGED by issue #16)
 
-R_min (code 0xFF) = RFIX                = 67.73 kOhm  -> f = 1/(R*C*ln3) = 67.2 MHz
-R_max (code 0x00) = RFIX + 255*R_unit   = 158.00 kOhm  -> f = 1/(R*C*ln3) = 28.8 MHz
+R_min (code 0xFF) = RFIX                = 8.599 kOhm  (simulated f = 83.5 MHz, real data point)
+R_max (code 0x00) = RFIX + 255*R_unit   = 104.0 kOhm  (simulated f ~= 29-34 MHz range, quadratic-fit target;
+                                                         nearest real data point: 90.0 kOhm -> 33.6 MHz)
 
-R_max / R_min = 158.00 / 67.73 = 2.3333 = 67.2 MHz / 28.8 MHz  (matches by construction)
-
-R_unit = (R_max - R_min) / 255 = 354.0 Ohm
-R_i = R_unit * 2^i  for i = 0..7  (354.0, 708.0, ..., 45312.0 Ohm)
+R_unit = (R_max - R_min) / 255 = 374.12 Ohm
+R_i = R_unit * 2^i  for i = 0..7  (374.12, 748.24, ..., 47887.56 Ohm)
 ```
 
 All resistors use `ppolyf_u_1k` (1000 Ω/sq typ, gf180mcu §6.1A) at
 `W = 2 µm`; segment lengths are solved from `R = Rsheet · L/W`:
-`RFIX: L = 135.46 µm`, `R0..R7: L = 0.708, 1.416, 2.832, 5.664, 11.328,
-22.656, 45.312, 90.624 µm`.
+`RFIX: L = 17.198 µm`, `R0..R7: L = 0.7482, 1.4965, 2.9930, 5.9859,
+11.9719, 23.9438, 47.8876, 95.7751 µm`.
 
 **What this sizing does and does not claim:**
 
-- The trim bank's **endpoint ratio** (`R_max/R_min = 2.3333`) is sized to
-  match the ratified frequency-range ratio exactly, so the schematic-level
-  claim ("this bank can realize 28.8–67.2 MHz across 256 codes") holds by
-  construction of the `f ≈ 1/(R·C·ln 3)` model.
-- **Code ↔ frequency linearity within that range is NOT claimed or
-  verified.** `f(code)` is linear in `1/R(code)`, and `R(code)` is a
-  piecewise-linear (binary-weighted-segment) function of code, not `f`
-  itself — DR-0002/0003's "linear mapping" language describes the *trim
-  word design intent* (256 codes, ~0.31%/code average step), not a
-  per-code DNL guarantee this schematic has verified. Trim linearity/DNL
-  characterization is corner-sim-phase work.
-- The measured smoke-test frequency at code `0x80` (≈20.2 MHz, see above)
-  does not match the ≈40.4 MHz the `ln 3` hand estimate predicts at that
-  code — flagged, not resolved, in this issue (see "Running the smoke
-  test").
-- Several LSB-side segment lengths (`R0`: 0.708 µm, `R1`: 1.416 µm) are
+- **`R_min` (code `0xFF`) is a directly-measured data point**, not an
+  extrapolation: `RFIX = 8.599 kΩ` was one of the four real transient
+  measurements above, giving 83.5 MHz — comfortably above the 67.2 MHz
+  ratified upper trim-range endpoint.
+- **`R_max` (code `0x00`) is a modest extrapolation** (~15% beyond the
+  farthest real data point, 90.0 kΩ → 33.6 MHz) from a well-conditioned
+  quadratic fit (max residual < 0.1 ns across four real points spanning
+  8.6–90.0 kΩ) targeting the ratified 28.8 MHz lower endpoint. This is a
+  materially smaller extrapolation than an earlier iteration of this same
+  sizing attempt made (which assumed the pre-#16-schematic's naive `ln 3`-style
+  R-vs-frequency curvature and was off by ~74% when checked against real
+  simulation) — flagged explicitly because trusting curve-fit extrapolation
+  *without* real data points bracketing the target was the specific mistake
+  this issue's own process caught and corrected.
+- **This sizing is not claimed to hit the ratified endpoints exactly** —
+  see "Full PVT-corner re-verification" below for what the campaign
+  against this sizing actually shows row-by-row against the ratified
+  target-spec table. Re-deriving from simulated (not `ln 3`) behavior is
+  what issue #16 commits to; whether the result meets every ratified row
+  is reported there, not asserted here.
+- **Code ↔ frequency linearity within the range is still NOT claimed or
+  verified** — same caveat as the pre-#16 sizing; DR-0002/0003's "linear
+  mapping" language describes trim word design intent, not a per-code DNL
+  guarantee.
+- Several LSB-side segment lengths (`R0`: 0.7482 µm, `R1`: 1.4965 µm) are
   short enough that they may not pass this PDK's resistor minimum-length
   DRC rule — **not checked**, DRC is explicitly out of scope for this
-  issue (see Non-goals below). A later increment may need to widen these
-  segments (e.g. drop `W` for the LSBs, or restructure the LSB end of the
-  ladder) once DRC becomes in scope.
-- The comparator's offset budget, the discharge switch's on-resistance,
-  and the trim-DAC element mismatch/INL row DR-0002/0003 carries as a
-  flagged assumption are **not** sized or verified against this specific
+  issue (see Non-goals below), same flagged gap as the pre-#16 sizing.
+- The comparator's offset budget, the discharge switch's on-resistance
+  (beyond the qualitative root-cause role identified above), and the
+  trim-DAC element mismatch/INL row DR-0002/0003 carries as a flagged
+  assumption are **not** sized or verified against this specific
   transistor-level implementation here.
+- Increasing `RBIAS`'s current raises this block's quiescent current draw
+  (Row 4 of the ratified spec, `< 500 µA`) — **not re-verified against
+  that row by this issue**; flagged as a follow-up check, not a silent
+  regression claim either way.
 
-## Non-goals (this issue)
+### Full PVT-corner re-verification — in progress, tracked separately
 
-Per the issue's acceptance criteria and CLAUDE.md's evidence discipline:
+This issue's acceptance criteria call for re-running the same full
+process×temperature×supply campaign methodology issue #12 used
+(`sim/pvt/run-pvt-sweep.sh`) against this re-sized schematic, as a new,
+dated evidence directory under `sim/pvt/results/` (append-only — the
+issue #12 evidence directory, `20260905T211140Z`, is never overwritten).
 
-- **No PVT-corner claim.** Every number above is either a ratified spec
-  target (cited to DR-0002/DR-0003) or a first-order hand estimate/smoke
-  test at nominal, room-temperature, typical-corner conditions only.
+That campaign was started against this resize (`sim/pvt/pvt_sweep.py`'s
+`TSTOP_NS_DEFAULT`/`TSTOP_NS_RETRY` were lowered from 4000 ns/12000 ns to
+1200 ns/4000 ns first — the pre-#16 schematic free-ran at ~20 MHz, so
+4000 ns gave ample margin for the 25-edge measurement window, but the
+re-sized schematic free-runs several times faster, so the old window
+simulated far more oscillation cycles than the measurement needs, at a
+real wall-clock cost with no accuracy benefit). It did **not** complete
+within this issue: the shared build host was under sustained, heavy
+multi-tenant simulation load for the duration of this issue's work (other
+concurrent design sessions' PVT/eye-diagram sweeps observed via `ps`/`top`
+throughout), which by itself (independent of this schematic's own
+resimulation cost) pushed single-corner-point wall-clock times from the
+low single-digit minutes issue #12 saw to 5–20+ minutes per point even
+after the `TSTOP` reduction above — intractable for a ~200-point full
+factorial within this issue's session. This is a **follow-up issue**, not
+a decomposition of unfinished design work: the schematic resize itself,
+its root cause, and its reference-corner validation (this section and
+"Re-sizing methodology and result" above) are complete and are what this
+issue's PR closes out.
+
+## Non-goals
+
+Per the issue #6 acceptance criteria that first wrote this section, and
+CLAUDE.md's evidence discipline (updated by issue #12, which added a
+PVT-corner claim against the pre-#16 schematic — see `sim/README.md` and
+[DR-0005](../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md).
+Issue #16 re-derives the sizing with real reference-corner simulation
+evidence but did not complete a full PVT-corner re-campaign against it —
+see "Full PVT-corner re-verification" above):
+
 - **No DRC/LVS claim.** Device sizing (especially the LSB trim segments,
   see above) has not been checked against gf180mcu design rules.
 - **No offset/mismatch budget.** The comparator and trim-bank device
   sizing are first-pass placeholders; DR-0002/0003's flagged assumption
   rows (trim-DAC mismatch, comparator offset residual, supply drift) are
   not re-derived or confirmed against this specific circuit.
-- **No layout.** `layout/` remains untouched by this issue.
+- **No quiescent-current (Iq) re-verification.** Issue #16 raised
+  `RBIAS`'s current ~8×; DR-0003 Row 4's `< 500 µA` target is not
+  re-checked against this circuit by any issue to date.
+- **No layout.** `layout/` remains untouched to date.
 
-These are reserved for the follow-on increments tracked against the gap
-tracker (#5), consistent with the "Non-goals" section of this issue and the
-maturity ladder in the repo `README.md`.
+These are reserved for follow-on increments tracked against the gap
+tracker (#5), consistent with the maturity ladder in the repo `README.md`.

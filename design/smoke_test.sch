@@ -2,6 +2,11 @@ v {xschem version=3.4.7 file_version=1.2
 * rcosc smoke test (issue #6) -- functional/DC sanity check ONLY.
 * Drives trim code 0x80 (mid-scale) and VDD=3.3V; NOT a PVT-corner or
 * accuracy claim -- see design/README.md.
+*
+* tran window shortened 4000n -> 400n (issue #16): the re-sized schematic
+* free-runs several times faster than the original, so 4000n simulated
+* more periods than the rise=1/rise=2 measurement needs -- 400n keeps
+* >5x margin over the slowest expected code-0x80 period.
 }
 G {}
 K {}
@@ -85,7 +90,7 @@ C {code_shown.sym} 800 0 0 0 {name=s1 only_toplevel=false value="
 .control
 op
 print v(vdd) v(vc) v(vh) v(vl) v(ibias) v(clk)
-tran 200p 4000n
+tran 200p 400n
 meas tran t_first_rise when v(clk)=1.65 rise=1
 meas tran t_second_rise when v(clk)=1.65 rise=2
 print t_first_rise t_second_rise

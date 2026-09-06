@@ -1,23 +1,29 @@
 v {xschem version=3.4.7 file_version=1.2
 * rcosc_trim_bank -- 8-bit binary-weighted switched-resistor trim bank
-* (issue #6). Realizes DR-0003's ratified +/-40%% (28.8-67.2 MHz) trim
-* range in 256 monotonic codes. See design/README.md for the full sizing
-* derivation. p = top (charge-path side), m = bottom (RC integrator node
-* side), t0..t7 = trim bits (t7 = MSB, weight 128).
+* (issue #6, re-sized issue #16). Targets DR-0003's ratified +/-40%%
+* (28.8-67.2 MHz) trim range in 256 monotonic codes. p = top (charge-path
+* side), m = bottom (RC integrator node side), t0..t7 = trim bits (t7 =
+* MSB, weight 128).
+*
+* Sizing (issue #16): re-derived from SIMULATED transient charge-time
+* behavior at the reference corner (tt, 27 C, 3.3 V) against the resized
+* (higher-current) rcosc_bias.sch, not the original f ~= 1/(R*C*ln3) hand
+* estimate -- see design/README.md "Trim bank sizing" for the full
+* root-cause writeup and derivation.
 }
 G {}
 K {}
 V {}
 S {}
 E {}
-C {symbols/ppolyf_u_1k.sym} 0 0 0 0 {name=RFIX model=ppolyf_u_1k W=2u L=135.46u m=1}
+C {symbols/ppolyf_u_1k.sym} 0 0 0 0 {name=RFIX model=ppolyf_u_1k W=2u L=17.198u m=1}
 N 0 30 0 50 {}
 C {lab_pin.sym} 0 50 0 0 {name=l1 lab=p}
 N 0 -30 0 -50 {}
 C {lab_pin.sym} 0 -50 0 0 {name=l2 lab=c1}
 N -20 0 -40 0 {}
 C {lab_pin.sym} -40 0 0 0 {name=l3 lab=vss}
-C {symbols/ppolyf_u_1k.sym} 200 0 0 0 {name=R0 model=ppolyf_u_1k W=2u L=0.708u m=1}
+C {symbols/ppolyf_u_1k.sym} 200 0 0 0 {name=R0 model=ppolyf_u_1k W=2u L=0.7482u m=1}
 N 200 30 200 50 {}
 C {lab_pin.sym} 200 50 0 0 {name=l4 lab=c1}
 N 200 -30 200 -50 {}
@@ -33,7 +39,7 @@ N 220 -270 220 -250 {}
 C {lab_pin.sym} 220 -250 0 0 {name=l9 lab=c2}
 N 220 -300 240 -300 {}
 C {lab_pin.sym} 240 -300 0 0 {name=l10 lab=vss}
-C {symbols/ppolyf_u_1k.sym} 400 0 0 0 {name=R1 model=ppolyf_u_1k W=2u L=1.416u m=1}
+C {symbols/ppolyf_u_1k.sym} 400 0 0 0 {name=R1 model=ppolyf_u_1k W=2u L=1.4965u m=1}
 N 400 30 400 50 {}
 C {lab_pin.sym} 400 50 0 0 {name=l11 lab=c2}
 N 400 -30 400 -50 {}
@@ -49,7 +55,7 @@ N 420 -270 420 -250 {}
 C {lab_pin.sym} 420 -250 0 0 {name=l16 lab=c3}
 N 420 -300 440 -300 {}
 C {lab_pin.sym} 440 -300 0 0 {name=l17 lab=vss}
-C {symbols/ppolyf_u_1k.sym} 600 0 0 0 {name=R2 model=ppolyf_u_1k W=2u L=2.832u m=1}
+C {symbols/ppolyf_u_1k.sym} 600 0 0 0 {name=R2 model=ppolyf_u_1k W=2u L=2.9930u m=1}
 N 600 30 600 50 {}
 C {lab_pin.sym} 600 50 0 0 {name=l18 lab=c3}
 N 600 -30 600 -50 {}
@@ -65,7 +71,7 @@ N 620 -270 620 -250 {}
 C {lab_pin.sym} 620 -250 0 0 {name=l23 lab=c4}
 N 620 -300 640 -300 {}
 C {lab_pin.sym} 640 -300 0 0 {name=l24 lab=vss}
-C {symbols/ppolyf_u_1k.sym} 800 0 0 0 {name=R3 model=ppolyf_u_1k W=2u L=5.664u m=1}
+C {symbols/ppolyf_u_1k.sym} 800 0 0 0 {name=R3 model=ppolyf_u_1k W=2u L=5.9859u m=1}
 N 800 30 800 50 {}
 C {lab_pin.sym} 800 50 0 0 {name=l25 lab=c4}
 N 800 -30 800 -50 {}
@@ -81,7 +87,7 @@ N 820 -270 820 -250 {}
 C {lab_pin.sym} 820 -250 0 0 {name=l30 lab=c5}
 N 820 -300 840 -300 {}
 C {lab_pin.sym} 840 -300 0 0 {name=l31 lab=vss}
-C {symbols/ppolyf_u_1k.sym} 1000 0 0 0 {name=R4 model=ppolyf_u_1k W=2u L=11.328u m=1}
+C {symbols/ppolyf_u_1k.sym} 1000 0 0 0 {name=R4 model=ppolyf_u_1k W=2u L=11.9719u m=1}
 N 1000 30 1000 50 {}
 C {lab_pin.sym} 1000 50 0 0 {name=l32 lab=c5}
 N 1000 -30 1000 -50 {}
@@ -97,7 +103,7 @@ N 1020 -270 1020 -250 {}
 C {lab_pin.sym} 1020 -250 0 0 {name=l37 lab=c6}
 N 1020 -300 1040 -300 {}
 C {lab_pin.sym} 1040 -300 0 0 {name=l38 lab=vss}
-C {symbols/ppolyf_u_1k.sym} 1200 0 0 0 {name=R5 model=ppolyf_u_1k W=2u L=22.656u m=1}
+C {symbols/ppolyf_u_1k.sym} 1200 0 0 0 {name=R5 model=ppolyf_u_1k W=2u L=23.9438u m=1}
 N 1200 30 1200 50 {}
 C {lab_pin.sym} 1200 50 0 0 {name=l39 lab=c6}
 N 1200 -30 1200 -50 {}
@@ -113,7 +119,7 @@ N 1220 -270 1220 -250 {}
 C {lab_pin.sym} 1220 -250 0 0 {name=l44 lab=c7}
 N 1220 -300 1240 -300 {}
 C {lab_pin.sym} 1240 -300 0 0 {name=l45 lab=vss}
-C {symbols/ppolyf_u_1k.sym} 1400 0 0 0 {name=R6 model=ppolyf_u_1k W=2u L=45.312u m=1}
+C {symbols/ppolyf_u_1k.sym} 1400 0 0 0 {name=R6 model=ppolyf_u_1k W=2u L=47.8876u m=1}
 N 1400 30 1400 50 {}
 C {lab_pin.sym} 1400 50 0 0 {name=l46 lab=c7}
 N 1400 -30 1400 -50 {}
@@ -129,7 +135,7 @@ N 1420 -270 1420 -250 {}
 C {lab_pin.sym} 1420 -250 0 0 {name=l51 lab=c8}
 N 1420 -300 1440 -300 {}
 C {lab_pin.sym} 1440 -300 0 0 {name=l52 lab=vss}
-C {symbols/ppolyf_u_1k.sym} 1600 0 0 0 {name=R7 model=ppolyf_u_1k W=2u L=90.624u m=1}
+C {symbols/ppolyf_u_1k.sym} 1600 0 0 0 {name=R7 model=ppolyf_u_1k W=2u L=95.7751u m=1}
 N 1600 30 1600 50 {}
 C {lab_pin.sym} 1600 50 0 0 {name=l53 lab=c8}
 N 1600 -30 1600 -50 {}
