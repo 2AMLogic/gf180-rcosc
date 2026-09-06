@@ -30,6 +30,7 @@ every filename in this directory on `main`, including superseded records).
 | [0003](decision-records/0003-pdk-sourced-process-spread-tcr-and-iq.md) | PDK-sourced process spread, temperature drift, and Iq — superseding four rows of 0002 | Ratified |
 | [0004](decision-records/0004-no-active-tc-compensation-runtime-discipline.md) | No active temperature-coefficient compensation — rely on runtime discipline | Ratified |
 | [0005](decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md) | PVT campaign confirms a frequency/accuracy shortfall in the current schematic — ratified spec unchanged | Ratified (records evidence; supersedes nothing) |
+| [0006](decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md) | Post-#16-resize PVT campaign — trim range and post-trim accuracy still unmet, ratified spec unchanged | Ratified (records evidence; supersedes nothing) |
 
 A record is never deleted or rewritten once ratified — a later change
 supersedes it with a new record rather than editing history in place (same
