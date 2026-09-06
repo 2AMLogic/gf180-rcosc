@@ -7,13 +7,32 @@ v {xschem version=3.4.7 file_version=1.2
 * rail-to-rail 'out'. Device sizing is a first-pass placeholder (schematic-
 * phase only) -- offset and bandwidth are NOT budgeted or corner-simulated
 * in this issue; see design/README.md open items.
+*
+* MTAIL re-sized issue #22: W=4u nf=1 -> W=16u nf=8, i.e. the mirror ratio
+* against rcosc_bias.sch's W=2u MBIASD reference goes 2:1 -> 8:1. This is
+* one half of a joint re-derivation with RBIAS (L=25u -> L=1000u) that
+* brings quiescent current back under DR-0003 Row 4's ratified < 500 uA
+* target after issue #16's resize overshot it to 914.99 uA (DR-0007).
+*
+* Why raise the ratio while lowering the reference current: the block's
+* bias budget is ibias*(1 + 2*M) -- one reference branch plus two
+* comparator tails at M times ibias each -- so at any fixed total, a larger
+* M puts a larger share of that total into comparator tail current (where
+* it buys bandwidth) instead of into the reference leg (where it does not).
+* Simulated over a 2-D (RBIAS L) x (MTAIL W) grid; the gain saturates at
+* M ~ 8 (M = 16 and M = 32 land within 0.2% at equal Iq). See DR-0008.
+*
+* nf=8, not one 16u-wide finger: eight 2u fingers make the 8:1 ratio eight
+* copies of MBIASD's own W=2u unit geometry, which is the matched form for
+* a ratioed mirror. Simulated equivalent to the single-finger device to
+* within 0.6% -- the choice is a matching argument, not a speed one.
 }
 G {}
 K {}
 V {}
 S {}
 E {}
-C {symbols/nfet_03v3.sym} 0 0 0 0 {name=MTAIL model=nfet_03v3 W=4u L=1u nf=1 m=1}
+C {symbols/nfet_03v3.sym} 0 0 0 0 {name=MTAIL model=nfet_03v3 W=16u L=1u nf=8 m=1}
 N 20 -30 20 -50 {}
 C {lab_pin.sym} 20 -50 0 0 {name=l1 lab=tail}
 N -20 0 -40 0 {}

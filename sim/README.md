@@ -15,8 +15,13 @@ sim/
     corners/<runid>/      raw ngspice logs, one file per simulated operating point
     results/<runid>/      results.csv, manifest.json, summary.md for that run
   iq/
+    iq_sweep.py           the quiescent-current sweep driver (issue #22)
+    run-iq-sweep.sh       wrapper: regenerates netlists, then runs iq_sweep.py
+    corners/<runid>/      raw ngspice logs, one file per (sizing, trim code)
     results/<runid>/      README.md (measurement + verdict) for that quiescent-
-                           current check, plus a raw ngspice log excerpt
+                           current check, plus results.csv / manifest.json
+                           (the issue #20 run predates the driver and holds a
+                           hand-written README plus a raw log excerpt)
 ```
 
 `<runid>` is a UTC timestamp (`YYYYMMDDTHHMMSSZ`) assigned at invocation
@@ -93,8 +98,9 @@ for each campaign's overall disposition of those verdicts.
 |---|---|
 | [`20260905T211140Z`](pvt/results/20260905T211140Z/summary.md) | First full campaign against the DR-0004 (pre-#16) schematic (issue #12). 210 unique operating points, 0 failed measurements, 49.5 minutes wall clock at 16 parallel jobs (gf180mcuC, ngspice-46). See [DR-0005](../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md) for the resulting spec-compliance disposition. |
 | [`20260906T030219Z`](pvt/results/20260906T030219Z/summary.md) | Full campaign against the issue #16 re-sized schematic (issues #16/#18). 278 unique operating points, 0 failed measurements, 15.0 minutes wall clock at 14 parallel jobs (gf180mcuC, ngspice-46). See [DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md) for the resulting spec-compliance disposition. |
+| [`20260906T060104Z`](pvt/results/20260906T060104Z/summary.md) | Full campaign against the issue #22 bias re-balance (`RBIAS L = 1000 µm`, 8:1 tail mirror). 271 unique operating points, 0 failed measurements, 11.9 minutes wall clock at 14 parallel jobs (gf180mcuC, ngspice-46). Output frequency still **met** (max reachable 51.9415 MHz vs. the ratified 48.000 MHz); trim range still **not met** and its margin worse than DR-0006's (±32.42% vs. ±38.16%) — the price paid for the Iq fix. See [DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md). |
 
-## Quiescent current (Iq) check (issue #20)
+## Quiescent current (Iq) check (issues #20, #22)
 
 `design/smoke_test.sch`'s existing `.op` analysis was extended to compute
 the total DC current drawn from `vdd` (`i(vdd)`, which by KCL sums every
@@ -105,8 +111,39 @@ tail-current increase. This is a single representative-corner point check,
 not a PVT factorial — a full corner sweep for Iq is a possible future
 increment, not part of this check's scope.
 
+**Two metrics, always reported together** (issue #22,
+[DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md)):
+
+- **`iq_op`** — the `.op` figure above, which issue #20 introduced and
+  DR-0007 quoted. A relaxation oscillator has no stable DC operating point,
+  so that solve converges on the unstable equilibrium, which pins the
+  charge-complete comparator `XCMPH` at its own output inverter's trip
+  point — holding that buffer, and the SR-latch NOR gate its mid-rail
+  output drives, in full crowbar conduction, a state the running circuit
+  passes through but never rests in. Every raw log under
+  `iq/corners/<runid>/` prints those `.op` node voltages so the claim is
+  checkable, not merely asserted. At the pre-#22 sizing this figure
+  overstates the running one by 1.8x and is all but code-independent. Kept
+  unchanged for continuity with DR-0007.
+- **`iq_run`** — `-i(vdd)` averaged over 20 whole oscillation periods
+  (rising edges 5..25 of `clk`, startup skipped, the same window convention
+  `pvt_sweep.py` uses). This is the quantity DR-0003 Row 4 names —
+  `< 500 µA` **(running)**, anchored to ST `DS9826`'s `IDDA(HSI48)`, a
+  datasheet supply current for an oscillator that is oscillating.
+
+Neither may be quoted without the other. `sim/iq/run-iq-sweep.sh` measures
+both, across trim codes, for **both** the as-committed sizing and the
+pre-#22 sizing it replaced, so the before/after comparison is produced by
+one command from one netlist under one ngspice:
+
+```bash
+sim/iq/run-iq-sweep.sh                                 # codes 0x00 0x80 0xFF
+sim/iq/run-iq-sweep.sh --codes 0x00 0x40 0x80 0xC0 0xFF --jobs 8
+```
+
 ### Committed runs (Iq check)
 
 | Run id | Notes |
 |---|---|
-| [`20260906T032927Z`](iq/results/20260906T032927Z/README.md) | First post-#16 Iq measurement (issue #20). Reference corner, code `0x80`: **914.99 µA measured vs. `< 500 µA` ratified — FAIL, 1.83x over.** Independent hand-estimate sanity check corroborates the figure. See [DR-0007](../spec/decision-records/0007-quiescent-current-exceeds-target-post-resize.md) for the resulting disposition (spec unchanged, follow-up issue #22 filed). |
+| [`20260906T032927Z`](iq/results/20260906T032927Z/README.md) | First post-#16 Iq measurement (issue #20). Reference corner, code `0x80`: **914.99 µA measured vs. `< 500 µA` ratified — FAIL, 1.83x over.** Independent hand-estimate sanity check corroborates the figure. See [DR-0007](../spec/decision-records/0007-quiescent-current-exceeds-target-post-resize.md) for the resulting disposition (spec unchanged, follow-up issue #22 filed). Predates `iq_sweep.py`; `.op` metric only. |
+| [`20260906T062311Z`](iq/results/20260906T062311Z/README.md) | Post-#22 bias re-balance (issue #22), first run of `iq_sweep.py`. Reference corner, codes `0x00`/`0x80`/`0xFF`, both sizings, both metrics. **PASS on both metrics at every code**: as-committed `iq_op` 467.13–467.18 µA and `iq_run` 136.45–218.54 µA, vs. pre-#22 `iq_op` 914.40–914.99 µA and `iq_run` 470.40–605.50 µA. The `pre-22` variant reproduces DR-0007's 914.99 µA and DR-0006's trim-curve frequencies exactly, cross-validating the driver. See [DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md). |

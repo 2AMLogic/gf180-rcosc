@@ -18,6 +18,24 @@ v {xschem version=3.4.7 file_version=1.2
 * RBIAS re-sized issue #16: L=200u -> L=25u (~8x higher tail-current
 * reference) to shrink comparator propagation delay -- see
 * design/README.md "Trim bank sizing" / root cause writeup.
+*
+* RBIAS re-balanced issue #22: L=25u -> L=1000u, jointly with a 2:1 -> 8:1
+* tail-mirror ratio in rcosc_comparator.sch (MTAIL W=4u nf=1 -> W=16u nf=8).
+* Issue #16's resize pushed quiescent current to 914.99 uA, 1.83x DR-0003
+* Row 4's ratified < 500 uA target (DR-0007). The two knobs are re-derived
+* TOGETHER, from a simulated 2-D sizing grid over (RBIAS L) x (MTAIL W) at
+* the reference corner -- not from a hand-estimated closed form: for any
+* fixed total supply current, raising the mirror ratio spends less of that
+* budget on the reference branch itself (total ~= ibias*(1 + 2*M) for M the
+* mirror ratio and two comparator instances) and more on comparator tail
+* current, so it buys back comparator bandwidth at constant Iq. The grid
+* shows that gain saturating at M ~ 8: M = 16 and M = 32 were also simulated
+* and are within 0.2% of M = 8 at equal Iq, so 8:1 is the knee, not an
+* arbitrary pick. See sim/iq/results/ and DR-0008 for the full grid.
+*
+* MBIASD stays W=2u nf=1 and is the mirror's unit device: MTAIL's W=16u is
+* drawn as nf=8 fingers of 2u each so the 8:1 ratio is realized as eight
+* copies of the reference geometry rather than one 8x-wider device.
 }
 G {}
 K {}
@@ -45,7 +63,7 @@ N 400 -30 400 -50 {}
 C {lab_pin.sym} 400 -50 0 0 {name=l8 lab=vss}
 N 380 0 360 0 {}
 C {lab_pin.sym} 360 0 0 0 {name=l9 lab=vss}
-C {symbols/ppolyf_u_1k.sym} 600 0 0 0 {name=RBIAS model=ppolyf_u_1k W=2u L=25u m=1}
+C {symbols/ppolyf_u_1k.sym} 600 0 0 0 {name=RBIAS model=ppolyf_u_1k W=2u L=1000u m=1}
 N 600 30 600 50 {}
 C {lab_pin.sym} 600 50 0 0 {name=l10 lab=vdd}
 N 600 -30 600 -50 {}
