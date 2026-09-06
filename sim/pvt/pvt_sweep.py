@@ -118,8 +118,17 @@ MIDSCALE_CODE = 0x80
 MEAS_FIRST_EDGE = 5
 MEAS_LAST_EDGE = 25
 TSTEP = "200p"
-TSTOP_NS_DEFAULT = 4000
-TSTOP_NS_RETRY = 12000  # used once, if the default window is too short
+# TSTOP_NS_DEFAULT was 4000 for the DR-0004 schematic (~20 MHz free-running,
+# so 4000ns gave ~80 periods of margin for a 25-edge measurement). Issue #16's
+# re-sized schematic free-runs several times faster (tens of MHz), so the old
+# 4000ns window now simulates far more oscillation cycles than the 25-edge
+# measurement needs -- unnecessarily expensive without adding accuracy.
+# Lowered to keep >=25 edges comfortably reachable at the slowest expected
+# corner/code while cutting simulated-cycle count (and wall-clock cost) at
+# the fast end. TSTOP_NS_RETRY is scaled down to match, still a >3x margin
+# over TSTOP_NS_DEFAULT for the rare slow-corner point that needs it.
+TSTOP_NS_DEFAULT = 1200
+TSTOP_NS_RETRY = 4000  # used once, if the default window is too short
 
 
 @dataclass(frozen=True)
