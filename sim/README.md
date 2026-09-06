@@ -60,26 +60,33 @@ post-trim passes are reported together, and the full-temperature-range
 figure is always reported alongside the calibration-point figure, never
 alone** — per the acceptance criteria for issue #12.
 
-**Why a surrogate calibration target exists**: the current schematic
-(`design/rcosc_top.sch`, unchanged since DR-0004) does not reach anywhere
-close to the ratified 48.000 MHz target at any simulated corner — see
+**Why a surrogate calibration target exists**: the pre-#16 schematic
+(unchanged since DR-0004) did not reach anywhere close to the ratified
+48.000 MHz target at any simulated corner — see
 [`spec/decision-records/0005`](../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md)
 for the full evidence and disposition. Calibrating against the unreachable
-ratified target saturates every corner's trim code at `0xFF`, which would
-make every "post-trim" pass degenerate into the pre-trim spread. The
+ratified target saturated every corner's trim code at `0xFF`, which would
+have made every "post-trim" pass degenerate into the pre-trim spread. The
 surrogate target (the reference corner's own realized frequency at the
 mid-scale code) is simulated *in addition to* the ratified-target pass so
 the single-point trim methodology can still be exercised meaningfully; both
-are reported, and neither silently substitutes for the other.
+are reported, and neither silently substitutes for the other. Issue
+#16's resize (see [`spec/decision-records/0006`](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md))
+makes the ratified target reachable at almost every corner without
+saturation, but both methodologies continue to be run and reported for
+every campaign, since the surrogate methodology is what isolates the
+post-trim residual once saturation is no longer the dominant effect.
 
 Every committed run's `results/<runid>/summary.md` states, for each
 ratified spec row, the simulated value and an explicit met/exceeds verdict
 against `README.md`'s target-spec table — see
 [DR-0005](../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md)
-for the campaign's overall disposition of those verdicts.
+and [DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md)
+for each campaign's overall disposition of those verdicts.
 
 ## Committed runs
 
 | Run id | Notes |
 |---|---|
-| [`20260905T211140Z`](pvt/results/20260905T211140Z/summary.md) | First full campaign against the DR-0004 schematic (issue #12). 210 unique operating points, 0 failed measurements, 49.5 minutes wall clock at 16 parallel jobs (gf180mcuC, ngspice-46). See [DR-0005](../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md) for the resulting spec-compliance disposition. |
+| [`20260905T211140Z`](pvt/results/20260905T211140Z/summary.md) | First full campaign against the DR-0004 (pre-#16) schematic (issue #12). 210 unique operating points, 0 failed measurements, 49.5 minutes wall clock at 16 parallel jobs (gf180mcuC, ngspice-46). See [DR-0005](../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md) for the resulting spec-compliance disposition. |
+| [`20260906T030219Z`](pvt/results/20260906T030219Z/summary.md) | Full campaign against the issue #16 re-sized schematic (issues #16/#18). 278 unique operating points, 0 failed measurements, 15.0 minutes wall clock at 14 parallel jobs (gf180mcuC, ngspice-46). See [DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md) for the resulting spec-compliance disposition. |

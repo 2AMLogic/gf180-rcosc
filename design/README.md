@@ -306,42 +306,54 @@ All resistors use `ppolyf_u_1k` (1000 Ω/sq typ, gf180mcu §6.1A) at
   that row by this issue**; flagged as a follow-up check, not a silent
   regression claim either way.
 
-### Full PVT-corner re-verification — in progress, tracked separately
+### Full PVT-corner re-verification (issues #16 / #18)
 
-This issue's acceptance criteria call for re-running the same full
-process×temperature×supply campaign methodology issue #12 used
-(`sim/pvt/run-pvt-sweep.sh`) against this re-sized schematic, as a new,
-dated evidence directory under `sim/pvt/results/` (append-only — the
-issue #12 evidence directory, `20260905T211140Z`, is never overwritten).
+The full process×temperature×supply campaign methodology issue #12 used
+(`sim/pvt/run-pvt-sweep.sh`) has been re-run against this re-sized
+schematic (git sha `af1cf30c`, unchanged by this campaign), recorded as a
+new, dated evidence directory:
+`sim/pvt/results/20260906T030219Z/{results.csv,manifest.json,summary.md}`,
+raw logs under `sim/pvt/corners/20260906T030219Z/` — append-only, the
+issue #12 evidence directory (`20260905T211140Z`) is untouched. 278
+unique operating points, 0 failed measurements, 15.0 minutes wall clock
+at 14 parallel jobs (the shared-host contention that blocked this
+campaign within issue #16's own session, per the prior revision of this
+section, had cleared by the time issue #18 ran it).
 
-That campaign was started against this resize (`sim/pvt/pvt_sweep.py`'s
-`TSTOP_NS_DEFAULT`/`TSTOP_NS_RETRY` were lowered from 4000 ns/12000 ns to
-1200 ns/4000 ns first — the pre-#16 schematic free-ran at ~20 MHz, so
-4000 ns gave ample margin for the 25-edge measurement window, but the
-re-sized schematic free-runs several times faster, so the old window
-simulated far more oscillation cycles than the measurement needs, at a
-real wall-clock cost with no accuracy benefit). It did **not** complete
-within this issue: the shared build host was under sustained, heavy
-multi-tenant simulation load for the duration of this issue's work (other
-concurrent design sessions' PVT/eye-diagram sweeps observed via `ps`/`top`
-throughout), which by itself (independent of this schematic's own
-resimulation cost) pushed single-corner-point wall-clock times from the
-low single-digit minutes issue #12 saw to 5–20+ minutes per point even
-after the `TSTOP` reduction above — intractable for a ~200-point full
-factorial within this issue's session. This is a **follow-up issue**, not
-a decomposition of unfinished design work: the schematic resize itself,
-its root cause, and its reference-corner validation (this section and
-"Re-sizing methodology and result" above) are complete and are what this
-issue's PR closes out.
+Disposition, in full, is [DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md).
+Summary:
+
+| Spec row | Ratified | Simulated | Verdict |
+|---|---|---|---|
+| Free-running, untrimmed, process spread | ±35% (−27.7%/+47.6% exact) | −28.73% / +46.53% | met |
+| Output frequency | 48.000 MHz | reachable, 29.5–65.9 MHz range at the reference corner | met |
+| Trim range | ±40% (28.8–67.2 MHz) | ±38.16% (29.5072–65.9204 MHz) | **not met** (close: 96% of the intended endpoint ratio) |
+| Post-trim, at calibration point | ±1.1% | −34.83%/+53.97% (global code) or −16.28%/+15.24% (per-corner code) | **exceeds**, both methodologies |
+| Post-trim, full temperature range | +8%/−9% | −42.43%/+62.77% (global code) or −25.74%/+21.18% (per-corner code) | **exceeds**, both methodologies |
+
+The trim bank is no longer saturated against the ratified target at
+almost every corner (unlike DR-0005's pre-resize finding, where every
+corner saturated at code `0xFF`), so the two "exceeds" rows above are
+**not** a saturation artifact this time: DR-0006 finds a comparable
+per-corner-calibrated residual to DR-0005's own (pre-resize, partially
+saturation-limited) figure, meaning the comparator/bias path's own
+temperature and supply sensitivity — not the timing resistor's TCR
+DR-0003's post-trim-accuracy derivation was based on — is the dominant
+remaining residual. See DR-0006's "Consequences" for the follow-up
+direction (comparator/bias-path PVT sensitivity, not further timing R/C
+retuning).
+
+The top-code non-monotonicity DR-0005 flagged (`0xF0` → `0xFF`, pre-resize)
+**does not reproduce** at the resized operating point — the realized trim
+curve is monotonically increasing end to end (see DR-0006).
 
 ## Non-goals
 
 Per the issue #6 acceptance criteria that first wrote this section, and
-CLAUDE.md's evidence discipline (updated by issue #12, which added a
-PVT-corner claim against the pre-#16 schematic — see `sim/README.md` and
-[DR-0005](../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md).
-Issue #16 re-derives the sizing with real reference-corner simulation
-evidence but did not complete a full PVT-corner re-campaign against it —
+CLAUDE.md's evidence discipline (updated by issue #12's PVT-corner
+campaign against the pre-#16 schematic, [DR-0005](../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md),
+and by issues #16/#18's post-resize campaign,
+[DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md) —
 see "Full PVT-corner re-verification" above):
 
 - **No DRC/LVS claim.** Device sizing (especially the LSB trim segments,
