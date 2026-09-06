@@ -130,7 +130,10 @@ current). This raises comparator bandwidth/slew and so reduces
 comparator propagation delay — one of the two root-cause mechanisms this
 issue's "Trim bank sizing" section identifies for the pre-#16 frequency
 shortfall. The threshold-divider resistors (`RBA`/`RBB`/`RBC`) are
-unchanged: only the current-reference leg is re-sized.
+unchanged: only the current-reference leg is re-sized. **This raised the
+block's quiescent current above the ratified `< 500 µA` target** —
+measured at 914.99 µA by issue #20, see
+[DR-0007](../spec/decision-records/0007-quiescent-current-exceeds-target-post-resize.md).
 
 Using the **same poly-resistor flavor** (`ppolyf_u_1k`, gf180mcu §6.1A) for
 the threshold divider as for the timing/trim resistor is a deliberate,
@@ -302,9 +305,14 @@ All resistors use `ppolyf_u_1k` (1000 Ω/sq typ, gf180mcu §6.1A) at
   assumption are **not** sized or verified against this specific
   transistor-level implementation here.
 - Increasing `RBIAS`'s current raises this block's quiescent current draw
-  (Row 4 of the ratified spec, `< 500 µA`) — **not re-verified against
-  that row by this issue**; flagged as a follow-up check, not a silent
-  regression claim either way.
+  (Row 4 of the ratified spec, `< 500 µA`) — **re-verified by issue #20**:
+  the total `vdd` current at the reference corner, code `0x80`, is
+  **914.99 µA, 1.83x the ratified target**. See
+  [DR-0007](../spec/decision-records/0007-quiescent-current-exceeds-target-post-resize.md)
+  and `sim/iq/results/20260906T032927Z/README.md` for the full measurement,
+  an independent hand-estimate sanity check, and disposition — the ratified
+  spec is unchanged; issue #22 tracks re-balancing the bias generator's
+  sizing.
 
 ### Full PVT-corner re-verification (issues #16 / #18)
 
@@ -362,9 +370,14 @@ see "Full PVT-corner re-verification" above):
   sizing are first-pass placeholders; DR-0002/0003's flagged assumption
   rows (trim-DAC mismatch, comparator offset residual, supply drift) are
   not re-derived or confirmed against this specific circuit.
-- **No quiescent-current (Iq) re-verification.** Issue #16 raised
-  `RBIAS`'s current ~8×; DR-0003 Row 4's `< 500 µA` target is not
-  re-checked against this circuit by any issue to date.
+- ~~No quiescent-current (Iq) re-verification.~~ **Resolved by issue #20**:
+  measured 914.99 µA at the reference corner (code `0x80`) against DR-0003
+  Row 4's `< 500 µA` target — **fails, 1.83x over**. See
+  [DR-0007](../spec/decision-records/0007-quiescent-current-exceeds-target-post-resize.md)
+  for the finding and disposition, and `sim/iq/results/20260906T032927Z/README.md`
+  for the full measurement. Re-balancing the bias generator's sizing to
+  close this gap without regressing issue #16's frequency/trim-range fix
+  is issue #22, not resolved here.
 - **No layout.** `layout/` remains untouched to date.
 
 These are reserved for follow-on increments tracked against the gap

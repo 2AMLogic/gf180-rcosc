@@ -90,6 +90,13 @@ C {code_shown.sym} 800 0 0 0 {name=s1 only_toplevel=false value="
 .control
 op
 print v(vdd) v(vc) v(vh) v(vl) v(ibias) v(clk)
+* Total DC current drawn from vdd at this .op point (issue #20): ngspice's
+* passive sign convention on an independent source reports current flowing
+* INTO its positive terminal, so i(vdd) is negative when the circuit is
+* actually drawing current from the supply -- negate it to report a
+* positive quiescent-current figure in microamps.
+let iq_ua = -1e6*i(vdd)
+print iq_ua
 tran 200p 400n
 meas tran t_first_rise when v(clk)=1.65 rise=1
 meas tran t_second_rise when v(clk)=1.65 rise=2

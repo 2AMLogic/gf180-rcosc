@@ -14,6 +14,9 @@ sim/
     run-pvt-sweep.sh      wrapper: regenerates netlists, then runs pvt_sweep.py
     corners/<runid>/      raw ngspice logs, one file per simulated operating point
     results/<runid>/      results.csv, manifest.json, summary.md for that run
+  iq/
+    results/<runid>/      README.md (measurement + verdict) for that quiescent-
+                           current check, plus a raw ngspice log excerpt
 ```
 
 `<runid>` is a UTC timestamp (`YYYYMMDDTHHMMSSZ`) assigned at invocation
@@ -84,9 +87,26 @@ against `README.md`'s target-spec table — see
 and [DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md)
 for each campaign's overall disposition of those verdicts.
 
-## Committed runs
+## Committed runs (PVT campaign)
 
 | Run id | Notes |
 |---|---|
 | [`20260905T211140Z`](pvt/results/20260905T211140Z/summary.md) | First full campaign against the DR-0004 (pre-#16) schematic (issue #12). 210 unique operating points, 0 failed measurements, 49.5 minutes wall clock at 16 parallel jobs (gf180mcuC, ngspice-46). See [DR-0005](../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md) for the resulting spec-compliance disposition. |
 | [`20260906T030219Z`](pvt/results/20260906T030219Z/summary.md) | Full campaign against the issue #16 re-sized schematic (issues #16/#18). 278 unique operating points, 0 failed measurements, 15.0 minutes wall clock at 14 parallel jobs (gf180mcuC, ngspice-46). See [DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md) for the resulting spec-compliance disposition. |
+
+## Quiescent current (Iq) check (issue #20)
+
+`design/smoke_test.sch`'s existing `.op` analysis was extended to compute
+the total DC current drawn from `vdd` (`i(vdd)`, which by KCL sums every
+branch hung off the supply) at the reference corner (`tt`/27 °C/3.3 V) and
+the smoke test's existing representative trim code (`0x80`), to re-verify
+DR-0003 Row 4's `< 500 µA` (running) target after issue #16's ~8x `RBIAS`
+tail-current increase. This is a single representative-corner point check,
+not a PVT factorial — a full corner sweep for Iq is a possible future
+increment, not part of this check's scope.
+
+### Committed runs (Iq check)
+
+| Run id | Notes |
+|---|---|
+| [`20260906T032927Z`](iq/results/20260906T032927Z/README.md) | First post-#16 Iq measurement (issue #20). Reference corner, code `0x80`: **914.99 µA measured vs. `< 500 µA` ratified — FAIL, 1.83x over.** Independent hand-estimate sanity check corroborates the figure. See [DR-0007](../spec/decision-records/0007-quiescent-current-exceeds-target-post-resize.md) for the resulting disposition (spec unchanged, follow-up issue #22 filed). |
