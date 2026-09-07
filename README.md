@@ -8,8 +8,10 @@ open-source xschem + ngspice flow.
 
 **Status: spec ratified.** The target spec (frequency, trim math, PVT
 accuracy budget) is ratified — see below and
-[`spec/`](spec/README.md). Nothing is designed yet; schematic entry and
-PVT-corner simulation are the next work items.
+[`spec/`](spec/README.md). Schematic capture, the full PVT-corner
+campaign, DRC-clean/LVS-matched layout, and a first post-layout (PEX)
+re-verification pass are all committed (see the maturity ladder below);
+a shuttle seat and measured silicon remain the next work items.
 
 **Built agent-native.** Every specification, decision record, testbench, and
 line of documentation here is produced by AI agents working from a ratified
@@ -87,7 +89,12 @@ supersede them.
 
 Maturity ladder: spec ratified → schematic simulated across PVT → layout
 DRC/LVS-clean → post-layout re-verification → shuttle seat → measured
-silicon. **Current position: spec ratified, pre-schematic.**
+silicon. **Current position: spec ratified, schematic simulated across
+PVT, layout DRC-clean/LVS-matched, post-layout (PEX) re-verification
+done — still pre-shuttle-seat, pre-silicon.** See
+[`design/README.md`](design/README.md), [`layout/README.md`](layout/README.md),
+and [`spec/decision-records/0010`](spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)
+for the evidence behind each stage.
 
 ## Repo layout
 
