@@ -99,6 +99,14 @@ layout/        GDS + DRC/LVS reports (klayout-tools driven)
 measurements/  silicon characterization (empty until tape-out)
 ```
 
+## Chipalooza
+
+[`docs/chipalooza/challenge-5-proposal.md`](docs/chipalooza/challenge-5-proposal.md)
+is this block's Chipalooza Challenge #5 proposal: block type, I/O list
+mapped to the slot budget, functional description, a spec table re-derived
+from `sim/` with every row's met/unmet verdict against the ratified spec,
+and a bench test plan.
+
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE).
