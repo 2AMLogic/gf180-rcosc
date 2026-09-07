@@ -65,13 +65,14 @@ current. The transient window went 4 µs → 400 ns in issue #16 (the re-sized
 schematic free-runs several times faster, so 4 µs simulated far more
 periods than the two-edge measurement needed) and 400 ns → 1200 ns in issue
 #22, to fit the 20-whole-period averaging window the running-current
-measurement needs. As of issue #22's last run (see "Bias generator" below
+measurement needs. As of issue #24's last run (see "Bias generator" below
 for the re-sizing itself):
 
 - `.op`: `vh = 2.200 V` (exactly 2/3 · VDD), `vl = 1.100 V` (exactly
   1/3 · VDD) — the ratiometric bias generator is producing sane,
-  non-degenerate threshold nodes.
-- Transient: `clk` **free-runs** — measured period ≈ 27.7 ns (≈ 36.1 MHz)
+  non-degenerate threshold nodes (the threshold divider is untouched by
+  every `RBIAS` re-size to date).
+- Transient: `clk` **free-runs** — measured period ≈ 25.5 ns (≈ 39.1 MHz)
   at code `0x80`, using the same first-two-rising-edges methodology as the
   original issue #6 measurement. This is **not** a steady-state accuracy
   figure (see the caveat issue #6 already carried forward, and "Trim bank
@@ -81,11 +82,16 @@ for the re-sizing itself):
   free-running oscillation and sane bias nodes), not a substitute for the
   reference-corner steady-state and PVT-corner results below.
 - Quiescent current, **both metrics, reported together** (issue #22,
-  [DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md)):
-  `iq_ua = 467.18 µA` (the `.op` figure issue #20 introduced) and
-  `iq_run_ua = 157.27 µA` (`-i(vdd)` averaged over 20 whole periods, rising
-  edges 5..25). Both are under DR-0003 Row 4's ratified `< 500 µA`
-  (running) target. Neither may be quoted without the other — see
+  [DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md);
+  metric-basis update issue #24,
+  [DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md)):
+  `iq_ua = 754.90 µA` (the `.op` figure issue #20 introduced — no longer
+  DR-0003 Row 4's verdict basis, see below) and `iq_run_ua = 387.09 µA`
+  (`-i(vdd)` averaged over 20 whole periods, rising edges 5..25 — **this
+  is** Row 4's basis). `iq_run` is under DR-0003 Row 4's ratified
+  `< 500 µA` (running) target at every simulated code; `iq_op` is not, and
+  as of DR-0009 that is expected rather than a failure. Both metrics are
+  still always measured and reported together — see
   [`sim/README.md`](../sim/README.md)'s "Quiescent current (Iq) check" for
   why the `.op` figure is **not** the quantity Row 4 names (a relaxation
   oscillator has no stable DC operating point, so that solve pins the
@@ -180,6 +186,44 @@ running, both at `0xFF`). The ratified 500 µA figure is unchanged; nothing
 was relaxed. The price paid is trim range — see "Full PVT-corner
 re-verification" below and
 [DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md).
+
+**`RBIAS` re-derived again, issue #24** (current sizing), against the
+**running** Iq metric specifically — DR-0008 itself found that `.op` is a
+DC-equilibrium artifact, not the quantity DR-0003 Row 4 names, but sized
+against `.op` anyway (the stricter reading) rather than change the metric
+basis inside the record that first identified the discrepancy, and
+deferred that change to this issue:
+
+| device | file | DR-0008 (post-#22) | **now (post-#24)** |
+|---|---|---|---|
+| `RBIAS` | `rcosc_bias.sch` | `W = 2 µm`, `L = 1000 µm` | `W = 2 µm`, **`L = 210 µm`** |
+| `MTAIL` (per comparator) | `rcosc_comparator.sch` | `W = 16 µm`, `nf = 8` (8:1) | **unchanged** |
+
+The mirror ratio was re-checked, not just left stale: `M = 4:1` and
+`M = 16:1` were each swept to their own `iq_run(0xFF) = 500 µA` boundary,
+and both land within about a percentage point of `M = 8:1`'s recovered
+trim range at matched margin — DR-0008's saturation finding at `M ≈ 8`
+holds under the running metric too, so `RBIAS` is the only device resized.
+A 1-D grid over `RBIAS L` at the unchanged `M = 8:1` finds the
+`iq_run(0xFF) = 500 µA` boundary between `L = 185 µm` (502.61 µA, exceeds)
+and `L = 190 µm` (495.58 µA, met, <1% margin); `L = 210 µm` is chosen with
+a DR-0008-comparable ~6.3% margin (468.61 µA at worst code `0xFF`).
+
+**Result** (reference corner, `sim/iq/results/20260907T090639Z/`): running
+Iq **218.54 µA → 468.61 µA at worst code `0xFF`** — still **met** against
+the ratified `< 500 µA` (running) target, DR-0003 Row 4's actual basis as
+of [DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md).
+This deliberately runs `.op` Iq back up (467.18 → 754.90 µA at code
+`0x80`) — expected, not a regression, since `.op` is no longer the
+verdict basis (DR-0008/DR-0009) and was never the quantity being
+targeted. Realized reference-corner trim range recovers from DR-0008's
+±32.42% to **±35.50%** — about 54% of the range DR-0008 traded away for
+Iq, still short of DR-0006's pre-#22 ±38.16% and of the ratified ±40%.
+See DR-0009 for the full grid, the PVT-corner campaign at this sizing, and
+a real, not-hidden regression it also found: the post-trim,
+full-temperature, per-corner-code residual widens to −19.41%/+27.85%
+(vs. DR-0008's −17.38%/+13.46%), traced to the `fs` process corner's own
+calibration code landing on its untrimmed reference code at this sizing.
 
 Using the **same poly-resistor flavor** (`ppolyf_u_1k`, gf180mcu §6.1A) for
 the threshold divider as for the timing/trim resistor is a deliberate,
@@ -434,10 +478,50 @@ not degraded: the `0xE0` → `0xF0` → `0xFF` region stays monotonic
 (48.5043 → 50.7721 → 51.9415 MHz) and the small LSB-region non-monotonicity
 is marginally smaller than DR-0006's (−0.09% vs. −0.11% at `0x10`).
 
-Issue #24 is filed to re-derive the sizing against the **running** Iq
-metric — which has 56% margin at the worst code, where the `.op` metric
-this sizing was constrained by has only 6.6% — and determine how much of
-the lost trim range is recoverable while still meeting Row 4 as worded.
+Issue #24 re-derives the sizing against the **running** Iq metric — which
+had 44% margin at the worst code at this point, where the `.op` metric
+this sizing was constrained by had only 6.6% — and determines how much of
+the lost trim range is recoverable while still meeting Row 4 as worded;
+see the next section for that campaign.
+
+### Full PVT-corner re-verification (issue #24 running-metric re-derivation)
+
+The same campaign was re-run again against the issue #24 sizing
+(`RBIAS L = 210 µm`, 8:1 tail mirror unchanged) and recorded as
+`sim/pvt/results/20260907T090653Z/`, raw logs under
+`sim/pvt/corners/20260907T090653Z/` — append-only; all three prior
+campaigns are untouched. 277 unique operating points, 206 recorded rows,
+0 failed measurements, 4.0 minutes wall clock at 8 parallel jobs.
+
+Disposition, in full, is [DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md).
+Against DR-0006 (post-#16) and DR-0008 (post-#22):
+
+| Spec row | Ratified | DR-0006 (post-#16) | DR-0008 (post-#22) | **now (post-#24)** |
+|---|---|---|---|---|
+| Quiescent current | `< 500 µA` (running) | 914.99 µA `.op` (only metric then measured) | 467.18 µA `.op` / 157.27 µA running — met both | 754.90 µA `.op` (not the verdict basis) / **468.61 µA running — met** |
+| Output frequency | 48.000 MHz | max reachable 65.9204 MHz | max reachable 51.9415 MHz | max reachable **58.9870 MHz** — met |
+| Trim range | ±40% (28.8–67.2 MHz) | ±38.16% | ±32.42% | **±35.50%** (28.0769–58.9870 MHz) — not met, narrower gap than DR-0008 |
+| Trim step | 0.314 %/code | 0.4839 %/code | 0.3763 %/code | **0.4317 %/code** — met |
+| Free-running untrimmed process spread | ±35% | −25.60% / +38.71% | −25.46% / +38.54% | **−26.34% / +42.68%** — within |
+| Post-trim, at calibration point (per-corner code) | ±1.1% | −11.38% / +10.56% | −10.18% / +10.30% | **−11.50% / +13.19%** — exceeds |
+| Post-trim, full temperature range (per-corner code) | +8% / −9% | −18.00% / +12.91% | −17.38% / +13.46% | **−19.41% / +27.85%** — exceeds, worse than both priors |
+
+**Row 4's verdict basis is now `iq_run`** (DR-0009), and Row 4 is met on
+that basis at every simulated code — the elevated `.op` figure (754.90 µA)
+is expected, not a regression, since `.op` was never the quantity being
+targeted (DR-0008 Finding 1). **Trim range recovers about 54% of what
+DR-0008 traded away** (±32.42% → ±35.50%; DR-0006's pre-#22 ±38.16% and
+the ratified ±40% both remain out of reach). **A real, not-hidden
+regression**: the post-trim, full-temperature, per-corner-code residual
+widens to −19.41%/+27.85%, worse than both DR-0006 and DR-0008 — traced to
+the `fs` process corner's own per-corner calibration code coinciding with
+its untrimmed reference code at this sizing, so its post-trim figure is
+effectively its (comparatively high, +1923 ppm/K) untrimmed temperature
+drift. The verdict ("exceeds") does not change — every post-trim row has
+been "exceeds" since DR-0005 — but the margin does, and DR-0009 records it
+rather than omitting it. The coarse (`0x10`-step) trim curve shows the
+same small LSB-region non-monotonicity dips prior campaigns flagged
+(e.g. `0x10`→`0x20`: −0.14%), not a new or worsened pattern.
 
 ## Non-goals
 
@@ -446,9 +530,11 @@ CLAUDE.md's evidence discipline (updated by issue #12's PVT-corner
 campaign against the pre-#16 schematic, [DR-0005](../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md),
 by issues #16/#18's post-resize campaign,
 [DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md),
-and by issue #22's bias re-balance,
-[DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md) —
-see the two "Full PVT-corner re-verification" sections above):
+by issue #22's bias re-balance,
+[DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md),
+and by issue #24's running-metric re-derivation,
+[DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md) —
+see the three "Full PVT-corner re-verification" sections above):
 
 - **No DRC/LVS claim.** Device sizing (especially the LSB trim segments,
   see above) has not been checked against gf180mcu design rules.
@@ -457,26 +543,28 @@ see the two "Full PVT-corner re-verification" sections above):
   rows (trim-DAC mismatch, comparator offset residual, supply drift) are
   not re-derived or confirmed against this specific circuit.
 - ~~No quiescent-current (Iq) re-verification.~~ **Resolved by issue #20,
-  then closed by issue #22.** Issue #20 measured 914.99 µA at the reference
-  corner (code `0x80`) against DR-0003 Row 4's `< 500 µA` target —
-  **failing, 1.83x over** ([DR-0007](../spec/decision-records/0007-quiescent-current-exceeds-target-post-resize.md),
+  re-balanced by issue #22, re-derived against its actual verdict metric by
+  issue #24.** Issue #20 measured 914.99 µA at the reference corner (code
+  `0x80`) against DR-0003 Row 4's `< 500 µA` target — **failing, 1.83x
+  over** ([DR-0007](../spec/decision-records/0007-quiescent-current-exceeds-target-post-resize.md),
   `sim/iq/results/20260906T032927Z/README.md`). Issue #22 re-balanced
-  `RBIAS` and the tail-mirror ratio jointly and brought it to **467.18 µA
-  (`.op`) / 157.27 µA (running) at code `0x80` — met on both metrics at
-  every simulated code** ([DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md),
-  `sim/iq/results/20260906T062311Z/README.md`). See "Bias generator" above
-  for the sizing and "Full PVT-corner re-verification (issue #22 …)" for
-  the trim-range cost.
+  `RBIAS` and the tail-mirror ratio jointly and brought it to 467.18 µA
+  (`.op`) / 157.27 µA (running) at code `0x80` ([DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md),
+  `sim/iq/results/20260906T062311Z/README.md`), sized against the
+  *stricter* `.op` reading rather than the running current DR-0003 Row 4
+  actually names. Issue #24 re-derived `RBIAS` again against `iq_run`
+  specifically, recovering trim range at the cost of letting `.op` run
+  back up (754.90 µA at code `0x80`, no longer the verdict basis) —
+  **met on `iq_run` at every simulated code** ([DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md),
+  `sim/iq/results/20260907T090639Z/README.md`). See "Bias generator" above
+  for the sizing and "Full PVT-corner re-verification (issue #24 …)" for
+  the recovered trim range and the residual-accuracy trade-off it cost.
 - **No PVT factorial for Iq.** Every Iq figure above is the single
-  reference corner (`tt`/27 °C/3.3 V), as DR-0007's was. The `.op` metric's
-  margin to the 500 µA target is only 6.6%, thin enough that a corner
-  campaign could plausibly move it; the running metric's 56% margin at the
-  worst code is not seriously in doubt. A corner sweep for Iq remains a
-  future increment (DR-0008 "Consequences").
-- **No re-derivation against the running Iq metric.** The issue #22 sizing
-  is constrained by the stricter `.op` metric, which costs trim range;
-  whether sizing against the running metric DR-0003 Row 4 actually names
-  recovers that range is **issue #24**, not resolved here.
+  reference corner (`tt`/27 °C/3.3 V), as DR-0007's was. The DR-0009
+  sizing's `iq_run` margin (~6.3% at the worst code) is comparable to
+  DR-0008's `.op` margin (~6.6%) that this same gap already applied to; a
+  corner sweep for Iq remains a future increment (DR-0008/DR-0009
+  "Consequences").
 - **No layout.** `layout/` remains untouched to date.
 
 These are reserved for follow-on increments tracked against the gap

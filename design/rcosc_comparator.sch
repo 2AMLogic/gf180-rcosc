@@ -26,6 +26,14 @@ v {xschem version=3.4.7 file_version=1.2
 * copies of MBIASD's own W=2u unit geometry, which is the matched form for
 * a ratioed mirror. Simulated equivalent to the single-finger device to
 * within 0.6% -- the choice is a matching argument, not a speed one.
+*
+* MTAIL left UNCHANGED issue #24 (rcosc_bias.sch's RBIAS moved instead,
+* L=1000u -> L=210u): DR-0009 re-checked M=8's saturation finding against
+* the running Iq metric (not just the .op metric DR-0008 used) by sweeping
+* M=4:1 and M=16:1 to their own matched-Iq boundaries too -- both land
+* within about a percentage point of M=8's recovered trim range, so the
+* ratio knob still has no further leverage at this current budget. See
+* DR-0009 for the grid.
 }
 G {}
 K {}
