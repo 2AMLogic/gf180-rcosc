@@ -1,0 +1,310 @@
+====================================================================
+gf180-rcosc post-layout PEX PVT run: extracted_tt_T+085C_V3p0_code0xC0
+side        : extracted
+run id      : 20260907T131703Z
+process     : tt (fets=typical res=res_typical mimcap=mimcap_typical)
+temperature : 85 C
+supply      : 3 V
+trim code   : 0xC0 (192)
+transient   : tran 200p 1200n, f = 20 periods / (t[rise=25] - t[rise=5])
+wall clock  : 12.6 s
+exit status : 0
+====================================================================
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: ** sch_path: /users/rwalters/github/gf180-rcosc/.loom/worktrees/issue-28/design/pvt_tb.sch
+
+Doing analysis at TEMP = 85.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+xxdut.\$15__t0                         1.19318
+xxdut.\$19__t1                         1.25537
+xxdut.vss__t0                      6.79045e-05
+xxdut.vsubs                           0.399694
+xxdut.\$17__t2                     1.67938e-06
+xxdut.\$22__t2                           2.935
+xxdut.vss__t12                     1.69685e-08
+xxdut.\$18__t3                         1.15544
+xxdut.\$15__t3                          1.1964
+xxdut.vss__t11                       0.0011556
+xxdut.\$18__t2                         1.15793
+xxdut.clk__t5                         0.490306
+xxdut.vss__t10                     1.92406e-05
+xxdut.clk__t4                         0.490306
+xxdut.\$17__t3                     1.67949e-06
+xxdut.vss__t9                      1.69482e-08
+xxdut.clk__t3                         0.490028
+xxdut.\$18__t4                         1.15796
+xxdut.vss__t8                       0.00112005
+xxdut.\$14__t6                        0.686848
+xxdut.\$13__t3                        0.892368
+xxdut.vss__t3                      8.49583e-05
+xxdut.vss__t25                     8.10167e-05
+xxdut.\$13__t4                        0.892368
+xxdut.\$14__t7                        0.686855
+xxdut.\$14__t5                        0.686863
+xxdut.\$13__t17                       0.892368
+xxdut.vss__t24                     7.70786e-05
+xxdut.vss__t18                     7.31403e-05
+xxdut.\$13__t16                       0.892368
+xxdut.\$14__t9                         0.68687
+xxdut.\$14__t4                        0.686877
+xxdut.\$13__t15                       0.892368
+xxdut.vss__t23                      6.9202e-05
+xxdut.vss__t17                     6.52635e-05
+xxdut.\$13__t14                       0.892368
+xxdut.\$14__t8                        0.686885
+xxdut.\$14__t2                        0.686883
+xxdut.\$13__t13                       0.892368
+xxdut.vss__t22                     6.13249e-05
+xxdut.vss__t4                      5.73887e-05
+xxdut.\$13__t5                        0.892368
+xxdut.\$14__t3                        0.686875
+xxdut.\$16__t9                        0.287623
+xxdut.\$13__t18                       0.892368
+xxdut.vss__t7                      6.69672e-05
+xxdut.vss__t16                     7.04378e-05
+xxdut.\$13__t12                       0.892368
+xxdut.\$16__t8                        0.287629
+xxdut.\$16__t5                        0.287635
+xxdut.\$13__t11                       0.892368
+xxdut.vss__t21                     7.39117e-05
+xxdut.vss__t15                     7.73856e-05
+xxdut.\$13__t10                       0.892368
+xxdut.\$16__t7                        0.287642
+xxdut.\$16__t4                        0.287648
+xxdut.\$13__t9                        0.892368
+xxdut.vss__t20                     8.08594e-05
+xxdut.vss__t14                     8.43332e-05
+xxdut.\$13__t8                        0.892368
+xxdut.\$16__t6                        0.287655
+xxdut.\$16__t3                        0.287653
+xxdut.\$13__t7                        0.892368
+xxdut.vss__t19                     8.78058e-05
+xxdut.vss__t6                      9.12821e-05
+xxdut.\$13__t6                        0.892368
+xxdut.\$16__t2                        0.287647
+xxdut.\$19__t0                         1.25336
+xxdut.\$12__t1                         1.86244
+xxdut.\$14__t0                         0.68705
+xxdut.\$20__t3                        0.911879
+xxdut.\$10__t1                          1.9992
+xxdut.\$14__t1                        0.687161
+xxdut.\$22__t3                         2.93472
+xxdut.\$11__t0                        0.999253
+xxdut.\$16__t1                         0.28768
+xxdut.\$23__t3                        0.492312
+xxdut.\$12__t5                         1.86244
+xxdut.\$16__t0                          0.2881
+xxdut.vss__t2                       0.00106516
+xxdut.\$13__t2                        0.892368
+xxdut.\$13__t1                        0.890501
+xxdut.\$2__t2                          2.86294
+xxdut.t0__t0                                 0
+xxdut.\$1__t2                          2.87008
+xxdut.\$3__t2                          2.85023
+xxdut.t1__t0                                 0
+xxdut.\$2__t3                          2.86294
+xxdut.\$4__t2                           2.8264
+xxdut.t2__t0                                 0
+xxdut.\$3__t3                          2.85023
+xxdut.\$5__t2                          2.78032
+xxdut.t3__t0                                 0
+xxdut.\$4__t3                           2.8264
+xxdut.\$6__t2                          2.68975
+xxdut.t4__t0                                 0
+xxdut.\$5__t3                          2.78032
+xxdut.\$7__t2                           2.5102
+xxdut.t5__t0                                 0
+xxdut.\$6__t3                          2.68975
+xxdut.\$8__t2                          2.15294
+xxdut.t6__t0                                 3
+xxdut.\$7__t3                           2.5102
+xxdut.\$12__t4                         1.86281
+xxdut.t7__t0                                 3
+xxdut.\$8__t3                           2.1527
+xxdut.\$12__t2                         1.86203
+xxdut.clk__t0                         0.490306
+xxdut.vss__t1                      0.000172902
+xxdut.\$20__t0                         0.91468
+xxdut.\$20__t1                        0.914368
+xxdut.vdd__t2                          2.99988
+xxdut.vdd__t3                                3
+xxdut.\$19__t3                         1.25629
+xxdut.\$20__t2                        0.914368
+xxdut.vdd__t19                         2.99981
+xxdut.vdd__t16                               3
+xxdut.\$15__t1                          1.1986
+xxdut.\$19__t2                         1.25537
+xxdut.vdd__t4                          2.99965
+xxdut.vdd__t5                                3
+xxdut.\$23__t2                        0.496844
+xxdut.\$23__t0                        0.496339
+xxdut.vdd__t18                         2.99867
+xxdut.vdd__t15                               3
+xxdut.\$22__t1                         2.93513
+xxdut.\$23__t1                        0.496339
+xxdut.vdd__t20                         2.99987
+xxdut.vdd__t17                               3
+xxdut.\$17__t0                     1.67954e-06
+xxdut.\$22__t0                           2.935
+xxdut.vdd__t14                               3
+xxdut.vdd__t11                               3
+xxdut.\$24__t1                         2.41131
+xxdut.\$15__t2                          1.1964
+xxdut.vdd__t13                         2.99829
+xxdut.vdd__t10                               3
+xxdut.\$18__t0                          1.1594
+xxdut.clk__t2                         0.490306
+xxdut.\$24__t0                         2.40986
+xxdut.vdd__t9                                3
+xxdut.\$25__t1                          2.8042
+xxdut.\$17__t1                     1.67949e-06
+xxdut.vdd__t12                         2.99849
+xxdut.vdd__t8                                3
+xxdut.clk__t1                         0.493616
+xxdut.\$18__t1                         1.15796
+xxdut.\$25__t0                           2.803
+xxdut.vdd__t7                                3
+xxdut.vss__t5                                0
+xxdut.\$12__t3                         1.86244
+xxdut.vdd__t0                          2.99837
+xxdut.x$48.11                          2.99777
+xxdut.x$48.21                          2.00139
+xxdut.\$10__t0                         2.00078
+xxdut.\$10__t2                         1.99839
+xxdut.x$49.11                          1.99779
+xxdut.x$49.21                          1.00141
+xxdut.\$11__t1                         1.00081
+xxdut.\$11__t2                        0.998527
+xxdut.x$50.11                         0.997921
+xxdut.x$50.21                       0.00154312
+xxdut.vss__t13                     0.000937381
+xxdut.vdd__t1                           2.9994
+xxdut.x$51.11                          2.99895
+xxdut.x$51.21                          2.87115
+xxdut.\$1__t0                           2.8707
+xxdut.\$1__t1                          2.86975
+xxdut.x$52.11                           2.8693
+xxdut.x$52.21                          2.86374
+xxdut.\$2__t0                          2.86329
+xxdut.\$2__t1                           2.8626
+xxdut.x$53.11                          2.86215
+xxdut.x$53.21                          2.85103
+xxdut.\$3__t0                          2.85057
+xxdut.\$3__t1                          2.84989
+xxdut.x$54.11                          2.84944
+xxdut.x$54.21                           2.8272
+xxdut.\$4__t0                          2.82674
+xxdut.\$4__t1                          2.82606
+xxdut.x$55.11                           2.8256
+xxdut.x$55.21                          2.78112
+xxdut.\$5__t0                          2.78067
+xxdut.\$5__t1                          2.77997
+xxdut.x$56.11                          2.77952
+xxdut.x$56.21                          2.69056
+xxdut.\$6__t0                          2.69011
+xxdut.\$6__t1                           2.6894
+xxdut.x$57.11                          2.68895
+xxdut.x$57.21                          2.51102
+xxdut.\$7__t0                          2.51056
+xxdut.\$7__t1                          2.50983
+xxdut.x$58.11                          2.50938
+xxdut.x$58.21                          2.15379
+xxdut.\$8__t0                          2.15333
+xxdut.\$8__t1                          2.15278
+xxdut.x$59.11                          2.15259
+xxdut.x$59.21                          1.86288
+xxdut.\$12__t0                          1.8627
+xxdut.vdd__t6                          2.99853
+xxdut.x$60.11                          2.99792
+xxdut.x$60.21                         0.895488
+xxdut.\$13__t0                        0.894879
+xxdut.\$1                              2.87008
+xxdut.\$10                              1.9992
+xxdut.\$11                            0.999253
+xxdut.\$12                             1.86244
+xxdut.\$13                            0.892368
+xxdut.\$14                            0.686887
+xxdut.\$15                              1.1964
+xxdut.\$16                            0.287657
+xxdut.\$17                         1.67949e-06
+xxdut.\$18                             1.15796
+xxdut.\$19                             1.25537
+xxdut.\$2                              2.86294
+xxdut.\$20                            0.914368
+xxdut.\$22                               2.935
+xxdut.\$23                            0.496339
+xxdut.\$24                             2.41059
+xxdut.\$25                              2.8036
+xxdut.\$3                              2.85023
+xxdut.\$4                               2.8264
+xxdut.\$5                              2.78032
+xxdut.\$6                              2.68975
+xxdut.\$7                               2.5102
+xxdut.\$8                              2.15294
+clk                                   0.490306
+t0                                           0
+t1                                           0
+t2                                           0
+t3                                           0
+t4                                           0
+t5                                           0
+t6                                           3
+t7                                           3
+vdd                                          3
+vt7#branch                         6.95985e-18
+vt6#branch                         1.38671e-17
+vt5#branch                                   0
+vt4#branch                                   0
+vt3#branch                                   0
+vt2#branch                                   0
+vt1#branch                                   0
+vt0#branch                                   0
+vdd#branch                        -0.000656822
+
+ Reference value :  0.00000e+00
+ Reference value :  5.02543e-08
+ Reference value :  1.01047e-07
+ Reference value :  1.49931e-07
+ Reference value :  1.95692e-07
+ Reference value :  2.43925e-07
+ Reference value :  2.96370e-07
+ Reference value :  3.48755e-07
+ Reference value :  3.99043e-07
+ Reference value :  4.47968e-07
+ Reference value :  5.00233e-07
+ Reference value :  5.49939e-07
+ Reference value :  5.99051e-07
+ Reference value :  6.49875e-07
+ Reference value :  6.97902e-07
+ Reference value :  7.48589e-07
+ Reference value :  7.99261e-07
+ Reference value :  8.49869e-07
+ Reference value :  9.02178e-07
+ Reference value :  9.50543e-07
+ Reference value :  1.00498e-06
+ Reference value :  1.05474e-06
+ Reference value :  1.10835e-06
+ Reference value :  1.15841e-06
+No. of Data Rows : 6354
+ta                  =  9.02750e-08
+tb                  =  5.07937e-07
+ta = 9.027504e-08
+tb = 5.079369e-07
+period = 2.088309e-08
+fosc = 4.788563e+07
+ngspice-46 done
+
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed

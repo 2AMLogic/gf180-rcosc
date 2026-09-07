@@ -1,0 +1,87 @@
+{
+  "runid": "20260907T131703Z",
+  "utc": "2026-09-07T13:24:10.474351+00:00",
+  "git_sha": "a19bee42890d37969fd8a5667f9a5d00471c2d4e",
+  "git_dirty": true,
+  "ngspice": "** ngspice-46 : Circuit level simulation program",
+  "xschem": "XSCHEM V3.4.7",
+  "klt_version": "klt 0.4.0",
+  "pdk_root": "/Users/rwalters/.volare",
+  "pdk": "gf180mcuC",
+  "model_dir": "/Users/rwalters/.volare/gf180mcuC/libs.tech/ngspice",
+  "layout_gds": "layout/cells/rcosc_top.gds",
+  "extract_command": [
+    "klt",
+    "extract",
+    "layout/cells/rcosc_top.gds",
+    "--deck",
+    "gf180mcu",
+    "--top",
+    "rcosc_top",
+    "--pdk",
+    "gf180mcuC",
+    "--deck-option",
+    "poly_res=1k",
+    "--deck-option",
+    "mim_cap=cap_mim_1f0_m4m5_noshield",
+    "--pins",
+    "vdd,vss,clk,t0,t1,t2,t3,t4,t5,t6,t7",
+    "--parasitics"
+  ],
+  "extract_parasitic_model": {
+    "capacitance": "net-to-ground for every net's own (non-coupled) area/perimeter, plus net-to-net for the vertical-overlap coupling `coupling` describes below -- a coupled net pair gets a direct capacitor between their two hub nodes, not just capacitors to the deck's ground/substrate net",
+    "coupling": "vertical overlap (crossover) unconditionally -- where one net's conductor on an adjacent metal level sits directly over another *distinct* net's conductor, that overlap area is charged between the two nets instead of to ground (issue #760) -- plus lateral (same-layer, sidewall) coupling, but only for a net pair naming one of the caller's declared `--critical-net` nets (issue #976): facing-edge length within that layer's own minimum-spacing lookback is charged between the two nets, *additively* (not deducted from either net's substrate fringe term, unlike the vertical case -- a known simplification). Any same-layer pair with neither side named `--critical-net`, and fringe shielding in general, are still not modelled",
+    "resistance": "single lumped series resistance per net, distributed as a star across that net's device terminals (issue #592) -- not a per-segment, distributed RC ladder, *unless* `--distributed-rc` names this net via `--critical-net` (issue #977, Epic #709 Phase 2b): then the net's terminals are ordered along their approximate physical spread and its total R/C is broken into a chain of per-segment resistors (segment length proportional to inter-terminal distance) with a ground capacitor at each terminal node (proportional to its adjacent segment length/2), instead of one star hub -- still an approximation (terminal position is a device-placement proxy, not true per-segment routing geometry), but a strictly finer-grained one than the single-hub star",
+    "frequency": "quasi-static -- one frequency-independent R and C per net; no skin effect, no distributed transmission-line behavior"
+  },
+  "schematic_baseline_runid": "20260907T090653Z",
+  "process_corners": {
+    "tt": [
+      "typical",
+      "res_typical",
+      "mimcap_typical"
+    ],
+    "ff": [
+      "ff",
+      "res_ff",
+      "mimcap_ff"
+    ],
+    "ss": [
+      "ss",
+      "res_ss",
+      "mimcap_ss"
+    ]
+  },
+  "temps_c": [
+    -40.0,
+    27.0,
+    85.0
+  ],
+  "vdds_v": [
+    3.0,
+    3.3,
+    3.6
+  ],
+  "trim_code": 192,
+  "trim_hex": "0xC0",
+  "measurement": {
+    "tstep": "200p",
+    "tstop_ns": 1200,
+    "tstop_ns_retry": 4000,
+    "first_edge": 5,
+    "last_edge": 25,
+    "cycles_averaged": 20
+  },
+  "points": 27,
+  "sides": [
+    "schematic",
+    "extracted"
+  ],
+  "failed_runs": [],
+  "max_abs_delta_pct": 29.521,
+  "mean_delta_pct": -10.319803703703704,
+  "calibration_point_budget_pct": 1.1,
+  "schematic_rerun_vs_published_baseline_max_delta_pct": 2.464668693323553,
+  "wall_clock_s": 90.2,
+  "jobs": 8
+}

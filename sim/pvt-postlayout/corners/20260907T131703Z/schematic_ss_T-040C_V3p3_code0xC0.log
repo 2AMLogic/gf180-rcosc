@@ -1,0 +1,133 @@
+====================================================================
+gf180-rcosc post-layout PEX PVT run: schematic_ss_T-040C_V3p3_code0xC0
+side        : schematic
+run id      : 20260907T131703Z
+process     : ss (fets=ss res=res_ss mimcap=mimcap_ss)
+temperature : -40 C
+supply      : 3.3 V
+trim code   : 0xC0 (192)
+transient   : tran 200p 1200n, f = 20 periods / (t[rise=25] - t[rise=5])
+wall clock  : 34.8 s
+exit status : 0
+====================================================================
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: ** sch_path: /users/rwalters/github/gf180-rcosc/.loom/worktrees/issue-28/design/pvt_tb.sch
+
+Doing analysis at TEMP = -40.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vdd                                        3.3
+xxdut.xxbias.xrba.11                   3.29878
+xxdut.xxbias.xrba.21                   2.21731
+xxdut.vh                               2.21609
+xxdut.xxbias.xrbb.11                   2.21488
+xxdut.xxbias.xrbb.21                   1.14565
+xxdut.vl                               1.14445
+xxdut.xxbias.xrbc.11                   1.14316
+xxdut.xxbias.xrbc.21                0.00128561
+xxdut.xxbias.xrbias.11                 3.29886
+xxdut.xxbias.xrbias.21                 1.16391
+xxdut.ibias                            1.16277
+xxdut.xxtrim.xrfix.11                  3.29684
+xxdut.xxtrim.xrfix.21                  2.81448
+xxdut.xxtrim.c1                        2.81132
+xxdut.xxtrim.xr0.11                    2.80818
+xxdut.xxtrim.xr0.21                    2.78727
+xxdut.xxtrim.c2                        2.78412
+t0                                           0
+xxdut.xxtrim.xr1.11                    2.78099
+xxdut.xxtrim.xr1.21                    2.73941
+xxdut.xxtrim.c3                        2.73628
+t1                                           0
+xxdut.xxtrim.xr2.11                    2.73317
+xxdut.xxtrim.xr2.21                    2.65052
+xxdut.xxtrim.c4                        2.64741
+t2                                           0
+xxdut.xxtrim.xr3.11                    2.64433
+xxdut.xxtrim.xr3.21                    2.48034
+xxdut.xxtrim.c5                        2.47725
+t3                                           0
+xxdut.xxtrim.xr4.11                     2.4742
+xxdut.xxtrim.xr4.21                    2.14996
+xxdut.xxtrim.c6                        2.14691
+t4                                           0
+xxdut.xxtrim.xr5.11                    2.14392
+xxdut.xxtrim.xr5.21                    1.50736
+xxdut.xxtrim.c7                        1.50437
+t5                                           0
+xxdut.xxtrim.xr6.11                    1.50425
+xxdut.xxtrim.xr6.21                    1.45198
+xxdut.xxtrim.c8                        1.45186
+t6                                         3.3
+xxdut.xxtrim.xr7.11                    1.45181
+xxdut.xxtrim.xr7.21                    1.40942
+xxdut.vc                               1.40937
+t7                                         3.3
+xxdut.xxcmph.tail                     0.610315
+xxdut.xxcmph.dp                        3.30017
+xxdut.xxcmph.dn                       0.867628
+xxdut.cmph_out                     -0.00201189
+xxdut.xxcmpl.tail                      0.13914
+xxdut.xxcmpl.dp                        2.85561
+xxdut.xxcmpl.dn                        1.23823
+xxdut.cmpl_out                        0.117494
+clk                                 -0.0155041
+xxdut.qbar                             3.30929
+xxdut.mid1                              3.2915
+xxdut.mid2                             3.22817
+vt7#branch                         4.62093e-06
+vt6#branch                         4.90408e-06
+vt5#branch                           2.179e-07
+vt4#branch                         6.82133e-08
+vt3#branch                         4.92567e-08
+vt2#branch                         4.10148e-08
+vt1#branch                           3.759e-08
+vt0#branch                           3.637e-08
+vdd#branch                        -0.000381092
+
+ Reference value :  0.00000e+00
+ Reference value :  8.11174e-08
+ Reference value :  1.54997e-07
+ Reference value :  2.35854e-07
+ Reference value :  3.10119e-07
+ Reference value :  3.90078e-07
+ Reference value :  4.60893e-07
+ Reference value :  5.43966e-07
+ Reference value :  6.23106e-07
+ Reference value :  7.04127e-07
+ Reference value :  7.84474e-07
+ Reference value :  8.63085e-07
+ Reference value :  9.44159e-07
+ Reference value :  1.02099e-06
+ Reference value :  1.10247e-06
+ Reference value :  1.18273e-06
+No. of Data Rows : 6356
+ta                  =  1.42739e-07
+tb                  =  7.61664e-07
+ta = 1.427387e-07
+tb = 7.616638e-07
+period = 3.094625e-08
+fosc = 3.231409e+07
+ngspice-46 done
+
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Warning: True gmin stepping failed
+Note: Starting source stepping
+Warning: singular matrix:  check node xxdut.vl
+
+Warning: source stepping failed
+Note: Transient op started
+Note: Transient op finished successfully
