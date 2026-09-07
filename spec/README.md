@@ -32,7 +32,8 @@ every filename in this directory on `main`, including superseded records).
 | [0005](decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md) | PVT campaign confirms a frequency/accuracy shortfall in the current schematic — ratified spec unchanged | Ratified (records evidence; supersedes nothing) |
 | [0006](decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md) | Post-#16-resize PVT campaign — trim range and post-trim accuracy still unmet, ratified spec unchanged | Ratified (records evidence; realized trim-curve figures superseded by 0008) |
 | [0007](decision-records/0007-quiescent-current-exceeds-target-post-resize.md) | Post-#16 quiescent current exceeds DR-0003 Row 4's target — ratified spec unchanged | Ratified (records evidence; Row 4 verdict superseded by 0008) |
-| [0008](decision-records/0008-iq-metric-correction-and-bias-rebalance.md) | Bias re-balance brings Iq under DR-0003 Row 4 — and the `.op` figure 0007 used is not the quantity Row 4 names | Ratified (supersedes 0007's Row 4 verdict and 0006's trim-curve figures; supersedes no ratified target) |
+| [0008](decision-records/0008-iq-metric-correction-and-bias-rebalance.md) | Bias re-balance brings Iq under DR-0003 Row 4 — and the `.op` figure 0007 used is not the quantity Row 4 names | Ratified (supersedes 0007's Row 4 verdict and 0006's trim-curve figures; supersedes no ratified target; `RBIAS` sizing and trim-curve figures superseded by 0009, metric finding not) |
+| [0009](decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md) | Row 4's verdict basis moves to the running Iq metric — `RBIAS` re-derived, partial trim-range recovery | Ratified (supersedes 0008's `RBIAS` sizing and trim-curve figures, not its metric finding; supersedes no ratified target) |
 
 A record is never deleted or rewritten once ratified — a later change
 supersedes it with a new record rather than editing history in place (same
