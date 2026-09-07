@@ -99,21 +99,58 @@ def _tokenize(text: str) -> list[str]:
     return tokens
 
 
+def _subckt_header(stripped: str) -> list[str] | None:
+    """Split a `.subckt <name> <pins...>` header into its tokens, accepting
+    xschem's own **commented** spelling of the *top-level* block.
+
+    A hierarchical xschem export writes the top cell's own header/footer as
+    `**.subckt rcosc_top ...` / `**.ends` -- commented out, because the top
+    cell is emitted as a flat deck rather than a callable subcircuit. Its
+    device lines are ordinary, uncommented cards in that commented block, so
+    treating the commented header as a real one is what lets the same parser
+    read `rcosc_top` and its sub-blocks (issue #27)."""
+    low = stripped.lower()
+    for prefix in (".subckt ", "**.subckt "):
+        if low.startswith(prefix):
+            return stripped[len(prefix) :].split()
+    return None
+
+
+def _is_subckt_end(stripped: str) -> bool:
+    low = stripped.lower()
+    return low.startswith(".ends") or low.startswith("**.ends")
+
+
+def parse_subckt_pins(netlist_text: str, subckt_name: str) -> list[str]:
+    """Return the ordered pin list from `.subckt <subckt_name> <pins...>`.
+
+    Needed by the top-level composition (issue #27) to map a sub-block
+    instance's positional nodes onto that block's own pin names -- so a
+    schematic pin reorder shows up as a build failure rather than as silently
+    swapped layout connections."""
+    for line in _merge_continuations(netlist_text.splitlines()):
+        tokens = _subckt_header(line.strip())
+        if tokens and tokens[0] == subckt_name:
+            return tokens[1:]
+    raise KeyError(f".subckt {subckt_name} not found")
+
+
 def parse_subckt(netlist_text: str, subckt_name: str) -> dict[str, Device]:
     """Return `{device_name: Device}` for every `X...` device-call line
     inside `.subckt <subckt_name> ... .ends` (case-insensitive on the
     directive, exact-case on `subckt_name`, matching this repo's netlist
-    convention of lowercase subckt names)."""
+    convention of lowercase subckt names; xschem's commented `**.subckt`
+    top-level header counts, see `_subckt_header`)."""
     lines = _merge_continuations(netlist_text.splitlines())
     devices: dict[str, Device] = {}
     in_block = False
     for line in lines:
         stripped = line.strip()
-        low = stripped.lower()
-        if low.startswith(".subckt "):
-            in_block = stripped.split()[1] == subckt_name
+        header = _subckt_header(stripped)
+        if header is not None:
+            in_block = header[0] == subckt_name
             continue
-        if low.startswith(".ends"):
+        if _is_subckt_end(stripped):
             in_block = False
             continue
         if not in_block or not stripped or stripped.startswith("*"):

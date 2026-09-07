@@ -1,12 +1,15 @@
 # layout
 
-**Status: first layout increment (issue #13, partial).** This directory now
-carries a DRC-clean, LVS-matched GDS for two of `rcosc_top`'s four
-sub-blocks — the bias generator (`rcosc_bias`) and the trim bank
-(`rcosc_trim_bank`) — reproducible from a committed build script. It does
-**not** yet cover `rcosc_comparator`, the `rcosc_top` composition (SR
-latch, `MDISCH`, `CTIMING`, wiring the sub-blocks together), or the
-post-layout PVT re-verification — see "Scope and follow-up" below.
+**Status: full `rcosc_top` hierarchy (issues #13 + #27).** This directory
+carries a DRC-clean, LVS-matched GDS for all four of `rcosc_top`'s
+sub-blocks -- the bias generator (`rcosc_bias`), the trim bank
+(`rcosc_trim_bank`), the comparator (`rcosc_comparator`, instantiated twice
+as `XXCMPH`/`XXCMPL`) -- plus the `rcosc_top` top-level composition itself
+(the inline SR latch, `MDISCH`, the `CTIMING` MiM cap, and the wiring that
+instantiates the three sub-cells as real GDS sub-cells, not redrawn
+geometry) -- all reproducible from one committed build script. The
+post-layout (PEX-extracted) PVT re-verification this schematic-level layout
+enables is tracked separately, issue #28.
 
 ## What's checked in
 
@@ -21,14 +24,22 @@ layout/
   cells/
     rcosc_bias.gds
     rcosc_trim_bank.gds
+    rcosc_comparator.gds
+    rcosc_top.gds          instantiates the other three as sub-cells
   lvs_ref/               hand-authored-but-generated LVS reference netlists
     rcosc_bias.spice     (see "LVS reference netlists" below for why these
     rcosc_trim_bank.spice are not the schematic netlist verbatim)
+    rcosc_comparator.spice
+    rcosc_top.spice
   reports/                committed evidence -- DRC/extract/LVS JSON, fresh
     rcosc_bias.{drc,extract,lvs}.json
     rcosc_bias.extracted.spice
     rcosc_trim_bank.{drc,extract,lvs}.json
     rcosc_trim_bank.extracted.spice
+    rcosc_comparator.{drc,extract,lvs}.json
+    rcosc_comparator.extracted.spice
+    rcosc_top.{drc,extract,lvs}.json
+    rcosc_top.extracted.spice
 ```
 
 ## Reproducing
@@ -38,7 +49,8 @@ layout/run_checks.sh
 ```
 
 Regenerates `design/netlist/` (so layout always builds against the current
-schematic), rebuilds both GDS from `klt gen` primitives, and re-runs
+schematic), rebuilds all four GDS from `klt gen` primitives (plus, for
+`rcosc_top`, sub-cell instantiation of the other three), and re-runs
 `klt drc` / `klt extract` / `klt lvs` for each cell, asserting `status ==
 "clean"` / `"match"` and failing loudly otherwise. `layout/build_cells.py
 --check` (no `design/regen-netlist.sh` re-run) verifies the committed GDS +
@@ -51,22 +63,62 @@ convention `design/regen-netlist.sh` documents for the schematic netlists.
 Every resistor is one `klt gen res_array` call (`num=1` — these are not a
 *matched* array, each has its own binary-weighted length per "Trim bank
 sizing" in `design/README.md`) and every switch/diode-connected transistor
-is one `klt gen mos_array` call (single-finger). Both generators produce
-DRC-clean gf180mcu geometry (contacts, enclosures, spacing) already — no
-geometry in this directory is hand-drawn from scratch. `layout/gen_lib.py`'s
-`Composer` imports each generated cell into one composing `klayout.db`
-layout, places it at a computed offset, and wires ports together with plain
-Manhattan metal1 rectangles (`wire_segment`/`wire_l`/`wire_z`). See
-`gen_lib.py`'s and `build_cells.py`'s module docstrings for the exact
-floorplan (two rows per cell — a resistor chain, and a row of
-switches/bias-transistor above it — and why each cross-row jog stays inside
-its own resistor's private x-window rather than sharing a routing channel).
+is one `klt gen mos_array` call. Both generators produce DRC-clean gf180mcu
+geometry (contacts, enclosures, spacing) already — no active-device geometry
+in this directory is hand-drawn from scratch (the one exception, the MiM
+timing capacitor, is called out below). `layout/gen_lib.py`'s `Composer`
+imports each generated cell into one composing `klayout.db` layout, places
+it at a computed offset, and wires ports together with plain Manhattan
+metal rectangles.
+
+`rcosc_bias`/`rcosc_trim_bank` (issue #13) are single-finger, planar-in-
+metal1 cells: two rows per cell (a resistor chain, and a row of
+switches/bias-transistor above it), wired with `wire_segment`/`wire_l`/
+`wire_z` so each cross-row jog stays inside its own resistor's private
+x-window rather than sharing a routing channel. `rcosc_comparator`/
+`rcosc_top` (issue #27) needed three things those two cells did not:
+
+- **Multi-finger devices.** `rcosc_comparator`'s `MTAIL` is `nfet_03v3
+  W=16u nf=8` — one folded 8-finger `mos_array` call
+  (`finger_topology: "parallel"`, the default), not eight separate devices.
+  `klt extract` correctly reports it as 8 parallel `W=2u` `nfet`s; `klt
+  lvs`'s `options.combine_devices: ["nfet"]` folds them back into the
+  reference's single `W=16u` card (see `run_checks.sh`) — scoped to `nfet`
+  specifically so it can never quietly merge an unrelated series-resistor
+  pair. Two independent `mos_array` calls are used for the `MINP`/`MINN`
+  input pair rather than `klt gen diff_pair`'s common-centroid layout: the
+  comparator's offset is a second-order contributor to this design's
+  accuracy budget (dominated by R/C spread and trim resolution, DR-0003),
+  so `diff_pair`'s mandatory guard ring — which would need cutting open on
+  both sides to route four terminals out — was not judged worth it here.
+- **A two-layer channel router** (`gen_lib.Channel`, used by `build_cells.py`'s
+  `Row`/`Channel` helpers). `rcosc_comparator`'s `dn` net has to cross `dp`'s
+  own run to the output buffer, which metal1 alone cannot route without a
+  short; `rcosc_top`'s wiring between its four sub-blocks is denser still.
+  One horizontal track per net in a channel above a row of blocks, reached
+  by one vertical column per terminal below it (metal1 columns, metal2
+  tracks) makes an arbitrary, non-planar netlist routable.
+- **A shared n-well group** (`Composer.draw_nwell` / `klt gen well_island`).
+  `rcosc_comparator`'s three PMOS devices share one drawn n-well with a
+  `well_island` tap on `vdd` — without it every PMOS body extracts as an
+  anonymous floating net and LVS cannot match a `vdd`-bodied reference.
+- **A hand-drawn MiM capacitor** (`Composer.add_mim_cap`). `klt gen
+  cap_array` has no gf180mcu plate-layer configuration (see "Known `klt`
+  gaps" below) — `CTIMING` is the one device in this design drawn from base
+  layers (Metal4 bottom plate, inset FuseTop top plate with `CAP_MK`/
+  `MIM_L_MK`, `Via4` up to `Metal5`) rather than a `klt gen` primitive,
+  sized to clear `mim.enclosing.fusetop.1`/`mim.space.1` with margin.
+
+See `gen_lib.py`'s and `build_cells.py`'s module docstrings for the exact
+floorplan and geometric constants (`ROW_GAP_UM`, `TRACK_PITCH_UM`, etc.) of
+each cell.
 
 ## Known `klt` gaps this build works around (filed upstream)
 
-Both are genuine `klt gen`/`klt lvs` capability gaps for this PDK, not
-design-specific issues — filed per `CLAUDE.md`'s friction protocol against
-`2AMLogic/klayout-tools`, kept generic there:
+Each is a genuine `klt gen`/`klt lvs` capability gap for this PDK, not a
+design-specific issue — filed per `CLAUDE.md`'s friction protocol against
+`2AMLogic/klayout-tools`, kept generic there (the last two entries below are
+included for completeness — one worked as documented, needing no new issue):
 
 - **[klayout-tools#1550](https://github.com/2AMLogic/klayout-tools/issues/1550)**:
   `klt gen res_array`'s gf180mcu support has only one resistor flavor
@@ -108,6 +160,27 @@ design-specific issues — filed per `CLAUDE.md`'s friction protocol against
   the same underlying gap as klayout-tools#1550 (resistor support is a
   second-class citizen throughout this part of `klt`'s gf180mcu tooling),
   documented here rather than opening a duplicate.
+- **[klayout-tools#1555](https://github.com/2AMLogic/klayout-tools/issues/1555)**:
+  `klt gen cap_array` rejects the `gf180mcu` PDK family outright
+  (`"PDK family 'gf180mcu' has no MiM capacitor plate layers configured --
+  supported families: sky130, sg13g2"`). This is the specific gf180mcu
+  follow-on issue #1117 (the issue that first added `cap_array`, sky130-only)
+  explicitly anticipated splitting out as separate work, and that #1455 later
+  filed and closed for `sg13g2` — but no equivalent gf180mcu issue existed
+  before this repo hit the gap, so #1555 is that missing follow-on, not a
+  duplicate. Worked around by hand-drawing `CTIMING` from base layers
+  (`Composer.add_mim_cap`, see "Approach" above) instead of `cap_array` —
+  DRC-clean and LVS-matched against `klt extract`'s existing `mim_cap`
+  deck-option flavour selection (see below), just without `cap_array`'s
+  row-layout/`matched_group_id` conveniences (moot here: `CTIMING` is a
+  single fixed-size capacitor, not a matched array).
+- **(worked, not a gap)** `klt extract --deck-option
+  mim_cap=cap_mim_1f0_m4m5_noshield` (`rcosc_top`'s `DECK_OPTIONS` in
+  `run_checks.sh`) correctly selects this design's `cap_mim_1f0fF` MiM
+  density (as opposed to the deck's `cap_mim_2f0_m4m5_noshield` default) —
+  this is klayout-tools#1151's `--deck-option` mechanism, already merged
+  upstream by the time this issue started; confirmed working as documented,
+  not a new gap to file.
 
 ## LVS reference netlists (`layout/lvs_ref/`)
 
@@ -132,34 +205,36 @@ unchanged**, only the LVS bookkeeping's substrate-tie modeling. This mirrors
 ("the third (bulk) node is always rewritten to SUBSTRATE_NET ... regardless
 of what the schematic names there").
 
-`rcosc_trim_bank`'s LVS run additionally opts into
+`rcosc_comparator`'s three PMOS bulk terminals are **not** rewritten to
+`vsubs`: unlike the NMOS bodies and resistor bulks above, this cell draws a
+real n-well tap (`klt gen well_island`) tying the shared PMOS well to `vdd`,
+so the layout genuinely reports those bodies on the `vdd` net and the
+schematic's own `vdd` bulk connection compares directly, no accommodation
+needed. Its `MTAIL` is written `W=16u nf=1` (the same total-width device,
+respelled — `klt`'s reference normalizer rejects `nf>1`) with the layout's
+eight drawn fingers folded back together by `klt lvs`'s
+`options.combine_devices: ["nfet"]` (see "Known `klt` gaps" above).
+
+`rcosc_top`'s reference is written hierarchically (`XXBIAS`/`XXTRIM`/
+`XXCMPH`/`XXCMPL` subcircuit calls, reading like the schematic) but compared
+with `options.flatten_reference: true`, since `klt extract` always emits the
+layout side flat — the sub-block `.SUBCKT` bodies in
+`layout/lvs_ref/rcosc_top.spice` are byte-identical to the three per-cell
+references above, so the hierarchy is verified against exactly what each
+cell was already verified against on its own.
+
+`rcosc_trim_bank`'s and `rcosc_top`'s LVS runs additionally opt into
 `options.parameter_tolerance: 0.001` (klt's disclosed, opt-in relative
 tolerance, `klayout_tools/lvs.py` issue #589) to absorb the sub-0.1% grid-
 rounding deltas the `--check`-verified GDS's 1 nm database unit introduces
 against the reference's directly-computed `sheet_rho * r_length/r_width`
 values (plus `R1`'s deliberate 0.1 nm nudge above) — every tolerated
-parameter difference is disclosed in `reports/rcosc_trim_bank.lvs.json`'s
+parameter difference is disclosed in each cell's `reports/*.lvs.json`
 `device.parameter_tolerated` entries (both original values), not silently
-absorbed. `rcosc_bias` needs no tolerance (`status: "match"`, 0
-mismatches, 0 tolerated deltas).
+absorbed. `rcosc_bias` and `rcosc_comparator` need no tolerance (`status:
+"match"`, 0 mismatches, 0 tolerated deltas).
 
-## Scope and follow-up
-
-This issue's acceptance criteria cover the full `rcosc_top` hierarchy
-(bias generator, 2x comparator, trim bank, top-level composition) plus a
-post-layout PVT re-verification subset. Drawing and verifying that whole
-hierarchy transistor-by-transistor in one pass — while also learning (and
-in two cases, working around bugs in) `klt gen`/`klt gen-compose`/`klt
-lvs`'s gf180mcu support for the first time in this repo — was assessed as
-too large for one PR (builder-complexity.md's decomposition criteria: this
-increment alone touched 7 new files and needed real DRC/LVS iteration on 2
-of 4 sub-blocks). This increment lands `rcosc_bias` and `rcosc_trim_bank`
-DRC-clean and LVS-matched, resolves this file's previously-flagged "LSB
-trim-bank segment DRC risk" concretely (see below), and files/documents
-every `klt` gap hit along the way so the remaining sub-blocks do not
-re-discover them. The remainder (`rcosc_comparator` layout, the `rcosc_top`
-composition, and the post-layout PVT re-verification subset) is tracked in
-follow-up issue(s) linked from #13.
+## gf180mcu geometry notes
 
 **The LSB trim-bank segment DRC risk `design/README.md` previously flagged
 is resolved, empirically, not just asserted**: `rcosc_trim_bank.gds`'s `R0`
