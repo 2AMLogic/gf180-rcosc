@@ -385,10 +385,19 @@ All resistors use `ppolyf_u_1k` (1000 Ω/sq typ, gf180mcu §6.1A) at
   verified** — same caveat as the pre-#16 sizing; DR-0002/0003's "linear
   mapping" language describes trim word design intent, not a per-code DNL
   guarantee.
-- Several LSB-side segment lengths (`R0`: 0.7482 µm, `R1`: 1.4965 µm) are
-  short enough that they may not pass this PDK's resistor minimum-length
-  DRC rule — **not checked**, DRC is explicitly out of scope for this
-  issue (see Non-goals below), same flagged gap as the pre-#16 sizing.
+- Several LSB-side segment lengths (`R0`: 0.7482 µm, `R1`: 1.4965 µm) were
+  flagged here as possibly short enough to fail this PDK's resistor
+  minimum-length DRC rule, not checked at the time (DRC was out of scope
+  for the issue that wrote this note). **Checked and resolved by issue
+  #13** (layout increment): `klt`'s curated gf180mcu DRC deck has no
+  resistor minimum-*length* rule at all (only a minimum *width* rule every
+  segment's `r_width=2u` clears trivially) — `R0` is DRC-clean as drawn,
+  unchanged. `R1` hit an unrelated, half-nanometre-grid-tie generator bug
+  at its exact length (filed as
+  [klayout-tools#1551](https://github.com/2AMLogic/klayout-tools/issues/1551)),
+  worked around with a 0.1 nm / <0.007% layout-only nudge (not a resistor-
+  ratio or schematic change) — see `layout/README.md`'s "Known `klt` gaps"
+  and "Scope and follow-up" sections for the full evidence.
 - The comparator's offset budget, the discharge switch's on-resistance
   (beyond the qualitative root-cause role identified above), and the
   trim-DAC element mismatch/INL row DR-0002/0003 carries as a flagged

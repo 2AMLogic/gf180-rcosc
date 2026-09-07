@@ -1,0 +1,49 @@
+* extracted by klt extract --deck gf180mcu
+
+* cell rcosc_trim_bank
+* pin m
+* pin p
+* pin t0
+* pin t1
+* pin t2
+* pin t3
+* pin t4
+* pin t5
+* pin t6
+* pin t7
+.SUBCKT rcosc_trim_bank m p t0 t1 t2 t3 t4 t5 t6 t7
+* device instance $1 r0 *1 22.832,7 nfet
+M$1 \$2 t0 \$1 vsubs nfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $2 r0 *1 28.794,7 nfet
+M$2 \$3 t1 \$2 vsubs nfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $3 r0 *1 35.88,7 nfet
+M$3 \$4 t2 \$3 vsubs nfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $4 r0 *1 45.209,7 nfet
+M$4 \$5 t3 \$4 vsubs nfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $5 r0 *1 59.028,7 nfet
+M$5 \$6 t4 \$5 vsubs nfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $6 r0 *1 81.826,7 nfet
+M$6 \$7 t5 \$6 vsubs nfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $7 r0 *1 122.582,7 nfet
+M$7 \$8 t6 \$7 vsubs nfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $8 r0 *1 199.254,7 nfet
+M$8 m t7 \$8 vsubs nfet L=0.5U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+* device instance $9 r0 *1 9.019,1 ppolyf_u_1k
+R$9 p \$1 vsubs 8599 ppolyf_u_1k
+* device instance $10 r0 *1 22.832,1 ppolyf_u_1k
+R$10 \$1 \$2 vsubs 374 ppolyf_u_1k
+* device instance $11 r0 *1 28.794,1 ppolyf_u_1k
+R$11 \$2 \$3 vsubs 748.5 ppolyf_u_1k
+* device instance $12 r0 *1 35.879,1 ppolyf_u_1k
+R$12 \$3 \$4 vsubs 1496.5 ppolyf_u_1k
+* device instance $13 r0 *1 45.209,1 ppolyf_u_1k
+R$13 \$4 \$5 vsubs 2993 ppolyf_u_1k
+* device instance $14 r0 *1 59.028,1 ppolyf_u_1k
+R$14 \$5 \$6 vsubs 5986 ppolyf_u_1k
+* device instance $15 r0 *1 81.826,1 ppolyf_u_1k
+R$15 \$6 \$7 vsubs 11972 ppolyf_u_1k
+* device instance $16 r0 *1 122.582,1 ppolyf_u_1k
+R$16 \$7 \$8 vsubs 23944 ppolyf_u_1k
+* device instance $17 r0 *1 199.253,1 ppolyf_u_1k
+R$17 \$8 m vsubs 47887.5 ppolyf_u_1k
+.ENDS rcosc_trim_bank
