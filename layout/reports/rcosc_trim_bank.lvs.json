@@ -1,0 +1,298 @@
+{
+  "schema_version": 1,
+  "engine": "klayout",
+  "layout": "/home/ubuntu/loom-workspaces/gf180-rcosc/.loom/worktrees/issue-13/layout/reports/rcosc_trim_bank.extracted.spice",
+  "reference": "/home/ubuntu/loom-workspaces/gf180-rcosc/.loom/worktrees/issue-13/layout/lvs_ref/rcosc_trim_bank.spice",
+  "top": "RCOSC_TRIM_BANK",
+  "reference_top": "RCOSC_TRIM_BANK",
+  "parameter_tolerance": 0.001,
+  "options": {
+    "combine_devices": false,
+    "flatten_layout": false,
+    "flatten_reference": false,
+    "netgen_setup": null,
+    "parameter_tolerance": 0.001
+  },
+  "status": "match",
+  "mismatch_count": 6,
+  "error_count": 0,
+  "category_counts": {
+    "device.parameter_tolerated": 6
+  },
+  "category_error_counts": {},
+  "counts": {
+    "nets": {
+      "layout": 19,
+      "reference": 19,
+      "matched": 19
+    },
+    "devices": {
+      "layout": 17,
+      "reference": 17,
+      "matched": 17
+    },
+    "pins": {
+      "layout": 10,
+      "reference": 10,
+      "matched": 10
+    }
+  },
+  "device_classes": null,
+  "environment": {
+    "engine": "klayout",
+    "engine_version": "0.30.12",
+    "layout_sha256": "bad831d18be6f5850c8b483edd40236528e570c4c09a8d8db0252abe2632fd72",
+    "reference_sha256": "490fe3b041d56388377f5d8897ed9a0a694e4c5f5a241bd80a7c2f416b4265f4",
+    "extracted_netlist": null
+  },
+  "provenance": {
+    "klt_version": "0.3.0",
+    "klayout_version": "0.30.12",
+    "pdk": null,
+    "deck": null,
+    "input": null
+  },
+  "mismatches": [
+    {
+      "category": "device.parameter_tolerated",
+      "severity": "warning",
+      "description": "matched device parameter 'r' differs by 0.02673%, within the requested options.parameter_tolerance -- the reference value was snapped to the layout value for the comparison, so this dimension of the compare was verified only to that tolerance, not exactly (see docs/cli/lvs.md, 'device.parameter_tolerated')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": "\\$10",
+        "reference": "\\$R0",
+        "class": "PPOLYF_U_1K"
+      },
+      "property": {
+        "name": "r",
+        "layout": 374.0,
+        "reference": 374.1
+      },
+      "details": {
+        "relative_delta": 0.0002673082063619961,
+        "tolerance": 0.001
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.parameter_tolerated",
+      "severity": "warning",
+      "description": "matched device parameter 'r' differs by 0.0334%, within the requested options.parameter_tolerance -- the reference value was snapped to the layout value for the comparison, so this dimension of the compare was verified only to that tolerance, not exactly (see docs/cli/lvs.md, 'device.parameter_tolerated')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": "\\$11",
+        "reference": "\\$R1",
+        "class": "PPOLYF_U_1K"
+      },
+      "property": {
+        "name": "r",
+        "layout": 748.5,
+        "reference": 748.25
+      },
+      "details": {
+        "relative_delta": 0.00033400133600534405,
+        "tolerance": 0.001
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.parameter_tolerated",
+      "severity": "warning",
+      "description": "matched device parameter 'r' differs by 0.001671%, within the requested options.parameter_tolerance -- the reference value was snapped to the layout value for the comparison, so this dimension of the compare was verified only to that tolerance, not exactly (see docs/cli/lvs.md, 'device.parameter_tolerated')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": "\\$13",
+        "reference": "\\$R3",
+        "class": "PPOLYF_U_1K"
+      },
+      "property": {
+        "name": "r",
+        "layout": 2993.0,
+        "reference": 2992.9500000000003
+      },
+      "details": {
+        "relative_delta": 1.670564650842872e-05,
+        "tolerance": 0.001
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.parameter_tolerated",
+      "severity": "warning",
+      "description": "matched device parameter 'r' differs by 0.0008353%, within the requested options.parameter_tolerance -- the reference value was snapped to the layout value for the comparison, so this dimension of the compare was verified only to that tolerance, not exactly (see docs/cli/lvs.md, 'device.parameter_tolerated')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": "\\$14",
+        "reference": "\\$R4",
+        "class": "PPOLYF_U_1K"
+      },
+      "property": {
+        "name": "r",
+        "layout": 5986.0,
+        "reference": 5985.95
+      },
+      "details": {
+        "relative_delta": 8.352823254290328e-06,
+        "tolerance": 0.001
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.parameter_tolerated",
+      "severity": "warning",
+      "description": "matched device parameter 'r' differs by 0.0008353%, within the requested options.parameter_tolerance -- the reference value was snapped to the layout value for the comparison, so this dimension of the compare was verified only to that tolerance, not exactly (see docs/cli/lvs.md, 'device.parameter_tolerated')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": "\\$15",
+        "reference": "\\$R5",
+        "class": "PPOLYF_U_1K"
+      },
+      "property": {
+        "name": "r",
+        "layout": 11972.0,
+        "reference": 11971.900000000001
+      },
+      "details": {
+        "relative_delta": 8.35282325413839e-06,
+        "tolerance": 0.001
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    },
+    {
+      "category": "device.parameter_tolerated",
+      "severity": "warning",
+      "description": "matched device parameter 'r' differs by 0.0008353%, within the requested options.parameter_tolerance -- the reference value was snapped to the layout value for the comparison, so this dimension of the compare was verified only to that tolerance, not exactly (see docs/cli/lvs.md, 'device.parameter_tolerated')",
+      "side": "both",
+      "net": null,
+      "device": {
+        "layout": "\\$16",
+        "reference": "\\$R6",
+        "class": "PPOLYF_U_1K"
+      },
+      "property": {
+        "name": "r",
+        "layout": 23944.0,
+        "reference": 23943.800000000003
+      },
+      "details": {
+        "relative_delta": 8.35282325413839e-06,
+        "tolerance": 0.001
+      },
+      "circuit": null,
+      "instance": null,
+      "subcircuit": null
+    }
+  ],
+  "net_correspondence": [
+    {
+      "layout": "\\$1",
+      "reference": "C1",
+      "pin": false
+    },
+    {
+      "layout": "\\$2",
+      "reference": "C2",
+      "pin": false
+    },
+    {
+      "layout": "\\$3",
+      "reference": "C3",
+      "pin": false
+    },
+    {
+      "layout": "\\$4",
+      "reference": "C4",
+      "pin": false
+    },
+    {
+      "layout": "\\$5",
+      "reference": "C5",
+      "pin": false
+    },
+    {
+      "layout": "\\$6",
+      "reference": "C6",
+      "pin": false
+    },
+    {
+      "layout": "\\$7",
+      "reference": "C7",
+      "pin": false
+    },
+    {
+      "layout": "\\$8",
+      "reference": "C8",
+      "pin": false
+    },
+    {
+      "layout": "M",
+      "reference": "M",
+      "pin": true
+    },
+    {
+      "layout": "P",
+      "reference": "P",
+      "pin": true
+    },
+    {
+      "layout": "T0",
+      "reference": "T0",
+      "pin": true
+    },
+    {
+      "layout": "T1",
+      "reference": "T1",
+      "pin": true
+    },
+    {
+      "layout": "T2",
+      "reference": "T2",
+      "pin": true
+    },
+    {
+      "layout": "T3",
+      "reference": "T3",
+      "pin": true
+    },
+    {
+      "layout": "T4",
+      "reference": "T4",
+      "pin": true
+    },
+    {
+      "layout": "T5",
+      "reference": "T5",
+      "pin": true
+    },
+    {
+      "layout": "T6",
+      "reference": "T6",
+      "pin": true
+    },
+    {
+      "layout": "T7",
+      "reference": "T7",
+      "pin": true
+    },
+    {
+      "layout": "VSUBS",
+      "reference": "VSUBS",
+      "pin": false
+    }
+  ]
+}

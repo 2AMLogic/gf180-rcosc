@@ -1,0 +1,192 @@
+{
+  "schema_version": 3,
+  "file": "/home/ubuntu/loom-workspaces/gf180-rcosc/.loom/worktrees/issue-13/layout/cells/rcosc_bias.gds",
+  "deck": "gf180mcu",
+  "top": "rcosc_bias",
+  "dbu_um": 0.001,
+  "netlist_path": "/home/ubuntu/loom-workspaces/gf180-rcosc/.loom/worktrees/issue-13/layout/reports/rcosc_bias.extracted.spice",
+  "netlist_sha256": "7b35cd9a58638212309142f4bce7ab50194fb6abc1a4e1d89fe10c1edab446d0",
+  "status": "extracted",
+  "device_count": 5,
+  "net_count": 6,
+  "pin_count": 5,
+  "device_counts": {
+    "nfet": 1,
+    "ppolyf_u_1k": 4
+  },
+  "dummy_devices_dropped": 0,
+  "ignored_layers": [],
+  "device_recognition_only_layers": [
+    {
+      "layer": 49,
+      "datatype": 0,
+      "shapes": 4
+    },
+    {
+      "layer": 62,
+      "datatype": 0,
+      "shapes": 4
+    },
+    {
+      "layer": 110,
+      "datatype": 5,
+      "shapes": 4
+    }
+  ],
+  "device_classes": [
+    "nfet",
+    "pfet",
+    "bjt",
+    "cap_mim_2f0_m4m5_noshield",
+    "resistor",
+    "diode_nd2ps_06v0",
+    "diode_pd2nw_06v0"
+  ],
+  "devices": [
+    {
+      "name": "$1",
+      "class": "nfet",
+      "nets": {
+        "s": "ibias",
+        "g": "ibias",
+        "d": "vss",
+        "b": "vsubs"
+      },
+      "params": {
+        "l_um": 1.0,
+        "w_um": 2.0,
+        "as_um2": 0.84,
+        "ad_um2": 0.84,
+        "ps_um": 4.84,
+        "pd_um": 4.84
+      }
+    },
+    {
+      "name": "$2",
+      "class": "ppolyf_u_1k",
+      "nets": {
+        "a": "vdd",
+        "b": "vh",
+        "w": "vsubs"
+      },
+      "params": {
+        "r_ohm": 50000.0,
+        "l_um": 100.0,
+        "w_um": 2.0,
+        "area_um2": 200.0,
+        "perimeter_um": 204.0
+      }
+    },
+    {
+      "name": "$3",
+      "class": "ppolyf_u_1k",
+      "nets": {
+        "a": "vh",
+        "b": "vl",
+        "w": "vsubs"
+      },
+      "params": {
+        "r_ohm": 50000.0,
+        "l_um": 100.0,
+        "w_um": 2.0,
+        "area_um2": 200.0,
+        "perimeter_um": 204.0
+      }
+    },
+    {
+      "name": "$4",
+      "class": "ppolyf_u_1k",
+      "nets": {
+        "a": "vl",
+        "b": "vss",
+        "w": "vsubs"
+      },
+      "params": {
+        "r_ohm": 50000.0,
+        "l_um": 100.0,
+        "w_um": 2.0,
+        "area_um2": 200.0,
+        "perimeter_um": 204.0
+      }
+    },
+    {
+      "name": "$5",
+      "class": "ppolyf_u_1k",
+      "nets": {
+        "a": "vdd",
+        "b": "ibias",
+        "w": "vsubs"
+      },
+      "params": {
+        "r_ohm": 105000.0,
+        "l_um": 210.0,
+        "w_um": 2.0,
+        "area_um2": 420.0,
+        "perimeter_um": 424.0
+      }
+    }
+  ],
+  "nets": [
+    {
+      "name": "ibias",
+      "pin": true,
+      "device_count": 3
+    },
+    {
+      "name": "vdd",
+      "pin": true,
+      "device_count": 2
+    },
+    {
+      "name": "vh",
+      "pin": true,
+      "device_count": 2
+    },
+    {
+      "name": "vl",
+      "pin": true,
+      "device_count": 2
+    },
+    {
+      "name": "vss",
+      "pin": true,
+      "device_count": 2
+    },
+    {
+      "name": "vsubs",
+      "pin": false,
+      "device_count": 5
+    }
+  ],
+  "warnings": [
+    "kept 1 net(s) internal: not in the declared pin set (--pins / layout.declared_pins) (vsubs) -- issue #514"
+  ],
+  "black_box_regions": [],
+  "abstracted_cells": [],
+  "unmodelled_poly": [],
+  "merged_net_labels": [],
+  "voltage_domain_warnings": [],
+  "unbiased_pmos_body_nets": [],
+  "single_terminal_nets": [],
+  "dead_metal": [],
+  "matched_device_groups": [],
+  "pdk": null,
+  "provenance": {
+    "klt_version": "0.3.0",
+    "klayout_version": "0.30.12",
+    "pdk": null,
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:79e71a1e7d84be3cfc82e4c70afbdf7b743ac1f361fb8e981f57831014d2e8b0",
+      "released": true,
+      "options": {
+        "poly_res": "1k"
+      }
+    },
+    "input": {
+      "content_hash": "sha256:d6d8acfe396dcd87dc36ed7615c1d210d51ff23e52fc123c16eadd916dbe1871"
+    }
+  },
+  "parasitics": null,
+  "spef_path": null
+}

@@ -1,0 +1,20 @@
+* extracted by klt extract --deck gf180mcu
+
+* cell rcosc_bias
+* pin ibias
+* pin vdd
+* pin vh
+* pin vl
+* pin vss
+.SUBCKT rcosc_bias ibias vdd vh vl vss
+* device instance $1 r0 *1 215.76,7 nfet
+M$1 vss ibias ibias vsubs nfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+* device instance $2 r0 *1 50.42,1 ppolyf_u_1k
+R$2 vdd vh vsubs 50000 ppolyf_u_1k
+* device instance $3 r0 *1 155.26,1 ppolyf_u_1k
+R$3 vh vl vsubs 50000 ppolyf_u_1k
+* device instance $4 r0 *1 260.1,1 ppolyf_u_1k
+R$4 vl vss vsubs 50000 ppolyf_u_1k
+* device instance $5 r0 *1 105.42,7 ppolyf_u_1k
+R$5 vdd ibias vsubs 105000 ppolyf_u_1k
+.ENDS rcosc_bias
