@@ -1,9 +1,15 @@
 # design — gf180-rcosc schematic sources
 
-**Status: first schematic-capture increment (issue #6).** T1 item 1 of the
-gap tracker (#5) — design sources committed and netlist-reproducible. No
-PVT-corner, DRC, or LVS claim is made from this directory yet; that is
-explicitly out of scope for this increment (items 2-7 of #5).
+**Status: schematic capture (issue #6, T1 item 1 of the gap tracker #5) —
+design sources committed and netlist-reproducible — since carried through a
+full PVT-corner campaign and several re-sizing/re-balancing passes (issues
+#12/#16/#18/#20/#22/#24, decision records DR-0005 through DR-0009 below)
+and instantiated into a DRC-clean, LVS-matched layout with a first
+post-layout (PEX) re-verification pass (issues #13/#27/#28, see
+[`layout/README.md`](../layout/README.md) and
+[DR-0010](../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)).
+This directory holds the schematic sources and their PVT-corner evidence;
+layout geometry and DRC/LVS/PEX results live under `layout/`.
 
 ## What's checked in
 
@@ -545,8 +551,12 @@ and by issue #24's running-metric re-derivation,
 [DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md) —
 see the three "Full PVT-corner re-verification" sections above):
 
-- **No DRC/LVS claim.** Device sizing (especially the LSB trim segments,
-  see above) has not been checked against gf180mcu design rules.
+- ~~No DRC/LVS claim.~~ **Resolved by issues #13/#27.** The LSB trim
+  segments' DRC risk flagged above is checked and clean, and the full
+  `rcosc_top` hierarchy (bias generator, trim bank, comparator, top-level
+  composition) has a DRC-clean, LVS-matched GDS — see
+  [`layout/README.md`](../layout/README.md) for the sizing-to-geometry
+  translation and evidence.
 - **No offset/mismatch budget.** The comparator and trim-bank device
   sizing are first-pass placeholders; DR-0002/0003's flagged assumption
   rows (trim-DAC mismatch, comparator offset residual, supply drift) are
@@ -574,7 +584,12 @@ see the three "Full PVT-corner re-verification" sections above):
   DR-0008's `.op` margin (~6.6%) that this same gap already applied to; a
   corner sweep for Iq remains a future increment (DR-0008/DR-0009
   "Consequences").
-- **No layout.** `layout/` remains untouched to date.
+- ~~No layout.~~ **Resolved by issues #13/#27, post-layout re-verification
+  by issue #28.** `layout/cells/rcosc_top.gds` is DRC-clean and
+  LVS-matched, with a first post-layout (PEX-extracted) PVT
+  re-verification pass now committed — see
+  [`layout/README.md`](../layout/README.md) and
+  [DR-0010](../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md).
 
 These are reserved for follow-on increments tracked against the gap
 tracker (#5), consistent with the maturity ladder in the repo `README.md`.
