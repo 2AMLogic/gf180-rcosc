@@ -33,6 +33,27 @@ v {xschem version=3.4.7 file_version=1.2
 * and are within 0.2% of M = 8 at equal Iq, so 8:1 is the knee, not an
 * arbitrary pick. See sim/iq/results/ and DR-0008 for the full grid.
 *
+* RBIAS re-derived AGAIN issue #24: L=1000u -> L=210u, mirror ratio left at
+* M=8:1 (MTAIL unchanged). DR-0008 sized against the `.op` Iq figure -- a
+* DC-equilibrium artifact of a relaxation oscillator with no stable
+* operating point (DR-0008) -- not the RUNNING current DR-0003 Row 4
+* actually names ("< 500 uA (running)"). The running metric has far more
+* headroom at the DR-0008 point (221.59 of 500 uA at the worst code), so
+* re-deriving RBIAS against THAT metric recovers some of the trim range
+* DR-0008 traded away: a re-swept 1-D grid over RBIAS L at the unchanged
+* M=8:1 ratio (op-then-tran methodology, matching DR-0008's own tool
+* exactly) finds the running-Iq-500uA boundary between L=185u (502.61 uA,
+* exceeds) and L=190u (495.58 uA, met, <1% margin); L=210u is chosen with
+* a DR-0008-comparable ~6.3% margin (468.61 uA at worst code 0xFF),
+* recovering realized trim range from DR-0008's +-32.42% to +-35.50% -- a
+* partial, not full, recovery (still short of the ratified +-40%, and
+* still short of DR-0006/pre-#22's +-38.16%). M was not re-opened as a
+* free knob: DR-0008 already found it saturating at M~8, and this issue's
+* own grid (sim/iq/results/, DR-0009) confirms M=4 and M=16 land within
+* about a percentage point of M=8's recovered trim range at their own
+* matched-Iq boundary L -- the ratio knob has no further leverage
+* independent of RBIAS at this current budget. See DR-0009 for the grid.
+*
 * MBIASD stays W=2u nf=1 and is the mirror's unit device: MTAIL's W=16u is
 * drawn as nf=8 fingers of 2u each so the 8:1 ratio is realized as eight
 * copies of the reference geometry rather than one 8x-wider device.
@@ -63,7 +84,7 @@ N 400 -30 400 -50 {}
 C {lab_pin.sym} 400 -50 0 0 {name=l8 lab=vss}
 N 380 0 360 0 {}
 C {lab_pin.sym} 360 0 0 0 {name=l9 lab=vss}
-C {symbols/ppolyf_u_1k.sym} 600 0 0 0 {name=RBIAS model=ppolyf_u_1k W=2u L=1000u m=1}
+C {symbols/ppolyf_u_1k.sym} 600 0 0 0 {name=RBIAS model=ppolyf_u_1k W=2u L=210u m=1}
 N 600 30 600 50 {}
 C {lab_pin.sym} 600 50 0 0 {name=l10 lab=vdd}
 N 600 -30 600 -50 {}
