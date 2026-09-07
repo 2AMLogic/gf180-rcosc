@@ -22,6 +22,16 @@ sim/
                            current check, plus results.csv / manifest.json
                            (the issue #20 run predates the driver and holds a
                            hand-written README plus a raw log excerpt)
+  pvt-postlayout/
+    pex_pvt_sweep.py       the post-layout (PEX-extracted) PVT re-verification
+                           driver (issue #28) -- schematic vs. `klt extract
+                           --parasitics` on `layout/cells/rcosc_top.gds`,
+                           corner-endpoint subset
+    run-pex-pvt-sweep.sh   wrapper: regenerates netlists, extracts parasitics,
+                           then runs pex_pvt_sweep.py
+    corners/<runid>/      raw ngspice logs, one per (side, operating point)
+    results/<runid>/      results.csv, manifest.json, summary.md, plus the
+                           extracted netlist and `klt extract` JSON report
 ```
 
 `<runid>` is a UTC timestamp (`YYYYMMDDTHHMMSSZ`) assigned at invocation
@@ -100,6 +110,26 @@ for each campaign's overall disposition of those verdicts.
 | [`20260906T030219Z`](pvt/results/20260906T030219Z/summary.md) | Full campaign against the issue #16 re-sized schematic (issues #16/#18). 278 unique operating points, 0 failed measurements, 15.0 minutes wall clock at 14 parallel jobs (gf180mcuC, ngspice-46). See [DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md) for the resulting spec-compliance disposition. |
 | [`20260906T060104Z`](pvt/results/20260906T060104Z/summary.md) | Full campaign against the issue #22 bias re-balance (`RBIAS L = 1000 µm`, 8:1 tail mirror). 271 unique operating points, 0 failed measurements, 11.9 minutes wall clock at 14 parallel jobs (gf180mcuC, ngspice-46). Output frequency still **met** (max reachable 51.9415 MHz vs. the ratified 48.000 MHz); trim range still **not met** and its margin worse than DR-0006's (±32.42% vs. ±38.16%) — the price paid for the Iq fix. See [DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md). |
 | [`20260907T090653Z`](pvt/results/20260907T090653Z/summary.md) | Full campaign against the issue #24 running-metric re-derivation (`RBIAS L = 210 µm`, 8:1 tail mirror unchanged). 277 unique operating points, 206 recorded rows, 0 failed measurements, 4.0 minutes wall clock at 8 parallel jobs (gf180mcuC, ngspice-46). Output frequency still **met** (max reachable 58.9870 MHz); trim range still **not met** but its margin recovers about half of DR-0008's loss (±35.50% vs. DR-0008's ±32.42% and DR-0006's ±38.16%); the post-trim, full-temperature, per-corner-code residual widens to −19.41%/+27.85% (worse than both priors — see DR-0009 for the root cause). See [DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md). |
+
+## Post-layout (PEX-extracted) PVT re-verification (issue #28)
+
+`sim/pvt-postlayout/pex_pvt_sweep.py` re-runs the corner-endpoint subset of
+the PVT matrix (`tt`/`ff`/`ss` x -40/+27/+85 C x 3.0/3.3/3.6 V, 27 points)
+against a parasitic-annotated netlist extracted from the full-hierarchy
+`layout/cells/rcosc_top.gds` (issue #27) via `klt extract --parasitics`, at
+the fixed post-#24 (DR-0009) single-code post-trim methodology's own
+calibration code, and reports the per-point schematic-vs-extracted delta.
+See [`sim/pvt-postlayout/README.md`](pvt-postlayout/README.md) for the
+methodology and why `klt pex` was not used verbatim (a confirmed
+`--deck-option`/`--pins` gap on the installed build, plus a `klt extract
+--pdk ... --parasitics` capacitor-annotation issue worked around here and
+both filed as friction against `2AMLogic/klayout-tools`).
+
+### Committed runs (post-layout PEX PVT)
+
+| Run id | Notes |
+|---|---|
+| [`20260907T131703Z`](pvt-postlayout/results/20260907T131703Z/summary.md) | First post-layout PEX PVT re-verification against `layout/cells/rcosc_top.gds` (issue #27), fixed trim code `0xC0` (issue #28). 27-point corner-endpoint subset x 2 sides, 0 failed runs, 102.3 s wall clock at 8 jobs (gf180mcuC, ngspice-46). **Materially diverges**: schematic-vs-extracted delta is negative (slower) at every point, -1.88% to -29.52% — layout parasitics alone exceed the ±1.1% calibration-point accuracy budget. See [DR-0010](../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md). |
 
 ## Quiescent current (Iq) check (issues #20, #22, #24)
 
