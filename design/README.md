@@ -547,8 +547,10 @@ by issues #16/#18's post-resize campaign,
 [DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md),
 by issue #22's bias re-balance,
 [DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md),
-and by issue #24's running-metric re-derivation,
-[DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md) —
+by issue #24's running-metric re-derivation,
+[DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md),
+and by issue #35's Iq PVT-corner factorial,
+[DR-0011](../spec/decision-records/0011-iq-pvt-corner-factorial-row-4-exceeds-off-reference.md) —
 see the three "Full PVT-corner re-verification" sections above):
 
 - ~~No DRC/LVS claim.~~ **Resolved by issues #13/#27.** The LSB trim
@@ -578,12 +580,22 @@ see the three "Full PVT-corner re-verification" sections above):
   `sim/iq/results/20260907T090639Z/README.md`). See "Bias generator" above
   for the sizing and "Full PVT-corner re-verification (issue #24 …)" for
   the recovered trim range and the residual-accuracy trade-off it cost.
-- **No PVT factorial for Iq.** Every Iq figure above is the single
-  reference corner (`tt`/27 °C/3.3 V), as DR-0007's was. The DR-0009
-  sizing's `iq_run` margin (~6.3% at the worst code) is comparable to
-  DR-0008's `.op` margin (~6.6%) that this same gap already applied to; a
-  corner sweep for Iq remains a future increment (DR-0008/DR-0009
-  "Consequences").
+- ~~No PVT factorial for Iq.~~ **Resolved by issue #35.** `sim/iq/iq_sweep.py`
+  now runs the full 7-process × 3-temperature × 3-supply factorial (63
+  grid points/code, corner definitions imported from `sim/pvt/pvt_sweep.py`
+  so the two campaigns cannot drift), at codes `0x00`/`0x80`/`0xC0`/`0xFF`.
+  **Finding: DR-0003 Row 4 is met at the reference corner and across most
+  of the grid, but exceeds at the fast corners (`ff`/`rc_f`) once
+  temperature and supply move toward their hot/high-VDD extreme, at every
+  simulated code** — worst case `ff`/85 °C/3.6 V, e.g. 623.68 µA at code
+  `0xC0` (the code the block would actually ship at) vs. 400.87 µA at the
+  reference corner. See
+  [DR-0011](../spec/decision-records/0011-iq-pvt-corner-factorial-row-4-exceeds-off-reference.md)
+  and `sim/iq/results/20260909T225306Z/README.md` for the full grid and
+  per-code worst-case table. Re-sizing to close this off-reference gap is
+  a follow-on, not done here — DR-0009's ~6.3% reference-corner-only
+  margin was exactly the kind of unstress-tested margin this gap made
+  possible.
 - ~~No layout.~~ **Resolved by issues #13/#27, post-layout re-verification
   by issue #28.** `layout/cells/rcosc_top.gds` is DRC-clean and
   LVS-matched, with a first post-layout (PEX-extracted) PVT

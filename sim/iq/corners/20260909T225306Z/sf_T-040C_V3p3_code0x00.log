@@ -1,0 +1,125 @@
+====================================================================
+gf180-rcosc Iq sweep grid point: sf_T-040C_V3p3_code0x00
+process     : sf (fets=sf res=res_typical mimcap=mimcap_typical)
+temperature : -40 C
+supply      : 3.3 V
+trim code   : 0x00 (0)
+attempt     : 1 (tran 200p 1200n)
+wall clock  : 1.4 s
+exit status : 0
+====================================================================
+
+Note: No compatibility mode selected!
+
+
+Circuit: ** sch_path: /home/ubuntu/loom-workspaces/gf180-rcosc/.loom/worktrees/issue-35/design/smoke_test.sch
+
+Doing analysis at TEMP = -40.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+iq_ua = 7.465936e+02
+v(xxdut.xxcmph.dp) = 1.591156e+00
+v(xxdut.xxcmph.dn) = 1.544971e+00
+v(xxdut.cmph_out) = 1.546559e+00
+v(xxdut.xxcmpl.dp) = 3.300000e+00
+v(xxdut.xxcmpl.dn) = 1.080323e+00
+v(xxdut.cmpl_out) = 3.605940e-09
+Doing analysis at TEMP = -40.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vdd                                        3.3
+xxdut.xxbias.xrba.11                   3.29852
+xxdut.xxbias.xrba.21                   2.20148
+xxdut.vh                                   2.2
+xxdut.xxbias.xrbb.11                   2.19852
+xxdut.xxbias.xrbb.21                   1.10148
+xxdut.vl                                   1.1
+xxdut.xxbias.xrbc.11                   1.09852
+xxdut.xxbias.xrbc.21                0.00148214
+xxdut.xxbias.xrbias.11                 3.29862
+xxdut.xxbias.xrbias.21                 1.15244
+xxdut.ibias                            1.15106
+xxdut.xxtrim.xrfix.11                  3.29929
+xxdut.xxtrim.xrfix.21                  3.20934
+xxdut.xxtrim.c1                        3.20863
+xxdut.xxtrim.xr0.11                    3.20792
+xxdut.xxtrim.xr0.21                    3.20401
+xxdut.xxtrim.c2                         3.2033
+t0                                           0
+xxdut.xxtrim.xr1.11                     3.2026
+xxdut.xxtrim.xr1.21                    3.19477
+xxdut.xxtrim.c3                        3.19406
+t1                                           0
+xxdut.xxtrim.xr2.11                    3.19336
+xxdut.xxtrim.xr2.21                     3.1777
+xxdut.xxtrim.c4                        3.17699
+t2                                           0
+xxdut.xxtrim.xr3.11                    3.17629
+xxdut.xxtrim.xr3.21                    3.14498
+xxdut.xxtrim.c5                        3.14427
+t3                                           0
+xxdut.xxtrim.xr4.11                    3.14356
+xxdut.xxtrim.xr4.21                    3.08094
+xxdut.xxtrim.c6                        3.08024
+t4                                           0
+xxdut.xxtrim.xr5.11                    3.07953
+xxdut.xxtrim.xr5.21                    2.95429
+xxdut.xxtrim.c7                        2.95358
+t5                                           0
+xxdut.xxtrim.xr6.11                    2.95287
+xxdut.xxtrim.xr6.21                    2.70239
+xxdut.xxtrim.c8                        2.70168
+t6                                           0
+xxdut.xxtrim.xr7.11                    2.70098
+xxdut.xxtrim.xr7.21                    2.20001
+xxdut.vc                                2.1993
+t7                                           0
+xxdut.xxcmph.tail                     0.798236
+xxdut.xxcmph.dp                        1.59116
+xxdut.xxcmph.dn                        1.54497
+xxdut.cmph_out                         1.54656
+xxdut.xxcmpl.tail                     0.655327
+xxdut.xxcmpl.dp                            3.3
+xxdut.xxcmpl.dn                        1.08032
+xxdut.cmpl_out                     3.60594e-09
+clk                                   0.831442
+xxdut.qbar                             1.48779
+xxdut.mid1                             2.72062
+xxdut.mid2                             3.12751
+vt7#branch                                   0
+vt6#branch                                   0
+vt5#branch                                   0
+vt4#branch                                   0
+vt3#branch                                   0
+vt2#branch                                   0
+vt1#branch                                   0
+vt0#branch                                   0
+vdd#branch                        -0.000746594
+
+ Reference value :  0.00000e+00
+ Reference value :  2.19605e-07
+ Reference value :  4.30694e-07
+ Reference value :  7.38982e-07
+ Reference value :  1.02848e-06
+No. of Data Rows : 6292
+t_avg_start         =  1.60105e-07
+t_avg_end           =  9.32924e-07
+iq_run_ua           =  3.08624e+02 from=  1.60105e-07 to=  9.33010e-07
+ngspice-46 done
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Note: True gmin stepping completed
+Warning from checkvalid: vector xxdut.clk is not available or has zero length.
+Note: Starting dynamic gmin stepping
+Warning: Dynamic gmin stepping failed
+Note: Starting true gmin stepping
+Note: True gmin stepping completed
