@@ -15,13 +15,20 @@ sim/
     corners/<runid>/      raw ngspice logs, one file per simulated operating point
     results/<runid>/      results.csv, manifest.json, summary.md for that run
   iq/
-    iq_sweep.py           the quiescent-current sweep driver (issue #22)
+    iq_sweep.py           the quiescent-current sweep driver (issue #22,
+                           extended to a full PVT-corner factorial by
+                           issue #35) -- imports PROCESS_CORNERS/TEMPS_C/
+                           VDDS_V/corner_include() from sim/pvt/pvt_sweep.py
+                           rather than duplicating them
     run-iq-sweep.sh       wrapper: regenerates netlists, then runs iq_sweep.py
-    corners/<runid>/      raw ngspice logs, one file per (sizing, trim code)
-    results/<runid>/      README.md (measurement + verdict) for that quiescent-
-                           current check, plus results.csv / manifest.json
-                           (the issue #20 run predates the driver and holds a
-                           hand-written README plus a raw log excerpt)
+    corners/<runid>/      raw ngspice logs, one file per (corner, trim code)
+                           grid point (pre-#35 runs: one per (sizing, trim
+                           code) at the reference corner only)
+    results/<runid>/      README.md (measurement + verdict) for that
+                           quiescent-current check, plus results.csv /
+                           manifest.json (the issue #20 run predates the
+                           driver and holds a hand-written README plus a raw
+                           log excerpt)
   pvt-postlayout/
     pex_pvt_sweep.py       the post-layout (PEX-extracted) PVT re-verification
                            driver (issue #28) -- schematic vs. `klt extract
@@ -131,16 +138,19 @@ both filed as friction against `2AMLogic/klayout-tools`).
 |---|---|
 | [`20260907T131703Z`](pvt-postlayout/results/20260907T131703Z/summary.md) | First post-layout PEX PVT re-verification against `layout/cells/rcosc_top.gds` (issue #27), fixed trim code `0xC0` (issue #28). 27-point corner-endpoint subset x 2 sides, 0 failed runs, 102.3 s wall clock at 8 jobs (gf180mcuC, ngspice-46). **Materially diverges**: schematic-vs-extracted delta is negative (slower) at every point, -1.88% to -29.52% — layout parasitics alone exceed the ±1.1% calibration-point accuracy budget. See [DR-0010](../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md). |
 
-## Quiescent current (Iq) check (issues #20, #22, #24)
+## Quiescent current (Iq) check (issues #20, #22, #24, #35)
 
 `design/smoke_test.sch`'s existing `.op` analysis was extended to compute
 the total DC current drawn from `vdd` (`i(vdd)`, which by KCL sums every
-branch hung off the supply) at the reference corner (`tt`/27 °C/3.3 V) and
-the smoke test's existing representative trim code (`0x80`), to re-verify
-DR-0003 Row 4's `< 500 µA` (running) target after issue #16's ~8x `RBIAS`
-tail-current increase. This is a single representative-corner point check,
-not a PVT factorial — a full corner sweep for Iq is a possible future
-increment, not part of this check's scope.
+branch hung off the supply), to re-verify DR-0003 Row 4's `< 500 µA`
+(running) target after issue #16's ~8x `RBIAS` tail-current increase.
+Issue #35 extended this from a single representative-corner point check
+(`tt`/27 °C/3.3 V) into the same full process x temperature x supply
+factorial `sim/pvt/pvt_sweep.py` runs for frequency — 7 process corners x
+3 temperatures x 3 supplies = 63 grid points per trim code, with
+`PROCESS_CORNERS`/`TEMPS_C`/`VDDS_V`/`corner_include()` imported from
+`sim/pvt/pvt_sweep.py` directly (not re-typed), so the two campaigns'
+corner definitions cannot drift apart.
 
 **Two metrics, always reported together** (issue #22,
 [DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md);
@@ -170,14 +180,23 @@ metric-basis update issue #24,
 Both are always measured and reported together — DR-0008's own sizing
 happened to satisfy both, but the two are **not** expected to agree on
 verdict in general (DR-0009); reporting both, always, is what makes that
-checkable rather than asserted. `sim/iq/run-iq-sweep.sh` measures
-both, across trim codes, for **both** the as-committed sizing and the
-pre-#22 sizing it replaced, so the before/after comparison is produced by
-one command from one netlist under one ngspice:
+checkable rather than asserted.
+
+**Issue #35**: `sim/iq/run-iq-sweep.sh` now measures both metrics at
+every point of the full 63-point (7 process x 3 T x 3 V) corner grid, at
+codes `0x00`/`0x80`/`0xC0`/`0xFF`, for the `as-committed` sizing (the
+`pre-22` before/after comparison stays reference-corner-only —
+`sim/iq/results/20260906T062311Z/` — since running it across the full
+grid too would double this driver's simulation cost for a comparison the
+corner campaign does not need; see `sim/iq/iq_sweep.py`'s module
+docstring). `--subset endpoints` (`tt`/`ff`/`ss` x 3T x 3V, 27 points/code)
+is available as a fast check; the committed record always uses the full
+grid:
 
 ```bash
-sim/iq/run-iq-sweep.sh                                 # codes 0x00 0x80 0xFF
-sim/iq/run-iq-sweep.sh --codes 0x00 0x40 0x80 0xC0 0xFF --jobs 8
+sim/iq/run-iq-sweep.sh                                 # full grid, codes 0x00 0x80 0xC0 0xFF
+sim/iq/run-iq-sweep.sh --subset endpoints --jobs 8      # fast check, not for committed evidence
+sim/iq/run-iq-sweep.sh --codes 0x00 0x40 0x80 0xC0 0xFF
 ```
 
 ### Committed runs (Iq check)
@@ -187,3 +206,4 @@ sim/iq/run-iq-sweep.sh --codes 0x00 0x40 0x80 0xC0 0xFF --jobs 8
 | [`20260906T032927Z`](iq/results/20260906T032927Z/README.md) | First post-#16 Iq measurement (issue #20). Reference corner, code `0x80`: **914.99 µA measured vs. `< 500 µA` ratified — FAIL, 1.83x over.** Independent hand-estimate sanity check corroborates the figure. See [DR-0007](../spec/decision-records/0007-quiescent-current-exceeds-target-post-resize.md) for the resulting disposition (spec unchanged, follow-up issue #22 filed). Predates `iq_sweep.py`; `.op` metric only. |
 | [`20260906T062311Z`](iq/results/20260906T062311Z/README.md) | Post-#22 bias re-balance (issue #22), first run of `iq_sweep.py`. Reference corner, codes `0x00`/`0x80`/`0xFF`, both sizings, both metrics. **PASS on both metrics at every code**: as-committed `iq_op` 467.13–467.18 µA and `iq_run` 136.45–218.54 µA, vs. pre-#22 `iq_op` 914.40–914.99 µA and `iq_run` 470.40–605.50 µA. The `pre-22` variant reproduces DR-0007's 914.99 µA and DR-0006's trim-curve frequencies exactly, cross-validating the driver. See [DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md). |
 | [`20260907T090639Z`](iq/results/20260907T090639Z/README.md) | Post-#24 running-metric re-derivation (issue #24), `RBIAS L = 210 µm`. Reference corner, codes `0x00`/`0x80`/`0xFF`, both sizings, both metrics. **`iq_run` met at every code** (359.74–468.61 µA, vs. the 500 µA target); **`iq_op` exceeds at every code** (754.82–754.90 µA) — expected, not a failure, since `iq_op` is no longer Row 4's verdict basis (DR-0009). See [DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md). |
+| [`20260909T225306Z`](iq/results/20260909T225306Z/README.md) | First full PVT-corner Iq factorial (issue #35), `as-committed` sizing only. 63-point grid x codes `0x00`/`0x80`/`0xC0`/`0xFF` = 252 points, 0 failed measurements, 2.7 minutes wall clock at 6 parallel jobs (gf180mcuC, ngspice-46). **Row 4 met at the reference corner and across most of the grid, but exceeds at the fast corners (`ff`/`rc_f`) at hot/high-VDD, at every code** — worst case `ff`/85 °C/3.6 V: 531.18–713.68 µA depending on code, vs. 345.34–451.91 µA at the reference corner. See [DR-0011](../spec/decision-records/0011-iq-pvt-corner-factorial-row-4-exceeds-off-reference.md). |
