@@ -159,12 +159,14 @@ produced with a current `klt`.
 current artifact summarizing per-spec-row performance — 11 ratified rows, each
 with a per-row verdict citing the `sim/` evidence path it rests on. The generic
 envelope's `status: "pass"` asserts **the record is present and current** — it
-is **not** a claim that every spec row passes: the record itself reports
-**2 of 11 rows Not-met** (trim range; post-trim accuracy), undisguised, with
-causes traced in its §4 and DR-0009. The envelope pins the document's content
-hash (`provenance.input.content_hash`), mirrored in the manifest pin, so a
-citation against a stale characterization record rots in CI the same way the
-layout pins do.
+is **not** a claim that every spec row passes. In the record's own §4 verdict
+vocabulary: **Met** (rows 1, 3, 8, 11), **Within** the ratified bound (row 4),
+**Not met** (row 2 — trim range), **Exceeds** (rows 5–6 — post-trim accuracy,
+both methodologies — and row 9 — Iq off-reference), **Not evaluated** (rows 7,
+10) — every miss undisguised, with causes traced in §4 and DR-0009/DR-0011. The
+envelope pins the document's content hash (`provenance.input.content_hash`),
+mirrored in the manifest pin, so a citation against a stale characterization
+record rots in CI the same way the layout pins do.
 
 ### unmet — item 1 (Design sources): substance present, no gradeable citation
 
@@ -178,21 +180,24 @@ chain, and `klt sim` does not exist in this repo (see item 5). The row stays
 `no_evidence` rather than being painted green with a citation that does not
 prove the item.
 
-### unmet — item 5 (Full corner verification vs a ratified spec): campaign committed, not a gradeable envelope — and 2 rows fail
+### unmet — item 5 (Full corner verification vs a ratified spec): campaign committed, not a gradeable envelope — and the record shows missed rows
 
 The pre-layout PVT campaign is committed under `sim/pvt/results/`
 (`20260907T090653Z`: full 7-process × 3-temp × 3-VDD factorial, 277 unique
 points, 0 sim failures) as this repo's own append-only evidence format
 (`manifest.json` + `results.csv` + `summary.md`), not a `klt sim` JSON
 envelope — so the grader has nothing it can read, mechanically `no_evidence`.
-Beyond the format gap: the campaign's own record shows **2 of 11 ratified spec
-rows fail** (trim range ±35.5% realized vs ±40% ratified; post-trim accuracy
-−34.9%/+54.8% vs ±1.1% ratified) — whether a *failing* full-corner campaign
-can satisfy this item is a separate question the tracker has deliberately
-parked as needing a human/Architect call, since it is evidence-vs-passes, not
-evidence-existence. Making this row gradeable means running the campaign
-through `klt sim` — distinct follow-up work, tracked via the tracker's "Next"
-section (the design-side gap itself is issue #39's PVT-sensitivity work).
+Beyond the format gap, in the characterization record's own §4 verdict
+vocabulary: row 2 is **Not met** (trim range: ±35.50% realized vs ±40%
+ratified) and rows 5–6 **Exceed** the ratified post-trim accuracy budget
+(−34.85%/+54.78% at the calibration point vs ±1.1%, both methodologies; row
+9 likewise exceeds off-reference for Iq) — whether a full-corner campaign with
+missing spec rows can satisfy this item is a separate question the tracker
+has deliberately parked as needing a human/Architect call, since it is
+evidence-vs-passes, not evidence-existence. Making this row gradeable means
+running the campaign through `klt sim` — distinct follow-up work, tracked via
+the tracker's "Next" section (the design-side gap itself is issue #39's
+PVT-sensitivity work).
 
 ### unmet — item 6 (Statistical claims carry Monte Carlo evidence): nothing to back, nothing cited
 
