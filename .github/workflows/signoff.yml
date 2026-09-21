@@ -1,0 +1,63 @@
+name: Signoff
+
+# Mechanical re-grading of the klt-signoff block manifest -- the verdict of
+# record for this block's T1 (sim-validated) status per
+# klayout-tools/docs/design-evidence-tiers.md, replacing the hand-maintained
+# checklist in the gap-to-T1 tracker (issue #5).
+#
+# PDK-free by design: `klt signoff --manifest` on file-backed citations
+# grades committed evidence envelopes, it never runs DRC/LVS/sim gates, so
+# this job needs no PDK download, no xschem, no ngspice -- it runs on a bare
+# ubuntu runner with python3 only (same discipline as the sibling canary
+# repos' CI).
+#
+# What is checked (all inside signoff/verify-report.py):
+#   1. `klt signoff --manifest signoff/block-manifest.json --format json`
+#      runs clean. Exit 3 means "graded below T1" (unmet items exist) and is
+#      data, not failure; exit 1 (a real error) fails the job.
+#   2. The fresh per-item grades match the committed verdict of record
+#      (signoff/signoff-report.json), so a manifest or evidence envelope
+#      edited without re-grading and re-committing the report cannot pass.
+#   3. Every pinned content_hash matches the current bytes of the artifact it
+#      names, so a manifest citing an artifact that has since changed fails
+#      rather than rotting.
+#
+# The klt pin below is load-bearing: the committed report was graded under
+# the 11-item T1 rulebook (incl. klayout-tools#2025 item 11) that shipped
+# after the 0.5.0 release, so a git-pinned commit is the only installable
+# grader that reproduces the committed report. Released klt 0.5.0 bundles the
+# older 10-item checklist and would disagree on t1_item_count. When a
+# release carrying the 11-item rulebook ships, move this pin and re-grade
+# per signoff/README.md's refresh contract.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: signoff-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  signoff:
+    name: klt signoff --manifest (re-grade committed evidence)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install the pinned klt grader
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@2b1e55e51bb803c082e8857da44687f3e37ebfc0"
+          klt --version
+
+      - name: Re-grade the manifest and verify the committed pins
+        run: python signoff/verify-report.py
