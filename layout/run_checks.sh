@@ -122,4 +122,47 @@ print('$cell LVS: match', d.get('category_counts') or '(no tolerated deltas)')
 "
 done
 
+# T1 item 11 (structural power delivery, issue #37): supply-island ERC on
+# the merged top GDS. Unlike the DRC/extract/LVS loop above this is one
+# block-level check, not per-cell -- the question is whether the two
+# supplies each resolve to exactly one electrical island on the layers
+# they route on. The spec (layout/erc-supply-spec.json) declares Contact
+# and ties[] deliberately absent; its _comment block carries the per-entry
+# justification and both disclosures. The committed report's overall
+# "status" is expected to read "violations" -- every real gate reports as
+# erc.floating_gate without Contact declared -- which item 11 explicitly
+# does not grade; the assertion below checks only the item's own pass
+# conditions (zero findings naming a declared supply, plus a content hash
+# pinning the report to the GDS it was run against).
+echo "== rcosc_top: ERC (T1 item 11 supply spec) =="
+# klt erc (>= 0.5.0, klayout-tools#2115's exit-code rollup) exits 3 whenever
+# the report carries ANY finding -- which this report always does, because
+# the disclosed erc.floating_gate artifacts (Contact omitted from vias[], see
+# the spec's _comment) count as findings. Exit 0 (clean) would be equally
+# acceptable; anything else is a real failure and fails the run.
+set +e
+klt erc "$CELLS_DIR/rcosc_top.gds" "$LAYOUT_DIR/erc-supply-spec.json" \
+  --format json > "$REPORTS_DIR/rcosc_top.erc.json"
+erc_rc=$?
+set -e
+if [ "$erc_rc" -ne 0 ] && [ "$erc_rc" -ne 3 ]; then
+  echo "ERROR: klt erc exited $erc_rc (expected 0 or 3)" >&2
+  exit 1
+fi
+python3 -c "
+import hashlib, json
+d = json.load(open('$REPORTS_DIR/rcosc_top.erc.json'))
+supply_rules = ('erc.unconnected_net', 'erc.supply_short', 'erc.multiply_driven_net')
+bad = [f for f in d['erc_findings'] if f['rule'] in supply_rules]
+assert not bad, 'rcosc_top ERC supply findings: ' + json.dumps(bad)
+h = hashlib.sha256(open('$CELLS_DIR/rcosc_top.gds', 'rb').read()).hexdigest()
+assert d['provenance']['input']['content_hash'] == 'sha256:' + h, \
+    'rcosc_top ERC report does not pin the GDS it was run against'
+floating = sum(1 for f in d['erc_findings'] if f['rule'] == 'erc.floating_gate')
+print('rcosc_top ERC: vdd and vss each resolve to exactly one island '
+      '(zero unconnected_net/supply_short); '
+      f'{floating} floating-gate finding(s) = the disclosed Contact-omission '
+      'artifact (klayout-tools#2183), graded as absent by item 11')
+"
+
 echo "== all checks passed =="
