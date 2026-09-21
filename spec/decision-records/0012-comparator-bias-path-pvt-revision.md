@@ -112,7 +112,7 @@ target-spec table row by row:
 | Post-trim, full temperature range (per-corner code) | +8% / −9% | −20.15% / +13.03% | −19.41% / +27.85% | **exceeds** — the upper excess improves from +27.85% to +13.03% (the fs-corner ΔT collapse), the lower is ~0.7pt worse at −20.15%; both still outside +8%/−9% |
 | Trim range | ±40% | ±34.42% (27.6659–56.7060 MHz) | ±35.50% | **not met** — a small, honestly-recorded regression: ±35.50% → ±34.42% (the fast-corner curve shifted down slightly); the row has been not-met since DR-0005 |
 | Output frequency | 48.000 MHz | max reachable 56.7060 MHz | met | met — max reachable 56.7060 MHz at the reference corner (was 58.9870 MHz pre-#39), and the ratified 48.000 MHz target is reached without saturation at tt/ff/fs/sf/rc_f (ss and rc_s saturate at 0xFF) |
-| Quiescent current (running, Row 4) | < 500 µA | IQ | exceeds at fast corners pre-revision (DR-0011) | IQDISPO |
+| Quiescent current (running, Row 4) | < 500 µA | `iq_run` 242–330 µA at the reference corner across all codes; 459–498 µA worst-case across the whole grid at `0x00`/`0x80`; **exceeds** at the fast corners hot/high-VDD (`ff`/`rc_f`), worst 614.87 µA (`ff`/85 °C/3.6 V, `0xFF`) | exceeded at fast corners pre-revision (DR-0011: 531.18–713.68 µA there) | **the fast-corner-hot exceed region shrinks** — codes `0x00`/`0x80` are now met across the entire 63-point factorial (pre-revision every code exceeded there); `0xC0`/`0xFF` still exceed at `ff`/85 °C/3.6 V (541.85 / 614.87 µA). Iq PVT factorial: `sim/iq/results/20260921T091042Z/`, 252 points, 0 failed |
 
 **The scale of the accuracy miss shrinks materially but the two post-trim
 rows are still not met**, for the same honest reasons the instrumentation
