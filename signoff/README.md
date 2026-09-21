@@ -69,8 +69,8 @@ Today the machine grades this block (`klt signoff --manifest`, committed
 `signoff-report.json`):
 
 - **met — item 2 (Layout), item 3 (DRC clean), item 4 (LVS clean), item 8
-  (Characterization report)**
-- **unmet, reason `no_evidence` — items 1, 5, 6, 7, 9, 10, 11**
+  (Characterization report), item 11 (Power delivery, structural)**
+- **unmet, reason `no_evidence` — items 1, 5, 6, 7, 9, 10**
 
 `no_evidence` means exactly what it says mechanically: the manifest names no
 citation for that item. It is **not** an assertion that the underlying work is
@@ -149,9 +149,12 @@ grade:
 Also disclosed: this klt-0.4.0-era envelope predates both the
 `power_connectivity` block (klayout-tools#1952) and the `body_verification`
 block — neither question was *asked* by this compare, so the match says
-nothing about per-instance power pin-to-net reach or body ties; those land
-under item 11's companion work (issue #37) when the supply evidence is
-produced with a current `klt`.
+nothing about per-instance power pin-to-net reach or body ties. The supply
+question itself is now item 11's, graded met (see the met-item-11 section
+below) from this same envelope's `net_correspondence` rows plus a
+current-pinned-klt ERC half; the `power_connectivity`/`body_verification`
+blocks stay unasked by this pair, which is why item 11's analog branch
+does not lean on them.
 
 ### met — item 8 (Characterization report): `signoff/characterization-envelope.json`
 
@@ -167,6 +170,62 @@ both methodologies — and row 9 — Iq off-reference), **Not evaluated** (rows 
 envelope pins the document's content hash (`provenance.input.content_hash`),
 mirrored in the manifest pin, so a citation against a stale characterization
 record rots in CI the same way the layout pins do.
+
+### met — item 11 (Power delivery, structural): `layout/reports/rcosc_top.erc.json` + `layout/reports/rcosc_top.lvs.json`
+
+The one compound citation in the manifest (klayout-tools#2025): item 11 is
+the single T1 item no one artifact proves, so its manifest entry is a *list*
+of evidence parts — the ERC report of the supply-spec run (pinned to the
+GDS the way items 2/3 are) and the same `rcosc_top.lvs.json` item 4 grades
+(unpinned, klt-0.4.0-era, re-verified through its own recorded netlist
+digests). The committed report's `power_delivery` citation block records
+the branch that graded it: `partition_kind: "analog"`, no PDN citation, so
+the analog path — ERC supply-continuity plus LVS `net_correspondence` — is
+what the grade rests on. What each half proves, and the disclosures the
+grader does not grade:
+
+- **ERC half.** `layout/erc-supply-spec.json` declares `vdd`/`vss`
+  (`kind: "supply"`, the one-island-per-supply clauses) and one `ties[]`
+  entry — the upstream deck's own gf180mcu tap boolean (an `Nplus`-covered
+  `Comp` shape inside `Nwell`, wired to `Metal1`, net `vdd`; the
+  `tap_requires` intersection key the klayout-tools#2169 fix added). The
+  committed run reports zero `erc.unconnected_net`, zero `erc.supply_short`,
+  and zero `erc.missing_tie` — with `erc.missing_tie` listed under
+  `checked` in the envelope's `erc_coverage`, so the zero is graded
+  evidence, not an uncomputed absence. Disclosed, not graded: the report's
+  overall `status` is `"violations"` from its 32 `erc.floating_gate`
+  findings — the pre-declared artifact of omitting `Contact` from `vias[]`
+  (klayout-tools#2183, declared non-blocking by item 11's own text,
+  klayout-tools#1994); and this tie grades the *drawn-well* half only —
+  gf180mcu has no drawn p-tub layer, so per `klt erc`'s own contract a
+  substrate tie "cannot be declared at all" and the p-substrate half of
+  the question is outside what this run can ask. Layout-side detail lives
+  in `layout/README.md`'s "Supply ERC (T1 item 11)" section; why `ties[]`
+  was previously omitted (the pre-#2169 collapse that made a declared tie
+  report a false supply short) and why the pinned grader's fix retires
+  that rationale is recorded in both that section and the spec's own
+  `_comment`.
+- **LVS half.** Item 4's own `rcosc_top.lvs.json` at `status: "match"`,
+  carrying `VDD`/`VSS` in `net_correspondence` paired to reference-side
+  nets as pins — the analog branch's "the reference includes the supply
+  nets" clause, satisfied by a SPICE reference by construction. This
+  resolves the LVS-envelope open question of issue #42 by grader output:
+  the freshly graded committed report shows the pinned grader accepting
+  the committed klt-0.4.0-era envelope on this branch — no LVS regeneration
+  was needed, and with no PDN citation the `power_connectivity` block the
+  PDN branch would read is never consulted (`power_connectivity_status`
+  is `null` in the citation, and that null is why the analog branch, not
+  the PDN branch, applied).
+
+The flip itself (evidence landed in PR #41, citation + re-grade made here)
+is the refresh contract's step sequence executed once: regenerate the
+affected evidence the documented way, pin from the regenerated envelopes'
+`provenance` blocks, re-grade with the exact pinned command, and let
+`verify-report.py` fail until all three agree. The ERC part's manifest pin
+names the GDS input hash the envelope records, and the spec hash the
+envelope records is re-verified against the spec's current bytes on every
+CI run alongside it — the compound-entry extension of the artifact table
+at the top of `verify-report.py`.
 
 ### unmet — item 1 (Design sources): substance present, no gradeable citation
 
@@ -251,18 +310,6 @@ valid" half is satisfied by the signoff workflow itself
 (`.github/workflows/signoff.yml`, added with this directory) — but no `klt`
 envelope can cite a README, a license, or a CI file, so the row stays
 `no_evidence` rather than being painted green with an adjacent citation.
-
-### unmet — item 11 (Power delivery, structural): no `klt erc` supply evidence yet — companion issue #37
-
-The checklist's eleventh item (added 2026-09-17, klayout-tools#2025) requires
-a `klt erc` supply-spec run plus an LVS whose reference carried the supply
-nets. Neither exists in this repo yet — mechanically `no_evidence`. This is
-deliberately **not** being faked or deferred here: it is this repo's companion
-item-11 issue **#37** ("T1 item 11 (power delivery, structural): no klt erc
-supply spec or report in this repo"), which owns producing the supply spec,
-the `klt erc` run, and the item-11 citation. When #37 lands, its citation
-goes into this manifest's `evidence["11"]` (a compound list entry — `erc` +
-`lvs`), the report is re-graded, and this row turns on mechanically.
 
 ## Freshness and the refresh contract
 
