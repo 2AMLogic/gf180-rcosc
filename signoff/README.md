@@ -277,13 +277,13 @@ row change together.
 ### unmet — item 7 (Post-layout verification): campaign committed, not a `klt pex` report
 
 The post-layout re-verification is committed under
-`sim/pvt-postlayout/results/20260907T131703Z/` — a real `klt extract
+`sim/pvt-postlayout/results/20260921T164434Z/` — a real `klt extract
 --parasitics` run (`rcosc_top.pex.extract.json`, klt 0.4.0) against the same
 GDS item 2 pins (`provenance.input.content_hash` matches), re-simulated by the
 custom `pex_pvt_sweep.py` harness over a 27-point corner-endpoint subset at
-fixed trim `0xC0`, with the schematic-vs-extracted deltas recorded per point
-(oscillator runs −1.88% to −29.52% slower than schematic at every point —
-DR-0010). The grader accepts **only a `klt pex` report** for this item
+fixed trim `0xD0`, with the schematic-vs-extracted deltas recorded per point
+(oscillator runs −11.24% to −41.42% slower than schematic at every point —
+DR-0013). The grader accepts **only a `klt pex` report** for this item
 (a clean DRC or a custom re-sim proves nothing about post-layout behavior in
 its eyes — `wrong_kind` by design), so mechanically: `no_evidence`. Body-bias
 disclosure for the committed extractions: both the plain and the parasitic
