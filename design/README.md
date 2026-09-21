@@ -699,7 +699,8 @@ post-trim accuracy rows remain **not met**: the phantom-resistance share is
 removed, the per-code supply-sensitivity row at `ss` no longer tracks the
 switch mechanism (it now tracks the comparator/latch delay residue,
 monotone in the code's period-share of the delay — `0x80` +8.34%,
-`0x9D` +10.5%, `0xCF` +13.9%, `0xEF` +18.78% as in-chain trim mass falls),
+`0x9D` +9.88%, `0xCF` +13.87%, `0xEF` +18.78% as the code's in-chain trim
+mass falls on the frozen map: 56.1 / 45.4 / 20.6 / 14.6 kΩ),
 and the block-boundary code pairs carry the characterized ~1-LSB-margin
 local dips the campaign now samples explicitly. The block staircase stays
 monotone at every sampled 16-code step at every corner. No ratified row is

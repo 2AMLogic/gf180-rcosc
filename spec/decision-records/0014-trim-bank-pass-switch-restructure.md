@@ -111,7 +111,10 @@ as final.
   this issue: uniform, per-position-tapered, and bit-7-width sweeps; the dip
   reappears at every width that does not break `f(0x00)`). Measured at tt:
   `0x7F`→`0x80` −6.40%, `0xBF`→`0xC0` −3.21%, `0xDF`→`0xE0` −1.72%,
-  `0xEF`→`0xF0` −0.42%; at ss/85 °C/3.0 V the `0x7F`/`0x80` dip is −4.82%.
+  `0xEF`→`0xF0` −0.42%; the worst-corner (`ss`/85 °C/3.0 V) sizing probes
+  measured the same boundary at −4.82% (scratch-grid runs on this branch,
+  not part of the committed campaign evidence set — the campaign's
+  boundary sampling is reference-corner; magnitude class consistent).
   Every sampled 16-code block step is positive at every corner, and the
   calibration picks codes whose own f is re-simulated and reported. The
   pre-#43 "monotone by construction" claim held only because the dead
@@ -120,19 +123,24 @@ as final.
   margin itself would mean re-tuning the frozen R map — explicitly out of
   scope here.
 - **Per-code supply sensitivity at the ss corner (`switchprobe`).**
-  `0x80`: +11.0…+11.3% pre-#43 → **+8.34%** post-#43. `0xEF`:
-  +20.0…+20.8% pre-#43 → **+18.78%** post-#43. The named acceptance
+  `0x80`: +11.0…+11.3% pre-#43 (the issue body's own figures) → **+8.34%**
+  post-#43. `0xEF`: +20.0…+20.8% pre-#43 →
+  **+18.78%** post-#43. The named acceptance
   ("no longer materially worse at high codes") is **met at `0x80`, not met
   at `0xEF`**, and the campaign's own rows re-attribute the residue: the
   supply sensitivity grows monotonically as the code's in-chain trim mass
-  falls (+8.34% at 58.5 kΩ, +10.5% at 46 kΩ, +13.9% at 28 kΩ, +18.8% at
-  15.3 kΩ), which is the signature of the comparator/latch delay term paid
+  falls on the frozen map — +8.34% at `0x80` (56.1 kΩ ideal in-chain plus
+  the bit-7 residual), +9.88% at `0x9D` (45.4 kΩ),
+  +13.87% at `0xCF` (20.6 kΩ), +18.78% at `0xEF` (14.6 kΩ) —
+  which is the signature of the comparator/latch delay term paid
   ≈3× into the charge phase (DR-0012's own measurement) whose period-share
   grows as the RC term shrinks. The switch residual's own 3.0→3.6 V
-  contribution at these codes is bounded ≈1–3 points by direct arithmetic on
-  the frozen map (its R-share at `0xEF` is ~6–8% of in-chain mass, and a
-  pass-device overdrive ratio moves that share by <±25%). The measured gap
-  is ~10 points. **Conclusion: the remaining high-code supply sensitivity
+  contribution is bounded by the campaign's pre/post-revision deltas
+  (measured, not modeled): removing the phantom path cut the `0x80` row by
+  ~2.7 points (11.0-11.3 → 8.34) and the `0xEF` row by only ~1.6 points
+  (20.0-20.8 → 18.78), i.e. everything the switchover could remove was
+  single-digit, against a ~10-point gap between the two codes' rows.
+  **Conclusion: the remaining high-code supply sensitivity
   is dominated by the comparator/latch delay residue, not the switch
   phantom** — revising the DR-0012 attribution, which credited the phantom
   with the slow-corner calibrated-code residual. That mechanism was already
