@@ -19,8 +19,12 @@ layout/
   netlist_parse.py      tiny parser reading device geometry out of
                          design/netlist/rcosc_top.spice (never hand-retyped)
   build_cells.py        builds layout/cells/*.gds + layout/lvs_ref/*.spice
-  run_checks.sh          regen-netlist + build + DRC + extract + LVS, writes
-                         layout/reports/*.json
+  run_checks.sh          regen-netlist + build + DRC + extract + LVS
+                         + supply ERC, writes layout/reports/*.json
+  erc-supply-spec.json  klt erc spec for the T1 item-11 supply-island read
+                         (see "Supply ERC (T1 item 11)" below; every
+                         stackup/via/label field is justified in its
+                         _comment block)
   cells/
     rcosc_bias.gds
     rcosc_trim_bank.gds
@@ -31,7 +35,8 @@ layout/
     rcosc_trim_bank.spice are not the schematic netlist verbatim)
     rcosc_comparator.spice
     rcosc_top.spice
-  reports/                committed evidence -- DRC/extract/LVS JSON, fresh
+  reports/                committed evidence -- DRC/extract/LVS ERC JSON,
+                         fresh
     rcosc_bias.{drc,extract,lvs}.json
     rcosc_bias.extracted.spice
     rcosc_trim_bank.{drc,extract,lvs}.json
@@ -40,6 +45,9 @@ layout/
     rcosc_comparator.extracted.spice
     rcosc_top.{drc,extract,lvs}.json
     rcosc_top.extracted.spice
+    rcosc_top.erc.json     T1 item 11 structural power-delivery evidence
+                           (supply islands; input content-hash pinned to
+                           the committed GDS)
 ```
 
 ## Reproducing
@@ -52,11 +60,75 @@ Regenerates `design/netlist/` (so layout always builds against the current
 schematic), rebuilds all four GDS from `klt gen` primitives (plus, for
 `rcosc_top`, sub-cell instantiation of the other three), and re-runs
 `klt drc` / `klt extract` / `klt lvs` for each cell, asserting `status ==
-"clean"` / `"match"` and failing loudly otherwise. `layout/build_cells.py
+"clean"` / `"match"` and failing loudly otherwise — then the block-level
+`klt erc` supply-island check of the section below. `layout/build_cells.py
 --check` (no `design/regen-netlist.sh` re-run) verifies the committed GDS +
 reference netlists are byte-identical to a fresh rebuild, without touching
 them — the same "derived, not hand-written, and reproducible on change"
 convention `design/regen-netlist.sh` documents for the schematic netlists.
+
+## Supply ERC (T1 item 11)
+
+`erc-supply-spec.json` + `reports/rcosc_top.erc.json` are this block's
+structural power-delivery evidence for klayout-tools design-evidence-tiers
+T1 item 11 (added 2026-09-17, klayout-tools#2025), whose analog/custom
+branch reads: *"`klt erc` supply spec reports one island per supply and
+zero `missing_tie`; LVS reference includes the supply nets (already true
+for SPICE references)"*.
+
+What the committed report says, and on what each part rests:
+
+- **One island per supply.** `vdd` and `vss` are declared `kind:
+  "supply"`; in the committed report zero `erc.unconnected_net` and zero
+  `erc.supply_short` (and zero `erc.multiply_driven_net`) findings name
+  either — which is exactly the one-island verdict: `erc.unconnected_net`
+  fires on zero *and* on more-than-one island, so its absence plus no
+  supply short is "each supply is one connected rail", not merely a
+  missing check. The stackup covers the layers the supplies actually
+  route on, measured on this GDS: Metal1–Metal2 (intra-block device tabs
+  and channel-router columns/tracks) and Metal3–Metal4 (long top-level
+  tracks and `CTIMING`'s MiM bottom plate, which `XCTIMING` wires to
+  `vss`). `label_layer` is 36/10 (Metal2 pin text) only — verified
+  against the stream: that is the one layer this merged GDS puts `vdd` /
+  `vss` (and every other pin) text on.
+- **`erc.missing_tie` is not computed, by declared omission.** The spec
+  has no `ties[]` section, so `klt erc`'s own contract leaves
+  `erc.missing_tie` uncomputed rather than reporting a misleading zero.
+  Declaring `ties[]` on a real routed layout collapses it into one
+  electrical island and reports a false `erc.supply_short`
+  (klayout-tools#2169, reproduced four ways in gf180-drone-fc FRICTION
+  F-034), so its absence here is an **absence of evidence, not evidence
+  of absence**. The well-tie evidence standing in for it: (a) item 4's
+  own `rcosc_top.lvs.json` matches with `VDD`/`VSS` in
+  `net_correspondence` as pins — the analog branch's second clause: the
+  SPICE reference carries the supply nets, at full-connectivity LVS
+  "match"; (b) the merged GDS's own PG pin labels on 36/10 (what
+  `nets[]` matches); (c) `rcosc_comparator`'s drawn shared n-well group
+  with its `well_island` tap on `vdd` (see "Approach" above). Caveat
+  kept visible rather than papered over: klt extract's gf180mcu deck has
+  no distinct substrate-tap layer, so body/well ties are synthesized
+  (`vsubs`), not geometrically verified (see "LVS reference netlists"
+  below) — which is why no `missing_tie` number is claimed here at all.
+- **The report's overall `status` is `"violations"`, and item 11 does
+  not grade that.** Its 32 findings are all `erc.floating_gate`, the
+  disclosed artifact of omitting the `Contact` (33/0) vias entry: the
+  bias generator's resistor ladder is drawn poly straight across the
+  rails (`vdd→vh→vl→vss`, plus `vdd→ibias` and the trim chain
+  `vdd→vc`), and `klt erc` has no device recognition, so with
+  `Contact` declared those resistor bodies conduct the two supplies into
+  one island and report a false `erc.supply_short`. Omitting `Contact`
+  keeps the supply verdict about the metal power delivery —
+  measured both ways on this GDS — at the cost of reporting every real,
+  contacted gate as floating (klayout-tools#2183; item 11's own text
+  pre-declares antenna-verdict and floating-gate findings non-blocking,
+  klayout-tools#1994). Antenna verdicts themselves are all `"unchecked"`:
+  the run passes no `--pdk`, and `klt erc`'s antenna-ratio table covers
+  sky130 only.
+- **Freshness is pinned, not asserted.** The report's
+  `provenance.input.content_hash` is the sha256 of
+  `cells/rcosc_top.gds` and `provenance.spec.content_hash` is the
+  sha256 of the spec — `run_checks.sh` re-verifies the first on every
+  run, so a regenerated-but-stale pair fails the check.
 
 ## Approach: `klt gen` primitives, composed by hand
 
@@ -181,6 +253,31 @@ included for completeness — one worked as documented, needing no new issue):
   this is klayout-tools#1151's `--deck-option` mechanism, already merged
   upstream by the time this issue started; confirmed working as documented,
   not a new gap to file.
+- **[klayout-tools#2169](https://github.com/2AMLogic/klayout-tools/issues/2169)**:
+  `klt erc`'s `ties[]` collapses a real routed layout into one electrical
+  island and reports a **false** `erc.supply_short` (reproduced four ways
+  in `gf180-drone-fc`'s FRICTION F-034). Hit here while building the T1
+  item-11 supply spec ("Supply ERC" above): worked around by committing
+  the spec **without** `ties[]` — per `klt erc`'s own contract that
+  leaves `erc.missing_tie` *not computed* rather than reported as a
+  misleading zero, and the standing-in well-tie evidence is named in the
+  "Supply ERC" section instead of implied.
+- **[klayout-tools#2183](https://github.com/2AMLogic/klayout-tools/issues/2183)**:
+  `klt erc` registers no device recognition, so a drawn resistor body is
+  indistinguishable from a wire — any block whose topology deliberately
+  spans two declared supplies through an on-chip resistor (this block's
+  bias ladder and trim chain are exactly that) reports a **false**
+  `erc.supply_short` with a spec that declares `Contact`, and likewise a
+  MiM cap's top-plate `Via4` reads as a metal-to-metal short across the
+  dielectric. Worked around here by omitting `Contact` and `Via4` from
+  the supply spec's `vias[]` (each omission justified in the spec's
+  `_comment`, measured both ways on this GDS — see "Supply ERC" above):
+  the supply-island verdict stays about the metal rails, and the cost —
+  every real gate reported as `erc.floating_gate`, 32 findings — is
+  disclosed and pre-declared non-blocking by item 11's own text. The
+  LVS-side companion of this gap is this file's "LVS reference netlists"
+  note: `klt extract`, which *does* recognize device bodies, is what
+  keeps device-level connectivity honest.
 
 ## LVS reference netlists (`layout/lvs_ref/`)
 
