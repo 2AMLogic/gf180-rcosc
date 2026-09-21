@@ -37,20 +37,29 @@ value), not any neighbouring length. Worked around by drawing `R1` at
 `1.4966um` instead (`_R1_LENGTH_NUDGE_UM` below) -- a 0.1nm / <0.007%
 resistance nudge, filed upstream rather than silently absorbed.
 
-## Floorplan (both cells)
+## Floorplan
 
-Each cell is two rows: row 1 is the resistor chain (left to right, in
-schematic node order, baseline y=0); row 2, above row 1 with a routing gap,
-holds the diode-connected bias transistor (`rcosc_bias`) or the trim-bank
-shunt switches (`rcosc_trim_bank`), one per resistor it shorts. Every
-switch/transistor is centred in x above its own resistor so its two routing
-jogs (`Composer.wire_z`) stay inside that resistor's own private x window --
-no two different nets' routing ever needs to cross, since neighbouring
-resistors never overlap in x (see `gen_lib.py`'s `wire_z`/`wire_l`
-docstrings). `rcosc_bias`'s `RBIAS`+`MBIASD` sub-row and its `vdd`/`vss`
-cross-row jogs follow the same discipline -- `build_rcosc_bias()` below
-documents the left/right terminal-role swap that keeps its `vss` jog clear
-of the `ibias` rail.
+`rcosc_trim_bank` remains issue #13's two-row cell: row 1 is the resistor
+chain (left to right, in schematic node order, baseline y=0); row 2, above
+row 1 with a routing gap, holds the trim-bank shunt switches, one per
+resistor it shorts, planar in metal1 (each switch is centred in x above its
+own resistor so its two routing jogs (`Composer.wire_z`) stay inside that
+resistor's own private x window -- no two different nets' routing ever
+needs to cross, since neighbouring resistors never overlap in x).
+
+`rcosc_bias` was that shape while the pre-#39 reference leg
+(`RBIAS`+`MBIASD`) kept it planar; issue #39's self-biased beta-multiplier
+core (issue #44's re-spin) is not planar in metal1 -- the PMOS gate bus
+`pb` must reach five terminals spread across the cell (`P1` gate+drain,
+`P2` gate, `N2` drain, `SEED` drain), and `vl` must reach `SEED`'s gate
+across them -- so the re-spun cell follows the comparator's proven
+one-row-plus-`Channel` discipline (`build_rcosc_comparator`, issue #27):
+one row of blocks, metal1 columns, one metal2 track per net above them,
+pin pads above the channel. The two PMOS devices share one drawn n-well
+with a `well_island` tap on `vdd` (same reason as the comparator's), and
+`run_checks.sh` gives this cell's own LVS run the same
+`options.combine_devices: ["nfet"]` to fold `N2`'s eight drawn fingers
+back into the reference's single wide card.
 """
 
 from __future__ import annotations
@@ -194,89 +203,154 @@ class Row:
         return bottom, top
 
 
-def build_rcosc_bias(devices: dict) -> tuple[Composer, list[str]]:
-    rba = devices["XRBA"]
-    rbb = devices["XRBB"]
-    rbc = devices["XRBC"]
-    rbias = devices["XRBIAS"]
-    mbiasd = devices["XMBIASD"]
+# `rcosc_bias`'s row, left to right (issue #44's re-spin): the unchanged
+# vh/vl resistor ladder first (same three RBA/RBB/RBC strips the pre-#39
+# cell drew), then the post-#39 self-biased beta-multiplier core's devices in
+# schematic signal order -- N1 (the diode-connected reference unit), N2 (the
+# mirrored 8-finger output device), its source degeneration resistor RZ, the
+# weak SEED pull-down, and the P1/P2 pfet mirror pair last so the two PMOS
+# can share one drawn n-well with its tap island, exactly as
+# `build_rcosc_comparator` does (gf180mcu's `nwell.space.1` is 0.6um even
+# between equipotential wells; one drawn well is both DRC-legal and the real
+# device model). No NMOS may sit inside that well rectangle -- `klt
+# extract`'s MOS split is "active inside the well is PMOS, outside is
+# NMOS" (see `gen_lib.Composer.draw_nwell`).
+_BIAS_ROW_ORDER = ["XRBA", "XRBB", "XRBC", "XN1", "XN2", "XRZ", "XSEED", "XP1", "XP2"]
+#: Track order (bottom-up) in the bias cell's routing channel. The two
+#: internal core nets go first (they carry the most columns and benefit from
+#: the shortest runs), then the exported pins. `pb` (the PMOS gate bus) and
+#: `n2s` are the two nets the pre-#39 cell did not have and the reason this
+#: cell is channel-routed rather than planar -- `pb` alone must reach five
+#: terminals across the whole row (`P1` gate+drain, `P2` gate, `N2` drain,
+#: `SEED` drain), which metal1-only wiring cannot route without a short.
+_BIAS_TRACKS = ["pb", "n2s", "ibias", "vl", "vh", "vdd", "vss"]
+_BIAS_PINS = ["vdd", "vss", "vh", "vl", "ibias"]
 
-    c = Composer("rcosc_bias")
 
-    p_rba = c.gen_and_place(
-        "res_array",
-        {"length_um": rba.param_um("r_length"), "width_um": rba.param_um("r_width"), "num": 1, "dummy": 0},
-        0.0, 0.0, "rba",
-    )
-    p_rbb = c.gen_and_place(
-        "res_array",
-        {"length_um": rbb.param_um("r_length"), "width_um": rbb.param_um("r_width"), "num": 1, "dummy": 0},
-        p_rba.x1_um + GAP_UM, 0.0, "rbb",
-    )
-    p_rbc = c.gen_and_place(
-        "res_array",
-        {"length_um": rbc.param_um("r_length"), "width_um": rbc.param_um("r_width"), "num": 1, "dummy": 0},
-        p_rbb.x1_um + GAP_UM, 0.0, "rbc",
-    )
-
-    row2_y = p_rba.bbox_um[3] + GAP_UM
-    p_rbias = c.gen_and_place(
-        "res_array",
-        {"length_um": rbias.param_um("r_length"), "width_um": rbias.param_um("r_width"), "num": 1, "dummy": 0},
-        0.0, row2_y, "rbias",
-    )
-    p_mbiasd = c.gen_and_place(
-        "mos_array",
-        {
-            "w_um": mbiasd.param_um("w"), "l_um": mbiasd.param_um("l"),
-            "fingers": mbiasd.param_int("nf"), "rows": 1, "cols": 1, "dummy": 0,
-            "flavor": "nfet", "gate_contact": True,
-        },
-        p_rbias.x1_um + GAP_UM, row2_y, "mbiasd",
-    )
-
-    rba_a, rba_b = p_rba.port_abs("R0_A"), p_rba.port_abs("R0_B")
-    rbb_a, rbb_b = p_rbb.port_abs("R0_A"), p_rbb.port_abs("R0_B")
-    rbc_a, rbc_b = p_rbc.port_abs("R0_A"), p_rbc.port_abs("R0_B")
-    rbias_a, rbias_b = p_rbias.port_abs("R0_A"), p_rbias.port_abs("R0_B")
-    # U0_S (left, near RBIAS) carries the gate-tied "ibias" role; U0_D
-    # (right, far from RBIAS) carries "vss" -- an nfet's S/D is symmetric,
-    # so this is a free choice, and this one keeps the vss cross-row jog
-    # clear of the ibias rail (see module docstring's floorplan note).
-    mb_ibias_term = p_mbiasd.port_abs("U0_S")
-    mb_vss_term = p_mbiasd.port_abs("U0_D")
-    mb_g = p_mbiasd.port_abs("U0_G")
-
-    c.wire_segment(rba_b[0], rba_b[1], rbb_a[0], rbb_a[1], 2.0)  # vh
-    c.wire_segment(rbb_b[0], rbb_b[1], rbc_a[0], rbc_a[1], 2.0)  # vl
-    c.wire_segment(rba_a[0], rba_a[1], rbias_a[0], rbias_a[1], 2.0)  # vdd (aligned x=0 on both rows)
-    # ibias rail: RBIAS.B -> the gate's own x (covers MBIASD's S terminal,
-    # which sits between RBIAS.B and the gate in x)
-    c.wire_segment(rbias_b[0], rbias_b[1], mb_g[0], mb_ibias_term[1], 2.0)
-    c.wire_segment(mb_g[0], mb_g[1], mb_g[0], mb_ibias_term[1], 0.42)
-    # vss: RBC.B (row1, far right) -> MBIASD's D terminal (row2, far right
-    # of its own cell) -- via RBC.B's own x column, clear of the ibias rail
-    c.wire_l((rbc_b[0], rbc_b[1]), (mb_vss_term[0], mb_vss_term[1]), 0.42, via_x=rbc_b[0])
-
-    c.add_pin_label(rba_a[0], rba_a[1], "vdd")
-    c.add_pin_label(rba_b[0], rba_b[1], "vh")
-    c.add_pin_label(rbb_b[0], rbb_b[1], "vl")
-    c.add_pin_label(rbc_b[0], rbc_b[1], "vss")
-    c.add_pin_label(rbias_b[0], rbias_b[1], "ibias")
-
-    patched = c.patch_high_sheet_resistors()
-    assert patched == 4, f"expected 4 resistors patched, got {patched}"
-    # Pin coordinates, for `build_rcosc_top` to route to when it instantiates
-    # this cell -- read from the same ports the labels above were placed on,
-    # never re-measured off the written GDS.
-    c.pins_um = {
-        "vdd": (rba_a[0], rba_a[1]),
-        "vh": (rba_b[0], rba_b[1]),
-        "vl": (rbb_b[0], rbb_b[1]),
-        "vss": (rbc_b[0], rbc_b[1]),
-        "ibias": (rbias_b[0], rbias_b[1]),
+def _res_params(d: Device) -> dict:
+    """`klt gen res_array` params for one schematic resistor instance."""
+    return {
+        "length_um": d.param_um("r_length"),
+        "width_um": d.param_um("r_width"),
+        "num": 1,
+        "dummy": 0,
     }
-    return c, ["vdd", "vss", "vh", "vl", "ibias"]
+
+
+def build_rcosc_bias(devices: dict) -> tuple[Composer, list[str]]:
+    """The re-spun bias cell (issue #44): the unchanged vh/vl ratiometric
+    ladder plus issue #39's self-biased beta-multiplier current-reference
+    core (`P1`/`P2` pfet mirror, `N1` reference diode driving the exported
+    `ibias` node, `N2` degenerated by `RZ`, `SEED` start-up pull-down),
+    drawn against the post-#39 `design/rcosc_bias.sch`.
+
+    One row of blocks, one metal2 track per net above it, one metal1 column
+    per terminal -- `gen_lib.Channel`'s discipline, for the same structural
+    reason `rcosc_comparator` needed it (a net {pb} that must cross other
+    nets' terminal runs). The five sub-cell boundary pins land as one pad
+    row above the channel, mirroring the comparator, so the top-level
+    composition routes to this cell exactly as it routed to the old one:
+    same five pins (`vdd vss vh vl ibias`, unchanged subckt order -- issue
+    #39 deliberately kept the boundary interface), only the coordinates
+    move, and `build_rcosc_top` reads those from this builder's reported
+    `pins_um` rather than any hard-coded position."""
+    c = Composer("rcosc_bias")
+    row = Row(c)
+
+    placed: dict[str, object] = {}
+    for name in _BIAS_ROW_ORDER:
+        d = devices[name]
+        if d.model == "ppolyf_u_1k":
+            params = _res_params(d)
+        else:
+            params = _mos_params(d)
+        placed[name] = row.place(
+            "res_array" if d.model == "ppolyf_u_1k" else "mos_array",
+            params, name.lower()[1:],
+        )
+
+    # One n-well over the PMOS mirror pair plus its tap island, merging the
+    # generators' own per-device wells into one equipotential well tied to
+    # vdd (same construction and rationale as the comparator's well group).
+    well_x0 = row.left_um["p1"] + COL_OFFSET_UM - 0.5
+    p_well = row.place(
+        "well_island",
+        {
+            "inner_width_um": 1.0,
+            "inner_height_um": 1.0,
+            "contacts_per_side": 1,
+            # The label this generator would draw sits on the ring's own metal
+            # inside a sub-cell, where `klt extract` does not reliably promote
+            # it to a pin -- this cell names `vdd` on its own pin pad instead.
+            "net": "",
+        },
+        "pwell_tap",
+    )
+    well_x1 = row.right_um["pwell_tap"] - COL_OFFSET_UM + 0.5
+    c.draw_nwell(well_x0, -0.65, well_x1, row.top_um + 0.5)
+
+    ch = Channel(
+        c,
+        column_layer=gen_lib.METAL1,
+        track_layer=gen_lib.METAL2,
+        track_via=gen_lib.VIA1,
+        y0_um=row.top_um + CHANNEL_CLEARANCE_UM,
+        pitch_um=TRACK_PITCH_UM,
+    )
+
+    def terminal(dev_name: str, port: str, net: str, column_x: float) -> None:
+        x, y, _ = placed[dev_name].port_abs(port)
+        ch.add(net, x, y, column_x)
+
+    # `nodes` is the schematic's own terminal order -- [a, b, bulk] for the
+    # resistor calls and [d, g, s, b] for the MOS calls -- so every net
+    # below is read from the netlist, never retyped. MOS bulk (body)
+    # terminals are not routed: NMOS bodies extract to the deck's
+    # synthesized `vsubs` and the PMOS bodies take their `vdd` identity from
+    # the drawn well tap above, exactly as the LVS reference models them.
+    for name in _BIAS_ROW_ORDER:
+        key = name.lower()[1:]
+        d = devices[name]
+        if d.model == "ppolyf_u_1k":
+            terminal(name, "R0_A", d.nodes[0], row.left_um[key])
+            terminal(name, "R0_B", d.nodes[1], row.right_um[key])
+        else:
+            d_net, g_net, s_net, _b_net = d.nodes
+            terminal(name, "U0_S", s_net, row.left_um[key])
+            terminal(name, "U0_D", d_net, row.right_um[key])
+            gate_x, _, _ = placed[name].port_abs("U0_G")
+            terminal(name, "U0_G", g_net, gate_x)
+
+    tap_x, tap_y, _ = p_well.port_abs("TAP_N")
+    ch.add("vdd", tap_x, tap_y, tap_x)
+
+    ch.route(_BIAS_TRACKS)
+    pad_y = ch.top_y_um(_BIAS_TRACKS) + PAD_CLEARANCE_UM
+    # One pin pad per exported net, each above an existing column of the
+    # same net so the pad column's vertical run is continuous from track
+    # to pad (the comparator's own discipline: pin pads only at columns
+    # the net already reaches).
+    pin_column = {
+        "vdd": row.left_um["rba"],  # RBA.A -- the ladder's vdd terminal
+        "vss": row.right_um["rbc"],  # RBC.B -- the ladder's vss terminal
+        "vh": row.right_um["rba"],  # RBA.B -- the ladder's vh node
+        "vl": row.right_um["rbb"],  # RBB.B -- the ladder's vl node
+        "ibias": placed["XN1"].port_abs("U0_G")[0],  # N1's diode-connected gate
+    }
+    pins_um = {}
+    for net in _BIAS_PINS:
+        pins_um[net] = ch.pin_pad(net, pin_column[net], pad_y, gen_lib.METAL1_LABEL)
+
+    # MUST be the end of the build: relaunched PCell re-evaluation wipes
+    # the markers `patch_high_sheet_resistors()` draws if any `klt gen`
+    # call happens after it (see `place_gds`'s docstring).
+    patched = c.patch_high_sheet_resistors()
+    assert patched == 4, f"expected 4 resistors patched (RBA/RBB/RBC/RZ), got {patched}"
+    # Pin coordinates, for `build_rcosc_top` to route to when it instantiates
+    # this cell -- reported from the same pads the labels were placed on,
+    # never re-measured off the written GDS.
+    c.pins_um = pins_um
+    return c, _BIAS_PINS
 
 
 def build_rcosc_trim_bank(devices: dict) -> tuple[Composer, list[str]]:
@@ -617,6 +691,17 @@ def _write_reference_netlist_bias(devices: dict, path: Path, ctx: dict) -> None:
         "* limitation, not a schematic or spec change (mirrors gf180-temp-por's",
         "* lvs_reference.py: 'the deck ties every drawn resistor's bulk to its",
         "* substrate global' -- see layout/README.md for the full rationale).",
+        "* The pfet bulk terminals are NOT rewritten: this cell draws a real",
+        "* n-well tap ('klt gen well_island', see build_rcosc_bias) tying the",
+        "* shared PMOS well to vdd, so the layout genuinely reports those",
+        "* bodies on the vdd net and the schematic's own vdd bulk connection",
+        "* compares directly, no accommodation needed (same construction as",
+        "* rcosc_comparator's, see the comparator's reference header).",
+        "* N2 is written 'W=16u nf=1' rather than the schematic's",
+        "* 'W=16u nf=8' -- the same device (gf180mcu's W is the total channel",
+        "* width), respelled because klt's reference normalizer rejects nf>1;",
+        "* the layout's eight drawn fingers are folded back together by",
+        "* klt lvs's options.combine_devices (see layout/run_checks.sh).",
         "* Resistors are written as plain R-elements (value = sheet_rho *",
         "* r_length/r_width) rather than X subckt calls: klt's subckt-call",
         "* reference-netlist normalizer only converts MOS (l/w-bearing) X",
@@ -628,17 +713,27 @@ def _write_reference_netlist_bias(devices: dict, path: Path, ctx: dict) -> None:
 
 
 def _bias_subckt(devices: dict, vsubs_pin: bool = False) -> list[str]:
-    rba, rbb, rbc, rbias = devices["XRBA"], devices["XRBB"], devices["XRBC"], devices["XRBIAS"]
-    mbiasd = devices["XMBIASD"]
-    return [
-        ".SUBCKT rcosc_bias vdd vss vh vl ibias" + (" vsubs" if vsubs_pin else ""),
-        f"R$RBA vdd vh vsubs {_res_r_ohm(rba.param_um('r_length'), rba.param_um('r_width')):.6g} ppolyf_u_1k",
-        f"R$RBB vh vl vsubs {_res_r_ohm(rbb.param_um('r_length'), rbb.param_um('r_width')):.6g} ppolyf_u_1k",
-        f"R$RBC vl vss vsubs {_res_r_ohm(rbc.param_um('r_length'), rbc.param_um('r_width')):.6g} ppolyf_u_1k",
-        f"R$RBIAS vdd ibias vsubs {_res_r_ohm(rbias.param_um('r_length'), rbias.param_um('r_width')):.6g} ppolyf_u_1k",
-        f"XMBIASD ibias ibias vss vsubs nfet_03v3 L={mbiasd.params['l']} W={mbiasd.params['w']} nf={mbiasd.param_int('nf')}",
-        ".ENDS",
+    """The re-spun bias cell's LVS reference cards (issue #44): the unchanged
+    RBA/RBB/RBC ladder plus issue #39's beta-multiplier core -- RZ, N1, the
+    8-finger N2, the P1/P2 pfet mirror and SEED. Terminal nets come from the
+    netlist's own `nodes` (including the internal `pb` PMOS gate bus and
+    `n2s` degeneration node), never retyped; `_mos_ref_card` applies the two
+    disclosed reference-form rewrites (NMOS body -> `vsubs`, `nf>1` respelled
+    `nf=1` at the schematic's total W -- N2's eight drawn fingers fold back
+    together via `klt lvs`'s `options.combine_devices: ["nfet"]`,
+    `run_checks.sh`). The PMOS bulk terminals are NOT rewritten: this cell
+    draws a real n-well tap tying the PMOS well to `vdd`, so the layout
+    genuinely reports those bodies on the `vdd` net."""
+    lines = [
+        ".SUBCKT rcosc_bias vdd vss vh vl ibias" + (" vsubs" if vsubs_pin else "")
     ]
+    for name in ("XRBA", "XRBB", "XRBC", "XRZ"):
+        d = devices[name]
+        r_ohm = _res_r_ohm(d.param_um("r_length"), d.param_um("r_width"))
+        lines.append(f"R${d.name[1:]} {d.nodes[0]} {d.nodes[1]} vsubs {r_ohm:.6g} ppolyf_u_1k")
+    lines += [_mos_ref_card(name, devices[name]) for name in ("XN1", "XN2", "XP1", "XP2", "XSEED")]
+    lines.append(".ENDS")
+    return lines
 
 
 def _write_reference_netlist_trim_bank(devices: dict, path: Path, ctx: dict) -> None:

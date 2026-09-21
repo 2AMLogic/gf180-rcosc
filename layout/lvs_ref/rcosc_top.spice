@@ -18,8 +18,12 @@
 R$RBA vdd vh vsubs 50000 ppolyf_u_1k
 R$RBB vh vl vsubs 50000 ppolyf_u_1k
 R$RBC vl vss vsubs 50000 ppolyf_u_1k
-R$RBIAS vdd ibias vsubs 105000 ppolyf_u_1k
-XMBIASD ibias ibias vss vsubs nfet_03v3 L=1u W=2u nf=1
+R$RZ n2s vss vsubs 16000 ppolyf_u_1k
+XN1 ibias ibias vss vsubs nfet_03v3 L=1u W=2u nf=1
+XN2 pb ibias n2s vsubs nfet_03v3 L=1u W=16u nf=1
+XP1 pb pb vdd vdd pfet_03v3 L=1u W=4u nf=1
+XP2 ibias pb vdd vdd pfet_03v3 L=1u W=4u nf=1
+XSEED pb vl vss vsubs nfet_03v3 L=20u W=2u nf=1
 .ENDS
 .SUBCKT rcosc_trim_bank p m t0 t1 t2 t3 t4 t5 t6 t7 vsubs
 R$RFIX p c1 vsubs 8599 ppolyf_u_1k
