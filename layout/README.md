@@ -1,25 +1,32 @@
 # layout
 
-**Status: full `rcosc_top` hierarchy (issues #13 + #27).** This directory
-carries a DRC-clean, LVS-matched GDS for all four of `rcosc_top`'s
-sub-blocks -- the bias generator (`rcosc_bias`), the trim bank
-(`rcosc_trim_bank`), the comparator (`rcosc_comparator`, instantiated twice
-as `XXCMPH`/`XXCMPL`) -- plus the `rcosc_top` top-level composition itself
-(the inline SR latch, `MDISCH`, the `CTIMING` MiM cap, and the wiring that
-instantiates the three sub-cells as real GDS sub-cells, not redrawn
-geometry) -- all reproducible from one committed build script. The
-post-layout (PEX-extracted) PVT re-verification this schematic-level layout
-enables is tracked separately, issue #28.
+**Status: full `rcosc_top` hierarchy, re-spun current with the post-#39
+schematic (issues #13 + #27 + #44).** This directory carries a DRC-clean,
+LVS-matched GDS for all four of `rcosc_top`'s sub-blocks -- the bias
+generator (`rcosc_bias`), the trim bank (`rcosc_trim_bank`), the comparator
+(`rcosc_comparator`, instantiated twice as `XXCMPH`/`XXCMPL`) -- plus the
+`rcosc_top` top-level composition itself (the inline SR latch, `MDISCH`,
+the `CTIMING` MiM cap, and the wiring that instantiates the three sub-cells
+as real GDS sub-cells, not redrawn geometry) -- all reproducible from one
+committed build script. The post-layout (PEX-extracted) PVT re-verification
+this schematic-level layout enables was tracked separately as issue #28
+and re-run against the re-spin as part of issue #44.
 
-**Pre-#39 schematic:** the `rcosc_bias` cell geometry here was drawn
-against the pre-issue-#39 bias generator (the `RBIAS`/`MBIASD` leg); issue
-#39's self-biased current-reference core
-([DR-0012](../spec/decision-records/0012-comparator-bias-path-pvt-revision.md))
-changed the sub-cell's schematic afterward, so the bias generator's GDS
-and DR-0010's post-layout figures describe the **pre-#39** schematic until
-the bias cell's layout re-spin lands (filed as a follow-up issue). The
-trim-bank, comparator, and top-composition geometry are unaffected by #39
-and remain current.
+**Current with the post-#39 schematic (issue #44's re-spin):** the
+`rcosc_bias` cell geometry was re-drawn against the self-biased
+current-reference core issue #39 put on `main`
+([DR-0012](../spec/decision-records/0012-comparator-bias-path-pvt-revision.md)),
+keeping the sub-cell boundary (`vdd vss vh vl ibias`) unchanged; the trim
+bank, comparator, and top-level composition geometry are byte-for-byte the
+pre-re-spin cells (verified against this toolchain's own reproducibility
+check over the unmodified builders). The hierarchy was re-verified end to
+end -- DRC clean, LVS matched, supply-ERC one-island-per-supply -- and the
+post-layout (PEX) PVT re-verification re-run against the re-spun GDS: see
+[DR-0013](../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md),
+which supersedes
+[DR-0010](../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)'s
+figures for the post-#39 schematic (the parasitic frequency shift deepened
+relative to the pre-#39 pair: −11.24 % … −41.42 %, always slower).
 
 ## What's checked in
 
@@ -77,6 +84,24 @@ reference netlists are byte-identical to a fresh rebuild, without touching
 them — the same "derived, not hand-written, and reproducible on change"
 convention `design/regen-netlist.sh` documents for the schematic netlists.
 
+**Which `klt` reproduces which artifact (recorded here because it is
+load-bearing, and discovered the hard way on issue #44's re-spin):** every
+per-cell DRC/extract/LVS report in `layout/reports/` records the toolchain
+that produced the committed cells — `klt 0.4.0` with `klayout 0.30.12` —
+and byte-identical cell reproduction (and the re-spin's own bias/top
+evidence) holds under exactly that pair, while `klt erc` and `klt signoff`
+grading require the newer pinned build (`klt 0.5.0+g2b1e55e51bb8…`, the
+same version string `reports/rcosc_top.erc.json` records). `klt gen`'s
+drawn output is **not stable across `klayout-tools` versions**: the
+0.5.0-era generators render `res_array` footprints and an output grid
+that differ from the 0.4.0 era, so under a newer `klt` alone
+`layout/build_cells.py --check` reports the *unchanged* cells as stale —
+reproduce layout GDS with the 0.4.0-era toolchain the reports record
+(filed upstream per the friction protocol as
+[klayout-tools#2246](https://github.com/2AMLogic/klayout-tools/issues/2246);
+see [DR-0013](../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md)'s
+toolchain provenance note).
+
 ## Supply ERC (T1 item 11)
 
 `erc-supply-spec.json` + `reports/rcosc_top.erc.json` are this block's
@@ -108,9 +133,10 @@ What the committed report says, and on what each part rests:
   spelled with the optional `tap_requires` intersection key the #2169
   fix added) — so the committed report's zero is graded evidence:
   `erc_coverage` lists `erc.missing_tie:["nwell_vdd_tap"]` under
-  `checked`, and both merged n-well polygons (the comparator's PMOS
-  group and the top-level latch-PMOS group, each with its
-  `well_island` tap routed to the `vdd` track) carry a tap that reaches
+  `checked`, and every merged n-well polygon (the comparator's PMOS
+  group, the top-level latch-PMOS group, and — since issue #44's
+  re-spin — the bias core's `P1`/`P2` mirror-pair well, each with its
+  `well_island` tap routed to the `vdd` track) carries a tap that reaches
   the `vdd` net. **Coverage caveat, kept visible rather than papered
   over:** this grades the *drawn-well* half only. gf180mcu has no drawn
   p-tub/substrate layer, so per `klt erc`'s own contract a substrate tie
@@ -127,11 +153,13 @@ What the committed report says, and on what each part rests:
   the pinned grader ships the fix, and `klt signoff`'s item 11 now
   *requires* a declared tie — "an uncomputed check is not a clean one".)
 - **The report's overall `status` is `"violations"`, and item 11 does
-  not grade that.** Its 32 findings are all `erc.floating_gate`, the
+  not grade that.** Its findings (36 on the current, issue-#44 re-spun
+  GDS; 32 pre-re-spin) are all `erc.floating_gate`, the
   disclosed artifact of omitting the `Contact` (33/0) vias entry: the
   bias generator's resistor ladder is drawn poly straight across the
-  rails (`vdd→vh→vl→vss`, plus `vdd→ibias` and the trim chain
-  `vdd→vc`), and `klt erc` has no device recognition, so with
+  rails (`vdd→vh→vl→vss`, plus the trim chain
+  `vdd→vc` and — on the re-spun core — `n2s→vss`'s degeneration
+  resistor), and `klt erc` has no device recognition, so with
   `Contact` declared those resistor bodies conduct the two supplies into
   one island and report a false `erc.supply_short`. Omitting `Contact`
   keeps the supply verdict about the metal power delivery —
@@ -161,12 +189,19 @@ imports each generated cell into one composing `klayout.db` layout, places
 it at a computed offset, and wires ports together with plain Manhattan
 metal rectangles.
 
-`rcosc_bias`/`rcosc_trim_bank` (issue #13) are single-finger, planar-in-
-metal1 cells: two rows per cell (a resistor chain, and a row of
-switches/bias-transistor above it), wired with `wire_segment`/`wire_l`/
-`wire_z` so each cross-row jog stays inside its own resistor's private
-x-window rather than sharing a routing channel. `rcosc_comparator`/
-`rcosc_top` (issue #27) needed three things those two cells did not:
+`rcosc_trim_bank` (issue #13) is the design's one remaining single-finger,
+planar-in-metal1 cell: two rows (a resistor chain, with a row of shunt
+switches above it), wired with `wire_segment`/`wire_l`/`wire_z` so each
+cross-row jog stays inside its own resistor's private x-window rather than
+sharing a routing channel. The pre-#39 `rcosc_bias` was that shape too,
+but issue #44's re-spin against the self-biased core forced the same three
+things `rcosc_comparator`/`rcosc_top` (issue #27) had already needed —
+"the PMOS gate bus `pb` must reach five terminals across the cell and `vl`
+must reach `SEED`'s gate across them, which is not planar in metal1" — so
+the re-spun cell shares the comparator's row-plus-`Channel`/n-well
+constructions below verbatim (one row of blocks, `P1`/`P2` sharing a drawn
+n-well with a `well_island` tap on `vdd`) instead of the two-row metal1
+plan. `rcosc_comparator`/`rcosc_top` (issue #27) needed:
 
 - **Multi-finger devices.** `rcosc_comparator`'s `MTAIL` is `nfet_03v3
   W=16u nf=8` — one folded 8-finger `mos_array` call
@@ -336,7 +371,13 @@ schematic's own `vdd` bulk connection compares directly, no accommodation
 needed. Its `MTAIL` is written `W=16u nf=1` (the same total-width device,
 respelled — `klt`'s reference normalizer rejects `nf>1`) with the layout's
 eight drawn fingers folded back together by `klt lvs`'s
-`options.combine_devices: ["nfet"]` (see "Known `klt` gaps" above).
+`options.combine_devices: ["nfet"]` (see "Known `klt` gaps" above). The
+re-spun `rcosc_bias` (issue #44) carries the same two accommodations for
+the same reasons: its `P1`/`P2` pair shares a drawn n-well with a
+`well_island` tap on `vdd` (bodies compare on `vdd` directly), and its
+8-finger `N2` is respelled `W=16u nf=1` and folded at compare time by the
+`options.combine_devices: ["nfet"]` its own LVS run carries
+(`layout/run_checks.sh`).
 
 `rcosc_top`'s reference is written hierarchically (`XXBIAS`/`XXTRIM`/
 `XXCMPH`/`XXCMPL` subcircuit calls, reading like the schematic) but compared

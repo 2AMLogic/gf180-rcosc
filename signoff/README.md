@@ -90,11 +90,13 @@ machine verdict is the starting point for each read, not the whole of it.
 The extraction report is the documented-provenance statement of the committed
 GDS: it pins `layout/cells/rcosc_top.gds` by content hash (`provenance.input
 .content_hash`, mirrored in the manifest pin), records the extracted device/
-net inventory (46 devices, 35 nets, 11 pins) and the netlist it produced.
-`rcosc_top.gds` instantiates the three sub-blocks as real GDS sub-cells, so
-the pinned artifact is the composed whole block. The manifest pin, the
-envelope's recorded hash, and the current bytes of the GDS are cross-checked
-on every CI run by `verify-report.py`.
+net inventory and the netlist it produced. On the current, issue-#44
+re-spun GDS the envelope records **71 devices** (45 `nfet` + 12 `pfet` +
+13 `ppolyf_u_1k` + 1 MiM cap: the pre-re-spin GDS recorded 60 devices),
+**37 nets, 11 pins**. `rcosc_top.gds` instantiates the three sub-blocks as
+real GDS sub-cells, so the pinned artifact is the composed whole block. The
+manifest pin, the envelope's recorded hash, and the current bytes of the
+GDS are cross-checked on every CI run by `verify-report.py`.
 
 ### met — item 3 (DRC clean): `layout/reports/rcosc_top.drc.json`
 
@@ -193,8 +195,10 @@ grader does not grade:
   and zero `erc.missing_tie` — with `erc.missing_tie` listed under
   `checked` in the envelope's `erc_coverage`, so the zero is graded
   evidence, not an uncomputed absence. Disclosed, not graded: the report's
-  overall `status` is `"violations"` from its 32 `erc.floating_gate`
-  findings — the pre-declared artifact of omitting `Contact` from `vias[]`
+  overall `status` is `"violations"` from its `erc.floating_gate`
+  findings (36 on the current, issue-#44 re-spun GDS — the re-spun
+  beta-multiplier core's contacted gates; 32 pre-re-spin) — the
+  pre-declared artifact of omitting `Contact` from `vias[]`
   (klayout-tools#2183, declared non-blocking by item 11's own text,
   klayout-tools#1994); and this tie grades the *drawn-well* half only —
   gf180mcu has no drawn p-tub layer, so per `klt erc`'s own contract a

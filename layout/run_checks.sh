@@ -67,18 +67,21 @@ declare -A DECK_OPTIONS=(
 #                        database unit introduces on the trim bank's short
 #                        segments (every tolerated delta is listed with both
 #                        original values in the JSON -- see layout/README.md)
-#   combine_devices      folds the comparator's 8-finger MTAIL, which extracts
-#                        (correctly) as 8 parallel W=2u nfets, back into the
-#                        reference's single W=16u device. Scoped to "nfet"
-#                        rather than blanket-true so it can never quietly merge
-#                        a series resistor pair in the bias divider or trim
-#                        bank. Load-bearing, not decorative: without it the
-#                        comparator LVS reports 7 unmatched devices.
+#   combine_devices      folds an 8-finger nfet -- the comparator's MTAIL
+#                        and (since issue #44's re-spin) the bias core's N2,
+#                        both extracting (correctly) as 8 parallel W=2u
+#                        nfets -- back into the reference's single W=16u
+#                        device. Scoped to "nfet" rather than blanket-true
+#                        so it can never quietly merge a series resistor
+#                        pair in the bias divider or trim bank.
+#                        Load-bearing, not decorative: without it the
+#                        comparator LVS reports 7 unmatched devices (and the
+#                        re-spun bias cell its own unmatched set).
 #   flatten_reference    the reference is written hierarchically (it reads like
 #                        the schematic); `klt extract` always emits the layout
 #                        side flat, so the reference is flattened to meet it.
 declare -A LVS_OPTIONS=(
-  [rcosc_bias]='{}'
+  [rcosc_bias]='{"combine_devices": ["nfet"]}'
   [rcosc_trim_bank]='{"parameter_tolerance": 0.001}'
   [rcosc_comparator]='{"combine_devices": ["nfet"]}'
   [rcosc_top]='{"combine_devices": ["nfet"], "flatten_reference": true, "parameter_tolerance": 0.001}'

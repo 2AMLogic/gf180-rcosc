@@ -1,13 +1,15 @@
 {
   "schema_version": 1,
   "engine": "klayout",
-  "layout": "/Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-27/layout/reports/rcosc_bias.extracted.spice",
-  "reference": "/Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-27/layout/lvs_ref/rcosc_bias.spice",
+  "layout": "/Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-44/layout/reports/rcosc_bias.extracted.spice",
+  "reference": "/Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-44/layout/lvs_ref/rcosc_bias.spice",
   "top": "RCOSC_BIAS",
   "reference_top": "RCOSC_BIAS",
   "parameter_tolerance": null,
   "options": {
-    "combine_devices": false,
+    "combine_devices": [
+      "nfet"
+    ],
     "flatten_layout": false,
     "flatten_reference": false,
     "netgen_setup": null,
@@ -20,14 +22,14 @@
   "category_error_counts": {},
   "counts": {
     "nets": {
-      "layout": 6,
-      "reference": 6,
-      "matched": 6
+      "layout": 8,
+      "reference": 8,
+      "matched": 8
     },
     "devices": {
-      "layout": 5,
-      "reference": 5,
-      "matched": 5
+      "layout": 9,
+      "reference": 9,
+      "matched": 9
     },
     "pins": {
       "layout": 5,
@@ -39,8 +41,8 @@
   "environment": {
     "engine": "klayout",
     "engine_version": "0.30.12",
-    "layout_sha256": "7b35cd9a58638212309142f4bce7ab50194fb6abc1a4e1d89fe10c1edab446d0",
-    "reference_sha256": "d0a45985a42deec61bf8f44458f50c7d25a154318947871d98adda9213299449",
+    "layout_sha256": "361afca6a4893bae573d3b907110fddc738adc9799466d5c16edff04a11e7cfc",
+    "reference_sha256": "89fec71b2deb48f57fdb030316e57d28a84508e04ca95aaaf30756b4f405aba0",
     "extracted_netlist": null
   },
   "provenance": {
@@ -56,6 +58,16 @@
       "layout": "IBIAS",
       "reference": "IBIAS",
       "pin": true
+    },
+    {
+      "layout": "\\$1",
+      "reference": "N2S",
+      "pin": false
+    },
+    {
+      "layout": "\\$7",
+      "reference": "PB",
+      "pin": false
     },
     {
       "layout": "VDD",

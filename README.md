@@ -90,17 +90,22 @@ supersede them.
 Maturity ladder: spec ratified → schematic simulated across PVT → layout
 DRC/LVS-clean → post-layout re-verification → shuttle seat → measured
 silicon. **Current position: spec ratified, schematic simulated across
-PVT, post-layout (PEX) re-verification done for the pre-#39 schematic —
-still pre-shuttle-seat, pre-silicon.** The comparator/bias-path PVT
-revision ([issue #39](https://github.com/2AMLogic/gf180-rcosc/issues/39),
+PVT, layout DRC/LVS-clean against the post-#39 schematic, post-layout
+(PEX) re-verification re-done against the re-spun bias cell — still
+pre-shuttle-seat, pre-silicon.** The comparator/bias-path PVT revision
+([issue #39](https://github.com/2AMLogic/gf180-rcosc/issues/39),
 [DR-0012](spec/decision-records/0012-comparator-bias-path-pvt-revision.md))
-changed `design/rcosc_bias.sch` after the layout was verified, so the
-committed layout and
+changed `design/rcosc_bias.sch` after the layout was verified; the bias
+cell has since been re-drawn and the whole hierarchy re-verified
+([issue #44](https://github.com/2AMLogic/gf180-rcosc/issues/44),
+[DR-0013](spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md)),
+which supersedes
 [DR-0010](spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)'s
-post-layout figures describe the pre-#39 schematic until the bias cell's
-layout re-spin lands (filed as a follow-up issue). See
+post-layout figures for the post-#39 schematic — the parasitic shift
+deepened (−11.24 % to −41.42 %, always slower, worst at
+`ff`/−40 °C/3.6 V). See
 [`design/README.md`](design/README.md), [`layout/README.md`](layout/README.md),
-and [`spec/decision-records/0010`](spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)
+and [`spec/decision-records/0013`](spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md)
 for the evidence behind each stage.
 
 ## Repo layout

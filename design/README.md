@@ -6,13 +6,15 @@ full PVT-corner campaign and several re-sizing/re-balancing passes (issues
 #12/#16/#18/#20/#22/#24, decision records DR-0005 through DR-0009 below)
 and a comparator/bias-path PVT revision (issue #39,
 [DR-0012](../spec/decision-records/0012-comparator-bias-path-pvt-revision.md)).
-The layout remains the **pre-#39** schematic's: it was made DRC-clean and
-LVS-matched with a first post-layout (PEX) re-verification pass (issues
-#13/#27/#28, see [`layout/README.md`](../layout/README.md) and
-[DR-0010](../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md))
-against the pre-revision bias generator, so DR-0010's post-layout figures
-must not be quoted against the post-#39 schematic until the bias cell's
-layout is re-drawn and re-verified (filed as issue [#44](https://github.com/2AMLogic/gf180-rcosc/issues/44)).
+The layout is **current with the post-#39 schematic**: the bias cell was
+re-drawn and the whole hierarchy re-verified (issues #13/#27/#28/#44, see
+[`layout/README.md`](../layout/README.md)),
+[DR-0013](../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md))
+— DRC-clean, LVS-matched, and post-layout (PEX) re-verified against the
+re-spun `rcosc_bias` GDS; DR-0013 supersedes
+[DR-0010](../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)'s
+post-layout figures for the post-#39 schematic (the parasitic shift
+deepened to −11.24 % … −41.42 %, always slower).
 This directory holds the schematic sources and their PVT-corner evidence;
 layout geometry and DRC/LVS/PEX results live under `layout/`.
 
@@ -696,11 +698,15 @@ see the three "Full PVT-corner re-verification" sections above):
   margin was exactly the kind of unstress-tested margin this gap made
   possible.
 - ~~No layout.~~ **Resolved by issues #13/#27, post-layout re-verification
-  by issue #28.** `layout/cells/rcosc_top.gds` is DRC-clean and
-  LVS-matched, with a first post-layout (PEX-extracted) PVT
-  re-verification pass now committed — see
+  by issues #28/#44.** `layout/cells/rcosc_top.gds` is DRC-clean and
+  LVS-matched, with post-layout (PEX-extracted) PVT re-verification passes
+  committed — the re-spin pass against the post-#39 `rcosc_bias` GDS (issue
+  #44) is the current one: see
   [`layout/README.md`](../layout/README.md) and
-  [DR-0010](../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md).
+  [DR-0013](../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md)
+  (which supersedes
+  [DR-0010](../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)
+  for the post-#39 schematic).
 
 These are reserved for follow-on increments tracked against the gap
 tracker (#5), consistent with the maturity ladder in the repo `README.md`.
