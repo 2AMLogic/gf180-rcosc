@@ -19,6 +19,13 @@ Passes
 ------
 ``trim_curve``     f vs. trim code at the nominal reference corner, used to
                    establish the *realized* trim range and per-code step.
+                   Since issue #43 the sampled code set additionally includes
+                   the block-boundary pairs (0x0F/0x10 ... 0xEF/0xF0): the
+                   frozen R map leaves only ~1 LSB-R of ideal-switch
+                   monotonicity margin across each 0xkF -> 0x(k+1)0 boundary,
+                   so with real shunt switches those pairs carry a small,
+                   characterized local dip that this pass surfaces as
+                   evidence rather than leaving between the sampled codes.
 ``calibration``    single-point trim search (binary search over the 8-bit
                    code) at each process corner's own T=27 C / VDD=3.3 V
                    point, against both the ratified 48.000 MHz target and a
@@ -32,12 +39,32 @@ Passes
 ``posttrim_surr``  full factorial holding, per process corner, the code that
                    corner calibrated to against the *surrogate* target
                    f(tt, 27 C, 3.3 V, 0x80).  This is the "trim every die at
-                   test" model the spec's +-1.1% row actually depends on, and
-                   is the only pass that can produce a meaningful post-trim
-                   residual when the ratified absolute target is unreachable.
+                   test" model the spec's +-1.1% row actually depends on,
+                   and (pre-#43) was the only pass that could produce a
+                   meaningful post-trim residual, because the ratified
+                   absolute target was unreachable at every corner.
+``posttrim_ratif`` full factorial holding, per process corner, the code that
+                   corner calibrated to against the *ratified* 48.000 MHz
+                   target -- the same per-corner trim-every-die model
+                   pointed at the spec's own frequency.  Added by issue #43:
+                   pre-#43 every corner saturated below 48 MHz so this pass
+                   had no code to hold; the redesigned trim tree reaches the
+                   ratified target inner-range at all seven corners, so the
+                   pass now exists.  It is skipped (and so noted in the
+                   summary) if any corner still saturates against the
+                   ratified target.
+``switchprobe``    issue #43's phantom-resistance acceptance probe: per-code
+                   supply sensitivity at the `ss` corner's own 27 C point,
+                   comparing code 0x80 (shared with the pretrim factorial)
+                   against the high-code 0xEF the issue's evidence named,
+                   exactly the pairing the pre-#43 instrumentation used to
+                   expose the un-switched trailing segments' phantom path.
+                   Reported as a pair of supply-sensitivity rows; they are
+                   evidence for the switch revision, not a spec row.
 
-Both post-trim passes are reported.  Neither is allowed to stand in for the
-other: an oscillator spec without its trim math is not a spec.
+All three post-trim passes (when ``posttrim_ratif`` is not skipped) are
+reported.  None is allowed to stand in for another: an oscillator spec
+without its trim math is not a spec.
 """
 
 from __future__ import annotations
@@ -433,12 +460,22 @@ def calibrate(
 ) -> tuple[int, float, bool]:
     """Single-point trim search at (process, 27 C, 3.3 V).
 
-    ``R(code)`` is monotonically decreasing by construction of the trim bank
-    (a set bit only ever shorts out series resistance), so ``f(code)`` is
-    monotonically non-decreasing and a binary search is valid.  Returns
-    ``(code, f_hz, saturated)``; ``saturated`` is True when the target lies
-    outside the realized ``[f(0x00), f(0xFF)]`` range and the search had to
-    clamp to an endpoint.
+    ``R(code)`` is monotonically decreasing in the *ideal*-switch model of
+    the trim bank (a set bit only ever shorts out series resistance), so
+    ``f(code)`` is monotonically non-decreasing there and a binary search is
+    valid.  With the real shunt switches of issue #43 this holds at block
+    resolution on every sampled code, but the frozen R map leaves only ~1
+    LSB-R (~374 ohm) of monotonicity margin across each 0xkF -> 0x(k+1)0
+    block-boundary pair, and a realizable shunt's trip-weighted residual
+    exceeds that at slow corners -- so those specific adjacent pairs can dip
+    a few percent locally (measured and reported by the ``trim_curve`` pass).
+    A dip can make the binary search's pick locally suboptimal by at most
+    the dip magnitude; it is never unmeasured: the returned code's own ``f``
+    is re-simulated and reported, and the calibration table prints it.
+
+    Returns ``(code, f_hz, saturated)``; ``saturated`` is True when the
+    target lies outside the realized ``[f(0x00), f(0xFF)]`` range and the
+    search had to clamp to an endpoint.
     """
 
     def f_at(code: int) -> float:
@@ -551,7 +588,14 @@ def main() -> int:
 
     # -- Pass 1: realized trim curve at the nominal reference corner ---------
     print("== pass: trim_curve (nominal reference corner) ==", flush=True)
-    curve_codes = sorted(set(list(range(0x00, 0x100, 0x10)) + [0xFF]))
+    # The 0xk0 grid + 0xFF establish the staircase.  The block-boundary
+    # codes (0x0F, 0x1F, ..., 0xEF) ride along since issue #43: they pair
+    # with the sampled 0x(k+1)0 codes so the sub-LSB boundary margins are
+    # measured rather than assumed (see calibrate()'s docstring).
+    boundary_codes = [0x0F, 0x1F, 0x3F, 0x7F, 0xBF, 0xDF, 0xEF]
+    curve_codes = sorted(
+        set(list(range(0x00, 0x100, 0x10)) + [0xFF] + boundary_codes)
+    )
     curve_pts = [Point(REF_PROCESS, REF_TEMP_C, REF_VDD_V, c) for c in curve_codes]
     curve = simulate(camp, netlist_text, curve_pts)
     record(camp, "trim_curve", curve, "f vs. trim code at tt / 27 C / 3.3 V")
@@ -609,6 +653,38 @@ def main() -> int:
         post_surr,
         f"per-corner single-point trim at 27C/3.3V against surrogate {mhz(f_surrogate)} MHz",
     )
+
+    # -- Pass 6: post-trim, per-process-corner code, ratified target (#43) ---
+    # Meaningful only when every corner reaches the ratified target inner-range
+    # (pre-#43 every corner saturated below it).  Skipped, with a note, if any
+    # corner still saturates -- never silently.
+    ratified_reachable = not any(cal_spec[p][2] for p in PROCESS_CORNERS)
+    post_ratif = None
+    if ratified_reachable:
+        print("== pass: posttrim_ratif (per-corner code, full factorial) ==", flush=True)
+        post_ratif_pts = [Point(p, t, v, cal_spec[p][0]) for p, t, v in factorial]
+        post_ratif = simulate(camp, netlist_text, post_ratif_pts)
+        record(
+            camp,
+            "posttrim_ratif",
+            post_ratif,
+            "per-corner single-point trim at 27C/3.3V against ratified 48.000 MHz",
+        )
+    else:
+        print("== pass: posttrim_ratif skipped (a corner saturates at/below 48 MHz) ==",
+              flush=True)
+
+    # -- Pass 7: issue-#43 switch-acceptance probe --------------------------
+    # Per-code supply sensitivity at the ss corner's 27 C point: 0x80 (already
+    # measured by the pretrim factorial -- reuse those points) vs. the high
+    # code 0xEF the pre-#43 instrumentation named.  3 new sim points + reuse.
+    print("== pass: switchprobe (ss/27C supply sensitivity, 0x80 vs 0xEF) ==",
+          flush=True)
+    probe_codes = [MIDSCALE_CODE, 0xEF]
+    probe_pts = [Point("ss", REF_TEMP_C, v, c) for c in probe_codes for v in VDDS_V]
+    probe = simulate(camp, netlist_text, probe_pts)
+    record(camp, "switchprobe", probe,
+           "issue #43 phantom-acceptance: ss/27C supply sensitivity, code 0x80 vs 0xEF")
 
     elapsed = time.time() - started
 
@@ -692,6 +768,9 @@ def main() -> int:
             pre,
             post_spec,
             post_surr,
+            post_ratif,
+            probe,
+            probe_codes,
             cal_spec,
             cal_surr,
             f_surrogate,
@@ -723,6 +802,9 @@ def build_summary(
     pre,
     post_spec,
     post_surr,
+    post_ratif,
+    probe,
+    probe_codes,
     cal_spec,
     cal_surr,
     f_surrogate,
@@ -787,12 +869,31 @@ def build_summary(
     # -- realized trim curve
     add("## Realized trim curve (tt, 27 °C, 3.3 V)")
     add("")
-    add("| code | f (MHz) | Δ vs. code 0x00 |")
-    add("|---|---|---|")
+    add(
+        "The sampled code set includes the block-boundary pairs "
+        "(`0x0F`/`0x10` … `0xEF`/`)0xF0`) since issue #43; the *step* column "
+        "is vs. the previous *sampled* code.  A negative step at a "
+        "`0xkF` → `0x(k+1)0` pair is the characterized sub-LSB-margin local "
+        "dip of the real shunt switches (measured magnitude, not absorbed): "
+        "the frozen R map leaves ~1 LSB-R (~374 ohm) of ideal-switch "
+        "monotonicity margin per boundary pair, below a realizable switch "
+        "residual at slow corners."
+    )
+    add("")
+    add("| code | f (MHz) | Δ vs. code 0x00 | step vs. previous sampled code |")
+    add("|---|---|---|---|")
+    _prev_f = None
     for c in curve_codes:
         r = curve[Point(REF_PROCESS, REF_TEMP_C, REF_VDD_V, c)]
         d = f"{pct(r.f_hz, f_code00):+.2f}%" if (r.f_hz and f_code00) else "n/a"
-        add(f"| `0x{c:02X}` | {mhz(r.f_hz)} | {d} |")
+        if _prev_f is not None and r.f_hz:
+            step = f"{pct(r.f_hz, _prev_f):+.2f}%"
+            if r.f_hz < _prev_f:
+                step = f"**{step}** (local dip)"
+        else:
+            step = "—"
+        add(f"| `0x{c:02X}` | {mhz(r.f_hz)} | {d} | {step} |")
+        _prev_f = r.f_hz
     add("")
     if not (f_code00 and f_codeff):
         add(
@@ -835,21 +936,40 @@ def build_summary(
     add("")
     add(
         "Binary search over the 8-bit code at each process corner's own "
-        "27 °C / 3.3 V point (`f(code)` is monotonically non-decreasing by "
-        "construction of the trim bank, so the search is valid)."
+        "27 °C / 3.3 V point. `f(code)` is monotonically non-decreasing in the "
+        "ideal-switch model of the trim bank; with the real shunt switches of "
+        "issue #43 the block staircase stays monotone at every sampled code, "
+        "while a block-boundary pair can carry a small characterized local "
+        "dip (see the trim-curve table above) — a dip can make a search pick "
+        "locally suboptimal by at most the dip magnitude, never unmeasured: "
+        "the picked code's own f is re-simulated and printed here."
     )
     add("")
     add(
         f"- **Ratified target**: {SPEC['f_target_hz'] / 1e6:.3f} MHz "
         "(repo README target-spec table)."
     )
-    add(
-        f"- **Surrogate target**: {mhz(f_surrogate)} MHz — the design's own "
-        "realized frequency at `tt / 27 °C / 3.3 V / code 0x80`. Used only "
-        "because the ratified target is unreachable at every corner (below); "
-        "it lets the post-trim residual still be measured with the spec's own "
-        'single-point methodology instead of being reported as "undefined".'
-    )
+    _spec_saturated = any(cal_spec[p][2] for p in PROCESS_CORNERS)
+    if _spec_saturated:
+        add(
+            f"- **Surrogate target**: {mhz(f_surrogate)} MHz — the design's own "
+            "realized frequency at `tt / 27 °C / 3.3 V / code 0x80`. Used only "
+            "because the ratified target is unreachable at (at least one) corner "
+            "(below); it lets the post-trim residual still be measured with the "
+            "spec's own single-point methodology instead of being reported as "
+            '"undefined".'
+        )
+    else:
+        add(
+            f"- **Surrogate target**: {mhz(f_surrogate)} MHz — the design's own "
+            "realized frequency at `tt / 27 °C / 3.3 V / code 0x80`. The "
+            "ratified target is now reached inner-range at every corner (none "
+            "saturated, below), so this row is no longer the only way to get "
+            "a meaningful post-trim residual; it is reported unchanged anyway "
+            "for continuity with every prior campaign — the trim-every-die "
+            "residual is banded by which target the die is trimmed against, "
+            "and this is the `f(0x80)` anchor of the pre-#43 pass."
+        )
     add("")
     add(
         "| process | code @ 48.000 MHz target | f (MHz) | saturated? | code @ surrogate | f (MHz) | saturated? |"
@@ -913,8 +1033,8 @@ def build_summary(
     )
     add("")
 
-    # -- post-trim, both passes, always reported together
-    for name, data, cal, target_label in (
+    # -- post-trim, per-corner passes, always reported together
+    post_sections = [
         (
             f"Post-trim — single code `0x{spec_code:02X}` from the ratified-target calibration",
             post_spec,
@@ -927,7 +1047,27 @@ def build_summary(
             cal_surr,
             f"{mhz(f_surrogate)} MHz (surrogate)",
         ),
-    ):
+    ]
+    if post_ratif is not None:
+        post_sections.append(
+            (
+                "Post-trim — per-corner code from the ratified-target calibration (issue #43)",
+                post_ratif,
+                cal_spec,
+                f"{SPEC['f_target_hz'] / 1e6:.3f} MHz (ratified)",
+            )
+        )
+    else:
+        add(
+            "> **Post-trim, per-corner code from the ratified-target calibration "
+            "(issue #43 pass): skipped** — at least one corner still saturates "
+            "at/below the ratified 48.000 MHz target, so there is no "
+            "inner-range code to hold at that corner. The trim-every-die "
+            "residual is measured by the surrogate pass only, as in every "
+            "pre-#43 campaign."
+        )
+        add("")
+    for name, data, cal, target_label in post_sections:
         add(f"## {name}")
         add("")
         add(f"Calibration target: {target_label}.")
@@ -990,29 +1130,64 @@ def build_summary(
         add("")
 
     # -- temperature and supply sensitivity, isolated
-    add("## Isolated sensitivities (post-trim, per-corner surrogate calibration)")
+    # -- isolated sensitivities, per-corner calibrated codes, both targets
+    for sens_label, sens_cal, sens_data in (
+        ("surrogate calibration", cal_surr, post_surr),
+        ("ratified-target calibration (issue #43)", cal_spec, post_ratif),
+    ):
+        if sens_data is None:
+            continue
+        add(f"## Isolated sensitivities (post-trim, per-corner {sens_label})")
+        add("")
+        add("| process | code | f(−40 °C) | f(27 °C) | f(85 °C) | ΔT coefficient |")
+        add("|---|---|---|---|---|---|")
+        for p in PROCESS_CORNERS:
+            code = sens_cal[p][0]
+            fs = [sens_data[Point(p, t, REF_VDD_V, code)].f_hz for t in TEMPS_C]
+            if all(fs):
+                tc = (fs[2] - fs[0]) / fs[1] / (TEMPS_C[2] - TEMPS_C[0]) * 1e6
+                add(
+                    f"| `{p}` | `0x{code:02X}` | {mhz(fs[0])} | {mhz(fs[1])} | {mhz(fs[2])} | "
+                    f"{tc:+.0f} ppm/K |"
+                )
+        add("")
+        add("| process | code | f(3.0 V) | f(3.3 V) | f(3.6 V) | supply sensitivity |")
+        add("|---|---|---|---|---|---|")
+        for p in PROCESS_CORNERS:
+            code = sens_cal[p][0]
+            fs = [sens_data[Point(p, REF_TEMP_C, v, code)].f_hz for v in VDDS_V]
+            if all(fs):
+                sv = (fs[2] - fs[0]) / fs[1] * 100.0
+                add(
+                    f"| `{p}` | `0x{code:02X}` | {mhz(fs[0])} | {mhz(fs[1])} | {mhz(fs[2])} | "
+                    f"{sv:+.2f}% over 3.0→3.6 V |"
+                )
+        add("")
+
+    # -- issue #43 switch-acceptance probe: ss supply sensitivity, 0x80 vs 0xEF
+    add(
+        "## Issue #43 switch acceptance — per-code supply sensitivity at the "
+        "`ss` corner (27 °C)"
+    )
     add("")
-    add("| process | code | f(−40 °C) | f(27 °C) | f(85 °C) | ΔT coefficient |")
-    add("|---|---|---|---|---|---|")
-    for p in PROCESS_CORNERS:
-        code = cal_surr[p][0]
-        fs = [post_surr[Point(p, t, REF_VDD_V, code)].f_hz for t in TEMPS_C]
-        if all(fs):
-            tc = (fs[2] - fs[0]) / fs[1] / (TEMPS_C[2] - TEMPS_C[0]) * 1e6
-            add(
-                f"| `{p}` | `0x{code:02X}` | {mhz(fs[0])} | {mhz(fs[1])} | {mhz(fs[2])} | "
-                f"{tc:+.0f} ppm/K |"
-            )
+    add(
+        "The pre-#43 instrumentation measured ~+11.0–11.3% (3.0→3.6 V) at "
+        "`ss`/code `0x80` but ~+20.0–20.8% at `ss`/code `0xEF` — the "
+        "un-switched trailing segments' phantom series resistance, whose "
+        "magnitude grows as the switch drive thins. This pass re-measures "
+        "exactly that pairing against the restructured trim tree: the two "
+        "rows should now be of the same order, the high-code row no longer "
+        "materially worse."
+    )
     add("")
-    add("| process | code | f(3.0 V) | f(3.3 V) | f(3.6 V) | supply sensitivity |")
-    add("|---|---|---|---|---|---|")
-    for p in PROCESS_CORNERS:
-        code = cal_surr[p][0]
-        fs = [post_surr[Point(p, REF_TEMP_C, v, code)].f_hz for v in VDDS_V]
+    add("| code | f(3.0 V) | f(3.3 V) | f(3.6 V) | supply sensitivity |")
+    add("|---|---|---|---|---|")
+    for c in probe_codes:
+        fs = [probe[Point("ss", REF_TEMP_C, v, c)].f_hz for v in VDDS_V]
         if all(fs):
             sv = (fs[2] - fs[0]) / fs[1] * 100.0
             add(
-                f"| `{p}` | `0x{code:02X}` | {mhz(fs[0])} | {mhz(fs[1])} | {mhz(fs[2])} | "
+                f"| `0x{c:02X}` | {mhz(fs[0])} | {mhz(fs[1])} | {mhz(fs[2])} | "
                 f"{sv:+.2f}% over 3.0→3.6 V |"
             )
     add("")

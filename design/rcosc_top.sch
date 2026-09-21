@@ -4,7 +4,9 @@ v {xschem version=3.4.7 file_version=1.2
 * Relaxation-oscillator core per spec/decision-records/0001 (topology),
 * 0002/0003 (target spec, trim range). Composed from:
 *   XBIAS   rcosc_bias.sym       -- ratiometric V_H/V_L + tail-current bias
-*   XTRIM   rcosc_trim_bank.sym  -- 8-bit switched-R trim bank (the timing R)
+*   XTRIM   rcosc_trim_bank.sym  -- 8-bit switched-R trim bank (the timing R;
+*     issue #43 restructures the per-bit shunts to transmission gates with
+*     locally inverted pfet gates, and wires the new vdd pin for them)
 *   CTIMING cap_mim_1f0fF        -- timing capacitor (200 fF)
 *   XCMPH   rcosc_comparator.sym -- vc vs vh (charge-complete detector)
 *   XCMPL   rcosc_comparator.sym -- vl vs vc (discharge-complete detector)
@@ -32,6 +34,8 @@ C {lab_pin.sym} -82 556.0 0 0 {name=l4 lab=vl}
 N -62 512.0 -82 512.0 {}
 C {lab_pin.sym} -82 512.0 0 0 {name=l5 lab=ibias}
 C {rcosc_trim_bank.sym} 0 0 0 0 {name=XTRIM}
+N -62 -266.0 -82 -266.0 {}
+C {lab_pin.sym} -82 -266.0 0 0 {name=l6v lab=vdd}
 N -62 220.0 -82 220.0 {}
 C {lab_pin.sym} -82 220.0 0 0 {name=l6 lab=vdd}
 N -62 176.0 -82 176.0 {}

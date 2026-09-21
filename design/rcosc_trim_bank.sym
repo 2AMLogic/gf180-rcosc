@@ -1,6 +1,7 @@
 v {xschem version=3.4.7 file_version=1.2
 * rcosc_trim_bank symbol -- 8-bit switched-R trim bank (issue #6)
-* Pins: p, m, vss, t0..t7 (t7=MSB)
+* Pins: p, m, vss, t0..t7 (t7=MSB), vdd -- vdd added by issue #43 for the
+* per-bit transmission-gate inverters (tb_i complements of t_i).
 }
 G {}
 K {type=subcircuit
@@ -11,10 +12,10 @@ spiceprefix=X"
 V {}
 S {}
 E {}
-L 4 -60 -260.0 60 -260.0 {}
+L 4 -60 -308.0 60 -308.0 {}
 L 4 -60 260.0 60 260.0 {}
-L 4 -60 -260.0 -60 260.0 {}
-L 4 60 -260.0 60 260.0 {}
+L 4 -60 -308.0 -60 260.0 {}
+L 4 60 -308.0 60 260.0 {}
 B 5 -66 218.0 -62 222.0 {name=p dir=inout pinnumber=1}
 T {p} -54 215.0 0 0 0.2 0.2 {}
 B 5 -66 174.0 -62 178.0 {name=m dir=inout pinnumber=2}
@@ -37,5 +38,7 @@ B 5 -66 -178.0 -62 -174.0 {name=t6 dir=inout pinnumber=10}
 T {t6} -54 -181.0 0 0 0.2 0.2 {}
 B 5 -66 -222.0 -62 -218.0 {name=t7 dir=inout pinnumber=11}
 T {t7} -54 -225.0 0 0 0.2 0.2 {}
+B 5 -66 -268.0 -62 -264.0 {name=vdd dir=inout pinnumber=12}
+T {vdd} -54 -271.0 0 0 0.2 0.2 {}
 T {@name} -58 265.0 0 0 0.2 0.2 {}
 T {rcosc_trim_bank} -35 0 0 0 0.2 0.2 {}
