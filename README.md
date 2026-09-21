@@ -90,8 +90,15 @@ supersede them.
 Maturity ladder: spec ratified → schematic simulated across PVT → layout
 DRC/LVS-clean → post-layout re-verification → shuttle seat → measured
 silicon. **Current position: spec ratified, schematic simulated across
-PVT, layout DRC-clean/LVS-matched, post-layout (PEX) re-verification
-done — still pre-shuttle-seat, pre-silicon.** See
+PVT, post-layout (PEX) re-verification done for the pre-#39 schematic —
+still pre-shuttle-seat, pre-silicon.** The comparator/bias-path PVT
+revision ([issue #39](https://github.com/2AMLogic/gf180-rcosc/issues/39),
+[DR-0012](spec/decision-records/0012-comparator-bias-path-pvt-revision.md))
+changed `design/rcosc_bias.sch` after the layout was verified, so the
+committed layout and
+[DR-0010](spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)'s
+post-layout figures describe the pre-#39 schematic until the bias cell's
+layout re-spin lands (filed as a follow-up issue). See
 [`design/README.md`](design/README.md), [`layout/README.md`](layout/README.md),
 and [`spec/decision-records/0010`](spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)
 for the evidence behind each stage.

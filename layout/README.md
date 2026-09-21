@@ -11,6 +11,16 @@ geometry) -- all reproducible from one committed build script. The
 post-layout (PEX-extracted) PVT re-verification this schematic-level layout
 enables is tracked separately, issue #28.
 
+**Pre-#39 schematic:** the `rcosc_bias` cell geometry here was drawn
+against the pre-issue-#39 bias generator (the `RBIAS`/`MBIASD` leg); issue
+#39's self-biased current-reference core
+([DR-0012](../spec/decision-records/0012-comparator-bias-path-pvt-revision.md))
+changed the sub-cell's schematic afterward, so the bias generator's GDS
+and DR-0010's post-layout figures describe the **pre-#39** schematic until
+the bias cell's layout re-spin lands (filed as a follow-up issue). The
+trim-bank, comparator, and top-composition geometry are unaffected by #39
+and remain current.
+
 ## What's checked in
 
 ```
