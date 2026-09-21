@@ -46,6 +46,7 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 MANIFEST = REPO_ROOT / "signoff" / "block-manifest.json"
@@ -91,6 +92,24 @@ LVS_INPUTS = (
         "reference_sha256",
     ),
 )
+
+# T1 item 11's compound citation (klayout-tools issue #2025) -- the one
+# manifest entry that is a *list* of evidence parts graded together. The
+# ERC part is pinned exactly like items 2, 3 and 8 (manifest pin == the
+# envelope's recorded provenance.input.content_hash == the current bytes
+# of the GDS it ran against) and, because `klt signoff` reads the spec the
+# envelope names to grade the item's supply-style/tie conditions, the
+# spec hash the envelope records is checked against the spec's current
+# bytes too: a spec edit without an erc re-run rots here the same way a
+# GDS edit rots items 2/3. The LVS part is the same unpinned
+# klt-0.4.0-era envelope item 4 cites -- the grader accepts it via its
+# net_correspondence rows (VDD/VSS paired as pins), and its two netlists
+# are already re-hashed against its own recorded digests by
+# LVS_ENVELOPE/LVS_INPUTS above, so it needs no second row here.
+ITEM11_ERC_ENVELOPE = REPO_ROOT / "layout" / "reports" / "rcosc_top.erc.json"
+ITEM11_ERC_ARTIFACT = REPO_ROOT / "layout" / "cells" / "rcosc_top.gds"
+ITEM11_ERC_SPEC = REPO_ROOT / "layout" / "erc-supply-spec.json"
+ITEM11_LVS_FILE = "layout/reports/rcosc_top.lvs.json"
 
 BLOCK_LEVEL_FIELDS = (
     "schema_version",
@@ -251,6 +270,96 @@ def verify_pins(manifest: dict) -> list[str]:
                 "regenerate the layout evidence per layout/run_checks.sh and "
                 "re-grade per signoff/README.md)"
             )
+    problems += verify_power_delivery_citation(evidence)
+    return problems
+
+
+def _evidence_file(entry: Any) -> str | None:
+    """The repo-relative path a manifest evidence entry (or list part)
+    cites -- its ``file`` key as a dict, or the entry itself as a bare
+    string; ``None`` for any other shape."""
+    if isinstance(entry, str):
+        return entry
+    if isinstance(entry, dict) and isinstance(entry.get("file"), str):
+        return entry["file"]
+    return None
+
+
+def verify_power_delivery_citation(evidence: dict[str, Any]) -> list[str]:
+    """Verify T1 item 11's compound citation (a list of evidence parts),
+    whose ERC half is hash-pinned and whose LVS half is the same envelope
+    item 4's own LVS_ENVELOPE/LVS_INPUTS block already re-verifies.
+
+    Checks, all against current bytes:
+    - the manifest entry is the compound list shape, with one part citing
+      the ERC report and one part citing the LVS report;
+    - the ERC part's manifest pin == the ERC envelope's recorded
+      ``provenance.input.content_hash`` == the GDS's sha256 (mirroring
+      the items 2/3 loop above for the pinned part of the compound);
+    - the ERC envelope's recorded ``provenance.spec.content_hash`` == the
+      supply spec's sha256, so a spec edit without an erc re-run fails
+      here instead of silently grading against stale declarations.
+    """
+    label = "item 11 citation"
+    problems: list[str] = []
+    entry = evidence.get("11")
+    if not isinstance(entry, list) or not entry:
+        problems.append(
+            f"{label} is expected to be the compound list entry "
+            "(erc + lvs, see signoff/README.md and "
+            "klayout-tools docs/cli/signoff.md)"
+        )
+        return problems
+    by_file = {_evidence_file(part): part for part in entry}
+    erc_part = by_file.get(str(ITEM11_ERC_ENVELOPE.relative_to(REPO_ROOT)))
+    if not isinstance(erc_part, dict) or "content_hash" not in erc_part:
+        problems.append(
+            f"{label}: no ERC part carrying a content_hash pin for "
+            f"{ITEM11_ERC_ENVELOPE.relative_to(REPO_ROOT)} "
+            "(it is the pinned half of the compound entry)"
+        )
+        return problems
+    if not any(_evidence_file(part) == ITEM11_LVS_FILE for part in entry):
+        problems.append(
+            f"{label}: no part cites {ITEM11_LVS_FILE} (the LVS half of "
+            "the compound entry)"
+        )
+    manifest_pin = erc_part["content_hash"].removeprefix("sha256:")
+    envelope = json.loads(ITEM11_ERC_ENVELOPE.read_text())
+    provenance = envelope.get("provenance") or {}
+    recorded_input = (
+        (provenance.get("input") or {}).get("content_hash", "")
+    ).removeprefix("sha256:")
+    actual = sha256_of(ITEM11_ERC_ARTIFACT)
+    if manifest_pin != recorded_input:
+        problems.append(
+            f"{label}: manifest pin {manifest_pin[:16]}... does not match "
+            f"the hash recorded in {ITEM11_ERC_ENVELOPE.name} "
+            f"({recorded_input[:16] if recorded_input else 'absent'}...)"
+        )
+    if recorded_input != actual:
+        problems.append(
+            f"{label}: envelope {ITEM11_ERC_ENVELOPE.name} pins "
+            f"{(recorded_input or 'no hash')[:16] if recorded_input else 'no hash'}... but "
+            f"{ITEM11_ERC_ARTIFACT.name} currently hashes to {actual[:16]}... "
+            f"({ITEM11_ERC_ARTIFACT.name} changed since the evidence was "
+            "generated -- refresh the evidence, then re-pin and re-grade "
+            "per signoff/README.md's refresh contract)"
+        )
+    recorded_spec = (
+        (provenance.get("spec") or {}).get("content_hash", "")
+    ).removeprefix("sha256:")
+    actual_spec = sha256_of(ITEM11_ERC_SPEC)
+    if recorded_spec != actual_spec:
+        problems.append(
+            f"{label}: envelope {ITEM11_ERC_ENVELOPE.name} records "
+            f"spec hash {recorded_spec[:16] if recorded_spec else 'absent'}... but "
+            f"{ITEM11_ERC_SPEC.name} currently hashes to "
+            f"{actual_spec[:16]}... ({ITEM11_ERC_SPEC.name} changed since the "
+            "erc evidence was generated -- re-run the erc evidence per the "
+            "command in its own _comment, then re-grade per "
+            "signoff/README.md's refresh contract)"
+        )
     return problems
 
 

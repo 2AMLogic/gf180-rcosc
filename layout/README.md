@@ -101,24 +101,31 @@ What the committed report says, and on what each part rests:
   `vss`). `label_layer` is 36/10 (Metal2 pin text) only — verified
   against the stream: that is the one layer this merged GDS puts `vdd` /
   `vss` (and every other pin) text on.
-- **`erc.missing_tie` is not computed, by declared omission.** The spec
-  has no `ties[]` section, so `klt erc`'s own contract leaves
-  `erc.missing_tie` uncomputed rather than reporting a misleading zero.
-  Declaring `ties[]` on a real routed layout collapses it into one
-  electrical island and reports a false `erc.supply_short`
-  (klayout-tools#2169, reproduced four ways in gf180-drone-fc FRICTION
-  F-034), so its absence here is an **absence of evidence, not evidence
-  of absence**. The well-tie evidence standing in for it: (a) item 4's
-  own `rcosc_top.lvs.json` matches with `VDD`/`VSS` in
-  `net_correspondence` as pins — the analog branch's second clause: the
-  SPICE reference carries the supply nets, at full-connectivity LVS
-  "match"; (b) the merged GDS's own PG pin labels on 36/10 (what
-  `nets[]` matches); (c) `rcosc_comparator`'s drawn shared n-well group
-  with its `well_island` tap on `vdd` (see "Approach" above). Caveat
-  kept visible rather than papered over: klt extract's gf180mcu deck has
-  no distinct substrate-tap layer, so body/well ties are synthesized
-  (`vsubs`), not geometrically verified (see "LVS reference netlists"
-  below) — which is why no `missing_tie` number is claimed here at all.
+- **`erc.missing_tie` is computed, and clean: zero findings.** The spec
+  declares one `ties[]` entry — the upstream deck's own gf180mcu tap
+  boolean (an `Nplus`-covered `Comp` shape inside `Nwell`, wired to
+  `Metal1`, net `vdd`; the `tap_nplus` derivation of klayout-tools#1084,
+  spelled with the optional `tap_requires` intersection key the #2169
+  fix added) — so the committed report's zero is graded evidence:
+  `erc_coverage` lists `erc.missing_tie:["nwell_vdd_tap"]` under
+  `checked`, and both merged n-well polygons (the comparator's PMOS
+  group and the top-level latch-PMOS group, each with its
+  `well_island` tap routed to the `vdd` track) carry a tap that reaches
+  the `vdd` net. **Coverage caveat, kept visible rather than papered
+  over:** this grades the *drawn-well* half only. gf180mcu has no drawn
+  p-tub/substrate layer, so per `klt erc`'s own contract a substrate tie
+  "cannot be declared at all: `well_layer` requires drawn geometry, so
+  only the drawn-well half of such a design is graded" — and klt
+  extract's gf180mcu deck likewise synthesizes body/well ties
+  (`vsubs`) rather than geometrically verifying drawn taps (see "LVS
+  reference netlists" below). The p-substrate half of the question is
+  outside what this run can ask; device-level body verification stays
+  with item 4's full-connectivity LVS, matching with `VDD`/`VSS` in
+  `net_correspondence` as pins. (Why `ties[]` was previously omitted and
+  why that is obsolete under the pinned grader: the pre-#2169 model
+  collapsed routed layouts into one island — see the gaps list below;
+  the pinned grader ships the fix, and `klt signoff`'s item 11 now
+  *requires* a declared tie — "an uncomputed check is not a clean one".)
 - **The report's overall `status` is `"violations"`, and item 11 does
   not grade that.** Its 32 findings are all `erc.floating_gate`, the
   disclosed artifact of omitting the `Contact` (33/0) vias entry: the
@@ -138,7 +145,8 @@ What the committed report says, and on what each part rests:
   `provenance.input.content_hash` is the sha256 of
   `cells/rcosc_top.gds` and `provenance.spec.content_hash` is the
   sha256 of the spec — `run_checks.sh` re-verifies the first on every
-  run, so a regenerated-but-stale pair fails the check.
+  run, and the signoff verifier re-verifies both (plus the manifest's
+  item-11 pins) in CI, so a regenerated-but-stale pair fails the check.
 
 ## Approach: `klt gen` primitives, composed by hand
 
@@ -263,15 +271,23 @@ included for completeness — one worked as documented, needing no new issue):
   this is klayout-tools#1151's `--deck-option` mechanism, already merged
   upstream by the time this issue started; confirmed working as documented,
   not a new gap to file.
-- **[klayout-tools#2169](https://github.com/2AMLogic/klayout-tools/issues/2169)**:
-  `klt erc`'s `ties[]` collapses a real routed layout into one electrical
-  island and reports a **false** `erc.supply_short` (reproduced four ways
-  in `gf180-drone-fc`'s FRICTION F-034). Hit here while building the T1
-  item-11 supply spec ("Supply ERC" above): worked around by committing
-  the spec **without** `ties[]` — per `klt erc`'s own contract that
-  leaves `erc.missing_tie` *not computed* rather than reported as a
-  misleading zero, and the standing-in well-tie evidence is named in the
-  "Supply ERC" section instead of implied.
+- **[klayout-tools#2169](https://github.com/2AMLogic/klayout-tools/issues/2169)**
+  (*fixed* in the pinned grader): `klt erc`'s pre-fix `ties[]` model
+  registered the whole well layer as a conductor and shared its graph
+  with `gates[]`, so a declared tie collapsed a real routed layout into
+  one electrical island and reported a **false** `erc.supply_short`
+  (reproduced four ways in `gf180-drone-fc`'s FRICTION F-034). Hit here
+  while building the T1 item-11 supply spec ("Supply ERC" above):
+  originally worked around by committing the spec without `ties[]`;
+  the pinned grader (`0.5.0+g2b1e55e51bb8`) ships the fix — a declared
+  well is never a conductor, a tie contributes only its `tap_requires`
+  tap sites, and `ties[]` runs in an extraction that cannot alter any
+  other rule — so the spec now declares the tie (`Comp` intersected
+  with `Nplus`, per the deck's own tap definition) and grades
+  `erc.missing_tie` instead of omitting it. Regenerating the report
+  with the tie declared reproduced the guarantee on this GDS: still
+  exactly 32 `erc.floating_gate` findings, zero supply findings,
+  byte-comparable `gates[]` and `coverage`.
 - **[klayout-tools#2183](https://github.com/2AMLogic/klayout-tools/issues/2183)**:
   `klt erc` registers no device recognition, so a drawn resistor body is
   indistinguishable from a wire — any block whose topology deliberately

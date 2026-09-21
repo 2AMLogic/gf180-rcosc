@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "file": "/Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-37/layout/cells/rcosc_top.gds",
-  "spec": "/Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-37/layout/erc-supply-spec.json",
+  "file": "layout/cells/rcosc_top.gds",
+  "spec": "layout/erc-supply-spec.json",
   "pdk": null,
   "gate_role": "poly2",
   "gate_count": 32,
@@ -3009,22 +3009,18 @@
       "erc.floating_gate:[\"gate7\"]",
       "erc.floating_gate:[\"gate8\"]",
       "erc.floating_gate:[\"gate9\"]",
+      "erc.missing_tie:[\"nwell_vdd_tap\"]",
       "erc.net_connectivity:[\"vdd\"]",
       "erc.net_connectivity:[\"vss\"]"
     ],
     "skipped": [],
-    "inapplicable": [
-      {
-        "id": "erc.missing_tie:[]",
-        "reason": "no_ties_declared"
-      }
-    ],
+    "inapplicable": [],
     "unknown": [],
     "nothing_checked": false,
     "nothing_checked_reasons": []
   },
   "provenance": {
-    "klt_version": "0.5.0+g2b1e55e51bb8.dirty",
+    "klt_version": "0.5.0+g2b1e55e51bb8",
     "klayout_version": "0.30.12",
     "pdk": null,
     "deck": null,
@@ -3033,7 +3029,7 @@
       "role": "layout"
     },
     "spec": {
-      "content_hash": "sha256:5c125b141bbc828067e07a452c5485f47d1f79069bfe9fac80051e942afe829b"
+      "content_hash": "sha256:bb4462cce1639f0f043c2819bc56b29b04b5985b3acb5e18324259a5c799980f"
     }
   }
 }
