@@ -216,7 +216,6 @@ class Row:
 # extract`'s MOS split is "active inside the well is PMOS, outside is
 # NMOS" (see `gen_lib.Composer.draw_nwell`).
 _BIAS_ROW_ORDER = ["XRBA", "XRBB", "XRBC", "XN1", "XN2", "XRZ", "XSEED", "XP1", "XP2"]
-_BIAS_PFETS = ["XP1", "XP2"]
 #: Track order (bottom-up) in the bias cell's routing channel. The two
 #: internal core nets go first (they carry the most columns and benefit from
 #: the shortest runs), then the exported pins. `pb` (the PMOS gate bus) and
