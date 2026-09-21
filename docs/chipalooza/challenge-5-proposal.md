@@ -137,16 +137,17 @@ supply row. This is an explicit statement, not a blank or omitted row.
 
 **Post-layout divergence, applies to every accuracy row below**: post-layout
 (PEX-extracted) re-verification
-([DR-0010](../../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md),
-[`sim/pvt-postlayout/results/20260907T131703Z/summary.md`](../../sim/pvt-postlayout/results/20260907T131703Z/summary.md))
-found that, at the same fixed trim code and the same `tt`/`ff`/`ss` ×
+([DR-0013](../../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md),
+[`sim/pvt-postlayout/results/20260921T164434Z/summary.md`](../../sim/pvt-postlayout/results/20260921T164434Z/summary.md))
+found that, at the same fixed trim code (`0xD0`, the post-#39 global
+calibration code row 5 below names) and the same `tt`/`ff`/`ss` ×
 3-temperature × 3-supply corner-endpoint subset used for its 27-point
 check, a `klt extract --parasitics`-annotated netlist oscillates
 **slower** than the schematic-level netlist at every single point checked,
-by **−1.88% to −29.52%** (mean −10.32%) — well beyond the ratified ±1.1%
+by **−11.24% to −41.42%** (mean −19.56%) — well beyond the ratified ±1.1%
 calibration-point accuracy budget (which, per this document's own
 reporting convention, is always read alongside the ratified full
-temperature-range budget of +8% / −9%) on its own. DR-0010 did not re-run the
+temperature-range budget of +8% / −9%) on its own. DR-0013 did not re-run the
 full per-corner-code trim/calibration methodology under PEX (only this
 fixed-code, corner-endpoint subset), so the table below reports the
 schematic-level simulated figures as the primary numbers, with this
@@ -160,26 +161,29 @@ divergence bears on.
 | 2 | Trim range | ±40% (28.8–67.2 MHz) | **±35.50%** realized (28.0769–58.9870 MHz) | `sim/pvt/results/20260907T090653Z/summary.md` | **Not met** — 4.5 percentage points short, per DR-0009 |
 | 3 | Trim step (resolution) | 0.314 %/code (150.6 kHz/code LSB); half-LSB ±0.157% (arithmetic, not separately simulated) | **0.4317 %/code** average, realized over the trim range in row 2 | `sim/pvt/results/20260907T090653Z/summary.md` | **Met**, per the campaign's own generated verdict (average step at the realized range) |
 | 4 | Free-running, untrimmed process spread (fixed T = 27 °C, V = 3.3 V) | ±35% first-order (−27.7%/+47.6% exact) | **−26.34% / +42.68%** across the 7 simulated process corners at code `0x80` | `sim/pvt/results/20260907T090653Z/summary.md` | **Within** the ratified bound |
-| 5 | Post-trim accuracy — **global code `0xC0`** (one code applied across every corner, calibrated at `tt`/27 °C/3.3 V against the ratified 48.000 MHz target) — **calibration point** (±1.1% ratified) **and full temperature range** (+8%/−9% ratified), stated together | ±1.1% at the calibration point; **+8% / −9% across the full −40…+85 °C temperature range** (both ratified, read together) | Calibration point: **−34.85% / +54.78%**. Full temperature range: **−40.82% / +68.13%** (both simulated, read together) | `sim/pvt/results/20260907T090653Z/summary.md` | **Exceeds** both, this methodology†|
-| 6 | Post-trim accuracy — **per-corner code** (each process corner individually calibrated at its own 27 °C/3.3 V point against the surrogate target 39.1204 MHz — closer to the ratified spec's "single-point trim at test" description, since the ratified 48.000 MHz target is unreachable at every corner, per [DR-0005](../../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md)/[DR-0006](../../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md)) — **calibration point** (±1.1% ratified) **and full temperature range** (+8%/−9% ratified), stated together | ±1.1% at the calibration point; **+8% / −9% across the full −40…+85 °C temperature range** (both ratified, read together) | Calibration point: **−11.50% / +13.19%**. Full temperature range: **−19.41% / +27.85%** (both simulated, read together) | `sim/pvt/results/20260907T090653Z/summary.md` | **Exceeds** both, this methodology†|
+| 5 | Post-trim accuracy — **global code `0xD0`** (one code applied across every corner, calibrated at `tt`/27 °C/3.3 V against the ratified 48.000 MHz target) — **calibration point** (±1.1% ratified) **and full temperature range** (+8%/−9% ratified), stated together | ±1.1% at the calibration point; **+8% / −9% across the full −40…+85 °C temperature range** (both ratified, read together) | Calibration point: **−35.04% / +54.74%**. Full temperature range: **−41.38% / +60.71%** (both simulated, read together) | `sim/pvt/results/20260921T075822Z/summary.md` | **Exceeds** both, this methodology†|
+| 6 | Post-trim accuracy — **per-corner code** (each process corner individually calibrated at its own 27 °C/3.3 V point against the surrogate target 38.1812 MHz — closer to the ratified spec's "single-point trim at test" description, since the ratified 48.000 MHz target is unreachable at every corner, per [DR-0005](../../spec/decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md)/[DR-0006](../../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md)) — **calibration point** (±1.1% ratified) **and full temperature range** (+8%/−9% ratified), stated together | ±1.1% at the calibration point; **+8% / −9% across the full −40…+85 °C temperature range** (both ratified, read together) | Calibration point: **−11.65% / +8.32%**. Full temperature range: **−20.15% / +13.03%** (both simulated, read together) | `sim/pvt/results/20260921T075822Z/summary.md` | **Exceeds** both, this methodology†|
 | 7 | Runtime-disciplined accuracy (reserved) | ≤ ±0.25% (USB full-speed compliance) | Not designed, per [DR-0004](../../spec/decision-records/0004-no-active-tc-compensation-runtime-discipline.md) — this stage carries the entire burden of closing the gap from row 5/row 6's free-running figures (calibration point **and** full-temperature-range, always read together, per rows 5–6 above) down to this target | — (reserved, no `sim/` evidence exists or is expected pre-design) | **Not evaluated** — reserved, undesigned |
 | 8 | Supply | 3.3 V core (3.0–3.6 V); **no 5.0 V rail dependency** | Exercised across 3.0/3.3/3.6 V in every PVT campaign committed to date | `sim/pvt/results/20260907T090653Z/summary.md` | **Met** (exercised as specified; explicitly no 5.0 V row — see note above) |
-| 9 | Quiescent current, running (`< 500 µA`) | < 500 µA (running) | **Met at the reference corner only; exceeds elsewhere in the full PVT-corner grid** (issue #35/[DR-0011](../../spec/decision-records/0011-iq-pvt-corner-factorial-row-4-exceeds-off-reference.md)). Reference corner (`tt`/27 °C/3.3 V): met at every code, worst case 468.61 µA at `0xFF` (`sim/iq/results/20260907T090639Z/`). Full 63-point process × temperature × supply grid: worst-case corner `ff`/85 °C/3.6 V **exceeds** at every simulated code, e.g. **623.68 µA** at code `0xC0` (the single-point post-trim calibration code, [DR-0010](../../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)/#28) vs. 400.87 µA at the reference corner — 8 of 63 grid points exceed at `0xC0` (`iq_run`, the metric this row actually names, per [DR-0008](../../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md)/[DR-0009](../../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md)). `iq_op` (continuity only) is not this row's verdict basis | `sim/iq/results/20260907T090639Z/README.md` (reference corner); `sim/iq/results/20260909T225306Z/README.md` (full grid) | **Exceeds**, off-reference — re-sizing is a follow-on, not done in DR-0011 (ratified `< 500 µA` target unchanged) |
+| 9 | Quiescent current, running (`< 500 µA`) | < 500 µA (running) | **Met at the reference corner; exceeds off-reference at the top two codes of the fixed code set in the full PVT-corner grid** (issue #35/[DR-0011](../../spec/decision-records/0011-iq-pvt-corner-factorial-row-4-exceeds-off-reference.md)). Reference corner (`tt`/27 °C/3.3 V): met at every code, worst case 330.38 µA at `0xFF` (`sim/iq/results/20260921T091042Z/`). Full 63-point process × temperature × supply grid: the worst-case corner is `ff`/85 °C/3.6 V at every simulated code, **exceeding** at the top two codes, e.g. **541.85 µA** at code `0xC0` (one of the four codes of this sweep's fixed code set — a set inherited unchanged from prior Iq runs, not including the post-#39 single-point calibration code `0xD0`, [DR-0012](../../spec/decision-records/0012-comparator-bias-path-pvt-revision.md)) vs. 288.67 µA at the reference corner — 2 of 63 grid points exceed at `0xC0` (`iq_run`, the metric this row actually names, per [DR-0008](../../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md)/[DR-0009](../../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md)). `iq_op` (continuity only) is not this row's verdict basis | `sim/iq/results/20260921T091042Z/README.md` (reference corner and full grid) | **Exceeds**, off-reference — re-sizing is a follow-on, not done in DR-0011 (ratified `< 500 µA` target unchanged) |
 | 10 | Startup time | ≤ 10 µs to within trimmed accuracy | No `sim/` evidence exists for a measured startup time in this repository to date; the ratified target's own numeric precedent is flagged "unverified this session" in [DR-0003](../../spec/decision-records/0003-pdk-sourced-process-spread-tcr-and-iq.md) | — (gap, not invented) | **Not evaluated** — no simulation evidence exists; see §5 for how the bench closes this |
 | 11 | Temperature range | −40 °C to +85 °C (industrial) | Exercised at −40/27/85 °C in every PVT campaign committed to date | `sim/pvt/results/20260907T090653Z/summary.md` | **Met** (exercised as specified) |
 
-\* All schematic-level citations above are to the same run,
+\* Schematic-level citations above are split across two committed
+campaigns: rows 1–4, 8 and 11 cite the pre-#39 run
 `sim/pvt/results/20260907T090653Z/` (the final campaign against the
 [DR-0009](../../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md)
-sizing) except row 9, which cites the reference-corner Iq sweep
-`sim/iq/results/20260907T090639Z/` (the matching Iq sweep at the same
-sizing) and the full PVT-corner Iq grid
-`sim/iq/results/20260909T225306Z/` (issue #35/DR-0011).
+sizing), while rows 5–6 cite the post-#39 re-measurement
+`sim/pvt/results/20260921T075822Z/`
+([DR-0012](../../spec/decision-records/0012-comparator-bias-path-pvt-revision.md)).
+Row 9 cites the post-#39 Iq factorial
+`sim/iq/results/20260921T091042Z/` (reference corner and full PVT-corner
+grid, issue #35/DR-0011).
 
 † See the post-layout divergence note above this table: post-layout
-(PEX-extracted) re-verification at this same trim code
-([DR-0010](../../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md))
-shows a further, real, monotonic frequency reduction of up to 29.52% on
+(PEX-extracted) re-verification at this same trim code (`0xD0`)
+([DR-0013](../../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md))
+shows a further, real, monotonic frequency reduction of up to 41.42% on
 top of the schematic-level residual reported in rows 5–6 — no ratified
 row's disposition changes as a result (both rows were already "exceeds" at
 the schematic level), but the true post-layout accuracy is worse than what
@@ -249,7 +253,7 @@ post-layout re-verification).
    compare the measured spread against the ratified ±35% (−27.7%/+47.6%)
    target and the schematic-level ±26.34%/+42.68% simulated figure (row
    4) — this step is what would show whether the schematic-level model,
-   or the further-negative post-layout PEX-extracted shift (DR-0010,
+   or the further-negative post-layout PEX-extracted shift (DR-0013,
    §4), tracks real silicon more closely.
 
 Minimum bench instrumentation: a programmable `VDD` supply (3.0–3.6 V), a
