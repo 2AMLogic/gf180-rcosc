@@ -38,7 +38,7 @@ v {xschem version=3.4.7 file_version=1.2
 *   bit:      0    1    2    3   4   5   6   7   (W = SW<i> = PW<i>)
 *   W (um):  24   16   12    8   6   5   4   3
 * Known, characterized limit of this restructure (documented in
-* DR-0013, do not paper over): with the issue-#16-frozen R map, every
+* DR-0014, do not paper over): with the issue-#16-frozen R map, every
 * block-boundary code pair (0xkF -> 0x(k+1)0) has only ~1 LSB-R
 * (~374 ohm, R_maxbit minus the sum below it) of ideal-switch
 * monotonicity margin. A realizable shunt's trip-weighted residual
