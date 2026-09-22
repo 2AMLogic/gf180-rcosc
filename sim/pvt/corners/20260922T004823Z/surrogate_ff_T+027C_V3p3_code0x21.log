@@ -1,0 +1,76 @@
+====================================================================
+gf180-rcosc delay-probe run: surrogate_ff_T+027C_V3p3_code0x21
+run id      : 20260922T004823Z
+basis       : surrogate
+process     : ff (fets=ff res=res_ff mimcap=mimcap_ff)
+temperature : 27 C
+supply      : 3.3 V
+trim code   : 0x21 (33)
+transient   : tran 100p 1200n, wrdata + Python crossing/cycle-alignment analysis (see driver docstring)
+wall clock  : 35.6 s
+exit status : 0
+====================================================================
+vdd=3.3000 vmid=1.6500 vh=2.199535 vl=1.099727
+crossing counts: clk_r=50 clk_f=50 vh_r=49 vl_f=50 cmph=50 cmpl=50
+cycles decomposed: 3 / 3 candidates
+cross-cycle spread (max-min): period=0.0270ns t_cmp_h=0.0003ns t_lat_h=0.0027ns t_fall=0.0066ns t_cmp_l=0.0075ns t_lat_l=0.0046ns charge=0.0255ns dsum=0.0034ns overshoot_v=5039470.0000ns vh_dc=0.0000ns vl_dc=0.0000ns fosc=45977442772246.8984ns
+median decomposition: period=24.2183ns t_cmp_h=1.8832ns t_lat_h=0.4457ns t_fall=0.0432ns t_cmp_l=1.0601ns t_lat_l=0.2167ns charge=20.5722ns dsum=3.6025ns overshoot_v=0.115137V vh_dc=2.199535V vl_dc=1.099727V fosc=41291017483203.3359MHz
+97
+xxdut.cmpl_out                     4.10054e-09
+clk                                   0.591576
+xxdut.qbar                             1.35095
+xxdut.mid1                             2.61568
+xxdut.mid2                               3.067
+vt7#branch                                   0
+vt6#branch                                   0
+vt5#branch                                   0
+vt4#branch                                   0
+vt3#branch                                   0
+vt2#branch                                   0
+vt1#branch                                   0
+vt0#branch                                   0
+vdd#branch                        -0.000820152
+
+ Reference value :  0.00000e+00
+ Reference value :  5.59203e-08
+ Reference value :  1.18263e-07
+ Reference value :  1.70769e-07
+ Reference value :  1.99422e-07
+ Reference value :  2.32548e-07
+ Reference value :  2.64422e-07
+ Reference value :  2.94868e-07
+ Reference value :  3.26145e-07
+ Reference value :  3.56929e-07
+ Reference value :  3.88192e-07
+ Reference value :  4.16770e-07
+ Reference value :  4.47060e-07
+ Reference value :  4.77434e-07
+ Reference value :  5.10037e-07
+ Reference value :  5.38696e-07
+ Reference value :  5.69198e-07
+ Reference value :  6.03502e-07
+ Reference value :  6.35023e-07
+ Reference value :  6.65437e-07
+ Reference value :  6.95836e-07
+ Reference value :  7.29174e-07
+ Reference value :  7.58002e-07
+ Reference value :  7.92209e-07
+ Reference value :  8.24835e-07
+ Reference value :  8.54078e-07
+ Reference value :  8.87614e-07
+ Reference value :  9.19649e-07
+ Reference value :  9.49128e-07
+ Reference value :  9.83789e-07
+ Reference value :  1.01564e-06
+ Reference value :  1.04598e-06
+ Reference value :  1.07548e-06
+ Reference value :  1.11196e-06
+ Reference value :  1.14322e-06
+ Reference value :  1.17353e-06
+No. of Data Rows : 12230
+ngspice-46 done
+
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
