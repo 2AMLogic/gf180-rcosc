@@ -41,7 +41,6 @@ every filename in this directory on `main`, including superseded records).
 | [0014](decision-records/0014-trim-bank-pass-switch-restructure.md) | Trim-bank pass-switch restructure — per-position transmission-gate shunts with locally inverted pfet gates, trim range restored (±51.36 %, first `met` since DR-0005), residual supply sensitivity re-attributed | Ratified (records evidence; supersedes no ratified row; its "layout consequence" paragraph retired by 0015) |
 | [0015](decision-records/0015-trim-bank-respin-postlayout-pex-reverification.md) | Trim-bank layout re-spin against the post-#43 schematic + post-layout (PEX) PVT re-verification — parasitic shift deepens on the mean (−17.46 % … −40.92 %, mean −27.32 %), ratified rows unchanged | Ratified (records evidence; supersedes 0010's and 0013's post-layout figures for the post-#43 schematic — 0013 remains valid for the post-#39, pre-#43 GDS pair) |
 | [0016](decision-records/0016-comparator-latch-delay-residue-budget.md) | Comparator/latch delay residue measured and budgeted — the delay term (62–82% of the post-trim supply span) enters the post-trim accuracy arithmetic; schematic unchanged | Ratified (supersedes 0003 Row 3: at-calibration −9.2%/+6.5%, full-range +13.4%/−17.1%; circuit-side follow-up is #57) |
-(docs(spec): renumber the delay-residue record 0015 -> 0016 (collision with the concurrently-landed trim-bank re-spin record))
 
 A record is never deleted or rewritten once ratified — a later change
 supersedes it with a new record rather than editing history in place (same
