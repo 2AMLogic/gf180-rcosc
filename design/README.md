@@ -745,7 +745,7 @@ Measured headline facts (per-stage tables in the probe's `summary.md`):
 - The delay's own ΔT is second-order (≤ ±2.1 points of frequency at the
   worst corner/leg); the supply span dominates both post-trim rows.
 
-**Disposition** ([DR-0015](../spec/decision-records/0015-comparator-latch-delay-residue-budget.md)):
+**Disposition** ([DR-0016](../spec/decision-records/0016-comparator-latch-delay-residue-budget.md)):
 lever (b) — the budget arithmetic is re-derived to carry the delay term
 explicitly, superseding DR-0003 Row 3: **−9.2% / +6.5%** at the
 calibration point, **+13.4% / −17.1%** over the full temperature range.

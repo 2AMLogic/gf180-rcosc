@@ -1,4 +1,4 @@
-# 0015: Comparator/latch delay residue measured and budgeted — superseding DR-0003's post-trim accuracy rows
+# 0016: Comparator/latch delay residue measured and budgeted — superseding DR-0003's post-trim accuracy rows
 
 - **Status**: Ratified — supersedes Row 3 (post-trim PVT accuracy, both
   sub-rows a and b) of
