@@ -706,6 +706,62 @@ local dips the campaign now samples explicitly. The block staircase stays
 monotone at every sampled 16-code step at every corner. No ratified row is
 relaxed, and no result is rounded up to "met".
 
+### Comparator/latch delay residue: measured, attributed, budgeted (issue #51)
+
+The delay residue DR-0014 re-attributed the remaining post-trim excess to
+is now **instrumented directly** rather than inferred from code
+monotonicity. `sim/pvt/delay_probe.py` (run
+`sim/pvt/results/20260922T004823Z/`, 138 points, 0 failed) decomposes each
+steady-state cycle into its charge term and the four comparator/latch stage
+delays (`t_cmp_h`/`t_lat_h` at the `vh` crossing, `t_cmp_l`/`t_lat_l` at
+the `vl` crossing), at both per-corner calibrated-code sets across the full
+PVT factorial, plus the DR-0014 switchprobe code pairing at `ss`/27 °C.
+The standard campaign was re-run at the same netlist as a reproduction
+(`sim/pvt/results/20260922T010039Z/` — every post-trim table row
+reproduces `20260921T173529Z` exactly).
+
+Measured headline facts (per-stage tables in the probe's `summary.md`):
+
+- **The period decomposition closes to <20 ps at every probed cell**:
+  `period = charge + (t_cmp_h + t_lat_h) + t_fall + (t_cmp_l + t_lat_l)`.
+  The delay is paid once per crossing, two crossings per cycle — **not**
+  ≈3× as DR-0012's narrative shorthand had it. The `vh` overshoot
+  (100–205 mV ≈ charge-slope × high-side latency) costs no period because
+  `MDISCH` resets `vc` to ≈0 V every cycle; it is a symptom of the latency,
+  not a period term.
+- The delay sum `dsum` runs 3.4–7.4 ns at the calibrated codes (15–28% of
+  the period at 27 °C/3.3 V; 8.4 ns / 34% at the worst probed cell,
+  `ss`/−40 °C/3.0 V), and carries **62–82% of the period's 3.0→3.6 V
+  span**; the remaining 16–36% is a charge-path supply term
+  (transmission-gate shunt `R_on(VDD)` / loaded divider ratio), first
+  separated by this instrumentation.
+- **The dominant single stage is the low-side comparator** (`XCMPL`):
+  `t_cmp_l` = 3.81 ns at 3.0 V vs 1.90 ns at 3.6 V at `ss`/27 °C (87% of
+  that corner's delay span), against a nearly supply-flat high side
+  (2.55→2.45 ns) and ≈0.1–0.2 ns from the latch paths. Mechanism: `XCMPL`'s
+  input pair compares `vl` (= VDD/3) against `vc` ≈ 0 — near-ground common
+  mode, marginal overdrive, worst at slow-cold-low-supply (5.0 ns). This is
+  the measured starting point for the circuit-side follow-up, issue #57.
+- The delay's own ΔT is second-order (≤ ±2.1 points of frequency at the
+  worst corner/leg); the supply span dominates both post-trim rows.
+
+**Disposition** ([DR-0015](../spec/decision-records/0015-comparator-latch-delay-residue-budget.md)):
+lever (b) — the budget arithmetic is re-derived to carry the delay term
+explicitly, superseding DR-0003 Row 3: **−9.2% / +6.5%** at the
+calibration point, **+13.4% / −17.1%** over the full temperature range.
+Against the re-derived figures the two post-trim rows are **met** at both
+calibration bases (margin ≥ 0.7 pt at the calibration point, ≥ 1.6 pt
+full-range); against the superseded ±1.1% / +8%/−9%
+they remain exceeds — both verdicts recorded together in the DR. The
+circuit-side lever (a) was evaluated and rejected on measured grounds
+(even zeroing the delay cannot reach ±1.1% while the charge-path share
+remains, and any f-raising change flips DR-0003 Row 4's 1.24 µA-margin
+`0x80` verdict at `ff`/85 °C/3.6 V); the viable circuit shape — flattening
+the delay's supply slope at constant nominal delay, targeting the low-side
+common mode — is filed as issue #57. No schematic, netlist, or layout
+change rides in issue #51, so the committed `layout/` and PEX evidence
+remain current.
+
 ## Non-goals
 
 Per the issue #6 acceptance criteria that first wrote this section, and

@@ -27,7 +27,7 @@ every filename in this directory on `main`, including superseded records).
 |---|---|---|
 | [0001](decision-records/0001-relaxation-oscillator-topology.md) | Relaxation-oscillator topology for the trimmable RC core | Ratified |
 | [0002](decision-records/0002-target-spec-ratification.md) | Target spec ratification — frequency, trim, and PVT accuracy budget | Ratified (process spread, trim range/resolution, post-trim accuracy, and Iq rows superseded by 0003) |
-| [0003](decision-records/0003-pdk-sourced-process-spread-tcr-and-iq.md) | PDK-sourced process spread, temperature drift, and Iq — superseding four rows of 0002 | Ratified |
+| [0003](decision-records/0003-pdk-sourced-process-spread-tcr-and-iq.md) | PDK-sourced process spread, temperature drift, and Iq — superseding four rows of 0002 | Ratified (Row 3 — post-trim PVT accuracy — superseded by 0015; Rows 1, 2, 4 stand) |
 | [0004](decision-records/0004-no-active-tc-compensation-runtime-discipline.md) | No active temperature-coefficient compensation — rely on runtime discipline | Ratified |
 | [0005](decision-records/0005-pvt-campaign-frequency-shortfall-spec-unchanged.md) | PVT campaign confirms a frequency/accuracy shortfall in the current schematic — ratified spec unchanged | Ratified (records evidence; supersedes nothing) |
 | [0006](decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md) | Post-#16-resize PVT campaign — trim range and post-trim accuracy still unmet, ratified spec unchanged | Ratified (records evidence; realized trim-curve figures superseded by 0008) |
@@ -40,6 +40,8 @@ every filename in this directory on `main`, including superseded records).
 | [0013](decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md) | Bias-cell layout re-spin against the post-#39 schematic + post-layout (PEX) PVT re-verification — parasitic shift deepens (−11.24 % … −41.42 %), ratified rows unchanged | Ratified (records evidence; supersedes 0010's post-layout figures for the post-#39 schematic) |
 | [0014](decision-records/0014-trim-bank-pass-switch-restructure.md) | Trim-bank pass-switch restructure — per-position transmission-gate shunts with locally inverted pfet gates, trim range restored (±51.36 %, first `met` since DR-0005), residual supply sensitivity re-attributed | Ratified (records evidence; supersedes no ratified row; its "layout consequence" paragraph retired by 0015) |
 | [0015](decision-records/0015-trim-bank-respin-postlayout-pex-reverification.md) | Trim-bank layout re-spin against the post-#43 schematic + post-layout (PEX) PVT re-verification — parasitic shift deepens on the mean (−17.46 % … −40.92 %, mean −27.32 %), ratified rows unchanged | Ratified (records evidence; supersedes 0010's and 0013's post-layout figures for the post-#43 schematic — 0013 remains valid for the post-#39, pre-#43 GDS pair) |
+| [0015](decision-records/0015-comparator-latch-delay-residue-budget.md) | Comparator/latch delay residue measured and budgeted — the delay term (62–82% of the post-trim supply span) enters the post-trim accuracy arithmetic; schematic unchanged | Ratified (supersedes 0003 Row 3: at-calibration −9.2%/+6.5%, full-range +13.4%/−17.1%; circuit-side follow-up is #57) |
+(feat(spec): DR-0015 budgets the measured comparator/latch delay residue into the post-trim accuracy rows (issue #51))
 
 A record is never deleted or rewritten once ratified — a later change
 supersedes it with a new record rather than editing history in place (same
