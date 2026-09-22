@@ -137,17 +137,18 @@ supply row. This is an explicit statement, not a blank or omitted row.
 
 **Post-layout divergence, applies to every accuracy row below**: post-layout
 (PEX-extracted) re-verification
-([DR-0013](../../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md),
-[`sim/pvt-postlayout/results/20260921T164434Z/summary.md`](../../sim/pvt-postlayout/results/20260921T164434Z/summary.md))
-found that, at the same fixed trim code (`0xD0`, the post-#39 global
-calibration code row 5 below names) and the same `tt`/`ff`/`ss` ×
-3-temperature × 3-supply corner-endpoint subset used for its 27-point
-check, a `klt extract --parasitics`-annotated netlist oscillates
-**slower** than the schematic-level netlist at every single point checked,
-by **−11.24% to −41.42%** (mean −19.56%) — well beyond the ratified ±1.1%
-calibration-point accuracy budget (which, per this document's own
-reporting convention, is always read alongside the ratified full
-temperature-range budget of +8% / −9%) on its own. DR-0013 did not re-run the
+([DR-0015](../../spec/decision-records/0015-trim-bank-respin-postlayout-pex-reverification.md),
+[`sim/pvt-postlayout/results/20260922T004322Z/summary.md`](../../sim/pvt-postlayout/results/20260922T004322Z/summary.md))
+found that, at the fixed trim code (`0x9D`, the post-#43 campaign's own
+ratified-target calibration code, auto-read by the driver) and the same
+`tt`/`ff`/`ss` × 3-temperature × 3-supply corner-endpoint subset used for
+its 27-point check, a `klt extract --parasitics`-annotated netlist
+oscillates **slower** than the schematic-level netlist at every single
+point checked, by **−17.46% to −40.92%** (mean −27.32%) — well beyond the
+ratified ±1.1% calibration-point accuracy budget (which, per this
+document's own reporting convention, is always read alongside the ratified
+full temperature-range budget of +8% / −9%) on its own. DR-0015 did not
+re-run the
 full per-corner-code trim/calibration methodology under PEX (only this
 fixed-code, corner-endpoint subset), so the table below reports the
 schematic-level simulated figures as the primary numbers, with this
@@ -181,9 +182,9 @@ Row 9 cites the post-#39 Iq factorial
 grid, issue #35/DR-0011).
 
 † See the post-layout divergence note above this table: post-layout
-(PEX-extracted) re-verification at this same trim code (`0xD0`)
-([DR-0013](../../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md))
-shows a further, real, monotonic frequency reduction of up to 41.42% on
+(PEX-extracted) re-verification at this same fixed trim code (`0x9D`)
+([DR-0015](../../spec/decision-records/0015-trim-bank-respin-postlayout-pex-reverification.md))
+shows a further, real, monotonic frequency reduction of up to 40.92% on
 top of the schematic-level residual reported in rows 5–6 — no ratified
 row's disposition changes as a result (both rows were already "exceeds" at
 the schematic level), but the true post-layout accuracy is worse than what

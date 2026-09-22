@@ -90,13 +90,14 @@ machine verdict is the starting point for each read, not the whole of it.
 The extraction report is the documented-provenance statement of the committed
 GDS: it pins `layout/cells/rcosc_top.gds` by content hash (`provenance.input
 .content_hash`, mirrored in the manifest pin), records the extracted device/
-net inventory and the netlist it produced. On the current, issue-#44
-re-spun GDS the envelope records **71 devices** (45 `nfet` + 12 `pfet` +
-13 `ppolyf_u_1k` + 1 MiM cap: the pre-re-spin GDS recorded 60 devices),
-**37 nets, 11 pins**. `rcosc_top.gds` instantiates the three sub-blocks as
-real GDS sub-cells, so the pinned artifact is the composed whole block. The
-manifest pin, the envelope's recorded hash, and the current bytes of the
-GDS are cross-checked on every CI run by `verify-report.py`.
+net inventory and the netlist it produced. On the current, issue-#50
+re-spun GDS the envelope records **95 devices** (53 `nfet` + 28 `pfet` +
+13 `ppolyf_u_1k` + 1 MiM cap: the #44 re-spin GDS recorded 71 devices, the
+pre-#44 one 60), **45 nets, 11 pins**. `rcosc_top.gds` instantiates the
+three sub-blocks as real GDS sub-cells, so the pinned artifact is the
+composed whole block. The manifest pin, the envelope's recorded hash, and
+the current bytes of the GDS are cross-checked on every CI run by
+`verify-report.py`.
 
 ### met — item 3 (DRC clean): `layout/reports/rcosc_top.drc.json`
 
@@ -196,8 +197,9 @@ grader does not grade:
   `checked` in the envelope's `erc_coverage`, so the zero is graded
   evidence, not an uncomputed absence. Disclosed, not graded: the report's
   overall `status` is `"violations"` from its `erc.floating_gate`
-  findings (36 on the current, issue-#44 re-spun GDS — the re-spun
-  beta-multiplier core's contacted gates; 32 pre-re-spin) — the
+  findings (60 on the current, issue-#50 re-spun GDS — the #44 re-spin's
+  36 plus the re-spun trim bank's 24 additional contacted gates; 32
+  pre-#44) — the
   pre-declared artifact of omitting `Contact` from `vias[]`
   (klayout-tools#2183, declared non-blocking by item 11's own text,
   klayout-tools#1994); and this tie grades the *drawn-well* half only —
@@ -277,13 +279,16 @@ row change together.
 ### unmet — item 7 (Post-layout verification): campaign committed, not a `klt pex` report
 
 The post-layout re-verification is committed under
-`sim/pvt-postlayout/results/20260921T164434Z/` — a real `klt extract
+`sim/pvt-postlayout/results/20260922T004322Z/` — a real `klt extract
 --parasitics` run (`rcosc_top.pex.extract.json`, klt 0.4.0) against the same
 GDS item 2 pins (`provenance.input.content_hash` matches), re-simulated by the
 custom `pex_pvt_sweep.py` harness over a 27-point corner-endpoint subset at
-fixed trim `0xD0`, with the schematic-vs-extracted deltas recorded per point
-(oscillator runs −11.24% to −41.42% slower than schematic at every point —
-DR-0013). The grader accepts **only a `klt pex` report** for this item
+the post-#43 schematic campaign's own ratified-target calibration code
+`0x9D`, with the schematic-vs-extracted deltas recorded per point
+(oscillator runs −17.46% to −40.92% slower than schematic at every point —
+DR-0015; DR-0013's `20260921T164434Z` run remains the committed evidence
+for the pre-#43 GDS pair). The grader accepts **only a `klt pex` report**
+for this item
 (a clean DRC or a custom re-sim proves nothing about post-layout behavior in
 its eyes — `wrong_kind` by design), so mechanically: `no_evidence`. Body-bias
 disclosure for the committed extractions: both the plain and the parasitic

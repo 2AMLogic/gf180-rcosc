@@ -1,50 +1,47 @@
 # layout
 
-**Status: full `rcosc_top` hierarchy, re-spun current with the post-#39
-schematic (issues #13 + #27 + #44).** This directory carries a DRC-clean,
-LVS-matched GDS for all four of `rcosc_top`'s sub-blocks -- the bias
-generator (`rcosc_bias`), the trim bank (`rcosc_trim_bank`), the comparator
-(`rcosc_comparator`, instantiated twice as `XXCMPH`/`XXCMPL`) -- plus the
-`rcosc_top` top-level composition itself (the inline SR latch, `MDISCH`,
-the `CTIMING` MiM cap, and the wiring that instantiates the three sub-cells
-as real GDS sub-cells, not redrawn geometry) -- all reproducible from one
-committed build script. The post-layout (PEX-extracted) PVT re-verification
-this schematic-level layout enables was tracked separately as issue #28
-and re-run against the re-spin as part of issue #44.
+**Status: full `rcosc_top` hierarchy, re-spun current with the post-#43
+schematic (issues #13 + #27 + #44 + #50).** This directory carries a
+DRC-clean, LVS-matched GDS for all four of `rcosc_top`'s sub-blocks -- the
+bias generator (`rcosc_bias`), the trim bank (`rcosc_trim_bank`), the
+comparator (`rcosc_comparator`, instantiated twice as `XXCMPH`/`XXCMPL`)
+-- plus the `rcosc_top` top-level composition itself (the inline SR latch,
+`MDISCH`, the `CTIMING` MiM cap, and the wiring that instantiates the
+three sub-cells as real GDS sub-cells, not redrawn geometry) -- all
+reproducible from one committed build script. The post-layout
+(PEX-extracted) PVT re-verification this schematic-level layout enables
+was tracked separately as issue #28, re-run against the bias re-spin as
+part of issue #44, and re-run against the trim re-spin as part of issue
+#50.
 
-**Current with the post-#39 schematic (issue #44's re-spin):** the
-`rcosc_bias` cell geometry was re-drawn against the self-biased
-current-reference core issue #39 put on `main`
-([DR-0012](../spec/decision-records/0012-comparator-bias-path-pvt-revision.md)),
-keeping the sub-cell boundary (`vdd vss vh vl ibias`) unchanged; the trim
-bank, comparator, and top-level composition geometry are byte-for-byte the
-pre-re-spin cells (verified against this toolchain's own reproducibility
-check over the unmodified builders). The hierarchy was re-verified end to
-end -- DRC clean, LVS matched, supply-ERC one-island-per-supply -- and the
-post-layout (PEX) PVT re-verification re-run against the re-spun GDS: see
-[DR-0013](../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md),
+**Current with the post-#43 schematic (issue #50's re-spin):** the
+`rcosc_trim_bank` cell geometry was re-drawn against the
+transmission-gate shunt restructure issue #43 put on `main`
+([DR-0014](../spec/decision-records/0014-trim-bank-pass-switch-restructure.md))
+-- per-position `SW<i>`/`PW<i>` pairs at `L=0.28u` (widths
+24/16/12/8/6/5/4/3 µm) with per-bit 2u/4u `L=0.5u` complement inverters,
+a new `vdd` pin, and `vss` back as a real routed net. The restructure is
+not planar in metal1 (`tb<i>` must cross every c-node column; the rails
+cross the `t<i>` columns), so the cell moved from issue #13's two-row
+planar shape to the same one-row-plus-`Channel` discipline the comparator
+(#27) and the re-spun bias cell (#44) use, with all sixteen PMOS sharing
+one drawn n-well + `well_island` tap on `vdd`. The recomposed `rcosc_top`
+also fixes a latent pad-mapping bug the new pin exposed (two trim pins
+land on the top's `vdd`; the pad table is collision-safe now). The
+hierarchy was re-verified end to end -- DRC clean, LVS matched,
+supply-ERC one-island-per-supply -- and the post-layout (PEX) PVT
+re-verification re-run against the re-spun GDS: see
+[DR-0015](../spec/decision-records/0015-trim-bank-respin-postlayout-pex-reverification.md),
 which supersedes
 [DR-0010](../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)'s
-figures for the post-#39 schematic (the parasitic frequency shift deepened
-relative to the pre-#39 pair: −11.24 % … −41.42 %, always slower).
-
-**Pre-#43 schematic:** the `rcosc_trim_bank` cell geometry here was drawn
-against the pre-issue-#43 trim bank (eight single `nfet_03v3 W=4u L=0.5u`
-pass switches, no `vdd` pin); issue #43's pass-switch restructure
-([DR-0014](../spec/decision-records/0014-trim-bank-pass-switch-restructure.md))
-changed the sub-cell's schematic and its port list afterward, so the
-trim-bank cell's GDS, its LVS reference, and — because `rcosc_top.gds`
-instantiates the cell — the top-composition geometry / DRC / LVS /
-extraction evidence describe the **pre-#43** schematic until the
-trim-bank cell re-spin lands (follow-up issue #50; the bias cell is
-current again per #44's re-spin above, so the re-spin scope is now the
-trim cell and the top-composition re-verification only). Sizing for the
-re-spin is committed by the schematic (per-position widths
-24/16/12/8/6/5/4/3 µm at `L=0.28u`, per-bit 2u/4u `L=0.5u` complement
-inverters); none of `layout/`'s committed evidence is regenerated by
-issue #43, and DR-0010's / DR-0013's post-layout figures must not be
-quoted against the post-#43 trim tree until the #50 re-verification
-lands.
+and
+[DR-0013](../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md)'s
+figures for the post-#43 schematic (the parasitic frequency shift
+deepened on the mean: −17.46 % … −40.92 %, mean −27.32 %, always
+slower). The bias cell was re-spun current earlier per #44; the
+comparator and its evidence are byte-for-byte the pre-re-spin cell
+(verified against this toolchain's own reproducibility check over the
+unmodified builders).
 
 
 ## What's checked in
@@ -153,8 +150,9 @@ What the committed report says, and on what each part rests:
   fix added) — so the committed report's zero is graded evidence:
   `erc_coverage` lists `erc.missing_tie:["nwell_vdd_tap"]` under
   `checked`, and every merged n-well polygon (the comparator's PMOS
-  group, the top-level latch-PMOS group, and — since issue #44's
-  re-spin — the bias core's `P1`/`P2` mirror-pair well, each with its
+  group, the top-level latch-PMOS group, the bias core's `P1`/`P2`
+  mirror-pair well since issue #44's re-spin, and — since issue #50's
+  re-spin — the trim bank's sixteen-pfet group, each with its
   `well_island` tap routed to the `vdd` track) carries a tap that reaches
   the `vdd` net. **Coverage caveat, kept visible rather than papered
   over:** this grades the *drawn-well* half only. gf180mcu has no drawn
@@ -172,8 +170,8 @@ What the committed report says, and on what each part rests:
   the pinned grader ships the fix, and `klt signoff`'s item 11 now
   *requires* a declared tie — "an uncomputed check is not a clean one".)
 - **The report's overall `status` is `"violations"`, and item 11 does
-  not grade that.** Its findings (36 on the current, issue-#44 re-spun
-  GDS; 32 pre-re-spin) are all `erc.floating_gate`, the
+  not grade that.** Its findings (60 on the current, issue-#50 re-spun
+  GDS; 36 on the #44 re-spin; 32 pre-re-spin) are all `erc.floating_gate`, the
   disclosed artifact of omitting the `Contact` (33/0) vias entry: the
   bias generator's resistor ladder is drawn poly straight across the
   rails (`vdd→vh→vl→vss`, plus the trim chain
@@ -208,19 +206,24 @@ imports each generated cell into one composing `klayout.db` layout, places
 it at a computed offset, and wires ports together with plain Manhattan
 metal rectangles.
 
-`rcosc_trim_bank` (issue #13) is the design's one remaining single-finger,
-planar-in-metal1 cell: two rows (a resistor chain, with a row of shunt
-switches above it), wired with `wire_segment`/`wire_l`/`wire_z` so each
-cross-row jog stays inside its own resistor's private x-window rather than
-sharing a routing channel. The pre-#39 `rcosc_bias` was that shape too,
-but issue #44's re-spin against the self-biased core forced the same three
-things `rcosc_comparator`/`rcosc_top` (issue #27) had already needed —
-"the PMOS gate bus `pb` must reach five terminals across the cell and `vl`
-must reach `SEED`'s gate across them, which is not planar in metal1" — so
-the re-spun cell shares the comparator's row-plus-`Channel`/n-well
-constructions below verbatim (one row of blocks, `P1`/`P2` sharing a drawn
-n-well with a `well_island` tap on `vdd`) instead of the two-row metal1
-plan. `rcosc_comparator`/`rcosc_top` (issue #27) needed:
+Every cell in the hierarchy is now channel-routed on
+`gen_lib.Channel`'s two-layer discipline (metal1 columns, metal2 tracks —
+the top level one layer pair higher): `rcosc_comparator` and `rcosc_top`
+adopted it at issue #27, `rcosc_bias` at issue #44's re-spin (the PMOS
+gate bus is not planar in metal1), and `rcosc_trim_bank` at issue #50's
+re-spin (the `tb<i>` inverter buses and the two rails cross the c-node and
+`t<i>` terminal runs). Issue #13's two-row planar trim bank — a resistor
+chain with a row of shunt switches above it, wired with
+`wire_segment`/`wire_l`/`wire_z` so each cross-row jog stayed inside its
+own resistor's private x-window — survives only in history: it was
+planar precisely because pre-#43 every shunt was one nfet, which the
+transmission-gate restructure ended. The bias cell's own re-spin (#44)
+forced the same move for its own reason ("the PMOS gate bus `pb` must
+reach five terminals across the cell and `vl` must reach `SEED`'s gate
+across them"), so it too shares the comparator's row-plus-`Channel` and
+n-well constructions verbatim (one row of blocks, `P1`/`P2` sharing a
+drawn n-well with a `well_island` tap on `vdd`). What
+`rcosc_comparator`/`rcosc_top` (issue #27) additionally needed:
 
 - **Multi-finger devices.** `rcosc_comparator`'s `MTAIL` is `nfet_03v3
   W=16u nf=8` — one folded 8-finger `mos_array` call
@@ -375,8 +378,10 @@ substrate tie *and* a real circuit node here) — comparing that literally
 against the layout's `vsubs` pseudo-net is an unconditional, unfixable-by-
 better-layout net split. `layout/lvs_ref/*.spice` therefore rewrites just
 that one terminal's net name to `vsubs` to match the deck's own model
-(`rcosc_trim_bank`'s reference additionally drops the now-unused `vss` pin
-from its `.SUBCKT` line for the same reason) — the **schematic itself is
+(pre-#50, `rcosc_trim_bank`'s reference additionally dropped the then
+bulk-only `vss` pin from its `.SUBCKT` line for the same reason; since
+issue #50's re-spin the pin is back — the per-bit inverter nfets' sources
+are a real routed `vss` net) — the **schematic itself is
 unchanged**, only the LVS bookkeeping's substrate-tie modeling. This mirrors
 `gf180-temp-por`'s own `lvs_reference.py` precedent on this exact PDK
 ("the third (bulk) node is always rewritten to SUBSTRATE_NET ... regardless
