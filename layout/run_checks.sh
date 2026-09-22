@@ -43,7 +43,7 @@ CELLS=(rcosc_bias rcosc_trim_bank rcosc_comparator rcosc_top)
 
 declare -A PINS=(
   [rcosc_bias]="vdd,vh,vl,vss,ibias"
-  [rcosc_trim_bank]="p,m,t0,t1,t2,t3,t4,t5,t6,t7"
+  [rcosc_trim_bank]="p,m,vdd,vss,t0,t1,t2,t3,t4,t5,t6,t7"
   [rcosc_comparator]="vdd,vss,ibias,inp,inn,out"
   [rcosc_top]="vdd,vss,clk,t0,t1,t2,t3,t4,t5,t6,t7"
 )

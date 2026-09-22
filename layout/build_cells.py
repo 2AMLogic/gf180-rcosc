@@ -39,13 +39,18 @@ resistance nudge, filed upstream rather than silently absorbed.
 
 ## Floorplan
 
-`rcosc_trim_bank` remains issue #13's two-row cell: row 1 is the resistor
-chain (left to right, in schematic node order, baseline y=0); row 2, above
-row 1 with a routing gap, holds the trim-bank shunt switches, one per
-resistor it shorts, planar in metal1 (each switch is centred in x above its
-own resistor so its two routing jogs (`Composer.wire_z`) stay inside that
-resistor's own private x window -- no two different nets' routing ever
-needs to cross, since neighbouring resistors never overlap in x).
+`rcosc_trim_bank` was issue #13's two-row planar cell while every shunt was
+one nfet above its own resistor; issue #43's transmission-gate restructure
+(DR-0014) ended that -- `tb<i>` must reach `PW<i>`'s gate across every
+c-node column between the per-bit inverter and the pfet group, and
+`vdd`/`vss` must cross the `t<i>` columns, which metal1 alone cannot route
+without a short. The re-spun cell (issue #50) therefore follows the same
+one-row-plus-`Channel` discipline as the comparator and the re-spun bias
+cell: the nine resistor-chain segments interleaved with each segment's own
+shunt nfet and inverter nfet in schematic signal order, then the whole PMOS
+group (the eight transmission-gate pfets and the eight inverter pfets) last
+so all sixteen PMOS share one drawn n-well with a `well_island` tap on
+`vdd`.
 
 `rcosc_bias` was that shape while the pre-#39 reference leg
 (`RBIAS`+`MBIASD`) kept it planar; issue #39's self-biased beta-multiplier
@@ -81,8 +86,6 @@ import gen_lib  # noqa: E402
 from gen_lib import Channel, Composer  # noqa: E402
 from netlist_parse import Device, parse_subckt, parse_subckt_pins  # noqa: E402
 
-GAP_UM = 4.0
-ROW2_GAP_UM = 3.0
 SHEET_RHO_OHM_SQ = 1000.0  # ppolyf_u_1k, DR-0003 sec 5.1/6.1
 
 # klayout-tools#1551 workaround -- see module docstring.
@@ -353,79 +356,156 @@ def build_rcosc_bias(devices: dict) -> tuple[Composer, list[str]]:
     return c, _BIAS_PINS
 
 
+# `rcosc_trim_bank`'s row, left to right (issue #50's re-spin against the
+# post-#43 schematic, DR-0014): the nine resistor-chain segments each
+# followed by their own shunt nfet `SW<i>` and the per-bit complement
+# inverter's nfet `NINV<i>` (schematic signal order), then the whole PMOS
+# group last -- the eight transmission-gate pfets `PW<i>` and the eight
+# inverter pfets `PINV<i>` -- so all sixteen PMOS share one drawn n-well
+# with its `well_island` tap on `vdd` (same construction and reason as the
+# comparator's and the re-spun bias cell's well groups). No NMOS may sit
+# inside that well rectangle (`klt extract`'s MOS split is "active inside
+# the well is PMOS, outside is NMOS").
+_TRIM_RES_ORDER = ["XRFIX"] + [f"XR{i}" for i in range(8)]
+_TRIM_ROW_ORDER = (
+    ["XRFIX"]
+    + [dev for i in range(8) for dev in (f"XR{i}", f"XSW{i}", f"XNINV{i}")]
+    + [f"XPW{i}" for i in range(8)]
+    + [f"XPINV{i}" for i in range(8)]
+)
+#: Track order (bottom-up) in the trim bank's routing channel: the ladder
+#: nodes first (they span the whole row), then the per-bit gate/inverter
+#: pairs, then the two rails, then the exported endpoint pins.
+_TRIM_TRACKS = (
+    ["p", "m"]
+    + [f"c{i}" for i in range(1, 9)]
+    + [f"tb{i}" for i in range(8)]
+    + [f"t{i}" for i in range(8)]
+    + ["vdd", "vss"]
+)
+#: The re-spun cell's boundary pins, in the post-#43 schematic's own subckt
+#: order (`p m vss t0..t7 vdd`) -- `vdd` is new and `vss` is back to being
+#: a real routed net (the per-bit inverter nfet sources), where pre-#43 it
+#: was a bulk-only tie the LVS reference modeled as `vsubs` and dropped.
+_TRIM_PINS = ["p", "m", "vss"] + [f"t{i}" for i in range(8)] + ["vdd"]
+
+
 def build_rcosc_trim_bank(devices: dict) -> tuple[Composer, list[str]]:
-    res_order = ["XRFIX"] + [f"XR{i}" for i in range(8)]
-    sw_order = [f"XSW{i}" for i in range(8)]
+    """The re-spun trim bank (issue #50): the unchanged binary-weighted
+    `ppolyf_u_1k` ladder plus issue #43's per-segment transmission-gate
+    shunts (`SW<i>` nfet + `PW<i>` pfet, `L=0.28u`, per-position widths
+    24/16/12/8/6/5/4/3 um) and per-bit complement inverters
+    (`NINV<i>` 2u / `PINV<i>` 4u at `L=0.5u`) that generate the pfet gates
+    `tb<i>`, drawn against the post-#43 `design/rcosc_trim_bank.sch`.
 
+    One row of blocks, one metal2 track per net above it, one metal1 column
+    per terminal -- `gen_lib.Channel`'s discipline, for the same structural
+    reason `rcosc_comparator` and the re-spun `rcosc_bias` needed it (nets
+    that must cross other nets' terminal runs: `tb<i>` from each inverter
+    out to its `PW<i>` gate, `vdd`/`vss` across the `t<i>` columns). The
+    twelve boundary pins land as one pad row above the channel, so
+    `build_rcosc_top` routes to this cell exactly as before: the same pins
+    the pre-#43 cell exported plus the new `vdd`, at coordinates read from
+    this builder's reported `pins_um`, never hard-coded."""
     c = Composer("rcosc_trim_bank")
+    row = Row(c)
 
-    placed_r: dict[str, object] = {}
-    x = 0.0
-    for name in res_order:
+    placed: dict[str, object] = {}
+    for name in _TRIM_ROW_ORDER:
         d = devices[name]
-        length_um = d.param_um("r_length")
-        if name == "XR1":
-            length_um = _R1_LENGTH_NUDGE_UM
-        width_um = d.param_um("r_width")
-        p = c.gen_and_place(
-            "res_array", {"length_um": length_um, "width_um": width_um, "num": 1, "dummy": 0},
-            x, 0.0, name.lower()[1:],
-        )
-        placed_r[name] = p
-        x = p.x1_um + GAP_UM
+        if d.model == "ppolyf_u_1k":
+            params = _res_params(d)
+            if name == "XR1":
+                params["length_um"] = _R1_LENGTH_NUDGE_UM
+            placed[name] = row.place("res_array", params, name.lower()[1:])
+        else:
+            placed[name] = row.place("mos_array", _mos_params(d), name.lower()[1:])
 
-    row1_top = placed_r["XRFIX"].bbox_um[3]
-    row2_y = row1_top + ROW2_GAP_UM
+    # One n-well over the whole PMOS group plus its tap island, merging the
+    # generators' own per-device wells into one equipotential well tied to
+    # vdd (same construction and rationale as the comparator/bias well
+    # groups; sixteen pfets here instead of three or two).
+    well_x0 = row.left_um["pw0"] + COL_OFFSET_UM - 0.5
+    p_well = row.place(
+        "well_island",
+        {
+            "inner_width_um": 1.0,
+            "inner_height_um": 1.0,
+            "contacts_per_side": 1,
+            # The label this generator would draw sits on the ring's own metal
+            # inside a sub-cell, where `klt extract` does not reliably promote
+            # it to a pin -- this cell names `vdd` on its own pin pad instead.
+            "net": "",
+        },
+        "pwell_tap",
+    )
+    well_x1 = row.right_um["pwell_tap"] - COL_OFFSET_UM + 0.5
+    c.draw_nwell(well_x0, -0.65, well_x1, row.top_um + 0.5)
 
-    placed_sw: dict[str, object] = {}
-    for i, name in enumerate(sw_order):
+    ch = Channel(
+        c,
+        column_layer=gen_lib.METAL1,
+        track_layer=gen_lib.METAL2,
+        track_via=gen_lib.VIA1,
+        y0_um=row.top_um + CHANNEL_CLEARANCE_UM,
+        pitch_um=TRACK_PITCH_UM,
+    )
+
+    def terminal(dev_name: str, port: str, net: str, column_x: float) -> None:
+        x, y, _ = placed[dev_name].port_abs(port)
+        ch.add(net, x, y, column_x)
+
+    # `nodes` is the schematic's own terminal order -- [a, b, bulk] for the
+    # resistor calls and [d, g, s, b] for the MOS calls -- so every net
+    # below is read from the netlist, never retyped. MOS bulk (body)
+    # terminals are not routed: the NMOS bodies extract to the deck's
+    # synthesized `vsubs` and the PMOS bodies take their `vdd` identity from
+    # the drawn well tap above, exactly as the LVS reference models them.
+    for name in _TRIM_ROW_ORDER:
+        key = name.lower()[1:]
         d = devices[name]
-        params = {
-            "w_um": d.param_um("w"), "l_um": d.param_um("l"),
-            "fingers": d.param_int("nf"), "rows": 1, "cols": 1, "dummy": 0,
-            "flavor": "nfet", "gate_contact": True,
-        }
-        r_name = res_order[i + 1]
-        r = placed_r[r_name]
-        # peek (not place) this switch's bbox to learn its width before
-        # centring it above its resistor -- peek_bbox never touches the
-        # composing layout (see gen_lib.py), unlike gen_and_place
-        sw_x0_bbox, _, sw_x1_bbox, _ = c.peek_bbox("mos_array", params)
-        sw_width = sw_x1_bbox - sw_x0_bbox
-        center_x = (r.x0_um + r.x1_um) / 2.0
-        sw_x0 = center_x - sw_width / 2.0
-        p = c.gen_and_place("mos_array", params, sw_x0, row2_y, name.lower()[1:])
-        placed_sw[name] = p
+        if d.model == "ppolyf_u_1k":
+            terminal(name, "R0_A", d.nodes[0], row.left_um[key])
+            terminal(name, "R0_B", d.nodes[1], row.right_um[key])
+        else:
+            d_net, g_net, s_net, _b_net = d.nodes
+            terminal(name, "U0_S", s_net, row.left_um[key])
+            terminal(name, "U0_D", d_net, row.right_um[key])
+            gate_x, _, _ = placed[name].port_abs("U0_G")
+            terminal(name, "U0_G", g_net, gate_x)
 
-    for a_name, b_name in zip(res_order[:-1], res_order[1:]):
-        a, b = placed_r[a_name], placed_r[b_name]
-        a_b, b_a = a.port_abs("R0_B"), b.port_abs("R0_A")
-        c.wire_segment(a_b[0], a_b[1], b_a[0], b_a[1], 2.0)
+    tap_x, tap_y, _ = p_well.port_abs("TAP_N")
+    ch.add("vdd", tap_x, tap_y, tap_x)
 
-    y_mid = row1_top + ROW2_GAP_UM / 2.0
-    pins_um: dict[str, tuple[float, float]] = {}
-    for i, sw_name in enumerate(sw_order):
-        r_name = res_order[i + 1]
-        r, sw = placed_r[r_name], placed_sw[sw_name]
-        r_a, r_b = r.port_abs("R0_A"), r.port_abs("R0_B")
-        sw_s, sw_d, sw_g = sw.port_abs("U0_S"), sw.port_abs("U0_D"), sw.port_abs("U0_G")
-        c.wire_z((r_a[0], r_a[1]), (sw_s[0], sw_s[1]), 0.42, y_mid)
-        c.wire_z((r_b[0], r_b[1]), (sw_d[0], sw_d[1]), 0.42, y_mid)
-        gate_net = devices[sw_name].nodes[1]  # t{i}
-        c.add_pin_label(sw_g[0], sw_g[1], gate_net)
-        pins_um[gate_net] = (sw_g[0], sw_g[1])
+    ch.route(_TRIM_TRACKS)
+    pad_y = ch.top_y_um(_TRIM_TRACKS) + PAD_CLEARANCE_UM
+    # One pin pad per exported net, each above an existing column of the
+    # same net so the pad column's vertical run is continuous from track
+    # to pad (the comparator's own discipline: pin pads only at columns
+    # the net already reaches).
+    pin_column = {
+        "p": row.left_um["rfix"],  # RFIX.A -- the ladder's p terminal
+        "m": row.right_um["r7"],  # R7.B -- the ladder's m terminal
+        "vdd": tap_x,  # the PMOS group's well tap
+        "vss": row.left_um["ninv0"],  # NINV0.S -- an inverter source
+    }
+    pin_column.update(
+        {f"t{i}": placed[f"XSW{i}"].port_abs("U0_G")[0] for i in range(8)}
+    )
+    pins_um = {}
+    for net in _TRIM_PINS:
+        pins_um[net] = ch.pin_pad(net, pin_column[net], pad_y, gen_lib.METAL1_LABEL)
 
-    p_port = placed_r["XRFIX"].port_abs("R0_A")
-    m_port = placed_r["XR7"].port_abs("R0_B")
-    c.add_pin_label(p_port[0], p_port[1], "p")
-    c.add_pin_label(m_port[0], m_port[1], "m")
-    pins_um["p"] = (p_port[0], p_port[1])
-    pins_um["m"] = (m_port[0], m_port[1])
-
+    # MUST be the end of the build: relaunched PCell re-evaluation wipes
+    # the markers `patch_high_sheet_resistors()` draws if any `klt gen`
+    # call happens after it (see `place_gds`'s docstring).
     patched = c.patch_high_sheet_resistors()
-    assert patched == 9, f"expected 9 resistors patched, got {patched}"
+    assert patched == 9, f"expected 9 resistors patched (RFIX/R0..R7), got {patched}"
+    # Pin coordinates, for `build_rcosc_top` to route to when it instantiates
+    # this cell -- reported from the same pads the labels were placed on,
+    # never re-measured off the written GDS.
     c.pins_um = pins_um
-    return c, ["p", "m"] + [f"t{i}" for i in range(8)]
+    return c, _TRIM_PINS
 
 
 # `rcosc_comparator`'s row, left to right. The four NMOS come first and the
@@ -586,17 +666,29 @@ def build_rcosc_top(devices: dict, ctx: dict) -> tuple[Composer, list[str]]:
     subckt_pins = ctx["__subckt_pins__"]
 
     # Sub-cells: map each instance's positional nodes onto its own pin names,
-    # then onto the pin coordinates its builder reported.
-    sub_pins: dict[str, dict[str, tuple[float, float]]] = {}
+    # then onto the pin coordinates its builder reported. Kept as a *list* of
+    # (net, xy) pairs, not a dict: a sub-cell can export two pins that land
+    # on the same top-level net (post-#50 the trim bank's `p` and `vdd` pins
+    # both connect to the top's `vdd`), and a dict keyed by net would let one
+    # pad's coordinates silently overwrite the other's -- leaving that pad
+    # unrouted and its device end floating.
+    sub_pins: dict[str, list[tuple[str, tuple[float, float]]]] = {}
     for inst, cell_name in _TOP_SUBCELLS:
         origin = row.place_cell(
             CELLS_DIR / f"{cell_name}.gds", cell_name, inst.lower()[1:]
         )["__origin__"]
         net_of = dict(zip(subckt_pins[cell_name], devices[inst].nodes, strict=True))
-        sub_pins[inst] = {
-            net_of[pin]: (origin[0] + px, origin[1] + py)
+        sub_pins[inst] = [
+            (net_of[pin], (origin[0] + px, origin[1] + py))
             for pin, (px, py) in ctx[cell_name].items()
-        }
+        ]
+
+    def sub_pin_xy(inst: str, net: str) -> tuple[float, float]:
+        """First exported pad of `inst` wired to top-level `net`."""
+        for n, xy in sub_pins[inst]:
+            if n == net:
+                return xy
+        raise KeyError(f"{inst} exports no pin on net {net!r}")
 
     placed = {}
     for name in _TOP_NFETS + _TOP_PFETS:
@@ -633,7 +725,7 @@ def build_rcosc_top(devices: dict, ctx: dict) -> tuple[Composer, list[str]]:
     )
 
     for inst, _cell in _TOP_SUBCELLS:
-        for net, (x, y) in sub_pins[inst].items():
+        for net, (x, y) in sub_pins[inst]:
             ch.add(net, x, y, x)
 
     for name in _TOP_NFETS + _TOP_PFETS:
@@ -657,12 +749,12 @@ def build_rcosc_top(devices: dict, ctx: dict) -> tuple[Composer, list[str]]:
     ch.route(_TOP_TRACKS)
     pad_y = ch.top_y_um(_TOP_TRACKS) + PAD_CLEARANCE_UM
     pin_column = {
-        "vdd": sub_pins["XXBIAS"]["vdd"][0],
-        "vss": sub_pins["XXBIAS"]["vss"][0],
+        "vdd": sub_pin_xy("XXBIAS", "vdd")[0],
+        "vss": sub_pin_xy("XXBIAS", "vss")[0],
         "clk": placed["XMDISCH"].port_abs("U0_G")[0],
     }
     for i in range(8):
-        pin_column[f"t{i}"] = sub_pins["XXTRIM"][f"t{i}"][0]
+        pin_column[f"t{i}"] = sub_pin_xy("XXTRIM", f"t{i}")[0]
     for net in _TOP_PINS:
         ch.pin_pad(net, pin_column[net], pad_y, gen_lib.METAL2_LABEL)
 
@@ -743,22 +835,48 @@ def _write_reference_netlist_trim_bank(devices: dict, path: Path, ctx: dict) -> 
         "* See rcosc_bias's reference netlist header (layout/build_cells.py)",
         "* for why resistor bulk terminals are 'vsubs' here (not the",
         "* schematic's 'vss') and resistors are plain R-elements.",
-        "* 'vss' is dropped from this SUBCKT's pin list (present in the",
-        "* schematic's rcosc_trim_bank p m vss t0..t7) for the same reason:",
-        "* it is used *only* as every device's bulk tie there, which this",
-        "* reference models as 'vsubs' instead -- so 'vss' would otherwise be",
-        "* an unused, arity-mismatched pin against the layout side (which",
-        "* never draws a 'vss' net at all, matching the deck's vsubs-only",
-        "* substrate model).",
+        "* Post-#43 (issue #50's re-spin) 'vdd' is a new pin and 'vss' is a",
+        "* real routed net again, not a bulk-only tie: the per-bit complement",
+        "* inverter's nfet sources sit on 'vss', its pfet sources (and the",
+        "* eight transmission-gate pfet bodies, through the cell's one drawn",
+        "* n-well tap) sit on 'vdd', so both stay in the pin list. NMOS and",
+        "* resistor bulk terminals still extract to the deck's synthesized",
+        "* 'vsubs'; the pfet bulk terminals are written 'vdd' as the schematic",
+        "* ties them, matched by the layout's drawn, tapped well.",
     ] + _trim_bank_subckt(devices) + [""]
     path.write_text("\n".join(lines))
 
 
+def _trim_mos_ref_card(name: str, d: Device) -> str:
+    """One MOS subckt-call line for the trim bank's LVS reference netlist.
+
+    Same two disclosed rewrites as `_mos_ref_card` (NMOS body -> `vsubs`;
+    `nf=1` at the schematic's total width -- every post-#43 trim MOS is
+    `nf=1`, so the respell is exact), plus one trim-specific normalization:
+    `W`/`L` literals are re-emitted from the parsed micrometre value rather
+    than passed through verbatim, because the post-#43 schematic spells the
+    transmission-gate widths with xschem's double-u micrometre suffix
+    (`W=24uu`), a spelling `klt`'s reference normalizer is not documented to
+    accept -- `24u` is the same value in the canonical spelling."""
+    d_net, g_net, s_net, b_net = d.nodes
+    if not d.model.startswith("pfet"):
+        b_net = "vsubs"
+    return (
+        f"{name} {d_net} {g_net} {s_net} {b_net} {d.model} "
+        f"L={d.param_um('l'):.6g}u W={d.param_um('w'):.6g}u nf=1"
+    )
+
+
 def _trim_bank_subckt(devices: dict, vsubs_pin: bool = False) -> list[str]:
     res_order = ["XRFIX"] + [f"XR{i}" for i in range(8)]
-    sw_order = [f"XSW{i}" for i in range(8)]
+    mos_order = (
+        [f"XSW{i}" for i in range(8)]
+        + [f"XPW{i}" for i in range(8)]
+        + [f"XNINV{i}" for i in range(8)]
+        + [f"XPINV{i}" for i in range(8)]
+    )
     lines = [
-        ".SUBCKT rcosc_trim_bank p m t0 t1 t2 t3 t4 t5 t6 t7"
+        ".SUBCKT rcosc_trim_bank p m vss t0 t1 t2 t3 t4 t5 t6 t7 vdd"
         + (" vsubs" if vsubs_pin else "")
     ]
     nodes = ["p"] + [f"c{i}" for i in range(1, 9)] + ["m"]
@@ -766,12 +884,7 @@ def _trim_bank_subckt(devices: dict, vsubs_pin: bool = False) -> list[str]:
         d = devices[name]
         r_ohm = _res_r_ohm(d.param_um("r_length"), d.param_um("r_width"))
         lines.append(f"R${name[1:]} {nodes[i]} {nodes[i + 1]} vsubs {r_ohm:.6g} ppolyf_u_1k")
-    for i, name in enumerate(sw_order):
-        d = devices[name]
-        lines.append(
-            f"X{name[1:]} {nodes[i + 1]} t{i} {nodes[i + 2]} vsubs nfet_03v3 "
-            f"L={d.params['l']} W={d.params['w']} nf={d.param_int('nf')}"
-        )
+    lines += [_trim_mos_ref_card(name, devices[name]) for name in mos_order]
     lines.append(".ENDS")
     return lines
 
@@ -844,12 +957,10 @@ def _write_reference_netlist_top(devices: dict, path: Path, ctx: dict) -> None:
     layout side, which `klt extract` always emits flat. Every accommodation
     the three sub-block references already document applies here unchanged and
     consistently across the hierarchy -- NMOS/resistor bulk on `vsubs`, PMOS
-    bulk on the real drawn well, `rcosc_trim_bank` without its `vss` pin,
-    resistors and the MiM capacitor as plain elements."""
+    bulk on the real drawn well, resistors and the MiM capacitor as plain
+    elements."""
     by_cell = ctx["__devices_by_cell__"]
-    trim_pins = " ".join(
-        p for p in ctx["__subckt_pins__"]["rcosc_trim_bank"] if p != "vss"
-    )
+    trim_pins = " ".join(ctx["__subckt_pins__"]["rcosc_trim_bank"])
     ctiming = devices["XCTIMING"]
     c_f = _mim_c_farad(ctiming.param_um("c_width"), ctiming.param_um("c_length"))
 

@@ -90,22 +90,27 @@ supersede them.
 Maturity ladder: spec ratified → schematic simulated across PVT → layout
 DRC/LVS-clean → post-layout re-verification → shuttle seat → measured
 silicon. **Current position: spec ratified, schematic simulated across
-PVT, layout DRC/LVS-clean against the post-#39 schematic, post-layout
-(PEX) re-verification re-done against the re-spun bias cell — still
-pre-shuttle-seat, pre-silicon.** The comparator/bias-path PVT revision
-([issue #39](https://github.com/2AMLogic/gf180-rcosc/issues/39),
+PVT, layout DRC/LVS-clean against the post-#43 schematic, post-layout
+(PEX) re-verification re-done against the re-spun bias and trim cells —
+still pre-shuttle-seat, pre-silicon.** The comparator/bias-path PVT
+revision ([issue #39](https://github.com/2AMLogic/gf180-rcosc/issues/39),
 [DR-0012](spec/decision-records/0012-comparator-bias-path-pvt-revision.md))
-changed `design/rcosc_bias.sch` after the layout was verified; the bias
-cell has since been re-drawn and the whole hierarchy re-verified
+changed `design/rcosc_bias.sch` and the trim-bank pass-switch restructure
+([issue #43](https://github.com/2AMLogic/gf180-rcosc/issues/43),
+[DR-0014](spec/decision-records/0014-trim-bank-pass-switch-restructure.md))
+changed `design/rcosc_trim_bank.sch` after the layout was verified; both
+cells have since been re-drawn and the whole hierarchy re-verified
 ([issue #44](https://github.com/2AMLogic/gf180-rcosc/issues/44),
-[DR-0013](spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md)),
+[DR-0013](spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md);
+[issue #50](https://github.com/2AMLogic/gf180-rcosc/issues/50),
+[DR-0015](spec/decision-records/0015-trim-bank-respin-postlayout-pex-reverification.md)),
 which supersedes
 [DR-0010](spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)'s
-post-layout figures for the post-#39 schematic — the parasitic shift
-deepened (−11.24 % to −41.42 %, always slower, worst at
-`ff`/−40 °C/3.6 V). See
+and DR-0013's post-layout figures for the post-#43 schematic — the
+parasitic shift deepened on the mean (−17.46 % to −40.92 % range on the
+current pass, always slower, worst at `ff`/−40 °C/3.6 V). See
 [`design/README.md`](design/README.md), [`layout/README.md`](layout/README.md),
-and [`spec/decision-records/0013`](spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md)
+and [`spec/decision-records/0015`](spec/decision-records/0015-trim-bank-respin-postlayout-pex-reverification.md)
 for the evidence behind each stage.
 
 ## Repo layout
