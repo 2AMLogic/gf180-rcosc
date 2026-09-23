@@ -104,13 +104,18 @@ cells have since been re-drawn and the whole hierarchy re-verified
 [DR-0013](spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md);
 [issue #50](https://github.com/2AMLogic/gf180-rcosc/issues/50),
 [DR-0015](spec/decision-records/0015-trim-bank-respin-postlayout-pex-reverification.md)),
-which supersedes
-[DR-0010](spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)'s
-and DR-0013's post-layout figures for the post-#43 schematic — the
-parasitic shift deepened on the mean (−17.46 % to −40.92 % range on the
-current pass, always slower, worst at `ff`/−40 °C/3.6 V). See
+and the comparator re-reference ([issue
+#61](https://github.com/2AMLogic/gf180-rcosc/issues/61),
+[DR-0018](spec/decision-records/0018-comparator-pmos-respin-postlayout-pex-reverification.md))
+re-verifies the post-#60 hierarchy post-layout — which supersedes
+[DR-0010](spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)'s,
+DR-0013's and DR-0015's post-layout figures for it — the parasitic shift
+persists, always slower, −18.78 % to −36.86 % on the current pass (mean
+−25.65 %, worst at `ff`/−40 °C/3.6 V), with both DR-0017 guardrails
+holding extracted-side but the slow corner's trim headroom tightening to
+≈ +4.7 % (`ss` calibrates at `0xF7`). See
 [`design/README.md`](design/README.md), [`layout/README.md`](layout/README.md),
-and [`spec/decision-records/0015`](spec/decision-records/0015-trim-bank-respin-postlayout-pex-reverification.md)
+and [`spec/decision-records/0018`](spec/decision-records/0018-comparator-pmos-respin-postlayout-pex-reverification.md)
 for the evidence behind each stage.
 
 ## Repo layout
