@@ -183,8 +183,20 @@ echo "== rcosc_top: ERC (T1 item 11 supply spec) =="
 # (the repo root, in CI's verify-report.py run). An envelope generated with
 # absolute paths would record a host-absolute spec path that cannot resolve
 # in CI, downgrading item 11's grade to supply_spec_incomplete there.
+# The ERC envelope must come from the pinned *grader* build documented in
+# signoff/README.md (0.5.0+g2b1e55e51bb8): that build's `klt erc` writes the
+# provenance block (input + spec content hashes) that
+# signoff/verify-report.py's item-11 re-verification pins. klt 0.4.0's
+# `klt erc` writes no provenance, so regenerating the envelope with it
+# strips the pins and rots CI (found during issue #57's re-run). The two
+# pins are about different things -- 0.4.0 pins generator *geometry*, the
+# grader build pins the *envelope shape* -- so this step deliberately runs
+# erc through the grader build even though the geometry verbs above stay
+# on 0.4.0.
+ERC_KLT=(uv run --quiet --with "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@2b1e55e51bb803c082e8857da44687f3e37ebfc0" klt)
+
 set +e
-( cd "$REPO_ROOT" && klt erc layout/cells/rcosc_top.gds \
+( cd "$REPO_ROOT" && "${ERC_KLT[@]}" erc layout/cells/rcosc_top.gds \
     layout/erc-supply-spec.json --format json ) > "$REPORTS_DIR/rcosc_top.erc.json"
 erc_rc=$?
 set -e
