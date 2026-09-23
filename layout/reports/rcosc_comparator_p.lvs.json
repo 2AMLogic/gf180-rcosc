@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
   "engine": "klayout",
-  "layout": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/layout/reports/rcosc_bias.extracted.spice",
-  "reference": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/layout/lvs_ref/rcosc_bias.spice",
-  "top": "RCOSC_BIAS",
-  "reference_top": "RCOSC_BIAS",
+  "layout": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/layout/reports/rcosc_comparator_p.extracted.spice",
+  "reference": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/layout/lvs_ref/rcosc_comparator_p.spice",
+  "top": "RCOSC_COMPARATOR_P",
+  "reference_top": "RCOSC_COMPARATOR_P",
   "parameter_tolerance": null,
   "options": {
     "combine_devices": [
-      "nfet"
+      "pfet"
     ],
     "flatten_layout": false,
     "flatten_reference": false,
@@ -22,9 +22,9 @@
   "category_error_counts": {},
   "counts": {
     "nets": {
-      "layout": 8,
-      "reference": 8,
-      "matched": 8
+      "layout": 11,
+      "reference": 11,
+      "matched": 11
     },
     "devices": {
       "layout": 9,
@@ -41,8 +41,8 @@
   "environment": {
     "engine": "klayout",
     "engine_version": "0.30.12",
-    "layout_sha256": "e534d07ab2d9480c846f904b775b367a2035b6bbb9d88b83ebd4d6e74f16692a",
-    "reference_sha256": "4bc048dea45e59876f95d8bcff27153d741900c8a2573413f92cecadffefb595",
+    "layout_sha256": "18f91ca82306a7e55e41efd2fabac416bdcbc39d988d93c0f06129643329a8ca",
+    "reference_sha256": "1df134e84a2b824770421fb69b975bb4fa389462106843a51054ad17d4260051",
     "extracted_netlist": null
   },
   "provenance": {
@@ -55,13 +55,33 @@
   "mismatches": [],
   "net_correspondence": [
     {
-      "layout": "IBIAS",
-      "reference": "IBIAS",
+      "layout": "\\$8",
+      "reference": "DN",
+      "pin": false
+    },
+    {
+      "layout": "\\$9",
+      "reference": "DP",
+      "pin": false
+    },
+    {
+      "layout": "INN",
+      "reference": "INN",
       "pin": true
     },
     {
-      "layout": "\\$1",
-      "reference": "N2S",
+      "layout": "INP",
+      "reference": "INP",
+      "pin": true
+    },
+    {
+      "layout": "OUT",
+      "reference": "OUT",
+      "pin": true
+    },
+    {
+      "layout": "\\$2",
+      "reference": "OUTB",
       "pin": false
     },
     {
@@ -70,18 +90,13 @@
       "pin": true
     },
     {
+      "layout": "\\$10",
+      "reference": "TAILP",
+      "pin": false
+    },
+    {
       "layout": "VDD",
       "reference": "VDD",
-      "pin": true
-    },
-    {
-      "layout": "VH",
-      "reference": "VH",
-      "pin": true
-    },
-    {
-      "layout": "VL",
-      "reference": "VL",
       "pin": true
     },
     {

@@ -1,14 +1,15 @@
 {
   "schema_version": 1,
   "engine": "klayout",
-  "layout": "/Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-50/layout/reports/rcosc_top.extracted.spice",
-  "reference": "/Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-50/layout/lvs_ref/rcosc_top.spice",
+  "layout": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/layout/reports/rcosc_top.extracted.spice",
+  "reference": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/layout/lvs_ref/rcosc_top.spice",
   "top": "RCOSC_TOP",
   "reference_top": "RCOSC_TOP",
   "parameter_tolerance": 0.001,
   "options": {
     "combine_devices": [
-      "nfet"
+      "nfet",
+      "pfet"
     ],
     "flatten_layout": false,
     "flatten_reference": true,
@@ -25,14 +26,14 @@
   "category_error_counts": {},
   "counts": {
     "nets": {
-      "layout": 45,
-      "reference": 45,
-      "matched": 45
+      "layout": 46,
+      "reference": 46,
+      "matched": 46
     },
     "devices": {
-      "layout": 74,
-      "reference": 74,
-      "matched": 74
+      "layout": 76,
+      "reference": 76,
+      "matched": 76
     },
     "pins": {
       "layout": 11,
@@ -44,8 +45,8 @@
   "environment": {
     "engine": "klayout",
     "engine_version": "0.30.12",
-    "layout_sha256": "9e6f46884a24c9afd0ed35643e6c87a5e30d680a35886586e5433b5185d20ab0",
-    "reference_sha256": "fbaee0d98057c365d03a2b846c3a5191d7e8cf081820f876bcba399916d94a8c",
+    "layout_sha256": "feb2a08daa28211b0823b60aa5b97e40616e6bbae8f10bc207d9825e594259a1",
+    "reference_sha256": "c62addb8e5c82472ec41e05da47611b5727482ca4d597a7f4641f977247d4acd",
     "extracted_netlist": null
   },
   "provenance": {
@@ -63,7 +64,7 @@
       "side": "both",
       "net": null,
       "device": {
-        "layout": "\\$88",
+        "layout": "\\$92",
         "reference": "XTRIM.$R0",
         "class": "PPOLYF_U_1K"
       },
@@ -87,7 +88,7 @@
       "side": "both",
       "net": null,
       "device": {
-        "layout": "\\$89",
+        "layout": "\\$93",
         "reference": "XTRIM.$R1",
         "class": "PPOLYF_U_1K"
       },
@@ -111,7 +112,7 @@
       "side": "both",
       "net": null,
       "device": {
-        "layout": "\\$91",
+        "layout": "\\$95",
         "reference": "XTRIM.$R3",
         "class": "PPOLYF_U_1K"
       },
@@ -135,7 +136,7 @@
       "side": "both",
       "net": null,
       "device": {
-        "layout": "\\$92",
+        "layout": "\\$96",
         "reference": "XTRIM.$R4",
         "class": "PPOLYF_U_1K"
       },
@@ -159,7 +160,7 @@
       "side": "both",
       "net": null,
       "device": {
-        "layout": "\\$93",
+        "layout": "\\$97",
         "reference": "XTRIM.$R5",
         "class": "PPOLYF_U_1K"
       },
@@ -183,7 +184,7 @@
       "side": "both",
       "net": null,
       "device": {
-        "layout": "\\$94",
+        "layout": "\\$98",
         "reference": "XTRIM.$R6",
         "class": "PPOLYF_U_1K"
       },
@@ -203,7 +204,7 @@
     {
       "category": "topology.flattened",
       "severity": "warning",
-      "description": "options.flatten_reference flattened the reference netlist before comparing: 4 circuit(s) were collapsed into 1 top-level circuit(s), substituting every subcircuit-call instance in place -- this compare verified topology only after removing the original hierarchy boundaries on this side (see docs/cli/lvs.md, \"topology.flattened\")",
+      "description": "options.flatten_reference flattened the reference netlist before comparing: 5 circuit(s) were collapsed into 1 top-level circuit(s), substituting every subcircuit-call instance in place -- this compare verified topology only after removing the original hierarchy boundaries on this side (see docs/cli/lvs.md, \"topology.flattened\")",
       "side": "reference",
       "net": null,
       "device": null,
@@ -221,32 +222,37 @@
       "pin": true
     },
     {
-      "layout": "\\$27",
+      "layout": "\\$32",
       "reference": "CMPH_OUT",
       "pin": false
     },
     {
-      "layout": "\\$31",
+      "layout": "\\$35",
       "reference": "CMPL_OUT",
       "pin": false
     },
     {
-      "layout": "\\$35",
+      "layout": "\\$37",
       "reference": "IBIAS",
       "pin": false
     },
     {
-      "layout": "\\$33",
+      "layout": "\\$44",
       "reference": "MID1",
       "pin": false
     },
     {
-      "layout": "\\$34",
+      "layout": "\\$45",
       "reference": "MID2",
       "pin": false
     },
     {
-      "layout": "\\$32",
+      "layout": "\\$9",
+      "reference": "PB",
+      "pin": false
+    },
+    {
+      "layout": "\\$36",
       "reference": "QBAR",
       "pin": false
     },
@@ -291,7 +297,7 @@
       "pin": true
     },
     {
-      "layout": "\\$21",
+      "layout": "\\$26",
       "reference": "VC",
       "pin": false
     },
@@ -301,12 +307,12 @@
       "pin": true
     },
     {
-      "layout": "\\$2",
+      "layout": "\\$7",
       "reference": "VH",
       "pin": false
     },
     {
-      "layout": "\\$3",
+      "layout": "\\$8",
       "reference": "VL",
       "pin": false
     },
@@ -326,117 +332,117 @@
       "pin": false
     },
     {
-      "layout": "\\$4",
-      "reference": "XBIAS.PB",
-      "pin": false
-    },
-    {
-      "layout": "\\$26",
+      "layout": "\\$31",
       "reference": "XCMPH.DN",
       "pin": false
     },
     {
-      "layout": "\\$25",
+      "layout": "\\$30",
       "reference": "XCMPH.DP",
       "pin": false
     },
     {
-      "layout": "\\$24",
+      "layout": "\\$29",
       "reference": "XCMPH.TAIL",
       "pin": false
     },
     {
-      "layout": "\\$30",
+      "layout": "\\$42",
       "reference": "XCMPL.DN",
       "pin": false
     },
     {
-      "layout": "\\$29",
+      "layout": "\\$33",
       "reference": "XCMPL.DP",
       "pin": false
     },
     {
-      "layout": "\\$28",
-      "reference": "XCMPL.TAIL",
-      "pin": false
-    },
-    {
-      "layout": "\\$5",
-      "reference": "XTRIM.C1",
+      "layout": "\\$34",
+      "reference": "XCMPL.OUTB",
       "pin": false
     },
     {
       "layout": "\\$6",
-      "reference": "XTRIM.C2",
-      "pin": false
-    },
-    {
-      "layout": "\\$9",
-      "reference": "XTRIM.C3",
-      "pin": false
-    },
-    {
-      "layout": "\\$11",
-      "reference": "XTRIM.C4",
-      "pin": false
-    },
-    {
-      "layout": "\\$13",
-      "reference": "XTRIM.C5",
-      "pin": false
-    },
-    {
-      "layout": "\\$15",
-      "reference": "XTRIM.C6",
-      "pin": false
-    },
-    {
-      "layout": "\\$17",
-      "reference": "XTRIM.C7",
-      "pin": false
-    },
-    {
-      "layout": "\\$19",
-      "reference": "XTRIM.C8",
-      "pin": false
-    },
-    {
-      "layout": "\\$8",
-      "reference": "XTRIM.TB0",
+      "reference": "XCMPL.TAILP",
       "pin": false
     },
     {
       "layout": "\\$10",
-      "reference": "XTRIM.TB1",
+      "reference": "XTRIM.C1",
       "pin": false
     },
     {
-      "layout": "\\$12",
-      "reference": "XTRIM.TB2",
+      "layout": "\\$11",
+      "reference": "XTRIM.C2",
       "pin": false
     },
     {
       "layout": "\\$14",
-      "reference": "XTRIM.TB3",
+      "reference": "XTRIM.C3",
       "pin": false
     },
     {
       "layout": "\\$16",
-      "reference": "XTRIM.TB4",
+      "reference": "XTRIM.C4",
       "pin": false
     },
     {
       "layout": "\\$18",
-      "reference": "XTRIM.TB5",
+      "reference": "XTRIM.C5",
       "pin": false
     },
     {
       "layout": "\\$20",
-      "reference": "XTRIM.TB6",
+      "reference": "XTRIM.C6",
       "pin": false
     },
     {
       "layout": "\\$22",
+      "reference": "XTRIM.C7",
+      "pin": false
+    },
+    {
+      "layout": "\\$24",
+      "reference": "XTRIM.C8",
+      "pin": false
+    },
+    {
+      "layout": "\\$13",
+      "reference": "XTRIM.TB0",
+      "pin": false
+    },
+    {
+      "layout": "\\$15",
+      "reference": "XTRIM.TB1",
+      "pin": false
+    },
+    {
+      "layout": "\\$17",
+      "reference": "XTRIM.TB2",
+      "pin": false
+    },
+    {
+      "layout": "\\$19",
+      "reference": "XTRIM.TB3",
+      "pin": false
+    },
+    {
+      "layout": "\\$21",
+      "reference": "XTRIM.TB4",
+      "pin": false
+    },
+    {
+      "layout": "\\$23",
+      "reference": "XTRIM.TB5",
+      "pin": false
+    },
+    {
+      "layout": "\\$25",
+      "reference": "XTRIM.TB6",
+      "pin": false
+    },
+    {
+      "layout": "\\$27",
       "reference": "XTRIM.TB7",
       "pin": false
     }
