@@ -1,6 +1,10 @@
 v {xschem version=3.4.7 file_version=1.2
 * rcosc_bias symbol -- ratiometric threshold + current bias (issue #6)
-* Pins: vdd, vss, vh, vl, ibias
+* Pins: vdd, vss, vh, vl, ibias, pb
+* pb (PMOS mirror gate node of the beta-multiplier's P1 diode, exported
+* issue #57): the reference rcosc_comparator_p's MPTAIL mirrors 8:1 to
+* bias the complementary low-side comparator's tail at the same current
+* the NMOS cells take from the ibias node.
 }
 G {}
 K {type=subcircuit
@@ -25,5 +29,7 @@ B 5 -66 -46.0 -62 -42.0 {name=vl dir=inout pinnumber=4}
 T {vl} -54 -49.0 0 0 0.2 0.2 {}
 B 5 -66 -90.0 -62 -86.0 {name=ibias dir=inout pinnumber=5}
 T {ibias} -54 -93.0 0 0 0.2 0.2 {}
+B 5 -66 -134.0 -62 -130.0 {name=pb dir=inout pinnumber=6}
+T {pb} -54 -137.0 0 0 0.2 0.2 {}
 T {@name} -58 133.0 0 0 0.2 0.2 {}
 T {rcosc_bias} -35 0 0 0 0.2 0.2 {}

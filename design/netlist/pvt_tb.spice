@@ -1,4 +1,4 @@
-** sch_path: /Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-43/design/pvt_tb.sch
+** sch_path: /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/design/pvt_tb.sch
 **.subckt pvt_tb
 XXDUT vdd 0 clk t0 t1 t2 t3 t4 t5 t6 t7 rcosc_top
 VDD vdd 0 dc 'vddval'
@@ -35,8 +35,8 @@ VT7 t7 0 dc 'b7*vddval'
 **.ends
 
 * expanding   symbol:  rcosc_top.sym # of pins=11
-** sym_path: /Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-43/design/rcosc_top.sym
-** sch_path: /Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-43/design/rcosc_top.sch
+** sym_path: /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/design/rcosc_top.sym
+** sch_path: /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/design/rcosc_top.sch
 .subckt rcosc_top vdd vss clk t0 t1 t2 t3 t4 t5 t6 t7
 
 
@@ -51,11 +51,11 @@ VT7 t7 0 dc 'b7*vddval'
 *.iopin t5
 *.iopin t6
 *.iopin t7
-XXBIAS vdd vss vh vl ibias rcosc_bias
+XXBIAS vdd vss vh vl ibias pb rcosc_bias
 XXTRIM vdd vc vss t0 t1 t2 t3 t4 t5 t6 t7 vdd rcosc_trim_bank
 XCTIMING vss vc cap_mim_1f0fF c_width=20u c_length=10u m=1
 XXCMPH vdd vss ibias vc vh cmph_out rcosc_comparator
-XXCMPL vdd vss ibias vl vc cmpl_out rcosc_comparator
+XXCMPL vdd vss pb vl vc cmpl_out rcosc_comparator_p
 XMDISCH vc clk vss vss nfet_03v3 L=0.5u W=20u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
 + ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
 XMG1A qbar cmph_out vss vss nfet_03v3 L=0.5u W=2u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
@@ -77,10 +77,10 @@ XMG2D clk qbar mid2 vdd pfet_03v3 L=0.5u W=4u nf=1 ad='int((nf+1)/2) * W/nf * 0.
 .ends
 
 
-* expanding   symbol:  rcosc_bias.sym # of pins=5
-** sym_path: /Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-43/design/rcosc_bias.sym
-** sch_path: /Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-43/design/rcosc_bias.sch
-.subckt rcosc_bias vdd vss vh vl ibias
+* expanding   symbol:  rcosc_bias.sym # of pins=6
+** sym_path: /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/design/rcosc_bias.sym
+** sch_path: /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/design/rcosc_bias.sch
+.subckt rcosc_bias vdd vss vh vl ibias pb
 
 
 *.iopin vdd
@@ -88,6 +88,7 @@ XMG2D clk qbar mid2 vdd pfet_03v3 L=0.5u W=4u nf=1 ad='int((nf+1)/2) * W/nf * 0.
 *.iopin vh
 *.iopin vl
 *.iopin ibias
+*.iopin pb
 XRBA vdd vh vss ppolyf_u_1k r_width=2u r_length=100u m=1
 XRBB vh vl vss ppolyf_u_1k r_width=2u r_length=100u m=1
 XRBC vl vss vss ppolyf_u_1k r_width=2u r_length=100u m=1
@@ -106,8 +107,8 @@ XSEED pb vl vss vss nfet_03v3 L=20u W=2u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' 
 
 
 * expanding   symbol:  rcosc_trim_bank.sym # of pins=12
-** sym_path: /Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-43/design/rcosc_trim_bank.sym
-** sch_path: /Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-43/design/rcosc_trim_bank.sch
+** sym_path: /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/design/rcosc_trim_bank.sym
+** sch_path: /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/design/rcosc_trim_bank.sch
 .subckt rcosc_trim_bank p m vss t0 t1 t2 t3 t4 t5 t6 t7 vdd
 
 
@@ -200,8 +201,8 @@ XPINV7 tb7 t7 vdd vdd pfet_03v3 L=0.5u W=4u nf=1 ad='int((nf+1)/2) * W/nf * 0.18
 
 
 * expanding   symbol:  rcosc_comparator.sym # of pins=6
-** sym_path: /Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-43/design/rcosc_comparator.sym
-** sch_path: /Users/rwalters/GitHub/gf180-rcosc/.loom/worktrees/issue-43/design/rcosc_comparator.sch
+** sym_path: /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/design/rcosc_comparator.sym
+** sch_path: /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/design/rcosc_comparator.sch
 .subckt rcosc_comparator vdd vss ibias inp inn out
 
 
@@ -224,6 +225,39 @@ XMLOADB dp dn vdd vdd pfet_03v3 L=1u W=4u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u'
 XMBUFP out dp vdd vdd pfet_03v3 L=0.5u W=4u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
 + ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
 XMBUFN out dp vss vss nfet_03v3 L=0.5u W=2u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+.ends
+
+
+* expanding   symbol:  rcosc_comparator_p.sym # of pins=6
+** sym_path: /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/design/rcosc_comparator_p.sym
+** sch_path: /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-57/design/rcosc_comparator_p.sch
+.subckt rcosc_comparator_p vdd vss pb inp inn out
+
+
+*.iopin vdd
+*.iopin vss
+*.iopin pb
+*.iopin inp
+*.iopin inn
+*.iopin out
+XMPTAIL tailp pb vdd vdd pfet_03v3 L=1u W=16u nf=4 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XMPINP dp inn tailp vdd pfet_03v3 L=0.5u W=8u nf=4 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XMPINN dn inp tailp vdd pfet_03v3 L=0.5u W=8u nf=4 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XMNLOADA dn dn vss vss nfet_03v3 L=1u W=4u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XMNLOADB dp dn vss vss nfet_03v3 L=1u W=4u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XMBUFP outb dp vdd vdd pfet_03v3 L=0.5u W=4u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XMBUFN outb dp vss vss nfet_03v3 L=0.5u W=0.5u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XMBUF2P out outb vdd vdd pfet_03v3 L=0.5u W=4u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
++ ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
+XMBUF2N out outb vss vss nfet_03v3 L=0.5u W=2u nf=1 ad='int((nf+1)/2) * W/nf * 0.18u' as='int((nf+2)/2) * W/nf * 0.18u' pd='2*int((nf+1)/2) * (W/nf + 0.18u)'
 + ps='2*int((nf+2)/2) * (W/nf + 0.18u)' nrd='0.18u / W' nrs='0.18u / W' sa=0 sb=0 sd=0 m=1
 .ends
 

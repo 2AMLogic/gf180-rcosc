@@ -8,8 +8,13 @@ v {xschem version=3.4.7 file_version=1.2
 *     issue #43 restructures the per-bit shunts to transmission gates with
 *     locally inverted pfet gates, and wires the new vdd pin for them)
 *   CTIMING cap_mim_1f0fF        -- timing capacitor (200 fF)
-*   XCMPH   rcosc_comparator.sym -- vc vs vh (charge-complete detector)
-*   XCMPL   rcosc_comparator.sym -- vl vs vc (discharge-complete detector)
+*   XCMPH   rcosc_comparator.sym   -- vc vs vh (charge-complete detector)
+*   XCMPL   rcosc_comparator_p.sym -- vl vs vc (discharge-complete detector);
+*     issue #57 swaps this instance to the complementary PMOS-input
+*     comparator cell so the low-side crossing runs at its favorable
+*     common mode instead of a near-ground-starved NMOS pair (DR-0016 F4,
+*     flattened per DR-0017), tail mirrored from XBIAS's new pb pin at
+*     the same 8:1 budget the NMOS cells use
 *   MDISCH  nfet_03v3            -- discharge switch, gate driven by the latch
 *   NOR-NOR SR latch (8 transistors, inline below) -- set=cmph_out,
 *     reset=cmpl_out, q=clk=discharge-switch gate
@@ -33,6 +38,8 @@ N -62 556.0 -82 556.0 {}
 C {lab_pin.sym} -82 556.0 0 0 {name=l4 lab=vl}
 N -62 512.0 -82 512.0 {}
 C {lab_pin.sym} -82 512.0 0 0 {name=l5 lab=ibias}
+N -62 468.0 -82 468.0 {}
+C {lab_pin.sym} -82 468.0 0 0 {name=l5b lab=pb}
 C {rcosc_trim_bank.sym} 0 0 0 0 {name=XTRIM}
 N -62 -266.0 -82 -266.0 {}
 C {lab_pin.sym} -82 -266.0 0 0 {name=l6v lab=vdd}
@@ -76,13 +83,13 @@ N -62 -466.0 -82 -466.0 {}
 C {lab_pin.sym} -82 -466.0 0 0 {name=l23 lab=vh}
 N -62 -510.0 -82 -510.0 {}
 C {lab_pin.sym} -82 -510.0 0 0 {name=l24 lab=cmph_out}
-C {rcosc_comparator.sym} 400 -400 0 0 {name=XCMPL}
+C {rcosc_comparator_p.sym} 400 -400 0 0 {name=XCMPL}
 N 338 -290.0 318 -290.0 {}
 C {lab_pin.sym} 318 -290.0 0 0 {name=l25 lab=vdd}
 N 338 -334.0 318 -334.0 {}
 C {lab_pin.sym} 318 -334.0 0 0 {name=l26 lab=vss}
 N 338 -378.0 318 -378.0 {}
-C {lab_pin.sym} 318 -378.0 0 0 {name=l27 lab=ibias}
+C {lab_pin.sym} 318 -378.0 0 0 {name=l27 lab=pb}
 N 338 -422.0 318 -422.0 {}
 C {lab_pin.sym} 318 -422.0 0 0 {name=l28 lab=vl}
 N 338 -466.0 318 -466.0 {}
