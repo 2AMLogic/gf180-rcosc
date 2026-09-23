@@ -1,0 +1,69 @@
+====================================================================
+gf180-rcosc delay-probe run: ratified_fs_T+085C_V3p6_code0xA0
+run id      : 20260923T030905Z
+basis       : ratified
+process     : fs (fets=fs res=res_typical mimcap=mimcap_typical)
+temperature : 85 C
+supply      : 3.6 V
+trim code   : 0xA0 (160)
+transient   : tran 100p 1200n, wrdata + Python crossing/cycle-alignment analysis (see driver docstring)
+wall clock  : 6.8 s
+exit status : 0
+====================================================================
+vdd=3.6000 vmid=1.8000 vh=2.399500 vl=1.199671
+crossing counts: clk_r=60 clk_f=60 vh_r=60 vl_f=60 cmph=60 cmpl=60
+cycles decomposed: 3 / 3 candidates
+cross-cycle spread (max-min): period=0.0105ns t_cmp_h=0.0010ns t_lat_h=0.0025ns t_fall=0.0002ns t_cmp_l=0.0066ns t_lat_l=0.0015ns charge=0.0033ns dsum=0.0066ns overshoot_v=2947680.0000ns vh_dc=0.0000ns vl_dc=0.0000ns fosc=26363486020945.0117ns
+median decomposition: period=19.9851ns t_cmp_h=2.0157ns t_lat_h=0.5608ns t_fall=0.0593ns t_cmp_l=1.3625ns t_lat_l=0.2280ns charge=15.7608ns dsum=4.1650ns overshoot_v=0.176458V vh_dc=2.399500V vl_dc=1.199671V fosc=50037257011505.4922MHz
+im.tb6                           3.6
+xxdut.xxtrim.xr7.11                    2.44269
+xxdut.xxtrim.xr7.21                    2.40755
+xxdut.vc                               2.40753
+t7                                         3.6
+xxdut.xxtrim.tb7                   5.24229e-09
+xxdut.xxcmph.tail                      1.14322
+xxdut.xxcmph.dp                        1.49791
+xxdut.xxcmph.dn                        1.54295
+xxdut.cmph_out                         1.41443
+xxdut.xxcmpl.tailp                     2.83152
+xxdut.xxcmpl.dp                    1.56276e-08
+xxdut.xxcmpl.dn                        1.08464
+xxdut.xxcmpl.outb                          3.6
+xxdut.cmpl_out                     5.24229e-09
+clk                                   0.606001
+xxdut.qbar                             1.36799
+xxdut.mid1                             2.90066
+xxdut.mid2                             3.34492
+vt7#branch                                   0
+vt6#branch                                   0
+vt5#branch                                   0
+vt4#branch                                   0
+vt3#branch                                   0
+vt2#branch                                   0
+vt1#branch                                   0
+vt0#branch                                   0
+vdd#branch                        -0.000689035
+
+ Reference value :  1.82232e-08
+ Reference value :  9.12034e-08
+ Reference value :  1.66344e-07
+ Reference value :  2.42455e-07
+ Reference value :  3.18710e-07
+ Reference value :  3.95459e-07
+ Reference value :  4.71327e-07
+ Reference value :  5.46421e-07
+ Reference value :  6.20707e-07
+ Reference value :  6.92289e-07
+ Reference value :  7.60864e-07
+ Reference value :  8.22444e-07
+ Reference value :  8.86379e-07
+ Reference value :  9.48891e-07
+ Reference value :  1.01209e-06
+ Reference value :  1.07387e-06
+ Reference value :  1.13595e-06
+ Reference value :  1.19797e-06
+No. of Data Rows : 12145
+ngspice-46 done
+
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
