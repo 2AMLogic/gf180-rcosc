@@ -1,18 +1,39 @@
 # layout
 
-**Status: full `rcosc_top` hierarchy, re-spun current with the post-#43
-schematic (issues #13 + #27 + #44 + #50).** This directory carries a
-DRC-clean, LVS-matched GDS for all four of `rcosc_top`'s sub-blocks -- the
-bias generator (`rcosc_bias`), the trim bank (`rcosc_trim_bank`), the
-comparator (`rcosc_comparator`, instantiated twice as `XXCMPH`/`XXCMPL`)
--- plus the `rcosc_top` top-level composition itself (the inline SR latch,
-`MDISCH`, the `CTIMING` MiM cap, and the wiring that instantiates the
-three sub-cells as real GDS sub-cells, not redrawn geometry) -- all
-reproducible from one committed build script. The post-layout
-(PEX-extracted) PVT re-verification this schematic-level layout enables
-was tracked separately as issue #28, re-run against the bias re-spin as
-part of issue #44, and re-run against the trim re-spin as part of issue
-#50.
+**Status: full `rcosc_top` hierarchy, re-spun current with the post-#57
+schematic (issues #13 + #27 + #44 + #50 + #57).** This directory carries a
+DRC-clean, LVS-matched GDS for all of `rcosc_top`'s sub-blocks -- the bias
+generator (`rcosc_bias`), the trim bank (`rcosc_trim_bank`), the two
+comparators (`rcosc_comparator` for `XXCMPH`, and since issue #57 the
+complementary PMOS-input `rcosc_comparator_p` for `XXCMPL`) -- plus the
+`rcosc_top` top-level composition itself (the inline SR latch, `MDISCH`,
+the `CTIMING` MiM cap, and the wiring that instantiates the four sub-cells
+as real GDS sub-cells, not redrawn geometry) -- all reproducible from one
+committed build script. The post-layout (PEX-extracted) PVT re-verification
+this schematic-level layout enables was tracked separately as issue #28,
+re-run against the bias re-spin as part of issue #44, and re-run against
+the trim re-spin as part of issue #50; the post-#57 pass against the new
+comparator cell is the pending follow-up in that series.
+
+**Current with the post-#57 schematic (issue #57's re-spin):** `rcosc_bias`
+was re-spun minimally (one new `pb` pad above P1's gate column, its GDS
+otherwise byte-for-byte the #44 geometry) to export the beta-multiplier's
+PMOS gate bus for the new cell's 4:1 tail mirror; `rcosc_comparator_p` is
+new (one-row-plus-`Channel`, the load/buffer NMOS first, the five PMOS --
+tail, input pair, both buffer pfets -- sharing one drawn n-well with its
+`well_island` tap); `rcosc_top` recomposes with `XXCMPL` as the new cell
+and routes the new `pb` net. `rcosc_trim_bank.gds` and
+`rcosc_comparator.gds` are byte-for-byte unchanged from #50/#27 (reproced
+identically by the pinned toolchain). Two verification-apparatus repairs
+shipped with the re-run, both pre-existing on `main`: `run_checks.sh` now
+**pins klt 0.4.0** (0.5.0's generators draw different geometry and would
+silently rewrite every committed cell), and `erc-supply-spec.json`'s tie
+uses the **32/0 tap marker layer** because klt erc 0.4.0 ignores
+`tap_requires` (upstream klayout-tools#2358) -- the old 22/0 spelling
+merged every in-well diffusion into the supply net and reported vdd/vss
+shorted on the untouched pre-#57 GDS too. The hierarchy re-verified end to
+end -- DRC clean, LVS matched, supply-ERC one island per supply for all
+five cells.
 
 **Current with the post-#43 schematic (issue #50's re-spin):** the
 `rcosc_trim_bank` cell geometry was re-drawn against the

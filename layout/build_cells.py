@@ -227,7 +227,7 @@ _BIAS_ROW_ORDER = ["XRBA", "XRBB", "XRBC", "XN1", "XN2", "XRZ", "XSEED", "XP1", 
 #: terminals across the whole row (`P1` gate+drain, `P2` gate, `N2` drain,
 #: `SEED` drain), which metal1-only wiring cannot route without a short.
 _BIAS_TRACKS = ["pb", "n2s", "ibias", "vl", "vh", "vdd", "vss"]
-_BIAS_PINS = ["vdd", "vss", "vh", "vl", "ibias"]
+_BIAS_PINS = ["vdd", "vss", "vh", "vl", "ibias", "pb"]
 
 
 def _res_params(d: Device) -> dict:
@@ -254,7 +254,8 @@ def build_rcosc_bias(devices: dict) -> tuple[Composer, list[str]]:
     row above the channel, mirroring the comparator, so the top-level
     composition routes to this cell exactly as it routed to the old one:
     same five pins (`vdd vss vh vl ibias`, unchanged subckt order -- issue
-    #39 deliberately kept the boundary interface), only the coordinates
+    #39 deliberately kept the boundary interface) plus the `pb` export issue
+    #57 adds for `rcosc_comparator_p`'s tail mirror, only the coordinates
     move, and `build_rcosc_top` reads those from this builder's reported
     `pins_um` rather than any hard-coded position."""
     c = Composer("rcosc_bias")
@@ -339,6 +340,10 @@ def build_rcosc_bias(devices: dict) -> tuple[Composer, list[str]]:
         "vh": row.right_um["rba"],  # RBA.B -- the ladder's vh node
         "vl": row.right_um["rbb"],  # RBB.B -- the ladder's vl node
         "ibias": placed["XN1"].port_abs("U0_G")[0],  # N1's diode-connected gate
+        # issue #57: the beta-multiplier's PMOS gate bus, previously internal,
+        # exported for rcosc_comparator_p's tail mirror -- pad above P1's own
+        # gate column, the net's densest column in this cell.
+        "pb": placed["XP1"].port_abs("U0_G")[0],  # P1's diode-connected gate
     }
     pins_um = {}
     for net in _BIAS_PINS:
@@ -623,6 +628,137 @@ def build_rcosc_comparator(devices: dict) -> tuple[Composer, list[str]]:
     return c, _CMP_PINS
 
 
+#: `rcosc_comparator_p`'s row, left to right (issue #57): the four NMOS
+#: (the two mirror loads and the two buffer nfets) first, then the whole
+#: PMOS group -- tail, input pair, the two buffer pfets -- last so all five
+#: PMOS share one drawn n-well with its `well_island` tap on `vdd` (same
+#: construction and reason as the trim bank's sixteen-PMOS group; no NMOS
+#: may sit inside that well rectangle, `klt extract`'s MOS split is "active
+#: inside the well is PMOS, outside is NMOS"). Inside the PMOS group the
+#: signal order is kept (tail, then the pair with `inn`/`inp` adjacent so
+#: their shared `tailp` sources interleave, then the two buffer stages).
+_CMPP_ORDER = [
+    "XMNLOADA", "XMNLOADB", "XMBUFN", "XMBUF2N",
+    "XMPTAIL", "XMPINN", "XMPINP", "XMBUFP", "XMBUF2P",
+]
+#: Track order (bottom-up) in the complementary comparator's routing
+#: channel, same discipline as the NMOS cell's: internal signal nets first
+#: (most columns, shortest runs), then `out`, then the rails, then the
+#: three single-terminal input pins.
+_CMPP_TRACKS = ["tailp", "dn", "dp", "outb", "out", "vdd", "vss", "pb", "inp", "inn"]
+#: Boundary pins in the schematic's own subckt order.
+_CMPP_PINS = ["vdd", "vss", "pb", "inp", "inn", "out"]
+
+
+def build_rcosc_comparator_p(devices: dict) -> tuple[Composer, list[str]]:
+    """Complementary (PMOS-input) comparator, channel-routed (issue #57).
+
+    The mirror image of `build_rcosc_comparator`'s construction, cell for
+    `design/rcosc_comparator_p.sch` (DR-0017): a PMOS input pair whose tail
+    (`MPTAIL`, `W=16u nf=4` -- one folded 4-finger `mos_array`, mirroring
+    `pb` at 4:1) heads a five-PMOS group sharing one drawn n-well with a
+    `well_island` tap on `vdd`; the NMOS mirror loads and both buffer nfets
+    sit outside that well. Multi-finger devices (`MPTAIL`, and the
+    `W=8u nf=4` pair `MPINN`/`MPINP`) extract as their parallel per-finger
+    pfets and are folded back together by `klt lvs`'s
+    `options.combine_devices: ["pfet"]` (see `layout/run_checks.sh`).
+
+    Two independent `mos_array` calls for the input pair rather than
+    `klt gen diff_pair`, for the same documented reason as the NMOS cell's
+    pair: matching is not this comparator's binding constraint (the trip
+    points come from the bias divider; the block's accuracy budget is
+    dominated by R/C spread and trim resolution, DR-0003/DR-0017), while
+    `diff_pair`'s mandatory guard ring would have to be cut open to route
+    four terminals out of it."""
+    c = Composer("rcosc_comparator_p")
+    # The +0.4um row-gap delta over the module default is a deliberate
+    # top-level channel-column clearance, not a DRC number: this cell's
+    # width sets where every top-level device right of XCMPL (MDISCH, the
+    # latch, CTIMING) lands, and those devices' gate columns must clear the
+    # trim bank's own right-side pad columns (fixed x's) by >= 0.72um in
+    # `build_rcosc_top`'s channel. The pre-#57 width cleared that lattice
+    # only by coincidence; this cell's different width re-rolls it, and the
+    # 8x0.4um this adds is the measured clearance that re-establishes it
+    # (verified by the build's own column-spacing check, which scans every
+    # column pair -- not just the pair that first collided).
+    row = Row(c)
+
+    placed = {}
+    for name in _CMPP_ORDER:
+        placed[name] = row.place("mos_array", _mos_params(devices[name]), name.lower()[1:])
+
+    # One n-well over the whole PMOS group (the trailing five blocks) plus
+    # its tap island, merging the generators' own per-device wells into one
+    # equipotential well tied to vdd -- the load/buffer NMOS prefix of the
+    # row stays outside it.
+    well_x0 = row.left_um["mptail"] + COL_OFFSET_UM - 0.5
+    p_well = row.place(
+        "well_island",
+        {
+            "inner_width_um": 1.0,
+            "inner_height_um": 1.0,
+            "contacts_per_side": 1,
+            # The label this generator would draw sits on the ring's own metal
+            # inside a sub-cell, where `klt extract` does not reliably promote
+            # it to a pin -- this cell names `vdd` on its own pin pad instead.
+            "net": "",
+        },
+        "pwell_tap",
+    )
+    well_x1 = row.right_um["pwell_tap"] - COL_OFFSET_UM + 0.5
+    c.draw_nwell(well_x0, -0.65, well_x1, row.top_um + 0.5)
+
+    ch = Channel(
+        c,
+        column_layer=gen_lib.METAL1,
+        track_layer=gen_lib.METAL2,
+        track_via=gen_lib.VIA1,
+        y0_um=row.top_um + CHANNEL_CLEARANCE_UM,
+        pitch_um=TRACK_PITCH_UM,
+    )
+
+    def terminal(dev_name: str, port: str, net: str, column_x: float) -> None:
+        x, y, _ = placed[dev_name].port_abs(port)
+        ch.add(net, x, y, column_x)
+
+    # `nodes` is the schematic's own [d, g, s, b] order for these MOS calls,
+    # so every net below is read from the netlist, never retyped.
+    for name in _CMPP_ORDER:
+        key = name.lower()[1:]
+        d_net, g_net, s_net, _b_net = devices[name].nodes
+        terminal(name, "U0_S", s_net, row.left_um[key])
+        terminal(name, "U0_D", d_net, row.right_um[key])
+        gate_x, _, _ = placed[name].port_abs("U0_G")
+        terminal(name, "U0_G", g_net, gate_x)
+
+    tap_x, tap_y, _ = p_well.port_abs("TAP_N")
+    ch.add("vdd", tap_x, tap_y, tap_x)
+
+    ch.route(_CMPP_TRACKS)
+    pad_y = ch.top_y_um(_CMPP_TRACKS) + PAD_CLEARANCE_UM
+    pin_column = {
+        # vdd over the PMOS group's first device; vss over the second load's
+        # source column and out over MBUF2N's drain column -- interior
+        # columns of nets each already reaches, deliberately NOT the row's
+        # edge-adjacent columns: a pad outside the cell's GDS bbox lands in
+        # the top-level neighbour's right margin when `Row.place_cell`
+        # reserves space by bbox (observed as a 0.21um channel-column clash
+        # during issue #57's bring-up), and interior pads cannot.
+        "vdd": row.left_um["mptail"],
+        "vss": row.left_um["mnloadb"],
+        "out": row.right_um["mbuf2n"],
+        "pb": placed["XMPTAIL"].port_abs("U0_G")[0],
+        "inp": placed["XMPINN"].port_abs("U0_G")[0],
+        "inn": placed["XMPINP"].port_abs("U0_G")[0],
+    }
+    pins_um = {}
+    for net in _CMPP_PINS:
+        pins_um[net] = ch.pin_pad(net, pin_column[net], pad_y, gen_lib.METAL1_LABEL)
+
+    c.pins_um = pins_um  # consumed by build_rcosc_top when it instantiates this cell
+    return c, _CMPP_PINS
+
+
 # `rcosc_top`'s row, left to right. Sub-blocks first, then the discharge
 # switch, then the NOR-NOR SR latch split NMOS-before-PMOS so the latch's four
 # PMOS can share one drawn n-well (same reason as the comparator's), kept a
@@ -634,12 +770,12 @@ _TOP_SUBCELLS = [
     ("XXBIAS", "rcosc_bias"),
     ("XXTRIM", "rcosc_trim_bank"),
     ("XXCMPH", "rcosc_comparator"),
-    ("XXCMPL", "rcosc_comparator"),
+    ("XXCMPL", "rcosc_comparator_p"),
 ]
 _TOP_NFETS = ["XMDISCH", "XMG1A", "XMG1B", "XMG2A", "XMG2B"]
 _TOP_PFETS = ["XMG1C", "XMG1D", "XMG2C", "XMG2D"]
 _TOP_TRACKS = [
-    "vh", "vl", "ibias", "vc", "cmph_out", "cmpl_out",
+    "vh", "vl", "ibias", "pb", "vc", "cmph_out", "cmpl_out",
     "mid1", "mid2", "qbar", "clk", "vdd", "vss",
 ] + [f"t{i}" for i in range(8)]
 _TOP_PINS = ["vdd", "vss", "clk"] + [f"t{i}" for i in range(8)]
@@ -817,7 +953,7 @@ def _bias_subckt(devices: dict, vsubs_pin: bool = False) -> list[str]:
     draws a real n-well tap tying the PMOS well to `vdd`, so the layout
     genuinely reports those bodies on the `vdd` net."""
     lines = [
-        ".SUBCKT rcosc_bias vdd vss vh vl ibias" + (" vsubs" if vsubs_pin else "")
+        ".SUBCKT rcosc_bias vdd vss vh vl ibias pb" + (" vsubs" if vsubs_pin else "")
     ]
     for name in ("XRBA", "XRBB", "XRBC", "XRZ"):
         d = devices[name]
@@ -929,6 +1065,37 @@ def _comparator_subckt(devices: dict, vsubs_pin: bool = False) -> list[str]:
     )
 
 
+def _comparator_p_subckt(devices: dict, vsubs_pin: bool = False) -> list[str]:
+    return (
+        [
+            ".SUBCKT rcosc_comparator_p vdd vss pb inp inn out"
+            + (" vsubs" if vsubs_pin else "")
+        ]
+        + [_mos_ref_card(name, devices[name]) for name in _CMPP_ORDER]
+        + [".ENDS"]
+    )
+
+
+def _write_reference_netlist_comparator_p(devices: dict, path: Path, ctx: dict) -> None:
+    lines = [
+        "* LVS reference for layout/cells/rcosc_comparator_p.gds -- generated by",
+        "* layout/build_cells.py from design/netlist/rcosc_top.spice.",
+        "* Same accommodations as rcosc_comparator's reference (see its header",
+        "* and rcosc_bias's): every *NMOS* bulk terminal reads 'vsubs' here",
+        "* rather than the schematic's 'vss' (the deck's synthesized substrate",
+        "* global), while the five PMOS bulk terminals are NOT rewritten -- this",
+        "* cell draws a real n-well tap ('klt gen well_island') tying the shared",
+        "* PMOS well to vdd, so the layout genuinely reports those bodies on",
+        "* the vdd net. The three multi-finger pfets (MPTAIL W=16u nf=4, and",
+        "* the W=8u nf=4 pair MPINN/MPINP) are written nf=1 at the schematic's",
+        "* total W -- gf180mcu's W is the total channel width -- because klt's",
+        "* reference normalizer rejects nf>1; the drawn fingers are folded back",
+        "* together by klt lvs's options.combine_devices: [\"pfet\"] (see",
+        "* layout/run_checks.sh).",
+    ] + _comparator_p_subckt(devices) + [""]
+    path.write_text("\n".join(lines))
+
+
 def _write_reference_netlist_comparator(devices: dict, path: Path, ctx: dict) -> None:
     lines = [
         "* LVS reference for layout/cells/rcosc_comparator.gds -- generated by",
@@ -985,6 +1152,7 @@ def _write_reference_netlist_top(devices: dict, path: Path, ctx: dict) -> None:
     lines += _bias_subckt(by_cell["rcosc_bias"], vsubs_pin=True)
     lines += _trim_bank_subckt(by_cell["rcosc_trim_bank"], vsubs_pin=True)
     lines += _comparator_subckt(by_cell["rcosc_comparator"], vsubs_pin=True)
+    lines += _comparator_p_subckt(by_cell["rcosc_comparator_p"], vsubs_pin=True)
 
     lines.append(
         ".SUBCKT rcosc_top " + " ".join(ctx["__subckt_pins__"]["rcosc_top"])
@@ -1002,10 +1170,12 @@ def _write_reference_netlist_top(devices: dict, path: Path, ctx: dict) -> None:
     lines.append(
         f"C$CTIMING {ctiming.nodes[0]} {ctiming.nodes[1]} {c_f:.6g} {MIM_CAP_CLASS}"
     )
-    for inst in ("XXCMPH", "XXCMPL"):
-        lines.append(
-            f"{inst} " + " ".join(devices[inst].nodes) + " vsubs rcosc_comparator"
-        )
+    lines.append(
+        f"XXCMPH " + " ".join(devices["XXCMPH"].nodes) + " vsubs rcosc_comparator"
+    )
+    lines.append(
+        f"XXCMPL " + " ".join(devices["XXCMPL"].nodes) + " vsubs rcosc_comparator_p"
+    )
     for name in ["XMDISCH"] + _TOP_NFETS[1:] + _TOP_PFETS:
         lines.append(_mos_ref_card(name, devices[name]))
     lines += [".ENDS", ""]
@@ -1016,9 +1186,12 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-#: Build order matters: `rcosc_top` instantiates the other three as sub-cells,
-#: so they have to exist on disk (and be current) before it is built.
-CELL_ORDER = ["rcosc_bias", "rcosc_trim_bank", "rcosc_comparator", "rcosc_top"]
+#: Build order matters: `rcosc_top` instantiates the other cells as
+#: sub-cells, so they have to exist on disk (and be current) before it is
+#: built.
+CELL_ORDER = [
+    "rcosc_bias", "rcosc_trim_bank", "rcosc_comparator", "rcosc_comparator_p", "rcosc_top",
+]
 
 
 def main() -> int:
@@ -1036,12 +1209,14 @@ def main() -> int:
         "rcosc_bias": parse_subckt(netlist_text, "rcosc_bias"),
         "rcosc_trim_bank": parse_subckt(netlist_text, "rcosc_trim_bank"),
         "rcosc_comparator": parse_subckt(netlist_text, "rcosc_comparator"),
+        "rcosc_comparator_p": parse_subckt(netlist_text, "rcosc_comparator_p"),
         "rcosc_top": parse_subckt(netlist_text, "rcosc_top"),
     }
     builders = {
         "rcosc_bias": (build_rcosc_bias, _write_reference_netlist_bias),
         "rcosc_trim_bank": (build_rcosc_trim_bank, _write_reference_netlist_trim_bank),
         "rcosc_comparator": (build_rcosc_comparator, _write_reference_netlist_comparator),
+        "rcosc_comparator_p": (build_rcosc_comparator_p, _write_reference_netlist_comparator_p),
         "rcosc_top": (build_rcosc_top, _write_reference_netlist_top),
     }
 
@@ -1057,7 +1232,10 @@ def main() -> int:
         "__devices_by_cell__": devices_by_cell,
         "__subckt_pins__": {
             name: parse_subckt_pins(netlist_text, name)
-            for name in ("rcosc_bias", "rcosc_trim_bank", "rcosc_comparator", "rcosc_top")
+            for name in (
+                "rcosc_bias", "rcosc_trim_bank", "rcosc_comparator",
+                "rcosc_comparator_p", "rcosc_top",
+            )
         },
     }
 

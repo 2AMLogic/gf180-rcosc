@@ -2,35 +2,36 @@
 
 * cell rcosc_bias
 * pin ibias
+* pin pb
 * pin vdd
 * pin vh
 * pin vl
 * pin vss
-.SUBCKT rcosc_bias ibias vdd vh vl vss
+.SUBCKT rcosc_bias ibias pb vdd vh vl vss
 * device instance $1 r0 *1 315.44,1 nfet
 M$1 ibias ibias vss vsubs nfet L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $2 r0 *1 383.4,1 nfet
-M$2 \$7 vl vss vsubs nfet L=20U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
+M$2 pb vl vss vsubs nfet L=20U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U
 * device instance $3 r0 *1 321.28,1.82 nfet
-M$3 \$7 ibias \$1 vsubs nfet L=1U W=2U AS=0.84P AD=0.42P PS=4.84U PD=2.42U
+M$3 pb ibias \$1 vsubs nfet L=1U W=2U AS=0.84P AD=0.42P PS=4.84U PD=2.42U
 * device instance $4 r0 *1 322.7,1.82 nfet
-M$4 \$1 ibias \$7 vsubs nfet L=1U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
+M$4 \$1 ibias pb vsubs nfet L=1U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
 * device instance $5 r0 *1 324.12,1.82 nfet
-M$5 \$7 ibias \$1 vsubs nfet L=1U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
+M$5 pb ibias \$1 vsubs nfet L=1U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
 * device instance $6 r0 *1 325.54,1.82 nfet
-M$6 \$1 ibias \$7 vsubs nfet L=1U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
+M$6 \$1 ibias pb vsubs nfet L=1U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
 * device instance $7 r0 *1 326.96,1.82 nfet
-M$7 \$7 ibias \$1 vsubs nfet L=1U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
+M$7 pb ibias \$1 vsubs nfet L=1U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
 * device instance $8 r0 *1 328.38,1.82 nfet
-M$8 \$1 ibias \$7 vsubs nfet L=1U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
+M$8 \$1 ibias pb vsubs nfet L=1U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
 * device instance $9 r0 *1 329.8,1.82 nfet
-M$9 \$7 ibias \$1 vsubs nfet L=1U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
+M$9 pb ibias \$1 vsubs nfet L=1U W=2U AS=0.42P AD=0.42P PS=2.42U PD=2.42U
 * device instance $10 r0 *1 331.22,1.82 nfet
-M$10 \$1 ibias \$7 vsubs nfet L=1U W=2U AS=0.42P AD=0.84P PS=2.42U PD=4.84U
+M$10 \$1 ibias pb vsubs nfet L=1U W=2U AS=0.42P AD=0.84P PS=2.42U PD=4.84U
 * device instance $11 r0 *1 398.89,2 pfet
-M$11 \$7 \$7 vdd vdd pfet L=1U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+M$11 pb pb vdd vdd pfet L=1U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
 * device instance $12 r0 *1 405.03,2 pfet
-M$12 ibias \$7 vdd vdd pfet L=1U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
+M$12 ibias pb vdd vdd pfet L=1U W=4U AS=1.68P AD=1.68P PS=8.84U PD=8.84U
 * device instance $13 r0 *1 50.42,1 ppolyf_u_1k
 R$13 vdd vh vsubs 50000 ppolyf_u_1k
 * device instance $14 r0 *1 155.26,1 ppolyf_u_1k

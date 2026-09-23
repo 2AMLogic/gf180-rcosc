@@ -23,7 +23,11 @@ layout geometry and DRC/LVS/PEX results live under `layout/`.
 ```
 design/
   rcosc_bias.sch/.sym        ratiometric V_H/V_L threshold + tail-current bias
+                             (exports pb for the complementary comparator, #57)
   rcosc_comparator.sch/.sym  5T differential-pair comparator + output buffer
+                             (XCMPH, the high side)
+  rcosc_comparator_p.sch/.sym complementary PMOS-input comparator (XCMPL,
+                             the low side, issue #57 / DR-0017)
   rcosc_trim_bank.sch/.sym   8-bit binary-weighted switched-resistor trim bank
   rcosc_top.sch/.sym         the composed oscillator block (top of the hierarchy)
   smoke_test.sch             bring-up testbench: DC supplies + fixed trim code
@@ -761,6 +765,38 @@ the delay's supply slope at constant nominal delay, targeting the low-side
 common mode — is filed as issue #57. No schematic, netlist, or layout
 change rides in issue #51, so the committed `layout/` and PEX evidence
 remain current.
+
+### Low-side comparator re-referenced to a complementary PMOS-input cell (issue #57)
+
+Issue #57 landed the circuit-side lever: **`XCMPL` is now the complementary
+PMOS-input cell `rcosc_comparator_p`** (new `.sch/.sym`; `rcosc_bias`
+exports its beta-multiplier `pb` gate node for the new tail mirror at 4:1;
+`XCMPH` and the NMOS cell are unchanged), re-referencing the low-side
+comparison to the vdd rail so the input pair operates in its favorable
+region at every corner instead of against `vss`. Measured on the
+re-derived campaigns (all in this issue: campaign
+`sim/pvt/results/20260923T030125Z/`, probe
+`sim/pvt/results/20260923T030905Z/` 138/138 ok, Iq factorial
+`sim/iq/results/20260923T031214Z/`):
+
+- `t_cmp_l`'s 3.0→3.6 V span collapses from −1.92/−0.80/−1.38 ns
+  (ss/tt/sf) to **+0.08/+0.08/+0.13 ns**; the delay share of the period's
+  supply span drops 62–82% → 7.6–33%.
+- The guardrail cell `0x80`/`ff`/85 °C/3.6 V: f 58.22 → 55.42 MHz and
+  `iq_run` 498.76 → **475.78 µA** — DR-0003 Row 4's margin widens
+  1.24 → 24.2 µA. `dsum(3.3 V)` per-corner is preserved or increased at
+  tt/ff/fs/rc_s and is lower at ss/sf/rc_f (both figures stated in
+  [DR-0017](../spec/decision-records/0017-low-side-comparator-pmos-respin-supply-slope.md));
+  every corner calibrates inner-range (no trim-range regression).
+- The two post-trim rows are re-derived in
+  [DR-0017](../spec/decision-records/0017-low-side-comparator-pmos-respin-supply-slope.md):
+  **−2.9% / +2.0%** at the calibration point and **+8.8% / −10.8%**
+  full-range (supersedes DR-0016's −9.2/+6.5 and −17.1/+13.4; both
+  superseded- and new-basis verdicts stated together in the DR). The
+  layout is re-verified end to end (DRC/LVS/extract/supply-ERC for all
+  five cells — see `layout/README.md`); the post-layout PEX re-verification
+  against the new cell remains a separate follow-up pass per this repo's
+  re-spin convention.
 
 ## Non-goals
 

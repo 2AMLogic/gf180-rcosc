@@ -46,6 +46,13 @@ v {xschem version=3.4.7 file_version=1.2
 * resistor's -1200 ppm/K TCR (DR-0004 stands); it restores the "fixed
 * voltage/current reference" assumption DR-0003's post-trim accuracy
 * derivation was built on, per DR-0006's sanctioned follow-up.
+*
+* pb exported as a pin issue #57: the beta-multiplier's PMOS mirror gate
+* bus (P1's diode node) was previously internal. The complementary
+* low-side comparator (rcosc_comparator_p, XCMPL) mirrors P1 from it at
+* 8:1 for its tail -- same branch current the NMOS cells mirror off the
+* ibias (N1 diode) node, so exporting pb adds no current draw of its own
+* (gate-only load, like every other mirror gate on the node).
 }
 G {}
 K {}
@@ -130,3 +137,4 @@ C {iopin.sym} -200 240 0 0 {name=p33 lab=vss}
 C {iopin.sym} -200 180 0 0 {name=p34 lab=vh}
 C {iopin.sym} -200 120 0 0 {name=p35 lab=vl}
 C {iopin.sym} -200 60 0 0 {name=p36 lab=ibias}
+C {iopin.sym} -200 0 0 0 {name=p37 lab=pb}

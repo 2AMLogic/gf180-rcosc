@@ -14,7 +14,7 @@
 * capacitance. Selected at extraction time with
 * `klt extract --deck-option mim_cap=cap_mim_1f0_m4m5_noshield`.
 
-.SUBCKT rcosc_bias vdd vss vh vl ibias vsubs
+.SUBCKT rcosc_bias vdd vss vh vl ibias pb vsubs
 R$RBA vdd vh vsubs 50000 ppolyf_u_1k
 R$RBB vh vl vsubs 50000 ppolyf_u_1k
 R$RBC vl vss vsubs 50000 ppolyf_u_1k
@@ -77,12 +77,23 @@ XMLOADA dn dn vdd vdd pfet_03v3 L=1u W=4u nf=1
 XMLOADB dp dn vdd vdd pfet_03v3 L=1u W=4u nf=1
 XMBUFP out dp vdd vdd pfet_03v3 L=0.5u W=4u nf=1
 .ENDS
+.SUBCKT rcosc_comparator_p vdd vss pb inp inn out vsubs
+XMNLOADA dn dn vss vsubs nfet_03v3 L=1u W=4u nf=1
+XMNLOADB dp dn vss vsubs nfet_03v3 L=1u W=4u nf=1
+XMBUFN outb dp vss vsubs nfet_03v3 L=0.5u W=0.5u nf=1
+XMBUF2N out outb vss vsubs nfet_03v3 L=0.5u W=2u nf=1
+XMPTAIL tailp pb vdd vdd pfet_03v3 L=1u W=16u nf=1
+XMPINN dn inp tailp vdd pfet_03v3 L=0.5u W=8u nf=1
+XMPINP dp inn tailp vdd pfet_03v3 L=0.5u W=8u nf=1
+XMBUFP outb dp vdd vdd pfet_03v3 L=0.5u W=4u nf=1
+XMBUF2P out outb vdd vdd pfet_03v3 L=0.5u W=4u nf=1
+.ENDS
 .SUBCKT rcosc_top vdd vss clk t0 t1 t2 t3 t4 t5 t6 t7
-XXBIAS vdd vss vh vl ibias vsubs rcosc_bias
+XXBIAS vdd vss vh vl ibias pb vsubs rcosc_bias
 XXTRIM vdd vc vss t0 t1 t2 t3 t4 t5 t6 t7 vdd vsubs rcosc_trim_bank
 C$CTIMING vss vc 2.172e-13 cap_mim_1f0_m4m5_noshield
 XXCMPH vdd vss ibias vc vh cmph_out vsubs rcosc_comparator
-XXCMPL vdd vss ibias vl vc cmpl_out vsubs rcosc_comparator
+XXCMPL vdd vss pb vl vc cmpl_out vsubs rcosc_comparator_p
 XMDISCH vc clk vss vsubs nfet_03v3 L=0.5u W=20u nf=1
 XMG1A qbar cmph_out vss vsubs nfet_03v3 L=0.5u W=2u nf=1
 XMG1B qbar clk vss vsubs nfet_03v3 L=0.5u W=2u nf=1

@@ -34,6 +34,13 @@ v {xschem version=3.4.7 file_version=1.2
 * within about a percentage point of M=8's recovered trim range, so the
 * ratio knob still has no further leverage at this current budget. See
 * DR-0009 for the grid.
+*
+* Issue #57 family note: this cell is now the HIGH-side comparator only
+* (XCMPH, common mode 2/3 VDD, where this NMOS-input cell is supply-flat
+* per DR-0016 F4). The low-side instance XCMPL moved to the complementary
+* PMOS-input sibling rcosc_comparator_p.sch (same pin contract, bias pin
+* pb instead of ibias) because this cell's input pair starves at the
+* low-side common mode -- see rcosc_comparator_p.sch's header and DR-0017.
 }
 G {}
 K {}

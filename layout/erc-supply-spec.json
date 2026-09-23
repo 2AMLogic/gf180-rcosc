@@ -148,7 +148,22 @@
     "  power-delivery question is therefore outside what this run can ask",
     "  -- disclosed, not faked. Device-level body verification stays with",
     "  item 4's own full-connectivity LVS, where this block matches with",
-    "  VDD/VSS pin correspondences at status \"match\""
+    "  VDD/VSS pin correspondences at status \"match\"",
+      "TIE CORRECTION (issue #57; upstream: klayout-tools#2358 --",
+      "tap_requires): klt erc 0.4.0 accepts ties[].tap_requires but ignores",
+      "it -- the tap region is the WHOLE tap_layer. With tap_layer 22/0",
+      "(COMP) that made every source/drain diffusion inside any n-well part",
+      "of the tie's supply net, merging each in-well PFET's drain net into",
+      "vdd and ultimately reporting vdd/vss shorted on layouts whose LVS is",
+      "clean (reproduced on the pre-#57 committed GDS, whose committed ERC",
+      "report already carried that finding). tap_layer is therefore the tap",
+      "MARKER layer 32/0 (drawn by 'klt gen well_island' exactly on its tap",
+      "ring, inside the well only), which implements the filter the",
+      "tap_requires key intended: the tie joins well -> ring -> ring metal,",
+      "and nothing else. Validated against both the pre-#57 and post-#57",
+      "top GDS: identical supply-island verdicts (one island each, zero",
+      "missing_tie) and zero supply shorts, with only the disclosed",
+      "floating-gate artifact remaining."
   ],
   "stackup": [
     { "name": "poly2", "layer": "30/0", "role": "gate", "active_layer": "22/0" },
@@ -170,7 +185,7 @@
     {
       "name": "nwell_vdd_tap",
       "well_layer": "21/0",
-      "tap_layer": "22/0",
+      "tap_layer": "32/0",
       "tap_requires": ["32/0"],
       "connect_to": "Metal1",
       "net": "vdd"
