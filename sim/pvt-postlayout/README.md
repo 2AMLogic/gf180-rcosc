@@ -30,6 +30,27 @@ sim/pvt-postlayout/run-pex-pvt-sweep.sh
 sim/pvt-postlayout/run-pex-pvt-sweep.sh --jobs 8
 ```
 
+Two knobs added by issue #61, both opt-in (the default path is
+byte-identical to issue #28's flow):
+
+- `--guardrails` additionally re-verifies the current decision record's
+  schematic-basis guardrails against the extracted netlist inside the same
+  run — since DR-0018, DR-0017's two: the Row-4 guardrail cell
+  (`0x80`/`ff`/85 °C/3.6 V) on both sides vs the schematic baseline's own
+  `pretrim` row at that cell, and a per-process (`tt`/`ff`/`ss`)
+  single-point trim calibration at 27 °C/3.3 V against the ratified
+  48.000 MHz target on both sides (the same binary search
+  `sim/pvt/pvt_sweep.py`'s `calibrate` performs). Results land in the
+  run's `guardrails.csv`, the manifest's `guardrails` key, and the
+  summary's guardrail sections.
+- `--baseline-runid <runid>` selects the schematic campaign explicitly.
+  The default auto-picks the newest `sim/pvt/results/<runid>/` — which is
+  wrong the moment the newest run is a probe campaign whose manifest
+  carries no `calibration_spec_target` (exactly what happened when
+  DR-0017's `20260923T030905Z` delay-probe run landed): pass
+  `--baseline-runid` naming the calibration campaign the comparison
+  should anchor to.
+
 ## Methodology
 
 Each of the 27 points is simulated **twice**, sharing everything (the
@@ -92,4 +113,5 @@ against `2AMLogic/klayout-tools` per `CLAUDE.md`'s friction protocol
 |---|---|
 | [`20260907T131703Z`](results/20260907T131703Z/summary.md) | First post-layout PEX PVT re-verification (issue #27's `rcosc_top.gds`, issue #28). 27-point corner-endpoint subset, both sides, 0 failed runs. **Materially diverges**: schematic-vs-extracted delta is negative (slower) at every point, -1.88% to -29.52%, exceeding the +-1.1% calibration-point accuracy budget on its own. See [DR-0010](../../spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md). *Superseded for the post-#39 schematic by the issue-#44 run below; figures valid only against the pre-#39 GDS pair.* |
 | [`20260921T164434Z`](results/20260921T164434Z/summary.md) | Post-layout PEX PVT re-verification of the **re-spun** bias cell (issue #44's `rcosc_bias.gds`/`rcosc_top.gds`, against the post-#39 schematic campaign `sim/pvt/results/20260921T075822Z/` at its own calibration code `0xD0`). 27-point corner-endpoint subset, both sides, 0 failed runs, 203.4 s at 8 jobs. **Materially diverges, deeper than the pre-#39 pass**: delta negative (slower) at every point, -11.24% to -41.42% (mean -19.56%), worst at `ff`/-40 C/3.6 V; in-run schematic-side cross-check vs the committed campaign: 0.00% at matched points. See [DR-0013](../../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md). *Superseded for the post-#43 schematic by the issue-#50 run below; figures valid only against the pre-#43 GDS pair.* |
-| [`20260922T004322Z`](results/20260922T004322Z/summary.md) | Post-layout PEX PVT re-verification of the **re-spun** trim bank (issue #50's `rcosc_trim_bank.gds`/`rcosc_top.gds`, against the post-#43 schematic campaign `sim/pvt/results/20260921T173529Z/` at its own auto-read ratified-target calibration code `0x9D`). 27-point corner-endpoint subset, both sides, 0 failed runs, 338.0 s at 8 jobs. **Materially diverges, deeper on the mean than the pre-#43 pass**: delta negative (slower) at every point, -17.46% to -40.92% (mean -27.32%), worst at `ff`/-40 C/3.6 V; in-run schematic-side cross-check vs the committed post-#43 campaign: 0.18% at matched points. See [DR-0015](../../spec/decision-records/0015-trim-bank-respin-postlayout-pex-reverification.md). |
+| [`20260922T004322Z`](results/20260922T004322Z/summary.md) | Post-layout PEX PVT re-verification of the **re-spun** trim bank (issue #50's `rcosc_trim_bank.gds`/`rcosc_top.gds`, against the post-#43 schematic campaign `sim/pvt/results/20260921T173529Z/` at its own auto-read ratified-target calibration code `0x9D`). 27-point corner-endpoint subset, both sides, 0 failed runs, 338.0 s at 8 jobs. **Materially diverges, deeper on the mean than the pre-#43 pass**: delta negative (slower) at every point, -17.46% to -40.92% (mean -27.32%), worst at `ff`/-40 C/3.6 V; in-run schematic-side cross-check vs the committed post-#43 campaign: 0.18% at matched points. See [DR-0015](../../spec/decision-records/0015-trim-bank-respin-postlayout-pex-reverification.md). *Superseded for the post-#60 schematic by the issue-#61 run below; figures valid only against the pre-#57 GDS pair.* |
+| [`20260923T152954Z`](results/20260923T152954Z/summary.md) | Post-layout PEX PVT re-verification of the **DR-0017 re-spun** comparator hierarchy (`rcosc_comparator_p`/`rcosc_top.gds`, against the post-#60 schematic campaign `sim/pvt/results/20260923T030125Z/` at its own calibration code `0xA3`, selected via `--baseline-runid` — the newest `sim/pvt/results/` run is DR-0017's delay-probe campaign, which carries no calibration manifest). 27-point corner-endpoint subset, both sides, 0 failed runs, 166.3 s at 8 jobs (`klt 0.4.0` pinned per `layout/run_checks.sh`, ngspice-46, Linux host). **Materially diverges, same always-slower sign and worst-corner signature**: delta negative at every point, -18.78% to -36.86% (mean -25.65%), worst at `ff`/-40 C/3.6 V; in-run schematic-side cross-check vs the committed DR-0017 campaign: 0.00% at matched points. **Both DR-0017 guardrails hold extracted-side** (this run's `--guardrails` pass): the Row-4 guardrail cell `0x80`/`ff`/85 C/3.6 V runs 31.16% below its DR-0017 campaign basis, and every corner still calibrates inner-range against 48.000 MHz (`tt 0xA3→0xD9`, `ff 0x59→0xB3`, `ss 0xCD→0xF7`), none saturated — `ss` with 8 LSBs / ≈+4.7% headroom to `0xFF`. See [DR-0018](../../spec/decision-records/0018-comparator-pmos-respin-postlayout-pex-reverification.md). |

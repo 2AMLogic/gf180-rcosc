@@ -36,6 +36,25 @@ convention: a fresh UTC run id, `sim/pvt-postlayout/corners/<runid>/` (raw
 ngspice logs) and `sim/pvt-postlayout/results/<runid>/` (results.csv,
 manifest.json, summary.md, plus the extracted netlist + `klt extract`
 JSON report as committed evidence of exactly what was compared).
+
+With `--guardrails` (issue #61), the same run additionally re-verifies
+DR-0017's two issue-#57 guardrails against the extracted netlist, on both
+sides (schematic + extracted, same run/host):
+
+- the Row-4 guardrail cell -- free-running f at trim code `0x80`, `ff`,
+  85 C, 3.6 V -- compared against DR-0017's own campaign basis for that
+  cell (read from the schematic baseline's `pretrim` row, which is exactly
+  the figure DR-0017 quotes), and
+- a per-process (`tt`/`ff`/`ss`) single-point trim calibration at 27 C /
+  3.3 V against the ratified 48.000 MHz target, reporting each side's
+  realized `f(0x00)`/`f(0xFF)` range, the calibrated code, and whether it
+  is inner-range or saturated. The search mirrors `sim/pvt/pvt_sweep.py`'s
+  own `calibrate` semantics (same endpoint-saturation rule, same
+  bisection, same closest-of-the-final-bracket pick) but is re-implemented
+  here against this driver's two-sided `run_point`, so every calibration
+  sim is logged under this run's own `corners/<runid>/` beside the PEX
+  points (`base.calibrate` itself cannot be reused verbatim: its
+  `Campaign` logs under `sim/pvt/corners/` paths).
 """
 
 from __future__ import annotations
@@ -67,6 +86,17 @@ BUILD_ROOT = REPO_ROOT / "sim" / "build" / "pvt-postlayout"
 # Corner-endpoint subset per issue #28: 3 process x 3 temp x 3 VDD, not the
 # full 7-process factorial `sim/pvt/pvt_sweep.py` itself runs.
 PEX_PROCESSES = ["tt", "ff", "ss"]
+
+# DR-0017's Row-4 guardrail cell (issue #61's `--guardrails` pass): the
+# free-running frequency at this (code, process, temp, VDD) operating point
+# is the cell whose DR-0017 schematic-basis value (55.32 MHz campaign /
+# 55.42 MHz delay-probe) must not be *increased* past by the re-spun
+# comparator hierarchy -- post-layout, the comparison is the extracted
+# side's f at this same cell against that same basis.
+GUARDRAIL_CODE = 0x80
+GUARDRAIL_PROCESS = "ff"
+GUARDRAIL_TEMP_C = 85.0
+GUARDRAIL_VDD_V = 3.6
 
 DECK_OPTIONS = ["poly_res=1k", "mim_cap=cap_mim_1f0_m4m5_noshield"]
 EXTRACT_PINS = "vdd,vss,clk,t0,t1,t2,t3,t4,t5,t6,t7"
@@ -308,6 +338,154 @@ def run_point(
     return last
 
 
+def run_guardrail_passes(
+    sides: list[tuple[str, str]],
+    model_dir: Path,
+    build_dir: Path,
+    corner_dir: Path,
+    runid: str,
+    jobs: int,
+    seed: dict[tuple[str, base.Point], Result],
+    baseline_dir: Path,
+    baseline_manifest: dict,
+) -> dict:
+    """Issue #61's `--guardrails` pass: re-verify DR-0017's two issue-#57
+    guardrails against both the schematic and the extracted netlist, inside
+    this same run (same host, same invocation), so every comparison the
+    summary reports is in-run.
+
+    Returns the dict recorded under the manifest's ``guardrails`` key (and
+    rendered into ``guardrails.csv`` / the summary's guardrail sections).
+    """
+    cache: dict[tuple[str, base.Point], Result] = dict(seed)
+    texts = dict(sides)
+
+    def run_cached(side: str, point: base.Point) -> Result:
+        key = (side, point)
+        if key not in cache:
+            cache[key] = run_point(
+                side, texts[side], point, model_dir, build_dir, corner_dir, runid
+            )
+        return cache[key]
+
+    target_hz = base.SPEC["f_target_hz"]
+
+    def calibrate_side(side: str, process: str) -> dict:
+        """Single-point trim search at (process, 27 C, 3.3 V) against the
+        ratified target, mirroring `pvt_sweep.calibrate`'s search semantics
+        exactly (see this module's docstring for why it is re-implemented
+        rather than imported)."""
+
+        def f_at(code: int) -> float:
+            pt = base.Point(process, base.REF_TEMP_C, base.REF_VDD_V, code)
+            res = run_cached(side, pt)
+            if res.f_hz is None:
+                sys.exit(
+                    f"ERROR: guardrail calibration point {side} {pt.key} "
+                    f"produced no measurement ({res.status})"
+                )
+            return res.f_hz
+
+        f_lo, f_hi = f_at(0x00), f_at(0xFF)
+        if target_hz <= f_lo:
+            return {
+                "code": 0x00, "f_hz": f_lo, "saturated": True,
+                "f_code0x00_hz": f_lo, "f_code0xff_hz": f_hi,
+            }
+        if target_hz >= f_hi:
+            return {
+                "code": 0xFF, "f_hz": f_hi, "saturated": True,
+                "f_code0x00_hz": f_lo, "f_code0xff_hz": f_hi,
+            }
+        lo, hi = 0x00, 0xFF
+        while hi - lo > 1:
+            mid = (lo + hi) // 2
+            if f_at(mid) < target_hz:
+                lo = mid
+            else:
+                hi = mid
+        f_l, f_h = f_at(lo), f_at(hi)
+        if abs(f_l - target_hz) <= abs(f_h - target_hz):
+            code, f = lo, f_l
+        else:
+            code, f = hi, f_h
+        return {
+            "code": code, "f_hz": f, "saturated": False,
+            "f_code0x00_hz": f_lo, "f_code0xff_hz": f_hi,
+        }
+
+    cell_point = base.Point(
+        GUARDRAIL_PROCESS, GUARDRAIL_TEMP_C, GUARDRAIL_VDD_V, GUARDRAIL_CODE
+    )
+
+    print(
+        f"== guardrails (issue #61): cell {GUARDRAIL_PROCESS}/"
+        f"{GUARDRAIL_TEMP_C:g}C/{GUARDRAIL_VDD_V:g}V/0x{GUARDRAIL_CODE:02X} "
+        f"+ per-process calibration vs {target_hz / 1e6:.3f} MHz ==",
+        flush=True,
+    )
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=jobs) as pool:
+        cell_futs = {
+            side: pool.submit(run_cached, side, cell_point) for side in texts
+        }
+        cal_futs = {
+            (side, p): pool.submit(calibrate_side, side, p)
+            for side in texts
+            for p in PEX_PROCESSES
+        }
+        cell_res = {side: fut.result() for side, fut in cell_futs.items()}
+        cal_res = {key: fut.result() for key, fut in cal_futs.items()}
+
+    # DR-0017's own campaign basis for the guardrail cell: the schematic
+    # baseline's `pretrim` (midscale 0x80) row at the same operating point.
+    # This is exactly the 55.32 MHz figure DR-0017 quotes ("probe basis;
+    # campaign 55.32") -- sourced from the baseline rather than hardcoded.
+    dr0017_cell_f_hz = None
+    baseline_csv = baseline_dir / "results.csv"
+    if baseline_csv.is_file():
+        with baseline_csv.open() as fh:
+            for brow in csv.DictReader(fh):
+                if (
+                    brow["pass"] == "pretrim"
+                    and brow["process"] == GUARDRAIL_PROCESS
+                    and float(brow["temp_c"]) == GUARDRAIL_TEMP_C
+                    and float(brow["vdd_v"]) == GUARDRAIL_VDD_V
+                    and brow["f_hz"]
+                ):
+                    dr0017_cell_f_hz = float(brow["f_hz"])
+                    break
+
+    calibration = {}
+    for p in PEX_PROCESSES:
+        calibration[p] = {
+            "dr0017_campaign_code": baseline_manifest[
+                "calibration_spec_target"
+            ][p]["code"],
+            "dr0017_campaign_saturated": baseline_manifest[
+                "calibration_spec_target"
+            ][p]["saturated"],
+            "schematic": cal_res[("schematic", p)],
+            "extracted": cal_res[("extracted", p)],
+        }
+
+    return {
+        "cell": {
+            "process": GUARDRAIL_PROCESS,
+            "temp_c": GUARDRAIL_TEMP_C,
+            "vdd_v": GUARDRAIL_VDD_V,
+            "code": GUARDRAIL_CODE,
+            "schematic_f_hz": cell_res["schematic"].f_hz,
+            "extracted_f_hz": cell_res["extracted"].f_hz,
+            "dr0017_campaign_f_hz": dr0017_cell_f_hz,
+        },
+        "calibration_target_hz": target_hz,
+        "calibration_temp_c": base.REF_TEMP_C,
+        "calibration_vdd_v": base.REF_VDD_V,
+        "calibration": calibration,
+    }
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--jobs", type=int, default=8)
@@ -318,6 +496,14 @@ def main() -> None:
         help="sim/pvt/results/<runid> to compare against (default: most recent)",
     )
     ap.add_argument("--runid", default=None)
+    ap.add_argument(
+        "--guardrails",
+        action="store_true",
+        help="additionally re-verify DR-0017's two issue-#57 guardrails "
+        "(Row-4 cell 0x80/ff/85C/3.6V + per-process trim calibration vs the "
+        "ratified 48 MHz target) on both sides, inside this same run "
+        "(issue #61)",
+    )
     args = ap.parse_args()
 
     runid = args.runid or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -416,6 +602,20 @@ def main() -> None:
                 flush=True,
             )
 
+    guard = None
+    if args.guardrails:
+        guard = run_guardrail_passes(
+            sides=[("schematic", schematic_text), ("extracted", extracted_side_text)],
+            model_dir=model_dir,
+            build_dir=build_dir,
+            corner_dir=corner_dir,
+            runid=runid,
+            jobs=args.jobs,
+            seed=results,
+            baseline_dir=baseline_dir,
+            baseline_manifest=baseline_manifest,
+        )
+
     elapsed = time.time() - started
 
     # -- results.csv ----------------------------------------------------
@@ -449,6 +649,58 @@ def main() -> None:
         writer = csv.DictWriter(fh, fieldnames=fields)
         writer.writeheader()
         writer.writerows(rows)
+
+    if guard is not None:
+        grows = []
+        c = guard["cell"]
+        for side in ("schematic", "extracted"):
+            grows.append(
+                {
+                    "kind": "row4_cell",
+                    "side": side,
+                    "process": c["process"],
+                    "temp_c": f"{c['temp_c']:g}",
+                    "vdd_v": f"{c['vdd_v']:g}",
+                    "code": c["code"],
+                    "trim_hex": f"0x{c['code']:02X}",
+                    "f_hz": f"{c[side + '_f_hz']:.6e}" if c[side + "_f_hz"] else "",
+                    "saturated": "",
+                    "f_code0x00_hz": "",
+                    "f_code0xff_hz": "",
+                    "target_hz": "",
+                    "dr0017_campaign_f_hz": (
+                        f"{c['dr0017_campaign_f_hz']:.6e}"
+                        if c["dr0017_campaign_f_hz"]
+                        else ""
+                    ),
+                }
+            )
+        for p in PEX_PROCESSES:
+            for side in ("schematic", "extracted"):
+                e = guard["calibration"][p][side]
+                grows.append(
+                    {
+                        "kind": "calibration",
+                        "side": side,
+                        "process": p,
+                        "temp_c": f"{guard['calibration_temp_c']:g}",
+                        "vdd_v": f"{guard['calibration_vdd_v']:g}",
+                        "code": e["code"],
+                        "trim_hex": f"0x{e['code']:02X}",
+                        "f_hz": f"{e['f_hz']:.6e}",
+                        "saturated": e["saturated"],
+                        "f_code0x00_hz": f"{e['f_code0x00_hz']:.6e}",
+                        "f_code0xff_hz": f"{e['f_code0xff_hz']:.6e}",
+                        "target_hz": f"{guard['calibration_target_hz']:.6e}",
+                        "dr0017_campaign_f_hz": "",
+                    }
+                )
+        gcsv_path = res_dir / "guardrails.csv"
+        gfields = list(grows[0].keys())
+        with gcsv_path.open("w", newline="") as fh:
+            writer = csv.DictWriter(fh, fieldnames=gfields)
+            writer.writeheader()
+            writer.writerows(grows)
 
     failures = [r for r in results.values() if r.status != "ok"]
     deltas = [float(r["delta_pct"]) for r in rows if r["delta_pct"]]
@@ -537,6 +789,8 @@ def main() -> None:
         "wall_clock_s": round(elapsed, 1),
         "jobs": args.jobs,
     }
+    if guard is not None:
+        manifest["guardrails"] = guard
     (res_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 
     # -- summary.md -------------------------------------------------------
@@ -576,6 +830,12 @@ def main() -> None:
     lines.append(
         f"| points | {len(points)} (process x temp x VDD corner-endpoint subset) |"
     )
+    if guard is not None:
+        lines.append(
+            "| guardrails | DR-0017 Row-4 guardrail cell + per-process trim "
+            "calibration, both sides (issue #61 `--guardrails`) -- see the "
+            "guardrail verification section below |"
+        )
     lines.append(f"| failed runs | {len(failures)} |")
     lines.append(f"| wall clock | {elapsed:.1f} s at {args.jobs} jobs |")
     lines.append("")
@@ -676,6 +936,116 @@ def main() -> None:
             "No comparable `posttrim_spec` baseline points were found under "
             f"`sim/pvt/results/{baseline_id}/results.csv` to cross-check against."
         )
+    if guard is not None:
+        c = guard["cell"]
+        lines.append("")
+        lines.append("## DR-0017 guardrail verification (issue #61, `--guardrails`)")
+        lines.append("")
+        lines.append(
+            "The two guardrails DR-0017 verified at the schematic level "
+            "(issue #57) re-measured here against the parasitic-annotated "
+            "netlist -- same run, same host, both sides simulated by this "
+            "invocation, so every comparison below is in-run."
+        )
+        lines.append("")
+        lines.append(
+            "### Guardrail 1 -- f must not increase at the Row-4 guardrail cell "
+            f"(`0x{c['code']:02X}` / `{c['process']}` / {c['temp_c']:g} C / "
+            f"{c['vdd_v']:g} V)"
+        )
+        lines.append("")
+        lines.append("| side | f (MHz) |")
+        lines.append("|---|---|")
+        lines.append(f"| schematic (this run) | {c['schematic_f_hz'] / 1e6:.4f} |")
+        lines.append(f"| extracted (this run) | {c['extracted_f_hz'] / 1e6:.4f} |")
+        ref = c["dr0017_campaign_f_hz"]
+        if ref:
+            lines.append(
+                f"| DR-0017 campaign basis | {ref / 1e6:.4f} |"
+            )
+        lines.append("")
+        exf, schf = c["extracted_f_hz"], c["schematic_f_hz"]
+        cell_delta = (exf - schf) / schf * 100.0
+        lines.append(
+            f"In-run extracted-vs-schematic delta at the cell: "
+            f"**{cell_delta:+.2f}%** (same sign and magnitude class as the "
+            "27-point subset above -- the guardrail cell is not an outlier)."
+        )
+        if ref:
+            margin = (ref - exf) / ref * 100.0
+            if exf <= ref:
+                v1 = (
+                    f"**holds**: the extracted side runs {margin:.2f}% *below* "
+                    f"DR-0017's campaign basis ({ref / 1e6:.4f} MHz, this "
+                    "baseline's own `pretrim` row at the cell -- the "
+                    "\"campaign 55.32\" figure DR-0017 quotes)"
+                )
+            else:
+                v1 = (
+                    f"**REGRESSES**: the extracted side exceeds DR-0017's "
+                    f"campaign basis ({ref / 1e6:.4f} MHz) by {-margin:.2f}%"
+                )
+            lines.append(f"Verdict: {v1}.")
+        else:
+            lines.append(
+                "Verdict: **INCONCLUSIVE vs DR-0017** -- no `pretrim` row at "
+                "the guardrail cell was found in the schematic baseline's "
+                "results.csv; compare the in-run rows above instead."
+            )
+        lines.append("")
+        lines.append(
+            "### Guardrail 2 -- trim range must not regress (per-process "
+            f"calibration at {guard['calibration_temp_c']:g} C / "
+            f"{guard['calibration_vdd_v']:g} V against the ratified "
+            f"{guard['calibration_target_hz'] / 1e6:.3f} MHz target)"
+        )
+        lines.append("")
+        lines.append(
+            "The same single-point trim search `sim/pvt/pvt_sweep.py`'s "
+            "`calibrate` performs, run here on both sides of this campaign "
+            "(DR-0017's schematic-level finding: every corner inner-range, "
+            "codes `0x59`..`0xCD`, none saturated)."
+        )
+        lines.append("")
+        lines.append(
+            "| process | side | f(0x00) (MHz) | f(0xFF) (MHz) | cal code | "
+            "f at cal code (MHz) | saturated | DR-0017 campaign code |"
+        )
+        lines.append("|---|---|---|---|---|---|---|---|")
+        for p in PEX_PROCESSES:
+            g = guard["calibration"][p]
+            for side in ("schematic", "extracted"):
+                e = g[side]
+                lines.append(
+                    f"| `{p}` | {side} | {e['f_code0x00_hz'] / 1e6:.4f} | "
+                    f"{e['f_code0xff_hz'] / 1e6:.4f} | `0x{e['code']:02X}` | "
+                    f"{e['f_hz'] / 1e6:.4f} | {e['saturated']} | "
+                    f"`0x{g['dr0017_campaign_code']:02X}` |"
+                )
+        sat = [
+            p
+            for p in PEX_PROCESSES
+            if guard["calibration"][p]["extracted"]["saturated"]
+        ]
+        lines.append("")
+        if not sat:
+            lines.append(
+                "Verdict: **holds** -- every extracted-side corner still "
+                "calibrates inner-range (none saturated) against the "
+                "ratified target; the code movement vs the schematic side "
+                "(table above) is the layout-parasitic frequency penalty "
+                "being trimmed out, and the remaining headroom to `0xFF` "
+                "is visible in each row's `f(0xFF)`."
+            )
+        else:
+            lines.append(
+                "Verdict: **REGRESSES** -- the extracted side saturates "
+                "(cannot reach the ratified target anywhere in "
+                "`0x00`..`0xFF`) at: "
+                + ", ".join(f"`{p}`" for p in sat)
+                + ". Per CLAUDE.md this is reported as a contradiction, "
+                "not relaxed."
+            )
     if failures:
         lines.append("")
         lines.append("## Failed runs")

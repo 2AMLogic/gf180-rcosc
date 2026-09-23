@@ -1,0 +1,157 @@
+{
+  "runid": "20260923T152954Z",
+  "utc": "2026-09-23T15:32:40.656257+00:00",
+  "git_sha": "89399c6e080656f1eb5c8ac77e027f1b826d45f1",
+  "git_dirty": true,
+  "ngspice": "** ngspice-46 : Circuit level simulation program",
+  "xschem": "XSCHEM V3.4.7",
+  "klt_version": "klt 0.4.0",
+  "pdk_root": "/home/ubuntu/.volare",
+  "pdk": "gf180mcuC",
+  "model_dir": "/home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice",
+  "layout_gds": "layout/cells/rcosc_top.gds",
+  "extract_command": [
+    "klt",
+    "extract",
+    "layout/cells/rcosc_top.gds",
+    "--deck",
+    "gf180mcu",
+    "--top",
+    "rcosc_top",
+    "--pdk",
+    "gf180mcuC",
+    "--deck-option",
+    "poly_res=1k",
+    "--deck-option",
+    "mim_cap=cap_mim_1f0_m4m5_noshield",
+    "--pins",
+    "vdd,vss,clk,t0,t1,t2,t3,t4,t5,t6,t7",
+    "--parasitics"
+  ],
+  "extract_parasitic_model": {
+    "capacitance": "net-to-ground for every net's own (non-coupled) area/perimeter, plus net-to-net for the vertical-overlap coupling `coupling` describes below -- a coupled net pair gets a direct capacitor between their two hub nodes, not just capacitors to the deck's ground/substrate net",
+    "coupling": "vertical overlap (crossover) unconditionally -- where one net's conductor on an adjacent metal level sits directly over another *distinct* net's conductor, that overlap area is charged between the two nets instead of to ground (issue #760) -- plus lateral (same-layer, sidewall) coupling, but only for a net pair naming one of the caller's declared `--critical-net` nets (issue #976): facing-edge length within that layer's own minimum-spacing lookback is charged between the two nets, *additively* (not deducted from either net's substrate fringe term, unlike the vertical case -- a known simplification). Any same-layer pair with neither side named `--critical-net`, and fringe shielding in general, are still not modelled",
+    "resistance": "single lumped series resistance per net, distributed as a star across that net's device terminals (issue #592) -- not a per-segment, distributed RC ladder, *unless* `--distributed-rc` names this net via `--critical-net` (issue #977, Epic #709 Phase 2b): then the net's terminals are ordered along their approximate physical spread and its total R/C is broken into a chain of per-segment resistors (segment length proportional to inter-terminal distance) with a ground capacitor at each terminal node (proportional to its adjacent segment length/2), instead of one star hub -- still an approximation (terminal position is a device-placement proxy, not true per-segment routing geometry), but a strictly finer-grained one than the single-hub star",
+    "frequency": "quasi-static -- one frequency-independent R and C per net; no skin effect, no distributed transmission-line behavior"
+  },
+  "schematic_baseline_runid": "20260923T030125Z",
+  "process_corners": {
+    "tt": [
+      "typical",
+      "res_typical",
+      "mimcap_typical"
+    ],
+    "ff": [
+      "ff",
+      "res_ff",
+      "mimcap_ff"
+    ],
+    "ss": [
+      "ss",
+      "res_ss",
+      "mimcap_ss"
+    ]
+  },
+  "temps_c": [
+    -40.0,
+    27.0,
+    85.0
+  ],
+  "vdds_v": [
+    3.0,
+    3.3,
+    3.6
+  ],
+  "trim_code": 163,
+  "trim_hex": "0xA3",
+  "measurement": {
+    "tstep": "200p",
+    "tstop_ns": 1200,
+    "tstop_ns_retry": 4000,
+    "first_edge": 5,
+    "last_edge": 25,
+    "cycles_averaged": 20
+  },
+  "points": 27,
+  "sides": [
+    "schematic",
+    "extracted"
+  ],
+  "failed_runs": [],
+  "max_abs_delta_pct": 36.8621,
+  "mean_delta_pct": -25.65101851851852,
+  "calibration_point_budget_pct": 1.1,
+  "schematic_rerun_vs_published_baseline_max_delta_pct": 0.0,
+  "wall_clock_s": 166.3,
+  "jobs": 8,
+  "guardrails": {
+    "cell": {
+      "process": "ff",
+      "temp_c": 85.0,
+      "vdd_v": 3.6,
+      "code": 128,
+      "schematic_f_hz": 55315380.0,
+      "extracted_f_hz": 38079000.0,
+      "dr0017_campaign_f_hz": 55315380.0
+    },
+    "calibration_target_hz": 48000000.0,
+    "calibration_temp_c": 27.0,
+    "calibration_vdd_v": 3.3,
+    "calibration": {
+      "tt": {
+        "dr0017_campaign_code": 163,
+        "dr0017_campaign_saturated": false,
+        "schematic": {
+          "code": 163,
+          "f_hz": 47981860.0,
+          "saturated": false,
+          "f_code0x00_hz": 26337510.0,
+          "f_code0xff_hz": 83229250.0
+        },
+        "extracted": {
+          "code": 217,
+          "f_hz": 48024960.0,
+          "saturated": false,
+          "f_code0x00_hz": 20806260.0,
+          "f_code0xff_hz": 60582140.0
+        }
+      },
+      "ff": {
+        "dr0017_campaign_code": 89,
+        "dr0017_campaign_saturated": false,
+        "schematic": {
+          "code": 89,
+          "f_hz": 48046340.0,
+          "saturated": false,
+          "f_code0x00_hz": 35409650.0,
+          "f_code0xff_hz": 108609600.0
+        },
+        "extracted": {
+          "code": 179,
+          "f_hz": 48015790.0,
+          "saturated": false,
+          "f_code0x00_hz": 25630020.0,
+          "f_code0xff_hz": 72532020.0
+        }
+      },
+      "ss": {
+        "dr0017_campaign_code": 205,
+        "dr0017_campaign_saturated": false,
+        "schematic": {
+          "code": 205,
+          "f_hz": 47877670.0,
+          "saturated": false,
+          "f_code0x00_hz": 20458050.0,
+          "f_code0xff_hz": 66054010.0
+        },
+        "extracted": {
+          "code": 247,
+          "f_hz": 48018780.0,
+          "saturated": false,
+          "f_code0x00_hz": 17354390.0,
+          "f_code0xff_hz": 50276150.0
+        }
+      }
+    }
+  }
+}
