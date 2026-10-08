@@ -19,7 +19,7 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
 
 ## In Progress
 
@@ -47,7 +47,9 @@ _None._
 
 ## Proposed (Architect / Hermit)
 
-_None._
+- **#77**: Item 6 groundwork: verify gf180mcu mismatch models under klt sim monte_carlo and build the per-sample-trim MC bench
+- **#78**: Add a startup-time testbench for the ratified 10 us row (currently not evaluated)
+- **#79**: Runtime-discipline trim-math: behavioural SOF loop model against the committed freq-vs-code data
 
 ## Epics
 
@@ -59,11 +61,11 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
-| Ready (`loom:issue`) | 0 |
+| Ready (`loom:issue`) | 1 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 0 |
-| Architect / Hermit proposals | 0 |
+| Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
