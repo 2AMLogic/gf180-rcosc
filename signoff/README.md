@@ -42,7 +42,7 @@ partition that does not exist. `analog` is the honest declaration.
 it does not run the gates — so the grading can be re-run anywhere:
 
 ```bash
-python -m pip install "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@3a75c3ae705b7ad3803625255de93bcd982e70c6"
+python -m pip install "klayout-tools==0.7.0"
 klt signoff --manifest signoff/block-manifest.json --format json > signoff/signoff-report.json
 python3 signoff/verify-report.py
 ```
@@ -52,7 +52,7 @@ a throwaway `uv` environment (`uv run --with` puts the pinned `klt` beside the
 interpreter, which is where `verify-report.py` looks first):
 
 ```bash
-PIN="klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@3a75c3ae705b7ad3803625255de93bcd982e70c6"
+PIN="klayout-tools==0.7.0"
 uv run --no-project --with "$PIN" klt signoff --manifest signoff/block-manifest.json --format json > signoff/signoff-report.json
 uv run --no-project --with "$PIN" python3 signoff/verify-report.py
 ```
@@ -72,17 +72,25 @@ klayout-tools#2878.
 **The grader pin is load-bearing.** The committed report records the build
 that graded it (`build.git_commit`) and the hash of the rulebook it graded
 under (`source_doc_content_hash`), and `verify-report.py` fails if either
-differs from a fresh grade. The pin is klayout-tools commit `3a75c3ae…`,
-the merge of klayout-tools#2843. It is the first build that grades T1
+differs from a fresh grade. The pin is the klayout-tools **0.7.0** release from PyPI
+(`klt --version`: `0.7.0`; the report records `git_tag: v0.7.0`,
+`is_release: true`, `git_commit: 0e2362bd…`). Its rulebook is the one that first graded T1
 items 1, 2, 9 and 10 from an **artifact-bound generic envelope**
 (klayout-tools#2718; see "Items 1, 2, 9, and 10: bind them to an audited
-artifact" in klayout-tools `docs/cli/signoff.md`). It is a development build
-(`klt --version`: `0.6.0+g3a75c3ae705b`, `is_release: false`), so a git pin
-is the only install that reproduces the report. When moving it, follow the
+artifact" in klayout-tools `docs/cli/signoff.md`). When moving it, follow the
 refresh contract below, starting with a pin-only re-grade of the unchanged
 manifest.
 
-**Pin history.** The previous pin was `2b1e55e5…` (`0.5.0+g2b1e55e51bb8`),
+**Pin move to 0.7.0 (issue #72).** The pin was klayout-tools commit
+`3a75c3ae…` (`0.6.0+g3a75c3ae705b`, a development build, git-pinned). The
+unchanged manifest graded identically under both builds: no row changed,
+`source_doc_content_hash` is identical, and the only differences in the whole
+report are the `build` block (`version`, `package_version`, `git_commit`,
+`git_tag`, `is_release`) and the item-10 envelope hash.
+The workflow bytes changed (item 10 binds them), so the repo-hygiene
+envelope, manifest pin and report were refreshed together.
+
+**Earlier pin history.** Before `3a75c3ae…`, the pin was `2b1e55e5…` (`0.5.0+g2b1e55e51bb8`),
 chosen because the 11-item rulebook (item 11, klayout-tools#2025) had not
 shipped in a release. Issue #64 moved it. Before any manifest change, the
 unchanged manifest was graded under both builds:

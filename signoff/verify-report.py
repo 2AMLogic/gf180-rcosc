@@ -179,13 +179,10 @@ def find_klt() -> str:
         f"{sys.executable} and on PATH) -- install the pinned grader per "
         "signoff/README.md, e.g.\n"
         "  python -m pip install "
-        "'klayout-tools @ git+https://github.com/2AMLogic/klayout-tools"
-        "@3a75c3ae705b7ad3803625255de93bcd982e70c6'\n"
+        "'klayout-tools==0.7.0'\n"
         "or, without installing anything, run this script inside a throwaway "
         "uv environment that carries it:\n"
-        "  uv run --no-project --with 'klayout-tools @ "
-        "git+https://github.com/2AMLogic/klayout-tools"
-        "@3a75c3ae705b7ad3803625255de93bcd982e70c6' "
+        "  uv run --no-project --with 'klayout-tools==0.7.0' "
         "python3 signoff/verify-report.py"
     )
 

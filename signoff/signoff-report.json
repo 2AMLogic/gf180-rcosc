@@ -9,12 +9,12 @@
   "source_doc": "docs/design-evidence-tiers.md",
   "source_doc_content_hash": "sha256:4c67ffc59128482d00f7d87cf446b6a96b9ab0c41ae5234098244e3052033335",
   "build": {
-    "version": "0.6.0+g3a75c3ae705b",
-    "package_version": "0.6.0",
-    "git_commit": "3a75c3ae705b7ad3803625255de93bcd982e70c6",
-    "git_tag": null,
+    "version": "0.7.0",
+    "package_version": "0.7.0",
+    "git_commit": "0e2362bda7309829398a35d54efaa989d5806065",
+    "git_tag": "v0.7.0",
     "dirty": false,
-    "is_release": false,
+    "is_release": true,
     "grading_ruleset_id": "sha256:eb8d2ba54d1700c78f1139ac111aee598fd7bc48688ab9654fca22995b6ac25e"
   },
   "items": [
@@ -258,7 +258,7 @@
         "command": null,
         "kind": "generic",
         "check_status": "pass",
-        "content_hash": "sha256:c58cef49422a80c1b954829e052b778e1a182e390afeaad14e08830b06269dcb",
+        "content_hash": "sha256:6e418917cadceb5a1ef3afc2bb25af54d485c76bb59228d0a9298168db5f8128",
         "input_verified": true,
         "exit_status": 0,
         "artifact_binding": {
@@ -267,7 +267,7 @@
             "path": ".github/workflows/signoff.yml",
             "scope": "repo"
           },
-          "content_hash": "sha256:c58cef49422a80c1b954829e052b778e1a182e390afeaad14e08830b06269dcb",
+          "content_hash": "sha256:6e418917cadceb5a1ef3afc2bb25af54d485c76bb59228d0a9298168db5f8128",
           "input_verified": true,
           "summary": "T1 item 10 (repo hygiene): bound to the CI workflow .github/workflows/signoff.yml, which re-grades this manifest and re-verifies every pinned evidence hash on every push and pull request (signoff/verify-report.py). Audited alongside it: README.md states what the block is, carries the ratified target-spec table with its basis citations (spec/decision-records/0002, 0003 and later records), and points to evidence reproduction; LICENSE (Apache-2.0) is committed. 'pass' asserts those three are present; only the workflow's bytes are bound, so an edit to the workflow (including a grader-pin move) requires refreshing this envelope.",
           "source": ".github/workflows/signoff.yml"
