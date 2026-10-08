@@ -2,6 +2,16 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-10-08
+
+- **PR #75**: Item 7: klt pex inputs + single-corner probe (grid blocked by fleet runner version) (#70)
+- **PR #74**: docs(spec): DR-0019 classify spec rows statistical vs deterministic, MC evidence plan
+- **PR #73**: chore(signoff): move grader pin to klayout-tools 0.7.0 release
+- **PR #67**: signoff: bind T1 items 1, 2, 9, 10 to audited artifacts; move grader pin to klayout-tools 3a75c3ae
+- **Issue #72** (closed): Evaluate moving the signoff grader pin from a klayout-tools git commit to the 0.7.0 release
+- **Issue #71** (closed): Item 6: decision record classifying spec rows as statistical vs deterministic, with the Monte Carlo evidence plan
+- **Issue #64** (closed): T1 items 1, 9, 10 (and item 2's binding): cite artifact-anchored evidence now that klt signoff can bind it (klayout-tools#2843)
+
 ### 2026-09-23
 
 - **PR #62**: feat(sim): post-layout PEX re-verify of DR-0017 respin + guardrails
