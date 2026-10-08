@@ -13,7 +13,13 @@ re-reading prose that was written against whatever the checklist said that day.
 | file | what it is |
 |---|---|
 | `block-manifest.json` | the block manifest `klt signoff --manifest` grades: `block`, `kind`, and per-T1-item evidence citations with pinned `content_hash` |
-| `characterization-envelope.json` | the hand-rolled **generic evidence envelope** (the one wrapper shape `klt signoff` accepts for T1 item 8, the one item no `klt` verb produces) wrapping this repo's characterization report |
+| `characterization-envelope.json` | the hand-rolled **generic evidence envelope** for T1 item 8 (the characterization report, which no `klt` verb produces) wrapping this repo's characterization report |
+| `design-sources-envelope.json` | artifact-bound generic envelope for T1 item 1, bound to `design-sources-inventory.md` |
+| `design-sources-inventory.md` | the committed design-source inventory: xschem sources, the derived netlist, the regeneration command, and its audit |
+| `layout-envelope.json` | artifact-bound generic envelope for T1 item 2, bound to `layout/cells/rcosc_top.gds` |
+| `testbench-envelope.json` | artifact-bound generic envelope for T1 item 9, bound to `testbench-inventory.md` |
+| `testbench-inventory.md` | the committed testbench inventory: every claimed measurement against its run, bench, cold-start command and recorded PDK identity |
+| `repo-hygiene-envelope.json` | artifact-bound generic envelope for T1 item 10, bound to `.github/workflows/signoff.yml` |
 | `signoff-report.json` | the committed output of the grading run — the graded T1 item table, per item `met`/`unmet` + machine-readable `reason` |
 | `verify-report.py` | the anti-rot verifier CI runs on every push and PR (see below) |
 
@@ -36,30 +42,72 @@ partition that does not exist. `analog` is the honest declaration.
 it does not run the gates — so the grading can be re-run anywhere:
 
 ```bash
-python -m pip install "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@2b1e55e51bb803c082e8857da44687f3e37ebfc0"
+python -m pip install "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@3a75c3ae705b7ad3803625255de93bcd982e70c6"
 klt signoff --manifest signoff/block-manifest.json --format json > signoff/signoff-report.json
 python3 signoff/verify-report.py
+```
+
+Without installing anything into the host Python, the same two steps run in
+a throwaway `uv` environment (`uv run --with` puts the pinned `klt` beside the
+interpreter, which is where `verify-report.py` looks first):
+
+```bash
+PIN="klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@3a75c3ae705b7ad3803625255de93bcd982e70c6"
+uv run --no-project --with "$PIN" klt signoff --manifest signoff/block-manifest.json --format json > signoff/signoff-report.json
+uv run --no-project --with "$PIN" python3 signoff/verify-report.py
 ```
 
 (The report is committed with the trailing-newline form `klt` emits; regenerate
 it with the exact command above rather than by hand.)
 
-**The grader pin is load-bearing.** The committed report was graded under the
-**11-item** T1 rulebook — including item 11, *Power delivery (structural)*,
-added 2026-09-17 (klayout-tools#2025) — which shipped after the klayout-tools
-`0.5.0` release. Released klt 0.5.0 bundles the older **10-item** checklist and
-renders no item-11 row at all, so it cannot reproduce the committed report
-(it disagrees on `t1_item_count` and item count). The pin is the public commit
-the grading install was built from (`klt --version` reports a
-`0.5.0+g2b1e55e51bb8` prefix), and the committed report was re-verified
-**item-for-item identical** against a clean `pip install` from this exact
-git pin — the same install command CI runs — so the committed record is
-reproducible from the public commit alone. When a klayout-tools release
-carrying the 11-item rulebook ships, move the pin in
-`.github/workflows/signoff.yml` and here, then re-grade. The release lag
-and the version-string/grading-rule identity behind this pin are tracked
-upstream: klayout-tools#2173 (release cadence) and klayout-tools#2216 (a
-version string does not identify the grading rules behind it).
+**Grade from a git checkout.** The four artifact-bound envelopes (items 1,
+2, 9, 10) name their artifacts repo-relatively (`"scope": "repo"`), and the
+grader resolves that scope against the nearest ancestor that contains
+`.git`. From a source archive or any copy without `.git`, those four rows
+grade `unmet`/`unverifiable_provenance` even though no bytes changed, and
+`verify-report.py` reports the drift. CI's `actions/checkout` is a git
+checkout. This was found during issue #64 and filed upstream as
+klayout-tools#2878.
+
+**The grader pin is load-bearing.** The committed report records the build
+that graded it (`build.git_commit`) and the hash of the rulebook it graded
+under (`source_doc_content_hash`), and `verify-report.py` fails if either
+differs from a fresh grade. The pin is klayout-tools commit `3a75c3ae…`,
+the merge of klayout-tools#2843. It is the first build that grades T1
+items 1, 2, 9 and 10 from an **artifact-bound generic envelope**
+(klayout-tools#2718; see "Items 1, 2, 9, and 10: bind them to an audited
+artifact" in klayout-tools `docs/cli/signoff.md`). It is a development build
+(`klt --version`: `0.6.0+g3a75c3ae705b`, `is_release: false`), so a git pin
+is the only install that reproduces the report. When moving it, follow the
+refresh contract below, starting with a pin-only re-grade of the unchanged
+manifest.
+
+**Pin history.** The previous pin was `2b1e55e5…` (`0.5.0+g2b1e55e51bb8`),
+chosen because the 11-item rulebook (item 11, klayout-tools#2025) had not
+shipped in a release. Issue #64 moved it. Before any manifest change, the
+unchanged manifest was graded under both builds:
+
+- **No row changed status or reason.** Items 2, 3, 4, 8 and 11 stayed `met`.
+  Items 1, 5, 6, 7, 9 and 10 stayed `unmet`/`no_evidence`, at 5 of 11.
+- What did change: `source_doc_content_hash` (the bundled rulebook text was
+  revised; the item texts of 6, 8 and 11 changed wording). New block-level
+  keys appeared: `build` and `build_t1_item_count` (11). Every row gained
+  `graded_by_build: true`, and every citation gained an `input_verified`
+  field. Items 2, 3, 4 and 8 render it `null` (they rest on their recorded
+  hash). Item 11's ERC part renders `true`, because the newer grader
+  re-hashes the GDS it names. Item 11's `power_delivery` block gained three
+  empty fields (`ties_checked_by_assertion`, `ties_checked_by_well_assertion`,
+  `supply_unlabelled_islands`).
+- Items 4 and 11 rest on the klt-0.4.0-era LVS envelope, which has no
+  recorded input hash. The newer grader accepts it unchanged
+  (`content_hash: null`, `input_verified: null`), so no LVS regeneration was
+  needed. Item 11's ERC half was written by the old build. The new grader
+  re-reads the spec it names and verifies the recorded spec hash, and grades
+  it `met`, so no ERC regeneration was needed either.
+- Not moved: `layout/run_checks.sh` keeps running `klt erc` on the
+  `2b1e55e5` build. The `3a75c3ae` build's `klt erc` refuses
+  `layout/erc-supply-spec.json` because of its `_comment` annotation key
+  (klayout-tools#2822). See the comment above `ERC_KLT` in that script.
 
 ## Current verdict, and the claims behind each row
 
@@ -68,33 +116,67 @@ version string does not identify the grading rules behind it).
 Today the machine grades this block (`klt signoff --manifest`, committed
 `signoff-report.json`):
 
-- **met — item 2 (Layout), item 3 (DRC clean), item 4 (LVS clean), item 8
-  (Characterization report), item 11 (Power delivery, structural)**
-- **unmet, reason `no_evidence` — items 1, 5, 6, 7, 9, 10**
+- **met, 8 of 11: item 1 (Design sources), item 2 (Layout), item 3 (DRC
+  clean), item 4 (LVS clean), item 8 (Characterization report), item 9
+  (Testbenches shipped), item 10 (Repo hygiene), item 11 (Power delivery,
+  structural)**
+- **unmet, reason `no_evidence`: items 5, 6, 7**
+
+The block therefore still grades **below T1** (`tier: null`, exit `3`).
+
+Items 1, 2, 9 and 10 are met through artifact-bound generic envelopes. Each
+envelope declares `t1_item`, names its audited artifact in
+`provenance.input.path` (repo-scoped) with that artifact's sha256, and the
+manifest pins the same sha256. The grader re-hashes the artifact and records
+`citation.artifact_binding` with `input_verified: true` on the row. The
+envelope's `status: "pass"` is still this repo's own assertion. The grader
+does not re-audit an inventory. What the binding adds is that the assertion
+names the exact bytes it was made about, cannot be cited for another item,
+and turns `unmet` (`stale_evidence`) the moment those bytes change.
 
 `no_evidence` means exactly what it says mechanically: the manifest names no
 citation for that item. It is **not** an assertion that the underlying work is
-absent — for several items the substance exists but no `klt` envelope backs it
-(the grader's own design: it only reads the evidence shapes named in
-`docs/cli/signoff.md`). What exists, per item, is stated below — this is the
-claim side the grader cannot grade, and it is stated here precisely so nobody
-has to guess whether an unmet row means "missing" or "present but ungradeable".
+absent — for items 5 and 7 the substance exists but no envelope of the kind
+the item requires backs it. What exists, per item, is stated below — this is
+the claim side the grader cannot grade, and it is stated here precisely so
+nobody has to guess whether an unmet row means "missing" or "present but
+ungradeable".
 
 The two-tier honesty rule from the tier doc cuts both ways: **`met` rows are
 weaker than they look** (their coverage gaps are disclosed below) and **`unmet`
 rows may be stronger than they look** (the substance noted below) — the
 machine verdict is the starting point for each read, not the whole of it.
 
-### met — item 2 (Layout): `layout/reports/rcosc_top.extract.json`
+### met — item 1 (Design sources): `signoff/design-sources-envelope.json` → `signoff/design-sources-inventory.md`
 
-The extraction report is the documented-provenance statement of the committed
-GDS: it pins `layout/cells/rcosc_top.gds` by content hash (`provenance.input
-.content_hash`, mirrored in the manifest pin), records the extracted device/
-net inventory and the netlist it produced. On the current, issue-#50
-re-spun GDS the envelope records **95 devices** (53 `nfet` + 28 `pfet` +
-13 `ppolyf_u_1k` + 1 MiM cap: the #44 re-spin GDS recorded 71 devices, the
-pre-#44 one 60), **45 nets, 11 pins**. `rcosc_top.gds` instantiates the
-three sub-blocks as real GDS sub-cells, so the pinned artifact is the
+The inventory lists the committed xschem sources of the whole hierarchy
+(`rcosc_top`, `rcosc_bias`, `rcosc_comparator`, `rcosc_comparator_p`,
+`rcosc_trim_bank`: `.sch` + `.sym` each, plus `design/xschemrc`), the
+derived netlist `design/netlist/rcosc_top.spice`, and the regeneration
+command `design/regen-netlist.sh`. That script is invoked first by every
+evidence generator (`layout/run_checks.sh` and the `sim/` wrappers). Its
+audit section records that the committed netlist re-derives from the
+committed schematics (identical after normalising xschem 3.4.4-vs-3.4.7
+line wrapping and the absolute `sch_path`/`sym_path` comments). The binding
+covers the inventory's bytes, not each listed source's. Every listed path
+is checked to exist by `verify-report.py`. This item attests that the
+sources and their derivation are committed. It does not attest that the
+design meets the spec (that is item 8's record, and issue #66).
+
+### met — item 2 (Layout): `signoff/layout-envelope.json` → `layout/cells/rcosc_top.gds`
+
+The envelope binds directly to the committed GDS, the same bytes items 3
+and 11 pin (`sha256:8cd7c47a…`). Until issue #64 this row was met through
+the `klt extract` report (`layout/reports/rcosc_top.extract.json`). The
+grader accepts any passing native envelope for item 2 without checking
+that it bears on the item (no `artifact_binding` on the row), so that
+citation was replaced. The extraction report is still committed and still
+the documented-provenance statement of the GDS: on the current, issue-#50
+re-spun GDS it records **95 devices** (53 `nfet` + 28 `pfet` + 13
+`ppolyf_u_1k` + 1 MiM cap; the #44 re-spin GDS recorded 71 devices, the
+pre-#44 one 60), **45 nets, 11 pins**. `rcosc_top.gds` instantiates
+`rcosc_bias`, `rcosc_trim_bank`, `rcosc_comparator` and
+`rcosc_comparator_p` as real GDS sub-cells, so the pinned artifact is the
 composed whole block. The manifest pin, the envelope's recorded hash, and
 the current bytes of the GDS are cross-checked on every CI run by
 `verify-report.py`.
@@ -154,8 +236,9 @@ Also disclosed: this klt-0.4.0-era envelope predates both the
 block — neither question was *asked* by this compare, so the match says
 nothing about per-instance power pin-to-net reach or body ties. The supply
 question itself is now item 11's, graded met (see the met-item-11 section
-below) from this same envelope's `net_correspondence` rows plus a
-current-pinned-klt ERC half; the `power_connectivity`/`body_verification`
+below) from this same envelope's `net_correspondence` rows plus an ERC
+half written by a post-0.4.0 build (`2b1e55e5`, the ERC pin in
+`layout/run_checks.sh`); the `power_connectivity`/`body_verification`
 blocks stay unasked by this pair, which is why item 11's analog branch
 does not lean on them.
 
@@ -208,7 +291,8 @@ grader does not grade:
   the question is outside what this run can ask. Layout-side detail lives
   in `layout/README.md`'s "Supply ERC (T1 item 11)" section; why `ties[]`
   was previously omitted (the pre-#2169 collapse that made a declared tie
-  report a false supply short) and why the pinned grader's fix retires
+  report a false supply short) and why the klayout-tools#2169 fix (in the
+  `2b1e55e5` ERC build and every later one) retires
   that rationale is recorded in both that section and the spec's own
   `_comment`.
 - **LVS half.** Item 4's own `rcosc_top.lvs.json` at `status: "match"`,
@@ -216,8 +300,9 @@ grader does not grade:
   nets as pins — the analog branch's "the reference includes the supply
   nets" clause, satisfied by a SPICE reference by construction. This
   resolves the LVS-envelope open question of issue #42 by grader output:
-  the freshly graded committed report shows the pinned grader accepting
-  the committed klt-0.4.0-era envelope on this branch — no LVS regeneration
+  the freshly graded committed report shows the pinned grader (both the
+  previous `2b1e55e5` pin and the current `3a75c3ae` one) accepting the
+  committed klt-0.4.0-era envelope on this branch — no LVS regeneration
   was needed, and with no PDN citation the `power_connectivity` block the
   PDN branch would read is never consulted (`power_connectivity_status`
   is `null` in the citation, and that null is why the analog branch, not
@@ -232,18 +317,6 @@ names the GDS input hash the envelope records, and the spec hash the
 envelope records is re-verified against the spec's current bytes on every
 CI run alongside it — the compound-entry extension of the artifact table
 at the top of `verify-report.py`.
-
-### unmet — item 1 (Design sources): substance present, no gradeable citation
-
-The substance exists: committed xschem sources (`design/*.sch`/`*.sym`), the
-derived netlist (`design/netlist/rcosc_top.spice`), and the regeneration flow
-(`design/regen-netlist.sh`, invoked first by `layout/run_checks.sh` so the
-layout evidence is always regenerated against the current schematic). No
-`klt` verb envelope can be cited for "committed schematic sources plus the
-derived netlist" — items 2/3/4's envelopes cover the *layout* end of that
-chain, and `klt sim` does not exist in this repo (see item 5). The row stays
-`no_evidence` rather than being painted green with a citation that does not
-prove the item.
 
 ### unmet — item 5 (Full corner verification vs a ratified spec): campaign committed, not a gradeable envelope — and the record shows missed rows
 
@@ -296,35 +369,53 @@ extraction report **no unbiased PMOS body nets** (`unbiased_pmos_body_nets:
 []`) — the extracted netlist's device bodies have DC bias paths, so the
 post-layout numbers were not measured on a physically-wrong netlist.
 
-### unmet — item 9 (Testbenches shipped): substance present, no gradeable citation
+### met — item 9 (Testbenches shipped): `signoff/testbench-envelope.json` → `signoff/testbench-inventory.md`
 
-Every claimed measurement's bench is committed and runnable cold:
-`design/pvt_tb.sch` + `sim/pvt/pvt_sweep.py` (+ `run-pvt-sweep.sh`),
-`sim/pvt-postlayout/pex_pvt_sweep.py` (+ `run-pex-pvt-sweep.sh`),
-`sim/iq/iq_sweep.py` (+ `run-iq-sweep.sh`), `design/smoke_test.sch`, with the
-invocations documented in each directory's README. PDK identity is recorded
-per run in the committed manifests (family `gf180mcuC`; the post-layout
-extraction additionally pins the open_pdks install,
-`c6d73a35f524070e85faff4a6a9eef49553ebc2b`). Per tracker history the PDK
-version pin remains a cheap follow-up (recording it in the pre-layout
-campaign's manifest too). None of this is a `klt` envelope the grader can
-read — the row is `no_evidence`, and the substance stands.
+The inventory lists every measured figure the top-level `README.md` and the
+characterization report currently quote. Each figure is tied to the
+committed run it comes from, the bench that produced it, the bench's
+cold-start command (`sim/pvt/run-pvt-sweep.sh`, `sim/pvt/delay_probe.py`
+(no wrapper script), `sim/iq/run-iq-sweep.sh`,
+`sim/pvt-postlayout/run-pex-pvt-sweep.sh`, `design/run-smoke-test.sh`), the
+run's git sha and dirty flag, and the PDK identity the run recorded. It
+also names the ratified rows with no claimed measurement (runtime
+discipline, startup time) so their absence is visible rather than
+implied.
 
-### unmet — item 10 (Repo hygiene): README + license present; the CI half arrives with this change
+**PDK identity is disclosed, not repaired.** Every pre-layout PVT
+campaign and both delay-probe runs record only the family name
+(`gf180mcuC`) and an install path, with no PDK revision. The cited Iq
+run's `manifest.json` records only the install path; the family name
+appears only in its generated README. The smoke-test log records no PDK
+identity at all. Only the post-layout runs' `klt extract` envelopes record
+an open_pdks commit. The current run records `c6d73a35…`, while two
+earlier post-layout runs record `f6eeac7d…`, so runs were not all on one
+revision. (This section previously said the post-layout extraction pins
+`c6d73a35…`. That holds for the current run only.) Historical revisions
+that were not recorded stay unknown. Recording the revision on new runs is
+issue #65.
 
-The top-level `README.md` states what the block is, carries the ratified
-spec table with its basis citations, and documents evidence reproduction;
-`LICENSE` is committed. The "CI that keeps the harness and evidence formats
-valid" half is satisfied by the signoff workflow itself
-(`.github/workflows/signoff.yml`, added with this directory) — but no `klt`
-envelope can cite a README, a license, or a CI file, so the row stays
-`no_evidence` rather than being painted green with an adjacent citation.
+### met — item 10 (Repo hygiene): `signoff/repo-hygiene-envelope.json` → `.github/workflows/signoff.yml`
+
+Bound to the CI workflow that keeps the evidence formats valid: it re-grades
+this manifest and re-verifies every pin on each push and pull request. The
+envelope's summary records the rest of the audit: the top-level `README.md`
+states what the block is, carries the ratified spec table with its basis
+citations, and documents evidence reproduction, and `LICENSE` (Apache-2.0)
+is committed. Only the workflow's bytes are bound. **Any edit to the
+workflow, including moving the grader pin, must refresh this envelope,
+its manifest pin and the report together**, or CI fails on its own
+workflow.
 
 ## Freshness and the refresh contract
 
 Every `content_hash` pin in the manifest names the **current bytes** of a
 committed artifact, and `verify-report.py` proves it: manifest pin == the
-cited envelope's recorded hash == the artifact's sha256 today. The
+cited envelope's recorded hash == the artifact's sha256 today. For the
+artifact-bound items (1, 2, 9, 10) it also checks the envelope's `t1_item`
+and `provenance.input.path`, that the fresh grade carries
+`artifact_binding.input_verified: true`, and that every path the two
+inventories list exists. The
 klt-0.4.0-era LVS envelope is the one citation without a manifest pin, and
 its two inputs are re-hashed against its own recorded digests instead. Write
 the pins from what the evidence actually records — never by hand from hope.
@@ -336,7 +427,11 @@ After changing any cited artifact or any cited envelope:
    `layout/reports/` wholesale);
 2. update the affected manifest pins (and, if a new citation kind is added,
    the artifact table at the top of `verify-report.py`) from the regenerated
-   envelopes' `provenance` blocks;
+   envelopes' `provenance` blocks. For the four hand-written bound envelopes
+   (items 1, 2, 9, 10) that means: re-audit the changed artifact (an
+   inventory edit is an audit change, not a formality), write its new
+   sha256 into the envelope's `provenance.input.content_hash`, and pin the
+   same value in the manifest;
 3. re-grade and commit `signoff-report.json` with the exact command above;
 4. run `python3 signoff/verify-report.py` — it fails until 1–3 are all true
    together, including in CI.

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Verify this block's committed ``klt signoff`` records against the live tree.
 
-Three independent checks, all PDK-free (``klt signoff --manifest`` grades
+Four independent checks, all PDK-free (``klt signoff --manifest`` grades
 committed JSON envelopes; it never runs DRC/LVS/sim gates, so this needs no
 PDK, xschem, or ngspice):
 
@@ -10,16 +10,25 @@ PDK, xschem, or ngspice):
     failure -- this block has unmet items by design until it matures); any
     other exit is a real error and fails here.
 2.  Compare the fresh per-item grades (id, title, status, reason) plus the
-    block-level fields against the committed verdict of record,
-    ``signoff/signoff-report.json``. Any drift fails: a manifest or evidence
-    envelope that changed without re-grading and re-committing the report
-    rots loudly instead of passing -- this is the anti-rot gate for the part
-    the grader itself does not check.
+    block-level fields (including the grading build's git commit) against
+    the committed verdict of record, ``signoff/signoff-report.json``. Any
+    drift fails: a manifest or evidence envelope that changed without
+    re-grading and re-committing the report rots loudly instead of passing
+    -- this is the anti-rot gate for the part the grader itself does not
+    check.
 3.  Re-hash the committed artifacts each citation pins and compare against
     the hashes recorded in the cited envelope AND in the manifest, so a
     citation whose artifact has since changed fails rather than rotting --
-    the equivalent of upstream klayout-tools #2212, done repo-side until the
-    pinned grader release carries it natively.
+    the equivalent of upstream klayout-tools #2212, kept repo-side as a
+    second, grader-independent check. For the artifact-bound generic
+    envelopes (items 1, 2, 9, 10 -- klayout-tools #2718/#2843) it also
+    checks the envelope declares the item it is cited for (``t1_item``)
+    and names the artifact this table expects (``provenance.input.path``),
+    and that the fresh grade reports ``input_verified: true`` for it.
+4.  Every path the two committed inventories list in the first column of
+    their tables exists in the tree. The grader hashes an inventory, it
+    does not open what the inventory lists; this keeps a listed path from
+    silently disappearing.
 
 Run from anywhere inside the repository:
 
@@ -32,16 +41,19 @@ report is not what got committed, or an artifact drifted, it fails.
 Environment note: the grader pin documented in ``signoff/README.md`` is
 load-bearing for check 2. Two klt builds that bundle different
 ``design-evidence-tiers.md`` rulebooks legitimately grade different item
-tables (the 11-item rulebook this report is committed under vs. the 10-item
-one released klt 0.5.0 bundles), so this script does not try to paper over
-a ``source_doc_content_hash``/item-table mismatch: it reports the drift and
-exits nonzero. Install the pinned grader from signoff/README.md first.
+tables, and only builds at or after klayout-tools 3a75c3ae grade items 1,
+2, 9 and 10 from an artifact-bound envelope at all, so this script does not
+try to paper over a ``source_doc_content_hash``/item-table/build mismatch:
+it reports the drift and exits nonzero. Install the pinned grader from
+signoff/README.md first (or use the ``uv run --with`` form documented
+there, which puts the pinned klt beside the interpreter running this).
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -63,9 +75,19 @@ COMMITTED_REPORT = REPO_ROOT / "signoff" / "signoff-report.json"
 # resolve from any other checkout. That is also why these are exactly the
 # citations block-manifest.json makes: adding a citation means adding a row
 # here, and signoff/README.md's refresh contract says so.
+#
+# Items 1, 2, 9 and 10 cite hand-written generic envelopes bound to an
+# audited artifact (klayout-tools #2718, graded since klayout-tools
+# 3a75c3ae). Those envelopes name their artifact repo-relatively, so for
+# them the table's path is also checked against the envelope's own
+# provenance.input.path, and the envelope's t1_item against the row's key.
 PINNED_ARTIFACTS = {
+    "1": (
+        REPO_ROOT / "signoff" / "design-sources-envelope.json",
+        REPO_ROOT / "signoff" / "design-sources-inventory.md",
+    ),
     "2": (
-        REPO_ROOT / "layout" / "reports" / "rcosc_top.extract.json",
+        REPO_ROOT / "signoff" / "layout-envelope.json",
         REPO_ROOT / "layout" / "cells" / "rcosc_top.gds",
     ),
     "3": (
@@ -76,7 +98,24 @@ PINNED_ARTIFACTS = {
         REPO_ROOT / "signoff" / "characterization-envelope.json",
         REPO_ROOT / "docs" / "chipalooza" / "challenge-5-proposal.md",
     ),
+    "9": (
+        REPO_ROOT / "signoff" / "testbench-envelope.json",
+        REPO_ROOT / "signoff" / "testbench-inventory.md",
+    ),
+    "10": (
+        REPO_ROOT / "signoff" / "repo-hygiene-envelope.json",
+        REPO_ROOT / ".github" / "workflows" / "signoff.yml",
+    ),
 }
+ARTIFACT_BOUND_ITEMS = ("1", "2", "9", "10")
+
+# Check 4: the committed inventories whose table rows name repo paths.
+INVENTORIES = (
+    REPO_ROOT / "signoff" / "design-sources-inventory.md",
+    REPO_ROOT / "signoff" / "testbench-inventory.md",
+)
+# A table row whose first cell is a single backticked repo path.
+INVENTORY_ROW = re.compile(r"^\| `([^`\s]+)` \|")
 
 # The unpinned LVS citation's own freshness statement: the committed envelope
 # records the sha256 of each netlist it compared, so the committed files can
@@ -117,6 +156,7 @@ BLOCK_LEVEL_FIELDS = (
     "kind",
     "tier",
     "t1_item_count",
+    "build_t1_item_count",
     "t1_met_count",
     "source_doc",
     "source_doc_content_hash",
@@ -140,7 +180,13 @@ def find_klt() -> str:
         "signoff/README.md, e.g.\n"
         "  python -m pip install "
         "'klayout-tools @ git+https://github.com/2AMLogic/klayout-tools"
-        "@2b1e55e51bb803c082e8857da44687f3e37ebfc0'"
+        "@3a75c3ae705b7ad3803625255de93bcd982e70c6'\n"
+        "or, without installing anything, run this script inside a throwaway "
+        "uv environment that carries it:\n"
+        "  uv run --no-project --with 'klayout-tools @ "
+        "git+https://github.com/2AMLogic/klayout-tools"
+        "@3a75c3ae705b7ad3803625255de93bcd982e70c6' "
+        "python3 signoff/verify-report.py"
     )
 
 
@@ -194,6 +240,15 @@ def grade_drift(fresh: dict, committed: dict) -> list[str]:
                 "(re-grade and commit a fresh signoff/signoff-report.json -- "
                 "see signoff/README.md -- or restore the evidence/manifest)"
             )
+    fresh_commit = (fresh.get("build") or {}).get("git_commit")
+    committed_commit = (committed.get("build") or {}).get("git_commit")
+    if fresh_commit != committed_commit:
+        problems.append(
+            f"grading build drifted: committed report was graded by klt commit "
+            f"{committed_commit!r}, this run used {fresh_commit!r} (install the "
+            "pinned grader per signoff/README.md; moving the pin means "
+            "re-grading and re-committing the report)"
+        )
     fresh_rows = [
         tuple(item.get(field) for field in ITEM_FIELDS) for item in fresh.get("items", [])
     ]
@@ -233,13 +288,30 @@ def verify_pins(manifest: dict) -> list[str]:
                 "(see signoff/README.md's refresh contract)"
             )
             continue
+        expected_file = str(envelope_path.relative_to(REPO_ROOT))
+        if entry.get("file") != expected_file:
+            problems.append(
+                f"{label} cites {entry.get('file')!r}, but this verifier's "
+                f"table expects {expected_file!r} (update PINNED_ARTIFACTS "
+                "together with the manifest)"
+            )
+            continue
         manifest_pin = entry["content_hash"].removeprefix("sha256:")
         envelope = json.loads(envelope_path.read_text())
-        recorded = (
-            (envelope.get("provenance") or {})
-            .get("input", {})
-            .get("content_hash", "")
-        ).removeprefix("sha256:")
+        provenance_input = (envelope.get("provenance") or {}).get("input") or {}
+        recorded = (provenance_input.get("content_hash") or "").removeprefix(
+            "sha256:"
+        )
+        if item in ARTIFACT_BOUND_ITEMS:
+            problems += _binding_shape_problems(
+                label, item, envelope, envelope_path, artifact_path
+            )
+        if not artifact_path.is_file():
+            problems.append(
+                f"{label}: bound artifact "
+                f"{artifact_path.relative_to(REPO_ROOT)} does not exist"
+            )
+            continue
         actual = sha256_of(artifact_path)
         if manifest_pin != recorded:
             problems.append(
@@ -271,6 +343,99 @@ def verify_pins(manifest: dict) -> list[str]:
                 "re-grade per signoff/README.md)"
             )
     problems += verify_power_delivery_citation(evidence)
+    return problems
+
+
+def _binding_shape_problems(
+    label: str,
+    item: str,
+    envelope: dict[str, Any],
+    envelope_path: Path,
+    artifact_path: Path,
+) -> list[str]:
+    """For an artifact-bound generic envelope: it must declare the item it
+    is cited for and name, repo-relatively, the artifact the table pins."""
+    problems: list[str] = []
+    if envelope.get("kind") != "generic":
+        problems.append(
+            f"{label}: {envelope_path.name} is expected to be a generic "
+            f"envelope, has kind {envelope.get('kind')!r}"
+        )
+    t1_item = envelope.get("t1_item")
+    if type(t1_item) is not int or str(t1_item) != item:
+        problems.append(
+            f"{label}: {envelope_path.name} declares t1_item {t1_item!r}, "
+            f"expected the integer {item}"
+        )
+    named = ((envelope.get("provenance") or {}).get("input") or {}).get("path")
+    if isinstance(named, dict):
+        named_path, scope = named.get("path"), named.get("scope")
+    else:
+        named_path, scope = named, None
+    expected = str(artifact_path.relative_to(REPO_ROOT))
+    if scope != "repo" or named_path != expected:
+        problems.append(
+            f"{label}: {envelope_path.name} names provenance.input.path "
+            f"{named!r}, expected {{'path': {expected!r}, 'scope': 'repo'}}"
+        )
+    return problems
+
+
+def verify_bindings(fresh: dict) -> list[str]:
+    """Every artifact-bound item that grades met must carry the grader's
+    own artifact_binding with input_verified true and the right t1_item --
+    i.e. it was met *because of* the binding, not through some other path
+    (a borrowed native envelope renders met with no binding at all)."""
+    problems: list[str] = []
+    by_id = {str(it.get("id")): it for it in fresh.get("items", [])}
+    for item in ARTIFACT_BOUND_ITEMS:
+        row = by_id.get(item)
+        if not row or row.get("status") != "met":
+            continue
+        binding = (row.get("citation") or {}).get("artifact_binding")
+        if not isinstance(binding, dict):
+            problems.append(
+                f"item {item} is met without an artifact_binding (an unbound "
+                "citation proves nothing about the item -- cite the bound "
+                "envelope, see signoff/README.md)"
+            )
+            continue
+        if binding.get("t1_item") != int(item) or binding.get("input_verified") is not True:
+            problems.append(
+                f"item {item}: artifact_binding is {{t1_item: "
+                f"{binding.get('t1_item')!r}, input_verified: "
+                f"{binding.get('input_verified')!r}}}, expected "
+                f"{{t1_item: {item}, input_verified: true}}"
+            )
+    return problems
+
+
+def verify_inventories() -> list[str]:
+    """Check 4: every path the committed inventories list in the first
+    column of a table row exists in the tree."""
+    problems: list[str] = []
+    for inventory in INVENTORIES:
+        rel = inventory.relative_to(REPO_ROOT)
+        if not inventory.is_file():
+            problems.append(f"inventory {rel} is missing")
+            continue
+        listed = 0
+        for line in inventory.read_text().splitlines():
+            match = INVENTORY_ROW.match(line)
+            if not match:
+                continue
+            listed += 1
+            if not (REPO_ROOT / match.group(1)).exists():
+                problems.append(
+                    f"inventory {rel} lists {match.group(1)}, which does not "
+                    "exist (update the inventory, then refresh its envelope, "
+                    "manifest pin and report per signoff/README.md)"
+                )
+        if listed == 0:
+            problems.append(
+                f"inventory {rel} lists no paths in the expected "
+                "'| `path` | ...' table form"
+            )
     return problems
 
 
@@ -380,6 +545,8 @@ def main() -> None:
     problems = []
     problems += grade_drift(fresh, committed)
     problems += verify_pins(manifest)
+    problems += verify_bindings(fresh)
+    problems += verify_inventories()
     if problems:
         fail(problems)
 
@@ -388,6 +555,8 @@ def main() -> None:
     tier = fresh["tier"] or f"below T1 ({t1_met}/{t1_total} T1 items met)"
     print(f"OK: fresh klt signoff grade == committed signoff/signoff-report.json")
     print(f"OK: every pinned citation's content_hash matches the current artifact bytes")
+    print(f"OK: items {', '.join(ARTIFACT_BOUND_ITEMS)} that grade met are bound to their audited artifact (input_verified)")
+    print(f"OK: every path the committed inventories list exists")
     print(f"OK: klt pin {fresh['source_doc_content_hash']} rulebook, {t1_total} T1 items -> {tier}")
 
 

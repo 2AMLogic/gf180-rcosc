@@ -1,0 +1,115 @@
+# Testbench inventory (T1 item 9)
+
+The audited artifact `signoff/testbench-envelope.json` is bound to (the
+envelope pins this file's sha256; `klt signoff` re-hashes it on every grade,
+and `signoff/verify-report.py` re-checks the pin in CI). Editing this file
+without refreshing the envelope and the manifest pin turns item 9 `unmet`
+(`stale_evidence`) and fails the verifier.
+
+What the binding proves, and what it does not: it proves that this list is
+the exact text that was audited. `klt signoff` does not re-audit a testbench
+list, and it does not open the benches or the result directories named here.
+`signoff/verify-report.py` additionally checks that every path in the first
+column of the tables below exists in the tree. Whether each claim is
+*correct* is a separate question, answered by the ratified-spec verdicts in
+`docs/chipalooza/challenge-5-proposal.md` §4 (item 8), not by this list.
+
+## Benches and their cold-start commands
+
+Commands run from the repository root on a host with `ngspice`, `xschem`,
+`python3` and a gf180mcuC PDK install (resolved from `PDK_ROOT`, or
+`klt pdk find --pdk gf180mcuC`). The post-layout bench also needs `klt`.
+Every wrapper regenerates `design/netlist/*.spice` from the committed
+schematics first (`design/regen-netlist.sh`), so a cold start always runs
+against the current design.
+
+| path | bench | cold-start command |
+|---|---|---|
+| `sim/pvt/run-pvt-sweep.sh` | PVT-corner campaign: `design/pvt_tb.sch` (netlisted to `design/netlist/pvt_tb.spice`) driven by `sim/pvt/pvt_sweep.py` (full 7-process x 3-temperature x 3-supply factorial, trim curve, single-point calibration, pre-/post-trim passes) | `sim/pvt/run-pvt-sweep.sh` |
+| `sim/pvt/delay_probe.py` | comparator/latch stage-delay instrumentation (issue #51); reuses `pvt_sweep.py`'s deck composition. **No wrapper script**: it does not regenerate the netlist itself | `design/regen-netlist.sh && python3 sim/pvt/delay_probe.py --cal-from sim/pvt/results/<calibration runid>` |
+| `sim/iq/run-iq-sweep.sh` | quiescent-current sweep: `design/smoke_test.sch` (netlisted to `design/netlist/smoke_test.spice`, its `.control` replaced) driven by `sim/iq/iq_sweep.py` over the full 63-point PVT grid at a fixed code set | `sim/iq/run-iq-sweep.sh` |
+| `sim/pvt-postlayout/run-pex-pvt-sweep.sh` | post-layout re-verification: `klt extract --parasitics` on `layout/cells/rcosc_top.gds`, then `sim/pvt-postlayout/pex_pvt_sweep.py` simulates schematic vs extracted netlist on the 27-point corner-endpoint subset | `sim/pvt-postlayout/run-pex-pvt-sweep.sh --guardrails --baseline-runid <calibration runid>` |
+| `design/run-smoke-test.sh` | functional/DC bring-up bench `design/smoke_test.sch`: `.op` plus a short transient at code `0x80`. Appends to `design/netlist/smoke_test.log`. **Not a spec-row claim** | `design/run-smoke-test.sh` |
+
+Supporting bench sources (each listed so it is visible that it is committed):
+
+| path | role |
+|---|---|
+| `design/pvt_tb.sch` | the PVT testbench schematic (DUT + VDD/VT0..VT7 sources + measurement window) |
+| `design/smoke_test.sch` | the bring-up testbench schematic; also the DUT harness the Iq sweep reuses |
+| `sim/pvt/pvt_sweep.py` | PVT campaign driver; owns the process-corner, temperature and supply definitions the other drivers import |
+| `sim/iq/iq_sweep.py` | Iq sweep driver |
+| `sim/pvt-postlayout/pex_pvt_sweep.py` | post-layout sweep driver |
+
+A cold start reproduces the *method* against the *current* design. It does
+not reproduce a historical run's numbers when the design has changed since
+then. To reproduce a historical figure, check out the run's recorded
+`git_sha`. Several runs below record `git_dirty: true` (uncommitted changes
+were present when they ran), so that checkout is close to the run's tree,
+not guaranteed identical to it.
+
+## Claimed measurements, bench, and recorded PDK identity
+
+Every measured figure the top-level `README.md` spec table and maturity
+ladder, or `docs/chipalooza/challenge-5-proposal.md` §4, currently quotes is
+listed here against the committed run it comes from. Superseded runs under
+`sim/*/results/` were produced by the same benches and remain as
+append-only history (indexed in `sim/README.md`). They are not current
+claims, so they are not listed one by one.
+
+| path | claim(s) it backs | bench | git sha (dirty?) | PDK identity the run records |
+|---|---|---|---|---|
+| `sim/pvt/results/20260907T090653Z/summary.md` | char. report rows 1-4, 8, 11: max reachable 58.9870 MHz; trim range ±35.50%; 0.4317 %/code average step; untrimmed spread −26.34%/+42.68%; 3.0/3.3/3.6 V and −40/27/85 °C exercised | `sim/pvt/run-pvt-sweep.sh` | `1362e1a` (dirty) | family `gf180mcuC` + install root path only. **No revision** |
+| `sim/pvt/results/20260921T075822Z/summary.md` | char. report rows 5-6: post-trim accuracy, global-code and per-corner-code methodologies, calibration point and full temperature range | `sim/pvt/run-pvt-sweep.sh` | `1ac4434` (dirty) | family `gf180mcuC` + install root path only. **No revision** |
+| `sim/pvt/results/20260923T030125Z/summary.md` | README spec table: measured supply span at per-corner calibrated codes (−2.07%/+1.17%) behind the DR-0017 post-trim rows; also the calibration baseline the post-layout run anchors to | `sim/pvt/run-pvt-sweep.sh` | `ed26786` (clean) | family `gf180mcuC` + install root path only. **No revision** |
+| `sim/pvt/results/20260922T004823Z/summary.md` | README spec table: delay share of the supply span before the issue #57 re-reference (62-82%, DR-0016) | `sim/pvt/delay_probe.py` | `bd57830` (dirty) | family `gf180mcuC` + install root path only. **No revision** |
+| `sim/pvt/results/20260923T030905Z/summary.md` | README spec table: delay share of the supply span after the issue #57 re-reference (7.6-33%) | `sim/pvt/delay_probe.py` (`--cal-from` `20260923T030125Z`) | `ed26786` (dirty) | family `gf180mcuC` + install root path only. **No revision** |
+| `sim/iq/results/20260921T091042Z/README.md` | char. report row 9: running Iq at the reference corner (worst 330.38 µA at `0xFF`) and over the full 63-point grid (541.85 µA at `0xC0`, `ff`/85 °C/3.6 V) | `sim/iq/run-iq-sweep.sh` | `1ac4434` (dirty) | `manifest.json` records the install root path only. The family name `gf180mcuC` appears only in the generated `README.md`. **No revision** |
+| `sim/pvt-postlayout/results/20260923T152954Z/summary.md` | char. report post-layout divergence note and README maturity ladder: extracted runs −18.78% to −36.86% slower than the schematic at `0xA3` (mean −25.65%); DR-0017 guardrails held extracted-side; `ss` calibrates at `0xF7` | `sim/pvt-postlayout/run-pex-pvt-sweep.sh` (`--guardrails --baseline-runid 20260923T030125Z`) | `89399c6` (dirty) | `manifest.json`: family `gf180mcuC` + install root path. The committed `rcosc_top.pex.extract.json` (the `klt extract` half) records `open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b` for the install it resolved under the same root. The simulation half does not record a revision of its own |
+| `design/netlist/smoke_test.log` | bring-up only: the block oscillates at `0x80`, `.op` sanity values. **No spec-row claim** | `design/run-smoke-test.sh` | not recorded | **None**: the log records the ngspice version and run time, not the PDK family or revision |
+
+### PDK identity, stated plainly
+
+- **Family name only, no revision:** every pre-layout PVT campaign and both
+  delay-probe runs above. Their manifests record `pdk: "gf180mcuC"` and the
+  install root path, nothing that identifies the open_pdks/volare revision
+  of the model files.
+- **Install path only in the manifest, family name only in the README:**
+  the Iq run.
+- **Revision recorded (extraction only):** the current post-layout run's
+  `klt extract` envelope records an open_pdks commit. The ngspice side of
+  the same run records family and root only. Earlier post-layout runs
+  record a different commit
+  (`20260921T164434Z`/`20260922T004322Z`: `open_pdks
+  f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7`). Different runs were
+  therefore not guaranteed to use the same PDK revision.
+- **Nothing recorded:** the smoke-test log.
+
+The historical revision behind a family-only run is **unknown**. It is not
+reconstructed here and must not be assumed. Recording the revision on
+new runs is issue #65. That work does not change these historical
+records.
+
+## Spec rows with no measurement claimed (no bench expected)
+
+- Ratified row "Runtime-disciplined accuracy" (characterization report
+  row 7): reserved, not designed (DR-0004). No measurement is claimed and
+  no bench exists.
+- Ratified row "Startup time" (characterization report row 10): **not
+  evaluated**. No startup-time measurement is claimed, and no bench for it
+  exists yet.
+- Monte Carlo / statistical: none claimed, none run (see item 6 in
+  `signoff/README.md`).
+
+## Audit (issue #64, against `origin/main` @ `dfb95bf`)
+
+- Every path above is committed (`git ls-files`).
+- Each claim row was checked against the cited run's committed
+  `manifest.json`/`summary.md` (git sha, dirty flag, PDK fields) and the
+  figure as quoted in `README.md` / `docs/chipalooza/challenge-5-proposal.md`.
+- The committed testbench netlists `design/netlist/pvt_tb.spice` and
+  `design/netlist/smoke_test.spice` were re-derived from the committed
+  schematics into a scratch directory and compared after the same
+  normalisation as item 1's audit (continuations, blank lines, `sch_path`/
+  `sym_path` comments): **identical**.
+- No simulation was re-run for this audit.

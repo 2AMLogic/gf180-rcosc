@@ -126,9 +126,15 @@ load-bearing, and discovered the hard way on issue #44's re-spin):** every
 per-cell DRC/extract/LVS report in `layout/reports/` records the toolchain
 that produced the committed cells — `klt 0.4.0` with `klayout 0.30.12` —
 and byte-identical cell reproduction (and the re-spin's own bias/top
-evidence) holds under exactly that pair, while `klt erc` and `klt signoff`
-grading require the newer pinned build (`klt 0.5.0+g2b1e55e51bb8…`, the
-same version string `reports/rcosc_top.erc.json` records). `klt gen`'s
+evidence) holds under exactly that pair, while `klt erc` requires the
+newer build `layout/run_checks.sh` pins for it (`klt 0.5.0+g2b1e55e51bb8…`,
+the same version string `reports/rcosc_top.erc.json` records), and `klt
+signoff` grading uses the build `signoff/README.md` pins (klayout-tools
+`3a75c3ae…` since issue #64). The ERC and grader pins differ on purpose:
+the `3a75c3ae` build's `klt erc` refuses the committed supply spec's
+`_comment` annotation
+([klayout-tools#2822](https://github.com/2AMLogic/klayout-tools/issues/2822)),
+while its `klt signoff` accepts the committed ERC envelope unchanged. `klt gen`'s
 drawn output is **not stable across `klayout-tools` versions**: the
 0.5.0-era generators render `res_array` footprints and an output grid
 that differ from the 0.4.0 era, so under a newer `klt` alone
