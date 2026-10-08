@@ -19,13 +19,13 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
-- **#64**: T1 items 1, 9, 10 (and item 2's binding): cite artifact-anchored evidence now that klt signoff can bind it (klayout-tools#2843)
+_None._
 
 ## PRs Awaiting Review
 
@@ -37,17 +37,19 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#67**: signoff: bind T1 items 1, 2, 9, 10 to audited artifacts; move grader pin to klayout-tools 3a75c3ae
+_None._
 
 ## Proposed
 
 Issues carrying `loom:curated`.
 
-- **#64**: T1 items 1, 9, 10 (and item 2's binding): cite artifact-anchored evidence now that klt signoff can bind it (klayout-tools#2843) *(curated)*
+_None._
 
 ## Proposed (Architect / Hermit)
 
-_None._
+- **#77**: Item 6 groundwork: verify gf180mcu mismatch models under klt sim monte_carlo and build the per-sample-trim MC bench
+- **#78**: Add a startup-time testbench for the ratified 10 us row (currently not evaluated)
+- **#79**: Runtime-discipline trim-math: behavioural SOF loop model against the committed freq-vs-code data
 
 ## Epics
 
@@ -59,11 +61,11 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
-| Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| Ready (`loom:issue`) | 1 |
+| In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 1 |
-| Curated | 1 |
-| Architect / Hermit proposals | 0 |
+| Approved PRs awaiting merge | 0 |
+| Curated | 0 |
+| Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
