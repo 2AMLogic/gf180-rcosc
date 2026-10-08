@@ -1,0 +1,17 @@
+{
+ "schema_version": 1,
+ "kind": "generic",
+ "status": "pass",
+ "t1_item": 10,
+ "summary": "T1 item 10 (repo hygiene): bound to the CI workflow .github/workflows/signoff.yml, which re-grades this manifest and re-verifies every pinned evidence hash on every push and pull request (signoff/verify-report.py). Audited alongside it: README.md states what the block is, carries the ratified target-spec table with its basis citations (spec/decision-records/0002, 0003 and later records), and points to evidence reproduction; LICENSE (Apache-2.0) is committed. 'pass' asserts those three are present; only the workflow's bytes are bound, so an edit to the workflow (including a grader-pin move) requires refreshing this envelope.",
+ "source": ".github/workflows/signoff.yml",
+ "provenance": {
+  "input": {
+   "path": {
+    "path": ".github/workflows/signoff.yml",
+    "scope": "repo"
+   },
+   "content_hash": "sha256:c58cef49422a80c1b954829e052b778e1a182e390afeaad14e08830b06269dcb"
+  }
+ }
+}

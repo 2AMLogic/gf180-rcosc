@@ -183,16 +183,26 @@ echo "== rcosc_top: ERC (T1 item 11 supply spec) =="
 # (the repo root, in CI's verify-report.py run). An envelope generated with
 # absolute paths would record a host-absolute spec path that cannot resolve
 # in CI, downgrading item 11's grade to supply_spec_incomplete there.
-# The ERC envelope must come from the pinned *grader* build documented in
-# signoff/README.md (0.5.0+g2b1e55e51bb8): that build's `klt erc` writes the
-# provenance block (input + spec content hashes) that
+# The ERC envelope must come from a post-0.4.0 build: that build's `klt erc`
+# writes the provenance block (input + spec content hashes) that
 # signoff/verify-report.py's item-11 re-verification pins. klt 0.4.0's
 # `klt erc` writes no provenance, so regenerating the envelope with it
-# strips the pins and rots CI (found during issue #57's re-run). The two
-# pins are about different things -- 0.4.0 pins generator *geometry*, the
-# grader build pins the *envelope shape* -- so this step deliberately runs
-# erc through the grader build even though the geometry verbs above stay
-# on 0.4.0.
+# strips the pins and rots CI (found during issue #57's re-run). The pins
+# are about different things -- 0.4.0 pins generator *geometry*, this one
+# pins the *ERC envelope shape* -- so this step deliberately runs erc
+# through a separate build even though the geometry verbs above stay on
+# 0.4.0.
+#
+# Since issue #64 this ERC pin is NOT the signoff grader pin. The grader
+# moved to klayout-tools 3a75c3ae (signoff/README.md), but that build's
+# `klt erc` rejects layout/erc-supply-spec.json outright: its strict
+# unknown-key check refuses the spec's `_comment` annotation
+# (klayout-tools#2822, open). The committed ERC envelope was written by
+# this 2b1e55e5 build, and the 3a75c3ae grader accepts it unchanged (item 11
+# still grades met, with input_verified true), so ERC evidence stays on the
+# build that can read the committed spec. Move this pin only once a build
+# accepts annotation keys, or together with a spec migration and an erc
+# re-run per signoff/README.md's refresh contract.
 ERC_KLT=(uv run --quiet --with "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@2b1e55e51bb803c082e8857da44687f3e37ebfc0" klt)
 
 set +e
