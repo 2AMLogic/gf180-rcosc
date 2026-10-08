@@ -115,3 +115,22 @@ against `2AMLogic/klayout-tools` per `CLAUDE.md`'s friction protocol
 | [`20260921T164434Z`](results/20260921T164434Z/summary.md) | Post-layout PEX PVT re-verification of the **re-spun** bias cell (issue #44's `rcosc_bias.gds`/`rcosc_top.gds`, against the post-#39 schematic campaign `sim/pvt/results/20260921T075822Z/` at its own calibration code `0xD0`). 27-point corner-endpoint subset, both sides, 0 failed runs, 203.4 s at 8 jobs. **Materially diverges, deeper than the pre-#39 pass**: delta negative (slower) at every point, -11.24% to -41.42% (mean -19.56%), worst at `ff`/-40 C/3.6 V; in-run schematic-side cross-check vs the committed campaign: 0.00% at matched points. See [DR-0013](../../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md). *Superseded for the post-#43 schematic by the issue-#50 run below; figures valid only against the pre-#43 GDS pair.* |
 | [`20260922T004322Z`](results/20260922T004322Z/summary.md) | Post-layout PEX PVT re-verification of the **re-spun** trim bank (issue #50's `rcosc_trim_bank.gds`/`rcosc_top.gds`, against the post-#43 schematic campaign `sim/pvt/results/20260921T173529Z/` at its own auto-read ratified-target calibration code `0x9D`). 27-point corner-endpoint subset, both sides, 0 failed runs, 338.0 s at 8 jobs. **Materially diverges, deeper on the mean than the pre-#43 pass**: delta negative (slower) at every point, -17.46% to -40.92% (mean -27.32%), worst at `ff`/-40 C/3.6 V; in-run schematic-side cross-check vs the committed post-#43 campaign: 0.18% at matched points. See [DR-0015](../../spec/decision-records/0015-trim-bank-respin-postlayout-pex-reverification.md). *Superseded for the post-#60 schematic by the issue-#61 run below; figures valid only against the pre-#57 GDS pair.* |
 | [`20260923T152954Z`](results/20260923T152954Z/summary.md) | Post-layout PEX PVT re-verification of the **DR-0017 re-spun** comparator hierarchy (`rcosc_comparator_p`/`rcosc_top.gds`, against the post-#60 schematic campaign `sim/pvt/results/20260923T030125Z/` at its own calibration code `0xA3`, selected via `--baseline-runid` — the newest `sim/pvt/results/` run is DR-0017's delay-probe campaign, which carries no calibration manifest). 27-point corner-endpoint subset, both sides, 0 failed runs, 166.3 s at 8 jobs (`klt 0.4.0` pinned per `layout/run_checks.sh`, ngspice-46, Linux host). **Materially diverges, same always-slower sign and worst-corner signature**: delta negative at every point, -18.78% to -36.86% (mean -25.65%), worst at `ff`/-40 C/3.6 V; in-run schematic-side cross-check vs the committed DR-0017 campaign: 0.00% at matched points. **Both DR-0017 guardrails hold extracted-side** (this run's `--guardrails` pass): the Row-4 guardrail cell `0x80`/`ff`/85 C/3.6 V runs 31.16% below its DR-0017 campaign basis, and every corner still calibrates inner-range against 48.000 MHz (`tt 0xA3→0xD9`, `ff 0x59→0xB3`, `ss 0xCD→0xF7`), none saturated — `ss` with 8 LSBs / ≈+4.7% headroom to `0xFF`. See [DR-0018](../../spec/decision-records/0018-comparator-pmos-respin-postlayout-pex-reverification.md). |
+
+## `klt pex` layer (issue #70)
+
+`klt-pex/` holds the `klt pex` testbench requests for the grader-readable
+item-7 layer (`signoff/README.md`): `gen_requests.py` writes three requests
+(one per VDD, tt/ff/ss x -40/27/85 C), their testbench bodies, and a schematic
+DUT wrapper from `design/netlist/pvt_tb.spice`. Trim code `0xA3`. The earlier
+"why not `klt pex`" reasons are resolved in the pinned build: `--deck-option` and
+`--pins` now exist. Two remaining gaps are filed as klayout-tools#2890 (pin
+order) and #2891 (relative include on the local backend).
+
+Status: the 27-point grid is **not yet run**; the batch fleet runner (klt 0.5.0)
+rejects every batch-capable client. The only committed `klt pex` output is the
+single-corner probe in `results/20261008T220500Z/klt-pex-probe/` (tt / 27 C /
+3.3 V; command in `COMMAND.txt`). The probe's testbench carries an absolute
+include path (local backend), so it is not portable. To produce the full report
+once a compatible client exists, run `klt pex layout/cells/rcosc_top.gds
+sim/pvt-postlayout/klt-pex/request_v{30,33,36}.json` with the flags in
+`COMMAND.txt` and `--backend batch`, one run per request.

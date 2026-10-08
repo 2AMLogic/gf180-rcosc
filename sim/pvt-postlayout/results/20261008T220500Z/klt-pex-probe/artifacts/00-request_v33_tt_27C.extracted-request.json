@@ -1,0 +1,54 @@
+{
+  "netlist": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-70/sim/pvt-postlayout/results/20261008T220500Z/klt-pex-probe/artifacts/00-request_v33_tt_27C.extracted-dut-testbench.spice",
+  "engine": "ngspice",
+  "netlist_source": "extracted",
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "tt",
+        "sections": [
+          "typical",
+          "res_typical",
+          "mimcap_typical",
+          "cap_mim"
+        ]
+      }
+    ],
+    "temperature_c": [
+      27
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "200p 1200n"
+  },
+  "measurements": [
+    {
+      "name": "ta",
+      "spice": ".meas tran ta WHEN v(clk)=1.6500 RISE=5",
+      "unit": "s"
+    },
+    {
+      "name": "tb",
+      "spice": ".meas tran tb WHEN v(clk)=1.6500 RISE=25",
+      "unit": "s"
+    },
+    {
+      "name": "fosc",
+      "spice": ".meas tran fosc PARAM='20/(tb-ta)'",
+      "unit": "Hz"
+    }
+  ],
+  "options": {
+    "timeout_s": 600,
+    "keep_artifacts": true,
+    "ngspice_init": [
+      "set measureprec=8"
+    ]
+  },
+  "backend": "local"
+}

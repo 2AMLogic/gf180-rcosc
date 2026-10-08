@@ -385,6 +385,44 @@ extraction report **no unbiased PMOS body nets** (`unbiased_pmos_body_nets:
 []`) — the extracted netlist's device bodies have DC bias paths, so the
 post-layout numbers were not measured on a physically-wrong netlist.
 
+**Issue #70 status (a `klt pex` report is prepared but not yet produced).**
+The inputs for the grader-readable layer are committed under
+`sim/pvt-postlayout/klt-pex/`: three `klt sim` requests (one per VDD, each a
+tt/ff/ss x -40/27/85 C grid, together the same 27 corner-endpoint points,
+trim code `0xA3` held), a schematic DUT wrapper, and `gen_requests.py`. The
+27-point grid has **not** run, so nothing is cited for item 7 and this
+section's mechanical grade is unchanged (`no_evidence`). The blocker is the
+Spot batch fleet, which is where the grid must run: its runner has klt 0.5.0,
+which refuses every client that can submit to batch (0.6.0 and later, including
+the pinned grader build and the host's 0.7.0; 0.5.0 itself has no batch
+backend). Every submitted corner came back as `batch_runner_version_mismatch`
+(tracked upstream as klayout-tools#2851), and `klt pex` reports those as
+bare `error` rows without the diagnostic (klayout-tools#2872). The grid was
+not run locally.
+
+One single-corner local probe (tt / 27 C / 3.3 V, `0xA3`) is committed at
+`sim/pvt-postlayout/results/20261008T220500Z/klt-pex-probe/`, produced by the
+pinned build `0.6.0+g3a75c3ae705b` (command in `COMMAND.txt`). It is **not**
+cited in the manifest: one corner is not the item's campaign. It shows the
+flow works end to end and records the expected delta (`fosc` 48.206 MHz
+schematic vs 35.961 MHz extracted, -25.40%, consistent with DR-0018's -18.78%
+to -36.86% range; status `pass` only because no limits are declared, not an
+accuracy verdict).
+
+`body_bias` for that report: `status: "biased"`, `unbiased_device_count: 0`,
+`unbiased_pmos_body_nets: []`, matching the earlier `klt extract` records. A
+future cited report must have this block re-read and re-stated here.
+
+What a `klt pex` report would and would not cover: it re-simulates one
+frequency figure (`fosc`, with its two edge times) at one trim code on the
+schematic and the lumped-RC extracted netlist, with coupling limited to
+vertical overlap. It does not cover the trim range or resolution, the
+post-trim accuracy rows, Iq, or startup; the `pex_pvt_sweep.py` campaign
+above remains the broader post-layout evidence. The schematic leg runs on a
+generated pin-order wrapper around the unmodified schematic hierarchy
+(klayout-tools#2890), so `model_mismatch` is populated by the wrapper and
+hierarchy, which `klt pex` documents as a known false-positive shape.
+
 ### met — item 9 (Testbenches shipped): `signoff/testbench-envelope.json` → `signoff/testbench-inventory.md`
 
 The inventory lists every measured figure the top-level `README.md` and the

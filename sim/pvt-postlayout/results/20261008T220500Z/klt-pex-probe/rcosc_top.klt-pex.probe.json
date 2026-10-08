@@ -1,0 +1,173 @@
+{
+  "schema_version": 2,
+  "status": "pass",
+  "layout": {
+    "path": "layout/cells/rcosc_top.gds",
+    "scope": "repo"
+  },
+  "netlist": {
+    "path": "sim/pvt-postlayout/results/20261008T220500Z/klt-pex-probe/rcosc_top.pex.spice",
+    "scope": "repo"
+  },
+  "reference_netlist": {
+    "path": "sim/pvt-postlayout/klt-pex/rcosc_top_schematic.spice",
+    "scope": "repo"
+  },
+  "extraction": {
+    "deck": "gf180mcu",
+    "device_count": 99,
+    "net_count": 46,
+    "netlist_sha256": "ef1c5fbcf0c8e9db937293f16b8e68de687facbb8abe56d39057dcc8f865e16c",
+    "model": {
+      "capacitance": "net-to-ground for every net's own (non-coupled) area/perimeter, plus net-to-net for the vertical-overlap coupling `coupling` describes below -- a coupled net pair gets a direct capacitor between their two hub nodes, not just capacitors to the deck's ground/substrate net",
+      "coupling": "vertical overlap (crossover) unconditionally -- where one net's conductor on an adjacent metal level sits directly over another *distinct* net's conductor, that overlap area is charged between the two nets instead of to ground (issue #760) -- plus lateral (same-layer, sidewall) coupling, but only for a net pair naming one of the caller's declared `--critical-net` nets (issue #976): facing-edge length within that layer's own minimum-spacing lookback is charged between the two nets, *additively* (not deducted from either net's substrate fringe term, unlike the vertical case -- a known simplification). Any same-layer pair with neither side named `--critical-net`, and fringe shielding in general, are still not modelled",
+      "resistance": "single lumped series resistance per net, distributed as a star across that net's device terminals (issue #592) -- not a per-segment, distributed RC ladder, *unless* `--distributed-rc` names this net via `--critical-net` (issue #977, Epic #709 Phase 2b): then the net's terminals are ordered along their approximate physical spread and its total R/C is broken into a chain of per-segment resistors (segment length proportional to inter-terminal distance) with a ground capacitor at each terminal node (proportional to its adjacent segment length/2), instead of one star hub -- still an approximation (terminal position is a device-placement proxy, not true per-segment routing geometry), but a strictly finer-grained one than the single-hub star",
+      "frequency": "quasi-static -- one frequency-independent R and C per net; no skin effect, no distributed transmission-line behavior"
+    },
+    "critical_nets": [],
+    "distributed_rc": false,
+    "mom_rlc_override": null,
+    "label_layers": null
+  },
+  "body_bias": {
+    "status": "biased",
+    "unbiased_device_count": 0,
+    "unbiased_nets": [],
+    "unbiased_pmos_body_nets": []
+  },
+  "measurement": {
+    "mode": "testbench",
+    "command": null,
+    "timeout_s": null,
+    "sides": null
+  },
+  "testbenches": [
+    {
+      "request": {
+        "path": "sim/pvt-postlayout/results/20261008T220500Z/klt-pex-probe/request_v33_tt_27C.json",
+        "scope": "repo"
+      },
+      "schematic_netlist": {
+        "path": "sim/pvt-postlayout/klt-pex/rcosc_top_schematic.spice",
+        "scope": "repo"
+      },
+      "corner_count": 1,
+      "measurement_names": [
+        "ta",
+        "tb",
+        "fosc"
+      ]
+    }
+  ],
+  "corner_count": 1,
+  "delta": [
+    {
+      "spec_row": "ta",
+      "corner_id": "tt/novdd/27C",
+      "schematic_value": 8.66451e-08,
+      "extracted_value": 1.17223e-07,
+      "delta_pct": 35.291,
+      "status": "pass"
+    },
+    {
+      "spec_row": "tb",
+      "corner_id": "tt/novdd/27C",
+      "schematic_value": 5.01531e-07,
+      "extracted_value": 6.73384e-07,
+      "delta_pct": 34.266,
+      "status": "pass"
+    },
+    {
+      "spec_row": "fosc",
+      "corner_id": "tt/novdd/27C",
+      "schematic_value": 48206000.0,
+      "extracted_value": 35960800.0,
+      "delta_pct": -25.402,
+      "status": "pass"
+    }
+  ],
+  "coverage": {
+    "testbenches": 1,
+    "delta_rows": 3,
+    "corners_compared": 1,
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "comparison:[0,\"tt/novdd/27C\",\"ta\"]",
+      "comparison:[1,\"tt/novdd/27C\",\"tb\"]",
+      "comparison:[2,\"tt/novdd/27C\",\"fosc\"]"
+    ],
+    "skipped": [],
+    "inapplicable": [],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
+  },
+  "passed": 3,
+  "failed": 0,
+  "errored": 0,
+  "pin_count_mismatch": null,
+  "flat_dut_mismatch": null,
+  "model_mismatch": {
+    "reference_only": [
+      "W'",
+      "cap_mim_1f0fF",
+      "rcosc_bias",
+      "rcosc_comparator",
+      "rcosc_comparator_p",
+      "rcosc_top_core",
+      "rcosc_trim_bank"
+    ],
+    "extracted_only": [
+      "nfet_03v3",
+      "pfet_03v3"
+    ],
+    "counts": {
+      "reference": {
+        "W'": 62,
+        "cap_mim_1f0fF": 1,
+        "ppolyf_u_1k": 13,
+        "rcosc_bias": 1,
+        "rcosc_comparator": 1,
+        "rcosc_comparator_p": 1,
+        "rcosc_top_core": 1,
+        "rcosc_trim_bank": 1
+      },
+      "extracted": {
+        "nfet_03v3": 46,
+        "pfet_03v3": 39,
+        "ppolyf_u_1k": 13
+      }
+    },
+    "detail": "the reference netlist is hierarchical (it instantiates at least one locally-defined `.subckt`), while `klt extract`'s output is always flat -- see docs/cli/extract.md's \"Extraction is flat, not hierarchical\" note and issue #1085 (the same shape `klt lvs`'s `options.flatten_reference` exists for). This divergence may simply be a hierarchy-representation artifact -- a device nested inside a locally-defined `.subckt` is counted once per definition here, not once per physical instance -- rather than a genuine device-flavour mismatch; verify with a flattened reference before treating this as evidence the two sides are unrelated. Only in the reference netlist: W', cap_mim_1f0fF, rcosc_bias, rcosc_comparator, rcosc_comparator_p, rcosc_top_core, rcosc_trim_bank. Only in the extracted netlist: nfet_03v3, pfet_03v3. See docs/cli/pex.md's `model_mismatch` section"
+  },
+  "provenance": {
+    "klt_version": "0.6.0+g3a75c3ae705b",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "gf180mcuC",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": {
+      "name": "gf180mcu",
+      "content_hash": "sha256:9babf6fd5d623fea50d380168ebf8f7c0f0f6e70eb7d89b221476dc47c7f6a85",
+      "released": false,
+      "options": {
+        "metal_top": "9K",
+        "mim_cap": "cap_mim_1f0_m4m5_noshield",
+        "poly_res": "1k"
+      },
+      "options_explicit": {
+        "metal_top": false,
+        "mim_cap": true,
+        "poly_res": true
+      },
+      "options_hash": "sha256:07c2718d5aa01836887c7f89e6fc55246f29f7f471229dd7a7bb1a1dc1cf1147"
+    },
+    "input": {
+      "content_hash": "sha256:8cd7c47a3c174c0bc049e7741dcc67c9a69603dda5da33891a2ef954015071fe",
+      "role": "layout"
+    }
+  }
+}
