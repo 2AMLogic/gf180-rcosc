@@ -39,7 +39,7 @@ it, so a corner can only bound the mean and the claim is a yield.
 | 6 | Runtime-disciplined, <= +/-0.25 % | Deterministic (reserved) | Reserved, not designed (DR-0004); the figure is the USB 2.0 `TFDRATE` clause, an external requirement, and no measurement is claimed. Re-classify when a discipline loop is designed. |
 | 7 | Supply, 3.0-3.6 V | Deterministic | An operating-condition range; it is a corner axis, not a measured result. |
 | 8 | Quiescent current, < 500 uA (running) | Deterministic (watch) | A maximum-limit row set by bias-resistor and process-corner current; bias mirror mismatch is second-order against the corner swing. Margin is thin (DR-0017: 24.2 uA), so Iq is recorded as a free by-product measurement in the S2/S3 runs; if its sampled spread threatens the margin the row is re-classified by a later record. |
-| 9 | Startup time, <= 10 us | Deterministic | A transient bound on a settling path, bounded by corners; not yet evaluated (see `signoff/testbench-inventory.md`). A mismatch-induced failure to start is a separate robustness check, not this row. |
+| 9 | Startup time, <= 10 us | Deterministic | A transient bound on a settling path, bounded by corners; bench added in issue #78 (`sim/startup/`), factorial not yet evaluated (see DR-0020 and `signoff/testbench-inventory.md`). A mismatch-induced failure to start is a separate robustness check, not this row. |
 | 10 | Temperature range, -40..+85 C | Deterministic | An operating-condition range, a corner axis. |
 
 ### 2. Statistical claims and Monte Carlo design
