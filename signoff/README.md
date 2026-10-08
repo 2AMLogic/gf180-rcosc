@@ -347,15 +347,23 @@ PVT-sensitivity work).
 
 ### unmet — item 6 (Statistical claims carry Monte Carlo evidence): nothing to back, nothing cited
 
-There is no Monte Carlo or `klt yield` run anywhere under `sim/`. The repo
-also makes **no statistical accuracy/yield claim**: every accuracy figure in
-the README and the characterization report is a worst-case-corner figure, not
-a distributional one (the buckets and reasons are recorded in the tracker's
-2026-09-15 re-verification). The tier doc's own pass condition ("any accuracy/
-yield claim carries MC evidence") is vacuously satisfied on the claim side;
-the machine row stays `no_evidence` because no `yield` envelope exists — if a
-distributional claim is ever ratified into the spec, both the MC run and this
-row change together.
+There is no Monte Carlo or `klt yield` run anywhere under `sim/`, so the
+machine row is `no_evidence`. The repo **does** have statistical claims to
+back: [DR-0019](../spec/decision-records/0019-statistical-vs-deterministic-spec-rows-and-monte-carlo-evidence-plan.md)
+(status `proposed`) classifies every ratified spec row and finds the trim
+coverage/resolution row and both post-trim accuracy rows statistical (their
+budgets contain per-die trim-DAC mismatch and comparator offset), while the
+remaining rows are corner-bounded or reserved. Until now the README treated
+every accuracy figure as a worst-case-corner figure and the item as vacuous;
+that reading is withdrawn -- a corner matrix cannot validate an accuracy row.
+The record states each claim (ratified limit, 99 % yield, 95 % confidence),
+the Monte Carlo design (500 samples per corner, recorded seed, deterministic
+negative controls, run on top of the corner matrix rather than replacing it),
+the evidence verb (`klt yield`, `klayout-tools[yield]` extra, fed by a `klt
+sim` `monte_carlo` request submitted to the batch fleet), and the sequencing:
+the campaign runs after #66 settles the sizing. The item stays `unmet` until
+that campaign lands a `yield` envelope; both the MC run and this row change
+together.
 
 ### unmet — item 7 (Post-layout verification): campaign committed, not a `klt pex` report
 
