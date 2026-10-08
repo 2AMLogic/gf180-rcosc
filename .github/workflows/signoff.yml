@@ -29,13 +29,13 @@ name: Signoff
 # The klt pin below is load-bearing: the committed report records the
 # grading build (`build.git_commit`) and the rulebook hash it graded under
 # (`source_doc_content_hash`), and two builds bundling different rulebooks
-# legitimately grade different item tables. The pin is klayout-tools commit
-# 3a75c3ae (the merge of klayout-tools#2843), the first build that grades
-# T1 items 1, 2, 9 and 10 from an artifact-bound generic envelope, which
-# signoff/block-manifest.json now cites for those items. It is not a
-# release (klt reports 0.6.0+g3a75c3ae705b), so a git-pinned commit is the
-# only installable grader that reproduces the committed report. Move it
-# only per signoff/README.md's refresh contract (re-grade, re-commit).
+# legitimately grade different item tables. The pin is the klayout-tools
+# 0.7.0 release (klt reports 0.7.0, is_release true). It replaced a git pin of
+# commit 3a75c3ae (0.6.0+g3a75c3ae705b), the first build that graded T1
+# items 1, 2, 9 and 10 from an artifact-bound generic envelope; 0.7.0 grades
+# the unchanged manifest identically (signoff/README.md, "Pin history").
+# Move it only per signoff/README.md's refresh contract (re-grade,
+# re-commit).
 #
 # This workflow file is itself the audited artifact T1 item 10 (repo
 # hygiene) is bound to (signoff/repo-hygiene-envelope.json pins its
@@ -68,7 +68,7 @@ jobs:
       - name: Install the pinned klt grader
         run: |
           python -m pip install --upgrade pip
-          python -m pip install "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@3a75c3ae705b7ad3803625255de93bcd982e70c6"
+          python -m pip install "klayout-tools==0.7.0"
           klt --version
 
       - name: Re-grade the manifest and verify the committed pins
