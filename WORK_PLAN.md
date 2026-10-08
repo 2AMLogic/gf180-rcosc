@@ -25,7 +25,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#64**: T1 items 1, 9, 10 (and item 2's binding): cite artifact-anchored evidence now that klt signoff can bind it (klayout-tools#2843)
 
 ## PRs Awaiting Review
 
@@ -37,13 +37,13 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#67**: signoff: bind T1 items 1, 2, 9, 10 to audited artifacts; move grader pin to klayout-tools 3a75c3ae
 
 ## Proposed
 
 Issues carrying `loom:curated`.
 
-_None._
+- **#64**: T1 items 1, 9, 10 (and item 2's binding): cite artifact-anchored evidence now that klt signoff can bind it (klayout-tools#2843) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -60,10 +60,10 @@ _None._
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 0 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 0 |
-| Curated | 0 |
+| Approved PRs awaiting merge | 1 |
+| Curated | 1 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
