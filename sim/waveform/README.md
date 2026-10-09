@@ -29,6 +29,11 @@ python3 -I sim/waveform/prepare.py --cal-run sim/pvt/results/20260923T030125Z --
 # tests (stdlib + pytest; no simulator; keep it small on the shared host)
 python3 -I -m pytest -p no:cacheprovider sim/waveform
 
+# CI: .github/workflows/waveform-offline.yml ("Waveform offline suite") runs exactly
+#   python3 -I -m pytest -p no:cacheprovider sim/waveform/test_harness.py
+# on every pull request and push to main (Python 3.12, pytest only; no PDK, klt,
+# ngspice or batch credentials). Its fixtures are SYNTHETIC, not measured evidence.
+
 # analysis of klt sim reports, one per request, nominal supply per report (new outdir each time)
 python3 -I sim/waveform/analyze.py rep_v33_tt.json rep_v33_ss.json --vdd 3.3 3.3 --outdir sim/waveform/results/<runid>
 ```
