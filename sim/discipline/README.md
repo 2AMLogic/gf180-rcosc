@@ -187,3 +187,12 @@ cold-start and 1 C/s experiments.
 - A successive-approximation acquisition (binary search over frames) was not
   modelled; the non-monotone carries make it unsafe without a monotone code
   mapping, which is a design question for the discipline stage, not this model.
+
+## Related: oscillator-side waveform shape (pending, issue #91)
+
+`sim/waveform/` prepares (offline only; no measurements yet) a harness for the
+`clk` pulse width, duty and deterministic period/cycle-to-cycle spread. Those
+oscillator-side numbers are separate from the SOF-arrival jitter above: the
++/-500 ns SOF assumption stays an external-reference assumption that
+oscillator measurements can neither validate nor replace, and nothing in this
+model is changed by the harness. See [sim/waveform/README.md](../waveform/README.md).
