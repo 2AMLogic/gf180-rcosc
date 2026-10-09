@@ -1,0 +1,287 @@
+{
+  "kind": "waveform-bench-requests",
+  "evidence": "NOT EVIDENCE: offline request generation, no simulation was run",
+  "issue": 91,
+  "grid": {
+    "processes": [
+      "tt",
+      "ss",
+      "ff"
+    ],
+    "temperature_c": [
+      -40.0,
+      27.0,
+      85.0
+    ],
+    "vdd_v": [
+      3.0,
+      3.3,
+      3.6
+    ],
+    "points": 27,
+    "note": "subset of the 63-point sim/pvt grid; not full signoff"
+  },
+  "process_library_mapping": {
+    "tt": {
+      "fets": "typical",
+      "res": "res_typical",
+      "mimcap": "mimcap_typical",
+      "extra": "cap_mim"
+    },
+    "ss": {
+      "fets": "ss",
+      "res": "res_ss",
+      "mimcap": "mimcap_ss",
+      "extra": "cap_mim"
+    },
+    "ff": {
+      "fets": "ff",
+      "res": "res_ff",
+      "mimcap": "mimcap_ff",
+      "extra": "cap_mim"
+    }
+  },
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "calibration": {
+    "campaign_dir": "sim/pvt/results/20260923T030125Z",
+    "target": "ratified",
+    "manifest_key": "calibration_spec_target",
+    "campaign_runid": "20260923T030125Z",
+    "campaign_git_sha": "ed26786191202a85a71b6938563c45a1eaaa5582",
+    "campaign_git_dirty": false,
+    "manifest_sha256": "bed0429d4128ccb93b50d7b0fc71f99e9f8f65c4bcf6a759568a02e6068732ae",
+    "results_csv_sha256": "d69d7a820563194d25c35a36cbf042dedf6f8c74ed0fe3b5728eaa9bfa0f3894",
+    "committing_hash": "7383d6234216c87f53cd5bdfefba890dcbb9337c",
+    "calibration_point": {
+      "temp_c": 27.0,
+      "vdd_v": 3.3
+    },
+    "per_process_f_hz": {
+      "tt": 47981860.0,
+      "ss": 47877670.0,
+      "ff": 48046340.0
+    },
+    "coverage": "each code verified at all 9 temperature/supply points of the campaign",
+    "codes": {
+      "tt": "0xA3",
+      "ss": "0xCD",
+      "ff": "0x59"
+    }
+  },
+  "settings": {
+    "ramp_ns": 1000.0,
+    "tstop_ns": 20000.0,
+    "tstep": "200p",
+    "tmax_time_step": "200p",
+    "window_ns": 2000.0,
+    "min_cycles": 20,
+    "load_f": 0.0,
+    "load_note": "no explicit clk capacitance, matching the calibration bench design/netlist/pvt_tb.spice",
+    "load_matches_calibration_bench": true,
+    "reltol": 0.001,
+    "abstol_a": 1e-12,
+    "vntol_v": 1e-06,
+    "saved_signals": [
+      "v(clk)",
+      "v(vdd)"
+    ],
+    "units": {
+      "time": "s (ramp/tstop/window given in ns)",
+      "voltage": "V",
+      "capacitance": "F",
+      "current_tolerance": "A",
+      "temperature": "C"
+    }
+  },
+  "dut": {
+    "source": "design/netlist/pvt_tb.spice",
+    "source_sha256": "6e1e0eaee4142051c90699a0159a17d1008870b6fc13ea1dd6de5fdf82212cca",
+    "extracted_sha256": "ea387d532b106ad9cc9ce072679011f83a3071926c6a8d91b4b3d1ddc08542ef"
+  },
+  "requests": [
+    {
+      "request": "request_v30_tt.json",
+      "netlist": "tb_v30_tt.spice",
+      "vdd_v": 3.0,
+      "process": "tt",
+      "trim_code": 163,
+      "trim_hex": "0xA3",
+      "temperature_c": [
+        -40.0,
+        27.0,
+        85.0
+      ],
+      "sections": [
+        "typical",
+        "res_typical",
+        "mimcap_typical",
+        "cap_mim"
+      ],
+      "corner_count": 3
+    },
+    {
+      "request": "request_v30_ss.json",
+      "netlist": "tb_v30_ss.spice",
+      "vdd_v": 3.0,
+      "process": "ss",
+      "trim_code": 205,
+      "trim_hex": "0xCD",
+      "temperature_c": [
+        -40.0,
+        27.0,
+        85.0
+      ],
+      "sections": [
+        "ss",
+        "res_ss",
+        "mimcap_ss",
+        "cap_mim"
+      ],
+      "corner_count": 3
+    },
+    {
+      "request": "request_v30_ff.json",
+      "netlist": "tb_v30_ff.spice",
+      "vdd_v": 3.0,
+      "process": "ff",
+      "trim_code": 89,
+      "trim_hex": "0x59",
+      "temperature_c": [
+        -40.0,
+        27.0,
+        85.0
+      ],
+      "sections": [
+        "ff",
+        "res_ff",
+        "mimcap_ff",
+        "cap_mim"
+      ],
+      "corner_count": 3
+    },
+    {
+      "request": "request_v33_tt.json",
+      "netlist": "tb_v33_tt.spice",
+      "vdd_v": 3.3,
+      "process": "tt",
+      "trim_code": 163,
+      "trim_hex": "0xA3",
+      "temperature_c": [
+        -40.0,
+        27.0,
+        85.0
+      ],
+      "sections": [
+        "typical",
+        "res_typical",
+        "mimcap_typical",
+        "cap_mim"
+      ],
+      "corner_count": 3
+    },
+    {
+      "request": "request_v33_ss.json",
+      "netlist": "tb_v33_ss.spice",
+      "vdd_v": 3.3,
+      "process": "ss",
+      "trim_code": 205,
+      "trim_hex": "0xCD",
+      "temperature_c": [
+        -40.0,
+        27.0,
+        85.0
+      ],
+      "sections": [
+        "ss",
+        "res_ss",
+        "mimcap_ss",
+        "cap_mim"
+      ],
+      "corner_count": 3
+    },
+    {
+      "request": "request_v33_ff.json",
+      "netlist": "tb_v33_ff.spice",
+      "vdd_v": 3.3,
+      "process": "ff",
+      "trim_code": 89,
+      "trim_hex": "0x59",
+      "temperature_c": [
+        -40.0,
+        27.0,
+        85.0
+      ],
+      "sections": [
+        "ff",
+        "res_ff",
+        "mimcap_ff",
+        "cap_mim"
+      ],
+      "corner_count": 3
+    },
+    {
+      "request": "request_v36_tt.json",
+      "netlist": "tb_v36_tt.spice",
+      "vdd_v": 3.6,
+      "process": "tt",
+      "trim_code": 163,
+      "trim_hex": "0xA3",
+      "temperature_c": [
+        -40.0,
+        27.0,
+        85.0
+      ],
+      "sections": [
+        "typical",
+        "res_typical",
+        "mimcap_typical",
+        "cap_mim"
+      ],
+      "corner_count": 3
+    },
+    {
+      "request": "request_v36_ss.json",
+      "netlist": "tb_v36_ss.spice",
+      "vdd_v": 3.6,
+      "process": "ss",
+      "trim_code": 205,
+      "trim_hex": "0xCD",
+      "temperature_c": [
+        -40.0,
+        27.0,
+        85.0
+      ],
+      "sections": [
+        "ss",
+        "res_ss",
+        "mimcap_ss",
+        "cap_mim"
+      ],
+      "corner_count": 3
+    },
+    {
+      "request": "request_v36_ff.json",
+      "netlist": "tb_v36_ff.spice",
+      "vdd_v": 3.6,
+      "process": "ff",
+      "trim_code": 89,
+      "trim_hex": "0x59",
+      "temperature_c": [
+        -40.0,
+        27.0,
+        85.0
+      ],
+      "sections": [
+        "ff",
+        "res_ff",
+        "mimcap_ff",
+        "cap_mim"
+      ],
+      "corner_count": 3
+    }
+  ],
+  "execution": "later campaign only, via `klt sim --backend batch`; never a local multi-corner loop"
+}
