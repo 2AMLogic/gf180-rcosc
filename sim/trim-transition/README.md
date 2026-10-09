@@ -115,7 +115,7 @@ per corner x step x direction x skew, aggregated over the four phases
   (runner klt 0.5.0, client 0.7.0), the same refusal as `sim/startup/batch-attempts/`.
   Not worked around by a local multi-corner run. A runner image update (or a
   compatible client) is needed before the campaign can run.
-- `results/20261009T152100Z-probe-tt-v33-lsb-first/`: the single-corner debug probe
+- `results/20261009T152100Z/`: the single-corner debug probe
   (tt, 3.3 V, 27 C, `lsb_first`, `klt sim --backend local`, ~90 s). Preliminary and
   one corner of 27; the rows, not these notes, are the record.
 
