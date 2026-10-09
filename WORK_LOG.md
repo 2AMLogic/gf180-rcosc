@@ -4,6 +4,9 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-09
 
+- **PR #102**: ci: run offline waveform fixture suite (#101)
+- **PR #100**: feat(waveform): offline clk waveform-shape harness (#91, offline subset)
+- **Issue #101** (closed): Run the offline waveform fixture suite in CI
 - **PR #96**: feat(signoff): doc-citation check for sim/ run dirs
 - **PR #94**: docs(spec): DR-0022 Monte Carlo matching model for trim-ladder resistors and MIM cap
 - **PR #90**: docs: index DR-0020 and un-indexed committed runs
