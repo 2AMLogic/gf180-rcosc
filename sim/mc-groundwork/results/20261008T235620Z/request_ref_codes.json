@@ -1,0 +1,66 @@
+{
+  "netlist": "tb_fixedcode.spice",
+  "engine": "ngspice",
+  "netlist_source": "schematic",
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "tt",
+        "sections": [
+          "typical",
+          "res_typical",
+          "mimcap_typical",
+          "cap_mim"
+        ]
+      }
+    ],
+    "temperature_c": [
+      27
+    ],
+    "supply_v": {
+      "vc": [
+        160.0,
+        161.0,
+        162.0,
+        163.0,
+        164.0,
+        165.0
+      ]
+    }
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "200p 1200n"
+  },
+  "measurements": [
+    {
+      "name": "ta",
+      "spice": ".meas tran ta WHEN v(clk)=1.6500 RISE=5",
+      "unit": "s"
+    },
+    {
+      "name": "tb",
+      "spice": ".meas tran tb WHEN v(clk)=1.6500 RISE=25",
+      "unit": "s"
+    },
+    {
+      "name": "fosc",
+      "spice": ".meas tran fosc PARAM='20/(tb-ta)'",
+      "unit": "Hz"
+    }
+  ],
+  "batch": {
+    "capacity_wait_s": 1200
+  },
+  "options": {
+    "timeout_s": 1800,
+    "keep_artifacts": true,
+    "ngspice_init": [
+      "set measureprec=8"
+    ]
+  }
+}

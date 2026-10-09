@@ -1,0 +1,767 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/mc-groundwork/results/20261008T235620Z/tb_trimsel_mm.spice",
+    "scope": "repo"
+  },
+  "status": "pass",
+  "corner_count": 5,
+  "passed": 5,
+  "failed": 0,
+  "errored": 0,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {
+      "nonconvergence": 4
+    },
+    "by_severity": {
+      "warning": 4
+    },
+    "corners_with_diagnostics": 4
+  },
+  "metrics": {
+    "sim__corner__count": 5,
+    "sim__corner__passed_count": 5,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 0,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "42",
+    "ngspice_binary": "/usr/bin/ngspice",
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "6edba54d23b38a2c60f8ffdbaa3eb75a7568c615e4820808969bd1121b77b1aa",
+    "netlist_sha256": "7c72b41761b6fbb8757d48aaa9c73f19fdadad00b727d704a7776bf1e1925c0c",
+    "netlist_closure": [
+      {
+        "path": "sim/mc-groundwork/results/20261008T235620Z/tb_trimsel_mm.spice",
+        "scope": "repo",
+        "sha256": "7c72b41761b6fbb8757d48aaa9c73f19fdadad00b727d704a7776bf1e1925c0c"
+      }
+    ],
+    "netlist_source": "schematic",
+    "monte_carlo": {
+      "n": 5,
+      "seed": 20261008,
+      "vary": "mismatch",
+      "family_mismatch": [
+        {
+          "family": "other",
+          "active": null,
+          "note": "mismatch activity for the 'other' family is not independently verified for PDK family 'gf180mcu'; treat any sampled spread for it as unconfirmed."
+        },
+        {
+          "family": "capacitor",
+          "active": null,
+          "note": "mismatch activity for the 'capacitor' family is not independently verified for PDK family 'gf180mcu'; treat any sampled spread for it as unconfirmed."
+        },
+        {
+          "family": "mosfet",
+          "active": true,
+          "note": "MOS per-instance mismatch (the fets_mm include) is gated by the model-level sw_stat_mismatch switch and scales the per-device delvto/mulu0 terms -- active whenever that switch is set (see docs/cli/sim.md's 'Known-good mismatch mechanisms')."
+        }
+      ]
+    }
+  },
+  "coverage": {
+    "corners_simulated": 5,
+    "measurements_declared": 5,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "measurement:[0,\"tt/novdd/27C/mc0\",\"code_sel\"]/observation",
+      "measurement:[0,\"tt/novdd/27C/mc0\",\"f_hold_hz\"]/observation",
+      "measurement:[0,\"tt/novdd/27C/mc0\",\"f_sel_hz\"]/observation",
+      "measurement:[0,\"tt/novdd/27C/mc0\",\"hold_gap_hz\"]/observation",
+      "measurement:[0,\"tt/novdd/27C/mc0\",\"resid_pct\"]/observation",
+      "measurement:[1,\"tt/novdd/27C/mc1\",\"code_sel\"]/observation",
+      "measurement:[1,\"tt/novdd/27C/mc1\",\"f_hold_hz\"]/observation",
+      "measurement:[1,\"tt/novdd/27C/mc1\",\"f_sel_hz\"]/observation",
+      "measurement:[1,\"tt/novdd/27C/mc1\",\"hold_gap_hz\"]/observation",
+      "measurement:[1,\"tt/novdd/27C/mc1\",\"resid_pct\"]/observation",
+      "measurement:[2,\"tt/novdd/27C/mc2\",\"code_sel\"]/observation",
+      "measurement:[2,\"tt/novdd/27C/mc2\",\"f_hold_hz\"]/observation",
+      "measurement:[2,\"tt/novdd/27C/mc2\",\"f_sel_hz\"]/observation",
+      "measurement:[2,\"tt/novdd/27C/mc2\",\"hold_gap_hz\"]/observation",
+      "measurement:[2,\"tt/novdd/27C/mc2\",\"resid_pct\"]/observation",
+      "measurement:[3,\"tt/novdd/27C/mc3\",\"code_sel\"]/observation",
+      "measurement:[3,\"tt/novdd/27C/mc3\",\"f_hold_hz\"]/observation",
+      "measurement:[3,\"tt/novdd/27C/mc3\",\"f_sel_hz\"]/observation",
+      "measurement:[3,\"tt/novdd/27C/mc3\",\"hold_gap_hz\"]/observation",
+      "measurement:[3,\"tt/novdd/27C/mc3\",\"resid_pct\"]/observation",
+      "measurement:[4,\"tt/novdd/27C/mc4\",\"code_sel\"]/observation",
+      "measurement:[4,\"tt/novdd/27C/mc4\",\"f_hold_hz\"]/observation",
+      "measurement:[4,\"tt/novdd/27C/mc4\",\"f_sel_hz\"]/observation",
+      "measurement:[4,\"tt/novdd/27C/mc4\",\"hold_gap_hz\"]/observation",
+      "measurement:[4,\"tt/novdd/27C/mc4\",\"resid_pct\"]/observation"
+    ],
+    "skipped": [],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"code_sel\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"f_hold_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"f_sel_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"hold_gap_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"resid_pct\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"code_sel\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"f_hold_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"f_sel_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"hold_gap_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"resid_pct\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"code_sel\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"f_hold_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"f_sel_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"hold_gap_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"resid_pct\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"tt/novdd/27C/mc3\",\"code_sel\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"tt/novdd/27C/mc3\",\"f_hold_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"tt/novdd/27C/mc3\",\"f_sel_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"tt/novdd/27C/mc3\",\"hold_gap_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"tt/novdd/27C/mc3\",\"resid_pct\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"tt/novdd/27C/mc4\",\"code_sel\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"tt/novdd/27C/mc4\",\"f_hold_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"tt/novdd/27C/mc4\",\"f_sel_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"tt/novdd/27C/mc4\",\"hold_gap_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"tt/novdd/27C/mc4\",\"resid_pct\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
+  },
+  "provenance": {
+    "klt_version": "0.7.0+g4cbdfa769875",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "gf180mcuC",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": {
+      "name": "sm141064.ngspice",
+      "content_hash": "sha256:6edba54d23b38a2c60f8ffdbaa3eb75a7568c615e4820808969bd1121b77b1aa",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:7c72b41761b6fbb8757d48aaa9c73f19fdadad00b727d704a7776bf1e1925c0c",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "code_sel",
+      "unit": "",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/novdd/27C/mc0",
+        "value": 163.0,
+        "margin": null
+      },
+      "monte_carlo": {
+        "n": 5,
+        "errored": 0,
+        "inconclusive": 0,
+        "mean": 162.4,
+        "stddev": 0.8944271909999159,
+        "min": 161.0,
+        "max": 163.0,
+        "quantiles": {
+          "p5": 161.20000000000002,
+          "p50": 163.0,
+          "p95": 163.0
+        },
+        "sigma_window": null,
+        "by_corner": [
+          {
+            "corner_id": "tt/novdd/27C",
+            "n": 5,
+            "errored": 0,
+            "inconclusive": 0,
+            "mean": 162.4,
+            "stddev": 0.8944271909999159,
+            "min": 161.0,
+            "max": 163.0,
+            "quantiles": {
+              "p5": 161.20000000000002,
+              "p50": 163.0,
+              "p95": 163.0
+            },
+            "sigma_window": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "f_sel_hz",
+      "unit": "Hz",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/novdd/27C/mc0",
+        "value": 48034200.0,
+        "margin": null
+      },
+      "monte_carlo": {
+        "n": 5,
+        "errored": 0,
+        "inconclusive": 0,
+        "mean": 48027020.0,
+        "stddev": 105484.96101340702,
+        "min": 47856100.0,
+        "max": 48136300.0,
+        "quantiles": {
+          "p5": 47889700.0,
+          "p50": 48034200.0,
+          "p95": 48125920.0
+        },
+        "sigma_window": null,
+        "by_corner": [
+          {
+            "corner_id": "tt/novdd/27C",
+            "n": 5,
+            "errored": 0,
+            "inconclusive": 0,
+            "mean": 48027020.0,
+            "stddev": 105484.96101340702,
+            "min": 47856100.0,
+            "max": 48136300.0,
+            "quantiles": {
+              "p5": 47889700.0,
+              "p50": 48034200.0,
+              "p95": 48125920.0
+            },
+            "sigma_window": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "f_hold_hz",
+      "unit": "Hz",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/novdd/27C/mc0",
+        "value": 48034200.0,
+        "margin": null
+      },
+      "monte_carlo": {
+        "n": 5,
+        "errored": 0,
+        "inconclusive": 0,
+        "mean": 48027020.0,
+        "stddev": 105484.96101340702,
+        "min": 47856100.0,
+        "max": 48136300.0,
+        "quantiles": {
+          "p5": 47889700.0,
+          "p50": 48034200.0,
+          "p95": 48125920.0
+        },
+        "sigma_window": null,
+        "by_corner": [
+          {
+            "corner_id": "tt/novdd/27C",
+            "n": 5,
+            "errored": 0,
+            "inconclusive": 0,
+            "mean": 48027020.0,
+            "stddev": 105484.96101340702,
+            "min": 47856100.0,
+            "max": 48136300.0,
+            "quantiles": {
+              "p5": 47889700.0,
+              "p50": 48034200.0,
+              "p95": 48125920.0
+            },
+            "sigma_window": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "resid_pct",
+      "unit": "%",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/novdd/27C/mc0",
+        "value": 0.07125,
+        "margin": null
+      },
+      "monte_carlo": {
+        "n": 5,
+        "errored": 0,
+        "inconclusive": 0,
+        "mean": 0.056291459999999995,
+        "stddev": 0.21976033904075593,
+        "min": -0.299792,
+        "max": 0.283958,
+        "quantiles": {
+          "p5": -0.22979194,
+          "p50": 0.07125,
+          "p95": 0.262333
+        },
+        "sigma_window": null,
+        "by_corner": [
+          {
+            "corner_id": "tt/novdd/27C",
+            "n": 5,
+            "errored": 0,
+            "inconclusive": 0,
+            "mean": 0.056291459999999995,
+            "stddev": 0.21976033904075593,
+            "min": -0.299792,
+            "max": 0.283958,
+            "quantiles": {
+              "p5": -0.22979194,
+              "p50": 0.07125,
+              "p95": 0.262333
+            },
+            "sigma_window": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "hold_gap_hz",
+      "unit": "Hz",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/novdd/27C/mc0",
+        "value": 0.0,
+        "margin": null
+      },
+      "monte_carlo": {
+        "n": 5,
+        "errored": 0,
+        "inconclusive": 0,
+        "mean": 0.0,
+        "stddev": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "quantiles": {
+          "p5": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "sigma_window": null,
+        "by_corner": [
+          {
+            "corner_id": "tt/novdd/27C",
+            "n": 5,
+            "errored": 0,
+            "inconclusive": 0,
+            "mean": 0.0,
+            "stddev": 0.0,
+            "min": 0.0,
+            "max": 0.0,
+            "quantiles": {
+              "p5": 0.0,
+              "p50": 0.0,
+              "p95": 0.0
+            },
+            "sigma_window": null
+          }
+        ]
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "tt/novdd/27C/mc0",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 15.556,
+      "measurements": [
+        {
+          "name": "code_sel",
+          "value": 163.0,
+          "unit": "",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "f_sel_hz",
+          "value": 48034200.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "f_hold_hz",
+          "value": 48034200.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "resid_pct",
+          "value": 0.07125,
+          "unit": "%",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "hold_gap_hz",
+          "value": 0.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "warning",
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed"
+        }
+      ],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_smoke_mm/tt_novdd_27C_mc0/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_smoke_mm/tt_novdd_27C_mc0/corner.cir"
+      },
+      "monte_carlo": {
+        "sample_index": 0,
+        "seed": 1316784515,
+        "process_seed": 1896205814,
+        "mismatch_seed": 224639185
+      }
+    },
+    {
+      "corner_id": "tt/novdd/27C/mc1",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 15.911,
+      "measurements": [
+        {
+          "name": "code_sel",
+          "value": 161.0,
+          "unit": "",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "f_sel_hz",
+          "value": 48084400.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "f_hold_hz",
+          "value": 48084400.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "resid_pct",
+          "value": 0.175833,
+          "unit": "%",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "hold_gap_hz",
+          "value": 0.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "warning",
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed"
+        }
+      ],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_smoke_mm/tt_novdd_27C_mc1/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_smoke_mm/tt_novdd_27C_mc1/corner.cir"
+      },
+      "monte_carlo": {
+        "sample_index": 1,
+        "seed": 1540059332,
+        "process_seed": 1896205814,
+        "mismatch_seed": 1360771492
+      }
+    },
+    {
+      "corner_id": "tt/novdd/27C/mc2",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 16.721,
+      "measurements": [
+        {
+          "name": "code_sel",
+          "value": 163.0,
+          "unit": "",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "f_sel_hz",
+          "value": 48024100.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "f_hold_hz",
+          "value": 48024100.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "resid_pct",
+          "value": 0.0502083,
+          "unit": "%",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "hold_gap_hz",
+          "value": 0.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_smoke_mm/tt_novdd_27C_mc2/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_smoke_mm/tt_novdd_27C_mc2/corner.cir"
+      },
+      "monte_carlo": {
+        "sample_index": 2,
+        "seed": 1563452231,
+        "process_seed": 1896205814,
+        "mismatch_seed": 1458937685
+      }
+    },
+    {
+      "corner_id": "tt/novdd/27C/mc3",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 18.308,
+      "measurements": [
+        {
+          "name": "code_sel",
+          "value": 163.0,
+          "unit": "",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "f_sel_hz",
+          "value": 48136300.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "f_hold_hz",
+          "value": 48136300.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "resid_pct",
+          "value": 0.283958,
+          "unit": "%",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "hold_gap_hz",
+          "value": 0.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "warning",
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed"
+        }
+      ],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_smoke_mm/tt_novdd_27C_mc3/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_smoke_mm/tt_novdd_27C_mc3/corner.cir"
+      },
+      "monte_carlo": {
+        "sample_index": 3,
+        "seed": 1041538739,
+        "process_seed": 1896205814,
+        "mismatch_seed": 916262379
+      }
+    },
+    {
+      "corner_id": "tt/novdd/27C/mc4",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 17.613,
+      "measurements": [
+        {
+          "name": "code_sel",
+          "value": 162.0,
+          "unit": "",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "f_sel_hz",
+          "value": 47856100.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "f_hold_hz",
+          "value": 47856100.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "resid_pct",
+          "value": -0.299792,
+          "unit": "%",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "hold_gap_hz",
+          "value": 0.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "warning",
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed"
+        }
+      ],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_smoke_mm/tt_novdd_27C_mc4/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_smoke_mm/tt_novdd_27C_mc4/corner.cir"
+      },
+      "monte_carlo": {
+        "sample_index": 4,
+        "seed": 785047205,
+        "process_seed": 1896205814,
+        "mismatch_seed": 1619286849
+      }
+    }
+  ]
+}

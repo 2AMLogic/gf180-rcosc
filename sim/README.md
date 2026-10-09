@@ -43,6 +43,15 @@ sim/
     corners/<runid>/      raw ngspice logs, one per (side, operating point)
     results/<runid>/      results.csv, manifest.json, summary.md, plus the
                            extracted netlist and `klt extract` JSON report
+  mc-groundwork/
+    gen_bench.py           the item-6 Monte Carlo groundwork bench generator
+                           (issue #77): per-sample trim-code selection bench,
+                           zero-mismatch control, fixed-code reference
+    run-groundwork.sh      wrapper: generates the benches, runs the `klt sim`
+                           requests into a new results/<runid>/
+    results/<runid>/       requests, benches, reports, model-mismatch evidence,
+                           failed batch attempts; see mc-groundwork/README.md
+                           for the feasibility verdict. No yield claim
 ```
 
 `<runid>` is a UTC timestamp (`YYYYMMDDTHHMMSSZ`) assigned at invocation

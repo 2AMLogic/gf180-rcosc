@@ -1,0 +1,546 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": null,
+    "scope": "external"
+  },
+  "status": "error",
+  "corner_count": 6,
+  "passed": 0,
+  "failed": 0,
+  "errored": 6,
+  "metrics": {
+    "sim__corner__count": 6,
+    "sim__corner__passed_count": 0,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 6
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": null,
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "6edba54d23b38a2c60f8ffdbaa3eb75a7568c615e4820808969bd1121b77b1aa",
+    "netlist_sha256": "a20ea44f9954bf535bd2a3131f20ebb1e0d75cf2bd91f69c5cfd5a805af589fa",
+    "netlist_source": "schematic",
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-e22282040d16",
+      "bucket": "2am-batch-jobs-221082181346",
+      "region": "us-east-1",
+      "instance_id": "i-00d155321aeca570c",
+      "instance_type": "c7i.8xlarge",
+      "availability_zone": "us-east-1a",
+      "ami_id": "ami-0e40e3245f1923ac8",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "failed",
+      "exit_code": "1",
+      "concurrency": "2",
+      "physical_cores": "16",
+      "elapsed_seconds": 5
+    }
+  },
+  "coverage": {
+    "corners_simulated": 6,
+    "measurements_declared": 3,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [],
+    "skipped": [
+      {
+        "id": "measurement:[0,\"tt/160.000V/27C\",\"fosc\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[0,\"tt/160.000V/27C\",\"ta\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[0,\"tt/160.000V/27C\",\"tb\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"tt/161.000V/27C\",\"fosc\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"tt/161.000V/27C\",\"ta\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"tt/161.000V/27C\",\"tb\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"tt/162.000V/27C\",\"fosc\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"tt/162.000V/27C\",\"ta\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"tt/162.000V/27C\",\"tb\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[3,\"tt/163.000V/27C\",\"fosc\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[3,\"tt/163.000V/27C\",\"ta\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[3,\"tt/163.000V/27C\",\"tb\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[4,\"tt/164.000V/27C\",\"fosc\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[4,\"tt/164.000V/27C\",\"ta\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[4,\"tt/164.000V/27C\",\"tb\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[5,\"tt/165.000V/27C\",\"fosc\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[5,\"tt/165.000V/27C\",\"ta\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[5,\"tt/165.000V/27C\",\"tb\"]/observation",
+        "reason": "unavailable_measurement"
+      }
+    ],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"tt/160.000V/27C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/160.000V/27C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/160.000V/27C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/161.000V/27C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/161.000V/27C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/161.000V/27C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/162.000V/27C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/162.000V/27C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/162.000V/27C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"tt/163.000V/27C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"tt/163.000V/27C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"tt/163.000V/27C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"tt/164.000V/27C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"tt/164.000V/27C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"tt/164.000V/27C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"tt/165.000V/27C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"tt/165.000V/27C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"tt/165.000V/27C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": true,
+    "nothing_checked_reasons": [
+      "characterization_without_limits",
+      "unavailable_measurement"
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.6.0",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "gf180mcuC",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": {
+      "name": "sm141064.ngspice",
+      "content_hash": "sha256:6edba54d23b38a2c60f8ffdbaa3eb75a7568c615e4820808969bd1121b77b1aa",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:a20ea44f9954bf535bd2a3131f20ebb1e0d75cf2bd91f69c5cfd5a805af589fa",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "ta",
+      "unit": "s",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "tt/160.000V/27C",
+        "value": null,
+        "margin": null
+      }
+    },
+    {
+      "name": "tb",
+      "unit": "s",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "tt/160.000V/27C",
+        "value": null,
+        "margin": null
+      }
+    },
+    {
+      "name": "fosc",
+      "unit": "Hz",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "tt/160.000V/27C",
+        "value": null,
+        "margin": null
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "tt/160.000V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vc": 160.0
+      },
+      "temperature_c": 27,
+      "status": "error",
+      "runtime_s": 0.0,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-e22282040d16 finished 'failed' without a usable report: job command exited 1"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/161.000V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vc": 161.0
+      },
+      "temperature_c": 27,
+      "status": "error",
+      "runtime_s": 0.0,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-e22282040d16 finished 'failed' without a usable report: job command exited 1"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/162.000V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vc": 162.0
+      },
+      "temperature_c": 27,
+      "status": "error",
+      "runtime_s": 0.0,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-e22282040d16 finished 'failed' without a usable report: job command exited 1"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/163.000V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vc": 163.0
+      },
+      "temperature_c": 27,
+      "status": "error",
+      "runtime_s": 0.0,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-e22282040d16 finished 'failed' without a usable report: job command exited 1"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/164.000V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vc": 164.0
+      },
+      "temperature_c": 27,
+      "status": "error",
+      "runtime_s": 0.0,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-e22282040d16 finished 'failed' without a usable report: job command exited 1"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/165.000V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vc": 165.0
+      },
+      "temperature_c": 27,
+      "status": "error",
+      "runtime_s": 0.0,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-e22282040d16 finished 'failed' without a usable report: job command exited 1"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    }
+  ]
+}

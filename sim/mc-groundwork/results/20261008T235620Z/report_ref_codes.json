@@ -1,0 +1,461 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/mc-groundwork/results/20261008T235620Z/tb_fixedcode.spice",
+    "scope": "repo"
+  },
+  "status": "pass",
+  "corner_count": 6,
+  "passed": 6,
+  "failed": 0,
+  "errored": 0,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {
+      "nonconvergence": 1
+    },
+    "by_severity": {
+      "warning": 1
+    },
+    "corners_with_diagnostics": 1
+  },
+  "metrics": {
+    "sim__corner__count": 6,
+    "sim__corner__passed_count": 6,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 0,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "42",
+    "ngspice_binary": "/usr/bin/ngspice",
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "6edba54d23b38a2c60f8ffdbaa3eb75a7568c615e4820808969bd1121b77b1aa",
+    "netlist_sha256": "a20ea44f9954bf535bd2a3131f20ebb1e0d75cf2bd91f69c5cfd5a805af589fa",
+    "netlist_closure": [
+      {
+        "path": "sim/mc-groundwork/results/20261008T235620Z/tb_fixedcode.spice",
+        "scope": "repo",
+        "sha256": "a20ea44f9954bf535bd2a3131f20ebb1e0d75cf2bd91f69c5cfd5a805af589fa"
+      }
+    ],
+    "netlist_source": "schematic"
+  },
+  "coverage": {
+    "corners_simulated": 6,
+    "measurements_declared": 3,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "measurement:[0,\"tt/160.000V/27C\",\"fosc\"]/observation",
+      "measurement:[0,\"tt/160.000V/27C\",\"ta\"]/observation",
+      "measurement:[0,\"tt/160.000V/27C\",\"tb\"]/observation",
+      "measurement:[1,\"tt/161.000V/27C\",\"fosc\"]/observation",
+      "measurement:[1,\"tt/161.000V/27C\",\"ta\"]/observation",
+      "measurement:[1,\"tt/161.000V/27C\",\"tb\"]/observation",
+      "measurement:[2,\"tt/162.000V/27C\",\"fosc\"]/observation",
+      "measurement:[2,\"tt/162.000V/27C\",\"ta\"]/observation",
+      "measurement:[2,\"tt/162.000V/27C\",\"tb\"]/observation",
+      "measurement:[3,\"tt/163.000V/27C\",\"fosc\"]/observation",
+      "measurement:[3,\"tt/163.000V/27C\",\"ta\"]/observation",
+      "measurement:[3,\"tt/163.000V/27C\",\"tb\"]/observation",
+      "measurement:[4,\"tt/164.000V/27C\",\"fosc\"]/observation",
+      "measurement:[4,\"tt/164.000V/27C\",\"ta\"]/observation",
+      "measurement:[4,\"tt/164.000V/27C\",\"tb\"]/observation",
+      "measurement:[5,\"tt/165.000V/27C\",\"fosc\"]/observation",
+      "measurement:[5,\"tt/165.000V/27C\",\"ta\"]/observation",
+      "measurement:[5,\"tt/165.000V/27C\",\"tb\"]/observation"
+    ],
+    "skipped": [],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"tt/160.000V/27C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/160.000V/27C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/160.000V/27C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/161.000V/27C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/161.000V/27C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/161.000V/27C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/162.000V/27C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/162.000V/27C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/162.000V/27C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"tt/163.000V/27C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"tt/163.000V/27C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"tt/163.000V/27C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"tt/164.000V/27C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"tt/164.000V/27C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"tt/164.000V/27C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"tt/165.000V/27C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"tt/165.000V/27C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"tt/165.000V/27C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
+  },
+  "provenance": {
+    "klt_version": "0.7.0+g4cbdfa769875",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "gf180mcuC",
+      "source": "search root: ~/.volare",
+      "version": "open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b"
+    },
+    "deck": {
+      "name": "sm141064.ngspice",
+      "content_hash": "sha256:6edba54d23b38a2c60f8ffdbaa3eb75a7568c615e4820808969bd1121b77b1aa",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:a20ea44f9954bf535bd2a3131f20ebb1e0d75cf2bd91f69c5cfd5a805af589fa",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "ta",
+      "unit": "s",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/160.000V/27C",
+        "value": 8.7215e-08,
+        "margin": null
+      }
+    },
+    {
+      "name": "tb",
+      "unit": "s",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/160.000V/27C",
+        "value": 5.09029e-07,
+        "margin": null
+      }
+    },
+    {
+      "name": "fosc",
+      "unit": "Hz",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/160.000V/27C",
+        "value": 47414300.0,
+        "margin": null
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "tt/160.000V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vc": 160.0
+      },
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 2.329,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": 8.7215e-08,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": 5.09029e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": 47414300.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_ref_codes/tt_160p000V_27C/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_ref_codes/tt_160p000V_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/161.000V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vc": 161.0
+      },
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 2.024,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": 8.83476e-08,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": 5.08071e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": 47650400.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "warning",
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed"
+        }
+      ],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_ref_codes/tt_161p000V_27C/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_ref_codes/tt_161p000V_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/162.000V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vc": 162.0
+      },
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 2.026,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": 8.47032e-08,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": 5.01983e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": 47929400.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_ref_codes/tt_162p000V_27C/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_ref_codes/tt_162p000V_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/163.000V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vc": 163.0
+      },
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 2.029,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": 8.44459e-08,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": 4.99594e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": 48175500.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_ref_codes/tt_163p000V_27C/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_ref_codes/tt_163p000V_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/164.000V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vc": 164.0
+      },
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 2.08,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": 8.55019e-08,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": 4.98093e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": 48474100.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_ref_codes/tt_164p000V_27C/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_ref_codes/tt_164p000V_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/165.000V/27C",
+      "process": "tt",
+      "supply_v": {
+        "vc": 165.0
+      },
+      "temperature_c": 27,
+      "status": "pass",
+      "runtime_s": 1.823,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": 8.33968e-08,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": 4.93376e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": 48783000.0,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_ref_codes/tt_165p000V_27C/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/art_ref_codes/tt_165p000V_27C/corner.cir"
+      },
+      "monte_carlo": null
+    }
+  ]
+}
