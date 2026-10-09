@@ -25,7 +25,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#91**: Characterize clk output pulse width and period jitter (unspecified quantities the discipline model assumes)
 
 ## PRs Awaiting Review
 
@@ -43,13 +43,13 @@ _None._
 
 Issues carrying `loom:curated`.
 
-_None._
+- **#91**: Characterize clk output pulse width and period jitter (unspecified quantities the discipline model assumes) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
 - **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b) *(architect)*
-- **#91**: Characterize clk output pulse width and period jitter (unspecified quantities the discipline model assumes) *(architect)*
-- **#92**: Dynamic supply-transient and ripple response bench (only static VDD corners are characterized today) *(architect)*
+- **#106**: Trim-pin logic-level interface: characterize VIL/VIH trip point, input leakage and capacitance (no bench or row today) *(architect)*
+- **#107**: CI guard: offline consistency check between pvt_tb.spice, rcosc_top.spice and the per-bench DUT netlist copies *(architect)*
 
 ## Epics
 
@@ -62,10 +62,10 @@ _None._
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 0 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 0 |
+| Curated | 1 |
 | Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->

@@ -4,6 +4,9 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-09
 
+- **PR #108**: sim/supply-transient: offline supply-step and ripple bench (generator, analyzer, tests, CI)
+- **PR #105**: Live trim-code transition bench: generator, analyzer, offline suite (results pending batch runner) (#103)
+- **Issue #92** (closed): Dynamic supply-transient and ripple response bench (only static VDD corners are characterized today)
 - **PR #102**: ci: run offline waveform fixture suite (#101)
 - **PR #100**: feat(waveform): offline clk waveform-shape harness (#91, offline subset)
 - **Issue #101** (closed): Run the offline waveform fixture suite in CI
