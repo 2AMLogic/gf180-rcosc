@@ -41,6 +41,15 @@ What the public PDK documents about this (google/gf180mcu-pdk at commit
 So there is **no PDK-sourced sigma** for either device. The values below are
 engineering assumptions, flagged as DR-0003 flags its own.
 
+[0021](0021-runtime-discipline-trim-resolution-sof-loop-model.md)
+(its Decision item 1), which landed before this record, constrains
+S1 on the committed design: the realized trim curve has a geometric-mean
+step of 0.41-0.47 %/code (not the ratified 0.314 %/code) and four
+**deterministic** non-monotone carries of -1.4 % to -6.1 % (0x7F->0x80,
+0xBF->0xC0, 0xDF->0xE0, 0xEF->0xF0) with no mismatch at all. Any
+mismatch-driven monotonicity statement below is therefore made relative to
+the zero-mismatch baseline, not to an ideal +1 LSB step.
+
 klayout-tools#2898 (`family_mismatch` reports these subcircuits as
 `other`, `active: null`) is a reporting gap and does not change the
 mechanism: no `klt sim` option exists to enable mismatch on a subcircuit
@@ -84,15 +93,42 @@ design (arithmetic done for this record, not simulated):
 | `RBA`/`RBB`/`RBC`, `RZ` | 0.07 %, 0.12 % | divider ratio and bias-resistor error |
 | `CTIMING` | 0.07 % | a single capacitor has no matching partner; see claims below |
 
-In LSB units (0.314 %/code, DR-0003), segment `Ri` has sigma
+**Ideal-ladder assumption.** The LSB-unit figures below treat the segment
+resistance as the only code-dependent term, i.e. an ideal binary ladder in
+which segment `Ri` is worth exactly 2^i LSB. The realized curve also
+contains the trim switches' on-resistance, which is MOS and is already
+covered by the PDK's MOS mismatch, and it is not an ideal binary ladder
+(DR-0021: 0.41-0.47 %/code mean step, four non-monotone carries at 0x). The
+figures are an order-of-magnitude sizing of the injected term, not a
+prediction of the realized curve.
+
+Under that assumption, in LSB units segment `Ri` has sigma
 0.0082 x 2^(i/2) LSB (0.008 LSB for `R0`, 0.093 LSB for `R7`). The summed
-ladder sigma is about 0.13 LSB (about 0.041 % in frequency). The MSB
-transition (`R7` against the sum of `R0`-`R6`) has a step-size sigma of
-0.13 LSB, so a non-monotonic step needs about a 7.7-sigma event at 1x. This
-is far inside the DR-0003 +/-0.300 % trim-DAC assumption: that assumption is
-equivalent to a roughly 3-sigma bound if `A_R` were about 2.4 %.um. The
-campaign reports the sampled ladder contribution next to the 0.300 % figure;
-it does not treat the assumption as confirmed, and does not edit it.
+ladder sigma is 0.0082 x sqrt(255), about 0.13 LSB. In frequency that is
+about 0.041 % at the ratified 0.314 %/code (DR-0003), or about
+0.054-0.061 % at DR-0021's realized 0.41-0.47 %/code mean step. Either
+figure is far inside the DR-0003 +/-0.300 % trim-DAC assumption, so the
+conclusion does not depend on which step is used: the 0.300 % figure is
+equivalent to a roughly 3-sigma bound only if `A_R` were about 2.4 %.um
+(0.314 %/code) or about 1.6-1.9 %.um (0.41-0.47 %/code). The campaign
+reports the sampled ladder contribution next to the 0.300 % figure; it does
+not treat the assumption as confirmed, and does not edit it.
+
+**Step-size deviation, not raw step sign.** For each sampled transition the
+campaign reports the deviation of the sampled step from the same
+transition's step in the zero-mismatch run (`sampled step - 0x step`). A
+transition `k` (`R_k` against the sum of the lower segments) has a
+deviation sigma of 0.0082 x sqrt(2^(k+1) - 1) LSB under the ideal-ladder
+assumption; for the MSB transition (0x7F->0x80) that is 0.13 LSB at 1x. A
+mismatch-induced non-monotonicity is counted only on transitions that are
+monotone in the zero-mismatch run, and its likelihood depends on that
+transition's baseline step margin divided by the deviation sigma. The
+transitions DR-0021 lists as non-monotone at 0x (including 0x7F->0x80) are
+non-monotone in essentially every sample at every scale; they are a
+deterministic trim-bank property, reported as such and not attributed to
+mismatch. For illustration only: a transition with an ideal +1 LSB
+baseline step and the MSB-transition sigma would need about a 7.7-sigma
+event at 1x.
 
 **Not modelled** (stated so nobody infers otherwise): layout gradients and
 common-centroid benefit, contact/end-resistance and edge-roughness terms
@@ -120,19 +156,26 @@ sample can be re-derived.
   injected sigma, and the same 3x is applied to the PDK's MOS terms, as
   DR-0019 states for "the mismatch sigma". The pass criterion is DR-0019's:
   clearly degraded yield, claim fails. This record notes the honest limit: at
-  `A_R` = 1.0 %.um the 3x MSB-transition sigma is about 0.39 LSB, so
-  non-monotonicity occurs in about 0.5 % of dies, which by itself is not a
-  clear failure. The detection of the harness therefore rests on the
-  aggregate run (MOS terms dominate comparator offset); the injected terms
-  are shown live by a second control.
+  `A_R` = 1.0 %.um the 3x MSB-transition deviation sigma is about 0.39 LSB
+  (ideal ladder). Even on a transition with an ideal +1 LSB baseline step
+  that would turn monotone into non-monotone in only about 0.5 % of dies,
+  which by itself is not a clear failure. The detection of the harness
+  therefore rests on the aggregate run (MOS terms dominate comparator
+  offset); the injected terms are shown live by a second control.
 - **Injected-term sensitivity control** (not a yield claim): with MOS
-  mismatch off, injected terms alone at 1x and at 10x. The sampled sigma of
-  the step size (MSB transition) and of code-selection spread must scale
-  with `mm_scale` within sampling error (ratio about 10), and at 10x the
-  non-monotonic fraction must be visibly nonzero (about 22 % predicted for
-  the MSB transition). If it does not scale, the injection is not live and
-  the campaign yields no verdict, exactly as DR-0019 says for any control
-  that misbehaves.
+  mismatch off, injected terms alone at 1x and at 10x. **Pass criterion**:
+  the sampled sigma of the step-size deviation from the zero-mismatch run
+  (MSB transition and each other reported transition) and of the
+  code-selection spread must scale with `mm_scale`, with a 10x/1x ratio of
+  about 10 within sampling error. This criterion is insensitive to the
+  deterministic carries, because a fixed offset does not change the sampled
+  spread. A non-monotonic fraction is **not** the pass test: the
+  0x-non-monotone transitions (DR-0021) would show a nonzero fraction even
+  with a dead injection. A change in the non-monotonic fraction on
+  transitions that are monotone at 0x may be reported as supporting
+  information only. If the sigma does not scale, the injection is not live
+  and the campaign yields no verdict, exactly as DR-0019 says for any
+  control that misbehaves.
 
 This adds a control and does not change DR-0019's.
 
@@ -179,8 +222,11 @@ May claim:
 - S1-S3 yield **under the stated model** ("with an assumed area-scaled
   random mismatch, `A_R` = `A_C` = 1.0 %.um, plus the PDK's MOS mismatch"),
   with the sigma assumption quoted next to every yield figure.
-- The sampled ladder contribution (step-size sigma, monotonicity fraction,
-  code-headroom) as simulation outputs of that model.
+- The sampled ladder contribution (step-size deviation sigma relative to
+  the zero-mismatch run, mismatch-induced non-monotonic fraction on
+  transitions monotone at 0x, code-headroom) as simulation outputs of that
+  model. The 0x non-monotone carries (DR-0021) are reported separately as a
+  deterministic property of the design, not as a mismatch yield.
 - A sensitivity statement: the yield at 1x and 3x, and the `A_R` at which
   the claim would stop passing if the campaign computes it.
 
@@ -231,10 +277,18 @@ fixes only how the yield evidence is produced.
 - S1/S2/S3 yield statements are conditional on two flagged assumptions
   (`A_R`, `A_C`); the sigma must be quoted with every figure, and revised by
   a superseding record if a public source or silicon data appears.
-- At 1x the ladder term (about 0.04 % f) is well under the DR-0003 +/-0.300 %
-  assumption, so the sampled ladder is unlikely to be the dominant term. That
-  is a property of the assumed sigma and is not evidence that the
-  assumption is conservative.
+- At 1x the ladder term (about 0.041 % f at the ratified 0.314 %/code, about
+  0.054-0.061 % at DR-0021's realized 0.41-0.47 %/code, both under the
+  ideal-ladder assumption) is well under the DR-0003 +/-0.300 % assumption,
+  so the sampled ladder is unlikely to be the dominant term. That is a
+  property of the assumed sigma and is not evidence that the assumption is
+  conservative.
+- S1 monotonicity cannot be a plain "all steps positive" yield on the
+  committed design: DR-0021's four carries are non-monotone at 0x. The
+  campaign reports the mismatch contribution relative to the 0x baseline;
+  whether the deterministic carries fail S1 is a trim-bank question
+  (DR-0021 consequences), not something this record or the mismatch
+  campaign resolves.
 - The 3x control may not by itself fail the claim for the ladder; the
   extra sensitivity control carries that burden, and a failure there means
   no verdict.
