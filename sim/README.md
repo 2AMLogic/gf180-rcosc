@@ -6,6 +6,12 @@ this directory is a dated, immutable record of a simulation run. **Never
 overwrite or edit a prior run's raw output** — a re-run adds a new,
 timestamped directory alongside the old one, never in place of it.
 
+This is enforced in CI by `.github/workflows/sim-append-only.yml`, which
+runs `sim/check-append-only.sh <base-sha>` and fails a PR that modifies,
+deletes, or renames anything under `sim/*/results/`. Narrow, reasoned
+exceptions go in `sim/append-only-exceptions.txt`
+(`<run path prefix> | <reason>`).
+
 ```
 sim/
   README.md              this file

@@ -1,0 +1,26 @@
+name: Sim append-only
+
+# Rejects PRs that modify, delete, or rename files under sim/*/results/
+# (additions of new run dirs are fine). Separate from signoff.yml on purpose:
+# signoff.yml is a hashed, audited artifact. Exceptions live in
+# sim/append-only-exceptions.txt. See sim/README.md.
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  append-only:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Fetch PR base
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: git fetch --no-tags --depth=1 origin "$BASE_SHA"
+      - name: Check sim results are append-only
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: sim/check-append-only.sh "$BASE_SHA" HEAD

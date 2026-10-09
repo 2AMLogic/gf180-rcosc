@@ -1,0 +1,6 @@
+# Narrow, reviewed exceptions to the sim/*/results append-only guard
+# (sim/check-append-only.sh). One entry per line:
+#   <run path prefix> | <reason>
+# The reason is mandatory; an empty reason fails the guard. Match is by path
+# prefix (use a run directory, not a blanket glob). Entries are reviewed in
+# the PR that adds them. Default: no exceptions.
