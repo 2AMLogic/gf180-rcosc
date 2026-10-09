@@ -128,7 +128,7 @@ host's ngspice 42 reads the same code 0.4 % apart: 0xA3 is 47.98186 MHz in
 fix `reltol` and the simulator version before it quotes residuals. This is
 recorded, not acted on: no committed result is changed.
 
-## Batch fleet: not usable on 2026-10-08 (reported, not worked around)
+## Batch fleet: not usable on 2026-10-08; local fallback was a host-rule deviation
 
 The three requests are expressed as `klt sim` requests and would go to the
 Spot fleet on a host exporting `KLT_SIM_BACKEND=batch`. They did not run
@@ -144,11 +144,20 @@ there:
   was not retrievable with this host's credentials. This matches
   klayout-tools#2882 (open); data point added there.
 
-Because the bench and its two requests (3 and 5 samples) are a smoke run,
-they were run on this host with `--backend local` (serial). The six-code
-fixed-code reference is a six-corner grid of one short solve each; it was
-also run locally (12 s), which is more than "single unit" — flagged for the
-reviewer. An earlier attempt of the same six-code grid with `uvx
+**Deviation from the host's batch-only rule.** The dispatch host's rule is
+that multi-corner and Monte Carlo `klt sim` requests go to the batch fleet,
+and that a failed batch submit is reported, not worked around by running the
+grid locally. After the batch failures above, the committed multi-unit runs
+were nevertheless run on this host with `--backend local` (serial) as a
+fallback: the 3-sample zero-mismatch control, the 5-sample mismatch smoke,
+and the six-code fixed-code reference grid (six corners of one short solve
+each, 12 s). None of these is a single-unit debug probe; this was a local
+fallback after the batch fleet failed, not a normal single-unit run, and it
+is recorded here as a deviation. The batch failure evidence is in
+`results/20261008T235620Z/batch-attempts/`. The committed outputs are kept
+as-is (append-only), and no further local multi-unit runs are to be added to
+this groundwork: any larger evidence, including the campaign itself, waits
+on the fleet and #66. An earlier attempt of the same six-code grid with `uvx
 klayout-tools==0.5.0` also ran locally (that version ignores
 `KLT_SIM_BACKEND`); its output is not committed, and it reproduced the same
 six values. The 500-sample campaign must not be run until the fleet accepts

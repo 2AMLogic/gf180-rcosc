@@ -1,0 +1,93 @@
+{
+  "runid": "20261008T235538Z",
+  "git_sha": "b5d4f5cdda553cc32538af9348c8d2c3940a0bc3",
+  "dirty_tree": false,
+  "klt": "klt 0.7.0+g4cbdfa769875",
+  "ramp_ns": 1000,
+  "tail_ns": 2000,
+  "tail_tol": 0.005,
+  "spec_us": 10.0,
+  "bands": {
+    "1.1%": 0.011,
+    "2.9%": 0.029,
+    "10.8%": 0.108
+  },
+  "primary_band": "1.1%",
+  "trim_code": "0xA3",
+  "sim_reports": [
+    {
+      "report": "st-probe.json",
+      "vdd_v": 3.0,
+      "remote": null,
+      "status": "pass",
+      "corner_count": 1
+    },
+    {
+      "report": "st-probe2.json",
+      "vdd_v": 3.3,
+      "remote": null,
+      "status": "pass",
+      "corner_count": 1
+    }
+  ],
+  "note": "SINGLE-CORNER LOCAL PROBES ONLY (ss/-40C/3.0V and tt/27C/3.3V via klt sim --backend local); NOT the 63-point factorial, which could not run on the fleet: see batch-attempts/",
+  "band_pass_counts": {
+    "1.1%": {
+      "pass": 2,
+      "total": 2
+    },
+    "2.9%": {
+      "pass": 2,
+      "total": 2
+    },
+    "10.8%": {
+      "pass": 2,
+      "total": 2
+    }
+  },
+  "worst_settle_ns": {
+    "1.1%": 1173.5580666349094,
+    "2.9%": 1173.5580666349094,
+    "10.8%": 1066.6900156694742
+  },
+  "points": [
+    {
+      "process": "ss",
+      "temp_c": -40.0,
+      "vdd_v": 3.0,
+      "klt_status": "pass",
+      "t_first_edge_ns": 909.822,
+      "n_edges": 677,
+      "tstop_ns": 20000.0,
+      "t_vdd90_ns": 900.0560000000436,
+      "clk_min_v": -0.1658254635979906,
+      "clk_max_v": 3.022091678975388,
+      "n_tail_edges": 71,
+      "f_settled_mhz": 35.61702294691681,
+      "tail_dev_pct": 0.2470384980047334,
+      "status": "STARTED",
+      "t_settle_1.1%_ns": 1173.5580666349094,
+      "t_settle_2.9%_ns": 1173.5580666349094,
+      "t_settle_10.8%_ns": 1066.6900156694742
+    },
+    {
+      "process": "tt",
+      "temp_c": 27.0,
+      "vdd_v": 3.3,
+      "klt_status": "pass",
+      "t_first_edge_ns": 595.75,
+      "n_edges": 926,
+      "tstop_ns": 20000.0,
+      "t_vdd90_ns": 900.0745332261733,
+      "clk_min_v": -0.1386816555533327,
+      "clk_max_v": 3.30942307070493,
+      "n_tail_edges": 96,
+      "f_settled_mhz": 48.13957414377596,
+      "tail_dev_pct": 0.16234974635422786,
+      "status": "STARTED",
+      "t_settle_1.1%_ns": 891.485729680341,
+      "t_settle_2.9%_ns": 869.5882026086639,
+      "t_settle_10.8%_ns": 792.8086245770779
+    }
+  ]
+}
