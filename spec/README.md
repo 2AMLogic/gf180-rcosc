@@ -55,3 +55,4 @@ own Status field alone (0002 is still "Ratified" in its own file) and is
 annotated here in the index instead — `TEMPLATE.md`'s Status field models
 supersession as all-or-nothing, and rewriting it would violate the
 append-only rule above.
+| [0022](decision-records/0022-mc-matching-model-trim-ladder-resistors-and-mim-capacitor.md) | Monte Carlo matching model for the trim-ladder resistors and MIM capacitor - injected area-scaled mismatch (flagged-assumption sigmas), netlist-body multipliers, controls, claim limits | Proposed (no ratified row changed) |
