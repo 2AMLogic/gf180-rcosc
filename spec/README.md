@@ -45,6 +45,7 @@ every filename in this directory on `main`, including superseded records).
 | [0018](decision-records/0018-comparator-pmos-respin-postlayout-pex-reverification.md) | Comparator PMOS re-spin post-layout (PEX) PVT re-verification — always-slower −18.78%…−36.86% (mean −25.65%), worst `ff`/−40 °C/3.6 V; both DR-0017 guardrails hold extracted-side (guardrail cell −31.16% under basis; every corner calibrates inner-range, `ss` at `0xF7` with ≈+4.7% headroom — the named risk) | Ratified (supersedes 0010/0013/0015 post-layout figures for the post-#60 hierarchy; no ratified spec row changes; retires 0017's post-layout deferral) |
 | [0019](decision-records/0019-statistical-vs-deterministic-spec-rows-and-monte-carlo-evidence-plan.md) | Statistical vs deterministic spec rows, and the Monte Carlo evidence plan (`klt yield`, batch-fleet `monte_carlo`, after #66) | Proposed (classification and evidence plan only; no ratified spec row changes) |
 | [0021](decision-records/0021-runtime-discipline-trim-resolution-sof-loop-model.md) | Runtime-discipline row: behavioural SOF-loop model on the committed freq-vs-code data - 8-bit/0.314 %/code interface does not meet +/-0.25 % per frame (realized step 0.41-0.47 %/code mean, 0.83 % max, four non-monotone carries); meets it as a 16-64 ms mean only with a fractional-code dither; post-layout `ss` saturates at -40 C/3.0 V (-0.343 %) | Proposed (evidence record; no ratified row changed, DR-0019 row 6 stays reserved) |
+| [0022](decision-records/0022-mc-matching-model-trim-ladder-resistors-and-mim-capacitor.md) | Monte Carlo matching model for the trim-ladder resistors and MIM capacitor - injected area-scaled mismatch (flagged-assumption sigmas), netlist-body multipliers, controls, claim limits | Proposed (no ratified row changed) |
 (docs(spec): renumber the delay-residue record 0015 -> 0016 (collision with the concurrently-landed trim-bank re-spin record))
 
 A record is never deleted or rewritten once ratified — a later change
@@ -55,4 +56,3 @@ own Status field alone (0002 is still "Ratified" in its own file) and is
 annotated here in the index instead — `TEMPLATE.md`'s Status field models
 supersession as all-or-nothing, and rewriting it would violate the
 append-only rule above.
-| [0022](decision-records/0022-mc-matching-model-trim-ladder-resistors-and-mim-capacitor.md) | Monte Carlo matching model for the trim-ladder resistors and MIM capacitor - injected area-scaled mismatch (flagged-assumption sigmas), netlist-body multipliers, controls, claim limits | Proposed (no ratified row changed) |
