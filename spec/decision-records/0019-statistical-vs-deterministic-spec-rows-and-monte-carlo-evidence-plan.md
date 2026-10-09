@@ -97,6 +97,11 @@ usable through `klt sim` `monte_carlo` is verified by the campaign's first
 step; if not, that is a recorded blocker and a generic tool-gap issue, not a
 reason to substitute a corner sweep.
 
+The matching model for the trim-ladder resistors and the MIM capacitor, which
+the PDK models cannot sample, and how the 3x negative control applies to it,
+are decided in
+[0022](0022-mc-matching-model-trim-ladder-resistors-and-mim-capacitor.md).
+
 ### 3. Evidence verb and execution
 
 The evidence verb is `klt yield`, which needs the `klayout-tools[yield]`

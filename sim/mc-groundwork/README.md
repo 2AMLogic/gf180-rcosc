@@ -40,7 +40,10 @@ therefore need a stated, design-owned matching model for the ladder resistors
 (and the capacitor) injected into the netlist (e.g. per-segment Pelgrom
 multipliers drawn from `mc_mismatch_seed`) with the assumption recorded in a
 decision record, or the campaign must say that its MC covers MOS mismatch only.
-That choice is the campaign's, not made here, and nothing here relaxes a row.
+That choice was made afterwards in
+[DR-0022](../../spec/decision-records/0022-mc-matching-model-trim-ladder-resistors-and-mim-capacitor.md)
+(inject a flagged-assumption matching model via netlist-body multipliers);
+nothing here relaxes a row.
 
 `klt sim` itself expresses the MOS case correctly: `monte_carlo` seeds
 `.options seed=` per sample, and `sw_stat_mismatch=1` set in the netlist body
