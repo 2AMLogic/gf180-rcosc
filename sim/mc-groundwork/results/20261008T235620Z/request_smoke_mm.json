@@ -1,0 +1,68 @@
+{
+  "netlist": "tb_trimsel_mm.spice",
+  "engine": "ngspice",
+  "netlist_source": "schematic",
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "tt",
+        "sections": [
+          "typical",
+          "res_typical",
+          "mimcap_typical",
+          "cap_mim"
+        ]
+      }
+    ],
+    "temperature_c": [
+      27
+    ]
+  },
+  "analysis": {
+    "kind": "op",
+    "args": ""
+  },
+  "measurements": [
+    {
+      "name": "code_sel",
+      "expr": "$v_code",
+      "unit": ""
+    },
+    {
+      "name": "f_sel_hz",
+      "expr": "$v_fsel",
+      "unit": "Hz"
+    },
+    {
+      "name": "f_hold_hz",
+      "expr": "$v_fhold",
+      "unit": "Hz"
+    },
+    {
+      "name": "resid_pct",
+      "expr": "$v_res",
+      "unit": "%"
+    },
+    {
+      "name": "hold_gap_hz",
+      "expr": "$v_gap",
+      "unit": "Hz"
+    }
+  ],
+  "batch": {
+    "capacity_wait_s": 1200
+  },
+  "options": {
+    "timeout_s": 1800,
+    "keep_artifacts": true
+  },
+  "monte_carlo": {
+    "n": 5,
+    "seed": 20261008,
+    "vary": "mismatch"
+  }
+}

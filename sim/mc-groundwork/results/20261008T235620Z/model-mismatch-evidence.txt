@@ -1,0 +1,38 @@
+# gf180mcuC model mismatch-parameter evidence (issue #77), generated 2026-10-08T23:49:56Z
+# open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b (klt pdk find --pdk gf180mcuC); file: libs.tech/ngspice/sm141064.ngspice
+6edba54d23b38a2c60f8ffdbaa3eb75a7568c615e4820808969bd1121b77b1aa  sm141064.ngspice
+
+## MOS: per-instance mismatch hook (active under sw_stat_mismatch=1); first three of the MOS blocks
+769:+delvto='mis_vth*sw_stat_mismatch' mulu0='1-mis_k*sw_stat_mismatch'
+4417:+delvto='mis_vth*sw_stat_mismatch' mulu0='1-mis_k*sw_stat_mismatch'
+8066:+delvto='mis_vth*sw_stat_mismatch' mulu0='1-mis_k*sw_stat_mismatch'
+758:+ mis_k=agauss(0,var_k,1)
+762:+ mis_vth=agauss(0,var_vth,1)
+4409:+ mis_k=agauss(0,var_k,1)
+4413:+ mis_vth=agauss(0,var_vth,1)
+
+## subckt ppolyf_u_1k  (lines 38749-38791): statistical switches referenced
+  5:+ r_rsh0='rsh_ppolyf_u_1k*(1+ mc_rsh_ppolyf_u_1k/(rsh_ppolyf_u_1k)*res_mc_skew*sw_stat_global)'
+  6:+ r_dw='0.0148E-6*(1+ mc_dw_ppolyf_u_1k*res_mc_skew*sw_stat_global)'
+  23:+ rsh='85.45+mc_rt_ppolyf_u_1k*res_mc_skew*sw_stat_global'
+  occurrences of sw_stat_mismatch in this subckt: 0
+  occurrences of sw_stat_global in this subckt:   3
+
+## subckt cap_mim_1f0fF  (lines 39201-39225): statistical switches referenced
+  13:+ c_c0='(c_cox*c_area+c_capsw*c_peri) * (1+mc_c_cox_1p0fF)'
+  22:* c_cap 1 2 c='c_c0*(1+ c_vcr1*v(1, 2)+c_vcr2*v(1,2)*v(1,2) )*(1+mc_c_cox_1p0fF)'
+  occurrences of sw_stat_mismatch in this subckt: 0
+  occurrences of sw_stat_global in this subckt:   0
+
+## subckts that carry a (1+mis_r*sw_stat_mismatch) hook: nplus_u npolyf_u pplus_u ppolyf_u -- NOT ppolyf_u_1k, the design's resistor.
+## Even there mis_r defaults to 0 and the sigma formula is commented out (excerpt from nplus_u, lines 38308-38314):
+* + par_r=0.012608
+* + par_sqrtarea='sqrt(par*(r_l)*(r_w))'
+* + var_r='0.7071*par_r*1e-06/par_sqrtarea'
+* + mis_r=agauss(0, 0.1, 1)
+**** + mis_r=agauss(0, var_r, 1)
++ mis_r = 0
+
+
+## cap_mim global term definition (gated by sw_stat_global, one draw per run -> common to all instances)
+47753:+ mc_c_cox_1p0fF='mc_c_cox_1p0fF2*sw_stat_global*cap_mc_skew'

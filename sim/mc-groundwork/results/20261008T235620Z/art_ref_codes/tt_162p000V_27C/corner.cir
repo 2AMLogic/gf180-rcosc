@@ -1,0 +1,17 @@
+* klt sim -- generated corner deck, do not edit
+.lib /home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice/sm141064.ngspice typical
+.lib /home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice/sm141064.ngspice res_typical
+.lib /home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice/sm141064.ngspice mimcap_typical
+.lib /home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice/sm141064.ngspice cap_mim
+.include /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/tb_fixedcode.spice
+.temp 27
+.meas tran ta WHEN v(clk)=1.6500 RISE=5
+.meas tran tb WHEN v(clk)=1.6500 RISE=25
+.meas tran fosc PARAM='20/(tb-ta)'
+.control
+save all
+alter vc=162.0
+tran 200p 1200n
+quit
+.endc
+.end

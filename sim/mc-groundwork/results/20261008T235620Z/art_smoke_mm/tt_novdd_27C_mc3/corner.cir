@@ -1,0 +1,27 @@
+* klt sim -- generated corner deck, do not edit
+.options seed=1041538739
+.param mc_sample_index=3
+.param mc_process_seed=1896205814
+.param mc_mismatch_seed=916262379
+.lib /home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice/sm141064.ngspice typical
+.lib /home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice/sm141064.ngspice res_typical
+.lib /home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice/sm141064.ngspice mimcap_typical
+.lib /home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice/sm141064.ngspice cap_mim
+.include /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-77/sim/mc-groundwork/results/20261008T235620Z/tb_trimsel_mm.spice
+.temp 27
+.control
+save all
+op 
+let code_sel = $v_code
+print code_sel
+let f_sel_hz = $v_fsel
+print f_sel_hz
+let f_hold_hz = $v_fhold
+print f_hold_hz
+let resid_pct = $v_res
+print resid_pct
+let hold_gap_hz = $v_gap
+print hold_gap_hz
+quit
+.endc
+.end

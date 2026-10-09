@@ -1,0 +1,19 @@
+* repeatability probe (issue #77): code 0xA2, tt, 27 C, 3.3 V, static sources, reltol=1e-3
+.lib /home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice/sm141064.ngspice typical
+.lib /home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice/sm141064.ngspice res_typical
+.lib /home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice/sm141064.ngspice mimcap_typical
+.lib /home/ubuntu/.volare/gf180mcuC/libs.tech/ngspice/sm141064.ngspice cap_mim
+.include tb_static_a2.spice
+.temp 27
+.control
+set noaskquit
+set measureprec=8
+option reltol=1e-3
+tran 200p 1200n
+meas tran ta when v(clk)=1.65 rise=5
+meas tran tb when v(clk)=1.65 rise=25
+let fosc = 20/(tb-ta)
+print fosc
+quit
+.endc
+.end
