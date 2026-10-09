@@ -4,6 +4,8 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-09
 
+- **Issue #97** (closed): Guard decision: preserve rejection of gh api literal body=@path
+- **Issue #95** (closed): Keep stash scope guard and document explicit scoped alternatives
 - **PR #108**: sim/supply-transient: offline supply-step and ripple bench (generator, analyzer, tests, CI)
 - **PR #105**: Live trim-code transition bench: generator, analyzer, offline suite (results pending batch runner) (#103)
 - **Issue #92** (closed): Dynamic supply-transient and ripple response bench (only static VDD corners are characterized today)
