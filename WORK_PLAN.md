@@ -19,7 +19,7 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
+_None._
 
 ## In Progress
 
@@ -47,9 +47,9 @@ _None._
 
 ## Proposed (Architect / Hermit)
 
-- **#77**: Item 6 groundwork: verify gf180mcu mismatch models under klt sim monte_carlo and build the per-sample-trim MC bench
-- **#78**: Add a startup-time testbench for the ratified 10 us row (currently not evaluated)
-- **#79**: Runtime-discipline trim-math: behavioural SOF loop model against the committed freq-vs-code data
+- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b) *(architect)*
+- **#91**: Characterize clk output pulse width and period jitter (unspecified quantities the discipline model assumes) *(architect)*
+- **#92**: Dynamic supply-transient and ripple response bench (only static VDD corners are characterized today) *(architect)*
 
 ## Epics
 
@@ -61,7 +61,7 @@ _None._
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
-| Ready (`loom:issue`) | 1 |
+| Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |

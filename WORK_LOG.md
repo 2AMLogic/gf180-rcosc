@@ -2,8 +2,26 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-10-09
+
+- **PR #96**: feat(signoff): doc-citation check for sim/ run dirs
+- **PR #94**: docs(spec): DR-0022 Monte Carlo matching model for trim-ladder resistors and MIM cap
+- **PR #90**: docs: index DR-0020 and un-indexed committed runs
+- **PR #89**: ci(sim): append-only guard for sim results (#84)
+- **PR #86**: feat(sim): runtime-discipline SOF loop model and trim-math note; DR-0021 (#79)
+- **PR #83**: feat(sim): item-6 Monte Carlo groundwork - mismatch feasibility verdict and per-sample trim-selection bench (#77)
+- **Issue #93** (closed): CI check that prose citations of sim result directories are not stale (recurring doc-drift issues)
+- **Issue #88** (closed): Docs: index DR-0020 in spec/README.md and add committed-runs tables for sim/startup, mc-groundwork, discipline
+- **Issue #85** (closed): Decision record: Monte Carlo matching model for trim-ladder resistors and MIM capacitor (before the item-6 campaign)
+- **Issue #84** (closed): CI guard: mechanically enforce append-only sim/ results
+- **Issue #79** (closed): Runtime-discipline trim-math: behavioural SOF loop model against the committed freq-vs-code data
+- **Issue #77** (closed): Item 6 groundwork: verify gf180mcu mismatch models under klt sim monte_carlo and build the per-sample-trim MC bench
+- **Issue #76** (closed): Keep unresolved removal scope guard for historical external-checkout cleanup
+
 ### 2026-10-08
 
+- **PR #80**: feat(sim): startup-time testbench for the 10 us row (partial evidence) (#78)
+- **Issue #78** (closed): Add a startup-time testbench for the ratified 10 us row (currently not evaluated)
 - **PR #75**: Item 7: klt pex inputs + single-corner probe (grid blocked by fleet runner version) (#70)
 - **PR #74**: docs(spec): DR-0019 classify spec rows statistical vs deterministic, MC evidence plan
 - **PR #73**: chore(signoff): move grader pin to klayout-tools 0.7.0 release
