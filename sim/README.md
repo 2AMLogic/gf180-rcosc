@@ -52,6 +52,12 @@ sim/
     results/<runid>/       requests, benches, reports, model-mismatch evidence,
                            failed batch attempts; see mc-groundwork/README.md
                            for the feasibility verdict. No yield claim
+  discipline/
+    discipline_model.py    behavioural SOF discipline-loop model against the
+                           committed freq-vs-code data (issue #79); pure
+                           stdlib, no ngspice
+    results/<runid>/       summary.md, results.csv, trim_math.csv, manifest.json;
+                           see discipline/README.md (trim-math note) and DR-0021
 ```
 
 `<runid>` is a UTC timestamp (`YYYYMMDDTHHMMSSZ`) assigned at invocation
