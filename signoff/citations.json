@@ -1,0 +1,16 @@
+{
+  "_comment": "Sidecar for signoff/verify-doc-citations.py. 'current' names the run dir that is the present evidence of record per bench (timestamp only); 'probes' are committed single-purpose probe/diagnostic dirs that docs may cite alongside it. Docs in 'strict_docs' may cite only current or probe dirs unless the line carries a marker (see signoff/README.md, 'Doc citation currency'). Every other tracked *.md is checked for existence only. When a newer campaign lands under sim/<bench>/results/, move 'current' here in the same PR (the script fails if a newer dir with manifest.json/summary.md exists that is neither).",
+  "strict_docs": [
+    "README.md",
+    "signoff/README.md",
+    "docs/chipalooza/challenge-5-proposal.md"
+  ],
+  "benches": {
+    "pvt": {"current": "20260923T030125Z", "probes": ["20260923T030905Z"]},
+    "pvt-postlayout": {"current": "20260923T152954Z", "probes": ["20261008T220500Z"]},
+    "iq": {"current": "20260923T031214Z", "probes": []},
+    "startup": {"current": "20261008T235538Z", "probes": []},
+    "mc-groundwork": {"current": "20261008T235620Z", "probes": []},
+    "discipline": {"current": "20261009T010000Z", "probes": []}
+  }
+}

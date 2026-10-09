@@ -22,6 +22,8 @@ re-reading prose that was written against whatever the checklist said that day.
 | `repo-hygiene-envelope.json` | artifact-bound generic envelope for T1 item 10, bound to `.github/workflows/signoff.yml` |
 | `signoff-report.json` | the committed output of the grading run — the graded T1 item table, per item `met`/`unmet` + machine-readable `reason` |
 | `verify-report.py` | the anti-rot verifier CI runs on every push and PR (see below) |
+| `verify-doc-citations.py` | stdlib-only check that docs cite existing, current `sim/<bench>/results/<ts>/` dirs (see "Doc citation currency"); CI: `.github/workflows/doc-citations.yml` |
+| `citations.json` | sidecar for the above: the current run (and listed probes) per bench, and the strict-scope docs |
 
 ## Block kind: `analog`
 
@@ -329,7 +331,8 @@ at the top of `verify-report.py`.
 ### unmet — item 5 (Full corner verification vs a ratified spec): campaign committed, not a gradeable envelope — and the record shows missed rows
 
 The pre-layout PVT campaign is committed under `sim/pvt/results/`
-(`20260907T090653Z`: full 7-process × 3-temp × 3-VDD factorial, 277 unique
+(`20260907T090653Z`, historical and superseded by the DR-0017
+campaign `20260923T030125Z`: full 7-process × 3-temp × 3-VDD factorial, 277 unique
 points, 0 sim failures) as this repo's own append-only evidence format
 (`manifest.json` + `results.csv` + `summary.md`), not a `klt sim` JSON
 envelope — so the grader has nothing it can read, mechanically `no_evidence`.
@@ -368,15 +371,17 @@ together.
 ### unmet — item 7 (Post-layout verification): campaign committed, not a `klt pex` report
 
 The post-layout re-verification is committed under
-`sim/pvt-postlayout/results/20260922T004322Z/` — a real `klt extract
+`sim/pvt-postlayout/results/20260923T152954Z/` — a real `klt extract
 --parasitics` run (`rcosc_top.pex.extract.json`, klt 0.4.0) against the same
-GDS item 2 pins (`provenance.input.content_hash` matches), re-simulated by the
+GDS item 2 pins (`provenance.input.content_hash` matches; the earlier runs'
+extractions were of earlier GDS and no longer match), re-simulated by the
 custom `pex_pvt_sweep.py` harness over a 27-point corner-endpoint subset at
-the post-#43 schematic campaign's own ratified-target calibration code
-`0x9D`, with the schematic-vs-extracted deltas recorded per point
-(oscillator runs −17.46% to −40.92% slower than schematic at every point —
-DR-0015; DR-0013's `20260921T164434Z` run remains the committed evidence
-for the pre-#43 GDS pair). The grader accepts **only a `klt pex` report**
+the post-#60 schematic campaign's calibration code `0xA3`, with the
+schematic-vs-extracted deltas recorded per point (oscillator runs −18.78% to
+−36.86% slower than schematic at every point, mean −25.65% — DR-0018). Earlier
+runs for earlier GDS pairs remain committed as the respin sequence's
+evidence (historical, superseded: DR-0013's `20260921T164434Z`;
+historical, superseded: DR-0015's `20260922T004322Z`). The grader accepts **only a `klt pex` report**
 for this item
 (a clean DRC or a custom re-sim proves nothing about post-layout behavior in
 its eyes — `wrong_kind` by design), so mechanically: `no_evidence`. Body-bias
@@ -497,3 +502,28 @@ in. They are not rewritten — rewriting evidence records destroys their
 verifiability, which is the point of publishing them. This directory's own
 artifacts (manifest, envelopes, report) contain no machine or author
 identifiers: paths are repo-relative throughout.
+
+## Doc citation currency
+
+`python3 signoff/verify-doc-citations.py` (stdlib only, no PDK; CI:
+`.github/workflows/doc-citations.yml`, a sibling of `signoff.yml` because that
+workflow is a hashed artifact) keeps prose from rotting against `sim/`:
+
+1. **Existence, every tracked `*.md`** (evidence trees excluded): each cited
+   `sim/<bench>/{results,corners}/<ts>` (full, `../../sim/...`, shortened
+   `pvt/results/<ts>`, or a bare `<ts>` resolved against the nearest bench
+   mention on its line, else its paragraph) must be a real directory.
+2. **Currency, only the strict docs** listed in `citations.json`
+   (`README.md`, this file, the characterization report): a cite must name the
+   bench's `current` run or a listed `probes` entry. "Current" is declared in
+   `citations.json`, not derived, because probe dirs sit beside campaigns in
+   the same tree. The script also fails if a newer dir holding `manifest.json`
+   or `summary.md` exists that is neither, so landing a campaign forces the
+   sidecar (and the strict docs) to be revisited in the same PR.
+
+**Marker convention.** A strict-doc line that deliberately cites a non-current
+run passes only if the same line contains `superseded`, `historical` or
+`(was ...)`, or the line sits under a heading containing `Historical`. Do not
+add markers to hide a stale claim; a marker states that the cite is
+intentionally retrospective. Other docs (`design/README.md`, `sim/README.md`,
+decision records) are narrative and are checked for existence only.

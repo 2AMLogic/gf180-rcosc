@@ -1,0 +1,28 @@
+name: Doc citations
+
+# Fails when a doc cites a nonexistent sim/<bench>/results/<ts>/ dir, or (in
+# the strict docs named by signoff/citations.json) cites a non-current run
+# without a superseded/historical/(was ...) marker. python3 stdlib only: no
+# PDK, no klt, no ngspice. A separate workflow from signoff.yml on purpose:
+# signoff.yml is a hashed, audited artifact (T1 item 10), so adding a step
+# there would force a re-pin/re-grade. See signoff/README.md,
+# "Doc citation currency".
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  doc-citations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Verify doc citations of sim/ run dirs
+        run: python signoff/verify-doc-citations.py
