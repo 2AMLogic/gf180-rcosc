@@ -49,6 +49,12 @@ sim/
     corners/<runid>/      raw ngspice logs, one per (side, operating point)
     results/<runid>/      results.csv, manifest.json, summary.md, plus the
                            extracted netlist and `klt extract` JSON report
+  trim-transition/
+    prepare.py, analyze.py live trim-code transition bench (issue #103): PWL-driven
+                           select-line steps on a running oscillator, runt/period/
+                           settle metrics; see trim-transition/README.md (campaign
+                           results pending the batch runner)
+    results/<runid>/       append-only evidence; batch-attempts/ keeps failed submits
   mc-groundwork/
     gen_bench.py           the item-6 Monte Carlo groundwork bench generator
                            (issue #77): per-sample trim-code selection bench,

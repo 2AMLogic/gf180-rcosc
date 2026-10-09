@@ -1,0 +1,87 @@
+{
+  "kind": "trim-transition-bench-requests",
+  "evidence": "NOT EVIDENCE: offline request generation, no simulation was run",
+  "issue": 103,
+  "positions": [
+    {
+      "name": "noncarry_A2_A3",
+      "lo": "0xA2",
+      "hi": "0xA3",
+      "bits_flipped": 1
+    },
+    {
+      "name": "carry_3F_40",
+      "lo": "0x3F",
+      "hi": "0x40",
+      "bits_flipped": 7
+    },
+    {
+      "name": "carry_7F_80",
+      "lo": "0x7F",
+      "hi": "0x80",
+      "bits_flipped": 8
+    },
+    {
+      "name": "carry_BF_C0",
+      "lo": "0xBF",
+      "hi": "0xC0",
+      "bits_flipped": 7
+    }
+  ],
+  "skew_modes": {
+    "none": "no skew",
+    "lsb_first": "bit i delayed i x 1 ns",
+    "msb_first": "bit i delayed (7-i) x 1 ns"
+  },
+  "bank_weighting": "binary, t0=LSB (R stage = 0.7482 um x 2^i), t<i>=1 shorts stage i; higher code = higher f",
+  "grid": {
+    "processes": [
+      "tt",
+      "ss",
+      "ff"
+    ],
+    "temperature_c": 27.0,
+    "vdd_v": [
+      3.0,
+      3.3,
+      3.6
+    ]
+  },
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "settings": {
+    "ramp_ns": 1000.0,
+    "t_first_ns": 3000.0,
+    "edge_ns": 1.0,
+    "setup_settle_ns": 1500.0,
+    "event_gap_ns": 700.0,
+    "phase_step_ns": 5.25,
+    "phases": 4,
+    "tstep": "100p",
+    "tmax": "100p",
+    "reltol": 0.001,
+    "abstol": 1e-12,
+    "vntol": 1e-06
+  },
+  "dut": {
+    "source": "design/netlist/pvt_tb.spice",
+    "source_sha256": "6e1e0eaee4142051c90699a0159a17d1008870b6fc13ea1dd6de5fdf82212cca",
+    "extracted_sha256": "ea387d532b106ad9cc9ce072679011f83a3071926c6a8d91b4b3d1ddc08542ef"
+  },
+  "requests": [
+    {
+      "request": "request_probe.json",
+      "netlist": "tb_probe.spice",
+      "schedule": "schedule_probe.json",
+      "vdd_v": 3.3,
+      "skew": "lsb_first",
+      "processes": [
+        "tt"
+      ],
+      "temperature_c": 27.0
+    }
+  ],
+  "execution": "via `klt sim` (batch backend); never a local multi-corner loop"
+}
