@@ -1,0 +1,28 @@
+name: Trim-interface offline suite
+
+# Runs the offline, synthetic-fixture tests of sim/trim-interface (issue #106).
+# PDK-free, simulator-free, cloud-free: python3 + pytest only. Fixtures are
+# SYNTHETIC and built in memory / temporary directories; this job never writes
+# into sim/ results and produces no signoff evidence. Separate from signoff.yml
+# on purpose (that workflow is a hashed, audited artifact).
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  trim-interface-offline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: python3 -m pip install pytest
+      - name: Run offline trim-interface fixture suite (synthetic, not evidence)
+        run: python3 -I -m pytest -p no:cacheprovider sim/trim-interface/test_harness.py

@@ -55,6 +55,10 @@ sim/
                            settle metrics; see trim-transition/README.md (campaign
                            results pending the batch runner)
     results/<runid>/       append-only evidence; batch-attempts/ keeps failed submits
+  trim-interface/
+    prepare.py, analyze.py offline trim-pin DC selection + static input-current harness
+                           (issue #106): generator, analyzer, synthetic tests only; no
+                           simulation run yet; see trim-interface/README.md
   mc-groundwork/
     gen_bench.py           the item-6 Monte Carlo groundwork bench generator
                            (issue #77): per-sample trim-code selection bench,
