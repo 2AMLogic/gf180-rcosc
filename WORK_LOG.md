@@ -2,6 +2,11 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-10-10
+
+- **PR #114**: Offline trim-input DC selection and static-current characterization harness
+- **Issue #106** (closed): Prepare offline trim-input DC selection and static-current characterization harness
+
 ### 2026-10-09
 
 - **Issue #97** (closed): Guard decision: preserve rejection of gh api literal body=@path
