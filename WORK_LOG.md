@@ -4,6 +4,10 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-10
 
+- **Issue #146** (closed): Append-only guard: fail when Git comparison fails instead of certifying unchecked evidence
+- **PR #147**: fix(sim): append-only guard fails when git comparison fails
+- **Issue #65** (closed): T1 item 9: record the PDK revision in every simulation campaign manifest, not only the PDK family name
+- **PR #145**: feat(sim): record PDK revision in campaign manifests (#65)
 - **Issue #140** (closed): Align netlist-consistency workflow action pins with the rest of CI (checkout@v4/setup-python@v5 -> v7)
 - **PR #142**: ci: align netlist-consistency action pins to v7 and split pytest install
 - **Issue #119** (closed): Consolidate five copy-pasted offline pytest workflows into one matrix workflow
