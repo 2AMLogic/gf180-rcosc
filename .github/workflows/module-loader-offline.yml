@@ -29,3 +29,5 @@ jobs:
         run: python3 -m pip install pytest
       - name: Run offline module-loader suite (synthetic, not evidence)
         run: python3 -I -m pytest -p no:cacheprovider sim/test_module_loader.py
+      - name: Run offline PDK-provenance suite (tmp-dir fixtures, not evidence)
+        run: python3 -I -m pytest -p no:cacheprovider sim/test_pdk_provenance.py

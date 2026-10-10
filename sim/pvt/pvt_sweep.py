@@ -85,6 +85,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(REPO_ROOT / "sim"))
+import pdk_provenance  # noqa: E402  shared PDK-revision helper (#65)
 DESIGN_DIR = REPO_ROOT / "design"
 NETLIST = DESIGN_DIR / "netlist" / "pvt_tb.spice"
 SIM_PVT = REPO_ROOT / "sim" / "pvt"
@@ -724,9 +726,7 @@ def main() -> int:
         "host_arch": os.uname().machine,
         "ngspice": tool_version(["ngspice", "-v"], line=1),
         "xschem": tool_version(["xschem", "--version"], line=0),
-        "pdk_root": str(pdk_root),
-        "pdk": pdk,
-        "model_dir": str(model_dir),
+        **pdk_provenance.manifest_fields(pdk_root, pdk, model_dir),
         "netlist": str(NETLIST.relative_to(REPO_ROOT)),
         "process_corners": {k: list(v) for k, v in PROCESS_CORNERS.items()},
         "temps_c": TEMPS_C,
@@ -832,7 +832,7 @@ def build_summary(
         f"| git sha | `{manifest['git_sha']}`{' (dirty tree)' if manifest['git_dirty'] else ''} |"
     )
     add(f"| ngspice | {manifest['ngspice']} |")
-    add(f"| PDK | {manifest['pdk']} @ `{manifest['pdk_root']}` |")
+    add(f"| PDK | {pdk_provenance.display(manifest)} |")
     add(f"| netlist | `{manifest['netlist']}` (from `design/pvt_tb.sch`) |")
     add(
         f"| measurement | `tran {TSTEP} {TSTOP_NS_DEFAULT}n`, f averaged over "

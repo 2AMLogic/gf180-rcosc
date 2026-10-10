@@ -93,9 +93,11 @@ claims, so they are not listed one by one.
 - **Nothing recorded:** the smoke-test log.
 
 The historical revision behind a family-only run is **unknown**. It is not
-reconstructed here and must not be assumed. Recording the revision on
-new runs is issue #65. That work does not change these historical
-records.
+reconstructed here and must not be assumed. New runs
+(issue #65) record `pdk_revision`, or an explicit `"unknown"` with a reason,
+through the shared `sim/pdk_provenance.py`, with no absolute install path.
+Every record listed above predates that and is unchanged; its PDK identity
+stays as disclosed here.
 
 ## Spec rows with no measurement claimed (no bench expected)
 
