@@ -4,6 +4,16 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-10
 
+- **Issue #112** (closed): Guard decision: preserve confinement for raw sweep checkpoint setup in main
+- **Issue #109** (closed): Guard decision: keep unresolved write confinement for temporary research downloads
+- **Issue #120** (closed): Add offline regression tests and CI job for the DR-0021 discipline model (sim/discipline has none)
+- **PR #124**: test(discipline): offline regression tests and CI job for the DR-0021 model
+- **Issue #121** (closed): Add offline unit tests and CI for legacy sim drivers' analysis cores (pvt_sweep calibrate/spread, startup_report, iq verdict)
+- **PR #123**: test(sim): offline tests and CI for legacy sim drivers' analysis cores
+- **Issue #115** (closed): Validate the layout builder Python runtime against the geometry toolchain pins
+- **PR #118**: fix(layout): validate builder Python runtime against geometry pins (#115)
+- **Issue #107** (closed): CI guard: offline consistency check between pvt_tb.spice, rcosc_top.spice and the per-bench DUT netlist copies
+- **PR #116**: CI guard: offline netlist consistency check (#107)
 - **PR #114**: Offline trim-input DC selection and static-current characterization harness
 - **Issue #106** (closed): Prepare offline trim-input DC selection and static-current characterization harness
 
