@@ -25,14 +25,13 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#107**: CI guard: offline consistency check between pvt_tb.spice, rcosc_top.spice and the per-bench DUT netlist copies
-- **#115**: Validate the layout builder Python runtime against the geometry toolchain pins
+- **#119**: Consolidate five copy-pasted offline pytest workflows into one matrix workflow
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-- **#116**: CI guard: offline netlist consistency check (#107)
+_None._
 
 ## Approved (Awaiting Merge)
 
@@ -45,11 +44,12 @@ _None._
 Issues carrying `loom:curated`.
 
 - **#91**: Characterize clk output pulse width and period jitter (unspecified quantities the discipline model assumes) *(curated)*
-- **#107**: CI guard: offline consistency check between pvt_tb.spice, rcosc_top.spice and the per-bench DUT netlist copies *(curated)*
 
 ## Proposed (Architect / Hermit)
 
 - **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b) *(architect)*
+- **#122**: Clk output-load sensitivity: frequency and edge shift vs capacitive load (no load ever swept; --load-f unused) *(architect)*
+- **#125**: Interior-temperature sweep: measure frequency-vs-T curvature between the -40/27/85 C grid points *(architect)*
 
 ## Epics
 
@@ -62,10 +62,10 @@ Issues carrying `loom:curated`.
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
-| PRs awaiting review | 1 |
+| In Progress (`loom:building`) | 1 |
+| PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 2 |
-| Architect / Hermit proposals | 1 |
+| Curated | 1 |
+| Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
