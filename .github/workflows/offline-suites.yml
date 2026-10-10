@@ -1,0 +1,49 @@
+name: Offline suites
+
+# Runs the offline, synthetic-fixture pytest suites (sim/waveform,
+# sim/supply-transient, sim/trim-interface, sim/trim-transition, and the
+# layout/run_checks.sh toolchain-pin preflight). PDK-free, simulator-free,
+# cloud-free: python3 + pytest only. Fixtures are SYNTHETIC and are built in
+# memory / temporary directories; this job never writes into sim/ results and
+# produces no signoff evidence. A separate workflow from signoff.yml on
+# purpose: signoff.yml is a hashed, audited artifact (T1 item 10), so adding a
+# step there would force refreshing its envelope and report.
+#
+# The matrix job's `name:` is the matrix `name`, which keeps the check names
+# identical to the former one-file-per-suite workflows' job ids.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  offline:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: supply-transient-offline
+            tests: sim/supply-transient/test_harness.py
+          - name: waveform-offline
+            tests: sim/waveform/test_harness.py sim/waveform/test_loadsweep.py
+          - name: trim-interface-offline
+            tests: sim/trim-interface/test_harness.py
+          - name: trim-transition-offline
+            tests: sim/trim-transition/test_harness.py
+          - name: layout-preflight-offline
+            tests: layout/test_run_checks_preflight.py
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: python3 -m pip install pytest
+      - name: Run ${{ matrix.name }} fixture suite (synthetic, not evidence)
+        run: python3 -I -m pytest -p no:cacheprovider ${{ matrix.tests }}

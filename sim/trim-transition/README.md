@@ -37,7 +37,7 @@ python3 -I sim/trim-transition/analyze.py v33_none=<report.json> ... --outdir si
 python3 -I -m pytest -p no:cacheprovider sim/trim-transition/test_harness.py   # offline, pytest only
 ```
 
-CI: `.github/workflows/trim-transition-offline.yml` runs the offline suite
+CI: `.github/workflows/offline-suites.yml` (matrix entry `trim-transition-offline`) runs the offline suite
 (synthetic fixtures; no PDK, klt, ngspice or batch credentials).
 
 ## Bank weighting (checked against the schematic, asserted by a test)
