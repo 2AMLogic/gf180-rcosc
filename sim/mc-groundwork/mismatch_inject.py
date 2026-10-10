@@ -16,7 +16,9 @@ so d_<inst> is identically 0 when sw_stat_mismatch=0.  W, L in um, A_x in
 not rewritten, only the .param lines (all d_<inst> = 0) are added.
 
 The generator fails loudly (UnmappedCardError) on any covered-model X card
-that is neither mapped nor on the explicit exclusion list.
+that is neither mapped nor on the explicit exclusion list.  Model names and
+the ``m=1`` multiplier are matched case-insensitively (SPICE semantics); a
+covered model named on a ``+`` continuation line is rejected, not skipped.
 """
 import math
 import re
@@ -34,6 +36,7 @@ MODELS = {
 # Instances (without the X prefix, lower case) that are covered models but
 # deliberately not injected.  DR-0022 names none: empty by default.
 DEFAULT_EXCLUDE = frozenset()
+_MODELS_CI = {k.lower(): k for k in MODELS}
 
 _NUM = re.compile(r"^([0-9.]+(?:e[-+]?[0-9]+)?)(meg|mil|[tgkmunpfa])?$", re.I)
 _SCALE = {"t": 1e12, "g": 1e9, "meg": 1e6, "k": 1e3, "m": 1e-3, "u": 1e-6,
@@ -53,20 +56,31 @@ def _spice_um(tok: str) -> float:
     return val * 1e6
 
 
+def _covered(tok: str):
+    """Canonical covered-model name for a token (SPICE is case-insensitive)."""
+    return _MODELS_CI.get(tok.lower())
+
+
 def _parse_card(line: str):
-    """Return (inst, model, params dict) for an X card, else None."""
+    """Return (inst, model, params dict) for an X card, else None.
+
+    ``model`` is the canonical MODELS key; matching is case-insensitive.
+    """
     toks = line.split()
     if not toks or not toks[0][:1] in "xX" or line.lstrip().startswith("*"):
         return None
-    model = next((t for t in toks[1:] if t in MODELS), None)
-    if model is None:
+    idx = next((i for i, t in enumerate(toks[1:], 1) if _covered(t)), None)
+    if idx is None:
         return None
     params = {}
-    for t in toks[toks.index(model) + 1:]:
+    for t in toks[idx + 1:]:
         if "=" in t:
             k, v = t.split("=", 1)
             params[k.lower()] = v
-    return toks[0], model, params
+    return toks[0], _covered(toks[idx]), params
+
+
+_M1 = re.compile(r"\bm=1\b", re.I)
 
 
 def inject(dut_text: str, mm_scale=None, exclude=DEFAULT_EXCLUDE):
@@ -81,7 +95,20 @@ def inject(dut_text: str, mm_scale=None, exclude=DEFAULT_EXCLUDE):
     exclude = {e.lower() for e in exclude}
     out, params, manifest = [], [], []
     seen = set()
+    last_x = None  # lower-case instance of the most recent X card
     for line in dut_text.splitlines():
+        stripped = line.lstrip()
+        if stripped.startswith("+"):
+            # A covered model named on a continuation line cannot be mapped
+            # line-by-line; fail loudly rather than skip it (DR-0022 s4).
+            if any(_covered(t) for t in stripped[1:].split()) and last_x not in exclude:
+                raise UnmappedCardError(
+                    f"covered model on continuation line after X{last_x}: {line!r}")
+            out.append(line)
+            continue
+        toks = stripped.split()
+        if toks and toks[0][:1] in "xX":
+            last_x = toks[0][1:].lower()
         card = _parse_card(line)
         if card is None:
             out.append(line)
@@ -92,7 +119,7 @@ def inject(dut_text: str, mm_scale=None, exclude=DEFAULT_EXCLUDE):
             out.append(line)
             continue
         kind, coeff, wk, lk = MODELS[model]
-        if line.lstrip().startswith("+") or wk not in p or lk not in p:
+        if wk not in p or lk not in p:
             raise UnmappedCardError(f"{name}: cannot read {wk}/{lk}")
         if p.get("m") != "1":
             raise UnmappedCardError(f"{name}: expected m=1, found m={p.get('m')}")
@@ -103,11 +130,16 @@ def inject(dut_text: str, mm_scale=None, exclude=DEFAULT_EXCLUDE):
         sigma = coeff / math.sqrt(w * l) / 100.0  # relative, at mm_scale=1
         d = f"d_{inst}"
         expr = f"1/(1+{d})" if kind == "res" else f"(1+{d})"
+        rewritten, n = _M1.subn(f"m='{expr}'", line)
+        if n != 1:
+            # The manifest is cited as proof the injection is live: never list
+            # an instance whose card was not actually rewritten.
+            raise UnmappedCardError(f"{name}: expected exactly one m=1 to rewrite, found {n}")
         if literal_zero:
             out.append(line)
             sigma_expr = "0"
         else:
-            out.append(re.sub(r"\bm=1\b", f"m='{expr}'", line))
+            out.append(rewritten)
             sigma_expr = f"{scale_expr}*{sigma!r}"
         params.append(f".param {d}='sw_stat_mismatch*agauss(0,{sigma_expr},1)'"
                       if not literal_zero else f".param {d}=0")

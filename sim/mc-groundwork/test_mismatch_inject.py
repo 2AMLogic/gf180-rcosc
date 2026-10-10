@@ -91,6 +91,59 @@ def test_manifest_lists_every_injected_instance_sigma_scale():
         assert {"instance", "param", "kind", "sigma_rel_at_unit_scale", "mm_scale"} <= set(m)
 
 
+def test_uppercase_M1_is_rewritten_not_just_listed():
+    text, man = mi.inject("XRA a b vss ppolyf_u_1k r_width=2u r_length=100u M=1")
+    assert "XRA a b vss ppolyf_u_1k r_width=2u r_length=100u m='1/(1+d_ra)'" in text
+    assert "M=1" not in text
+    assert [m["instance"] for m in man] == ["XRA"]
+
+
+def test_m1_rewrite_must_hit_exactly_once():
+    # two m=1 tokens: the substitution count is not 1, so refuse
+    with pytest.raises(mi.UnmappedCardError, match="exactly one"):
+        mi.inject("XRA a b vss ppolyf_u_1k r_width=2u r_length=100u m=1 M=1")
+
+
+@pytest.mark.parametrize("card,expr", [
+    ("XRA a b vss PPOLYF_U_1K r_width=2u r_length=100u m=1", "m='1/(1+d_ra)'"),
+    ("XCT vss vc CAP_MIM_1F0FF c_width=20u c_length=10u m=1", "m='(1+d_ct)'"),
+    ("xct vss vc Cap_Mim_1f0ff C_WIDTH=20u C_LENGTH=10u M=1", "m='(1+d_ct)'"),
+])
+def test_model_name_matched_case_insensitively(card, expr):
+    text, man = mi.inject(card)
+    assert expr in text
+    assert len(man) == 1
+    assert man[0]["model"] in (mi.RES_MODEL, mi.CAP_MODEL)
+
+
+@pytest.mark.parametrize("dut", [
+    "XRA a b vss\n+ ppolyf_u_1k r_width=2u r_length=100u m=1",
+    "XCT vss vc\n+ CAP_MIM_1F0FF c_width=20u c_length=10u m=1",
+    "XRA a b\n+ vss\n+ ppolyf_u_1k r_width=2u r_length=100u m=1",
+])
+def test_model_on_continuation_line_fails_loudly(dut):
+    with pytest.raises(mi.UnmappedCardError, match="continuation"):
+        mi.inject(dut)
+
+
+def test_params_on_continuation_line_fails_loudly():
+    with pytest.raises(mi.UnmappedCardError):
+        mi.inject("XRA a b vss ppolyf_u_1k\n+ r_width=2u r_length=100u m=1")
+
+
+def test_continuation_model_on_excluded_instance_is_allowed():
+    dut = "XRA a b vss\n+ ppolyf_u_1k r_width=2u r_length=100u m=1"
+    text, man = mi.inject(dut, exclude={"ra"})
+    assert man == []
+    assert dut in text
+
+
+def test_continuation_without_covered_model_passes_through():
+    dut = "XM1 d g s b\n+ nfet_03v3 W=1u L=1u m=1"
+    text, man = mi.inject(dut)
+    assert man == [] and dut in text
+
+
 def _dut_block():
     lines = PVT.read_text().splitlines()
     s = next(i for i, l in enumerate(lines) if "expanding" in l and "rcosc_top.sym" in l)
@@ -106,7 +159,7 @@ def test_real_netlist_full_coverage_and_dr0022_instances():
                    *{f"XR{i}" for i in range(8)}}
     # no covered-model card left unrewritten
     for l in text.splitlines():
-        if re.search(r"\b(ppolyf_u_1k|cap_mim_1f0fF)\b", l) and not l.startswith("*"):
+        if re.search(r"\b(ppolyf_u_1k|cap_mim_1f0fF)\b", l, re.I) and not l.startswith("*"):
             assert "m='" in l
     sig = {m["instance"]: m["sigma_rel_at_unit_scale"] * 100 for m in man}
     assert sig["XR0"] == pytest.approx(0.82, abs=0.01)
