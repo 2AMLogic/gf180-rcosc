@@ -1,6 +1,7 @@
 name: Discipline-model offline suite
 
-# Runs the offline, synthetic-fixture tests of sim/discipline (issue #120).
+# Runs the offline, synthetic-fixture tests of sim/discipline (issue #120;
+# test_outage.py, the SOF-loss/reacquisition model tests, added by #134).
 # PDK-free, simulator-free, cloud-free: python3 + pytest only. Fixtures are
 # SYNTHETIC and built in memory / temporary directories; this job never writes
 # into sim/ results and produces no signoff evidence. Separate from signoff.yml
@@ -25,4 +26,4 @@ jobs:
       - name: Install pytest
         run: python3 -m pip install pytest
       - name: Run offline discipline fixture suite (synthetic, not evidence)
-        run: python3 -I -m pytest -p no:cacheprovider sim/discipline/test_harness.py
+        run: python3 -I -m pytest -p no:cacheprovider sim/discipline/test_harness.py sim/discipline/test_outage.py

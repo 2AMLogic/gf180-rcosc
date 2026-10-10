@@ -24,6 +24,7 @@ re-reading prose that was written against whatever the checklist said that day.
 | `verify-report.py` | the anti-rot verifier CI runs on every push and PR (see below) |
 | `verify-doc-citations.py` | stdlib-only check that docs cite existing, current `sim/<bench>/results/<ts>/` dirs (see "Doc citation currency"); CI: `.github/workflows/doc-citations.yml` |
 | `citations.json` | sidecar for the above: the current run (and listed probes) per bench, and the strict-scope docs |
+| `verify-test-coverage.py` | stdlib-only orphaned-test guard: every tracked `test_*.py` must be named (outside comments) in some `.github/workflows/*.yml`; tests in `test_verify_test_coverage.py`; CI: `.github/workflows/doc-citations.yml` |
 
 ## Block kind: `analog`
 
