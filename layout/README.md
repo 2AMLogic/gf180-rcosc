@@ -75,6 +75,10 @@ layout/
   build_cells.py        builds layout/cells/*.gds + layout/lvs_ref/*.spice
   run_checks.sh          regen-netlist + build + DRC + extract + LVS
                          + supply ERC, writes layout/reports/*.json
+                         (toolchain-pin preflight first; see Reproducing)
+  test_run_checks_preflight.py
+                         offline test of that preflight (fake commands,
+                         no PDK, writes nothing under layout/)
   erc-supply-spec.json  klt erc spec for the T1 item-11 supply-island read
                          (see "Supply ERC (T1 item 11)" below; every
                          stackup/via/label field is justified in its
@@ -120,6 +124,39 @@ schematic), rebuilds all four GDS from `klt gen` primitives (plus, for
 reference netlists are byte-identical to a fresh rebuild, without touching
 them — the same "derived, not hand-written, and reproducible on change"
 convention `design/regen-netlist.sh` documents for the schematic netlists.
+
+**Toolchain preflight (issue #115).** Before it touches any netlist, GDS,
+LVS reference or report, `run_checks.sh` validates *both* runtimes that
+take part in geometry: the `klt` CLI (`klt --version` must report `0.4.0`)
+and the Python interpreter that runs `build_cells.py`, whose installed
+distribution metadata must read `klayout-tools==0.4.0` and
+`klayout==0.30.12` (checked via `importlib.metadata`, not module version
+attributes). A `python3` on `PATH` that imports both packages is used and
+must match — a mismatch fails the run rather than switching interpreters;
+only when `python3` cannot import them does the script fall back to an
+ephemeral `uv run --no-project --with "klayout-tools==0.4.0" --with
+"klayout==0.30.12" python3`, which is validated the same way. The simplest
+way to satisfy both is one pinned venv on `PATH`:
+
+```bash
+uv venv /tmp/venv-klt40
+uv pip install --python /tmp/venv-klt40/bin/python "klayout-tools==0.4.0" "klayout==0.30.12"
+PATH="/tmp/venv-klt40/bin:$PATH" layout/run_checks.sh
+```
+
+Running the builder directly (e.g. the non-mutating `--check`) uses the
+same pins:
+
+```bash
+uv run --no-project --with "klayout-tools==0.4.0" --with "klayout==0.30.12" \
+  python3 layout/build_cells.py --check
+```
+
+The separately pinned ERC build (below) is unaffected by this preflight.
+`layout/test_run_checks_preflight.py` exercises the preflight offline with
+fake `klt` / `python3` / `uv` commands (import failure, version mismatch,
+pinned pass) without regenerating any evidence:
+`python3 -I -m pytest -p no:cacheprovider layout/test_run_checks_preflight.py`.
 
 **Which `klt` reproduces which artifact (recorded here because it is
 load-bearing, and discovered the hard way on issue #44's re-spin):** every

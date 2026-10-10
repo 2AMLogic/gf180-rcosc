@@ -5,11 +5,18 @@ rcosc_top.spice` (issue #13 -- see `layout/README.md` for the full scope
 note: this build script covers `rcosc_bias` and `rcosc_trim_bank` only, not
 yet `rcosc_comparator` or the `rcosc_top` composition).
 
-    uv run --with klayout --with klayout-tools python3 layout/build_cells.py
-    uv run --with klayout --with klayout-tools python3 layout/build_cells.py --check
+    uv run --no-project --with "klayout-tools==0.4.0" --with "klayout==0.30.12" \
+        python3 layout/build_cells.py
+    uv run --no-project --with "klayout-tools==0.4.0" --with "klayout==0.30.12" \
+        python3 layout/build_cells.py --check
 
 Needs the `klayout` python module (`klt`'s own runtime dependency) and
-`klayout_tools` (`klt` itself) importable. Regenerate `design/netlist/
+`klayout_tools` (`klt` itself) importable, at exactly the geometry pins
+above: `klt gen`'s drawn output is not stable across klayout-tools versions,
+so any other pair redraws (or, under `--check`, reports stale) the committed
+cells. `layout/run_checks.sh` validates this runtime's installed
+distribution versions before it regenerates anything (issue #115); a direct
+invocation like the ones above is responsible for using the pins itself. Regenerate `design/netlist/
 rcosc_top.spice` first (`design/regen-netlist.sh`) if the schematic changed
 -- this script reads device geometry directly out of that file
 (`netlist_parse.py`), never retyping `r_length`/`r_width`/`L`/`W`/`nf`, so a
