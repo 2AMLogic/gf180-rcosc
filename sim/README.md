@@ -10,7 +10,9 @@ This is enforced in CI by `.github/workflows/sim-append-only.yml`, which
 runs `sim/check-append-only.sh <base-sha>` and fails a PR that modifies,
 deletes, or renames anything under `sim/*/results/`. Narrow, reasoned
 exceptions go in `sim/append-only-exceptions.txt`
-(`<run path prefix> | <reason>`).
+(`<run path prefix> | <reason>`). The guard fails (nonzero, no pass
+message) if either revision is unresolvable or the git comparison itself
+fails; `sim/test-check-append-only.sh` covers this on synthetic repos.
 
 ```
 sim/
