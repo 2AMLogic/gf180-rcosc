@@ -27,8 +27,9 @@ sim/pvt-postlayout/
 # Requires: ngspice, xschem, klt, python3, and a gf180mcuC PDK resolvable
 # the same way design/regen-netlist.sh resolves it.
 sim/pvt-postlayout/run-pex-pvt-sweep.sh
-sim/pvt-postlayout/run-pex-pvt-sweep.sh --jobs 8
 ```
+
+Default `--jobs` is 2 (shared hosts); grids of more than a handful of corners belong in a `klt sim` corners request (see sim/startup/README.md, Run section); this driver is for single-unit/debug use or dedicated simulation hosts.
 
 Two knobs added by issue #61, both opt-in (the default path is
 byte-identical to issue #28's flow):

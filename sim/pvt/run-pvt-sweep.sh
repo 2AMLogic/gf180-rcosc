@@ -15,8 +15,9 @@
 #
 # Usage:
 #   sim/pvt/run-pvt-sweep.sh                # full campaign
-#   sim/pvt/run-pvt-sweep.sh --jobs 8       # limit parallel ngspice processes
 #   sim/pvt/run-pvt-sweep.sh --keep-build   # keep the generated per-run decks
+#
+# Default --jobs is 2 (shared hosts); grids of more than a handful of corners belong in a `klt sim` corners request (see sim/startup/README.md, Run section); this driver is for single-unit/debug use or dedicated simulation hosts.
 #
 # All arguments are forwarded to sim/pvt/pvt_sweep.py (see --help there).
 #

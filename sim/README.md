@@ -139,7 +139,6 @@ measured frequency as append-only evidence.
 # Requires: ngspice, xschem, python3, and a gf180mcuC PDK resolvable the same
 # way design/regen-netlist.sh resolves it (PDK_ROOT env var, or `klt pdk find`).
 sim/pvt/run-pvt-sweep.sh                # full campaign, a fresh runid
-sim/pvt/run-pvt-sweep.sh --jobs 8       # limit parallel ngspice processes
 sim/pvt/run-pvt-sweep.sh --keep-build   # keep the generated per-run decks under sim/build/<runid>/
 ```
 
@@ -296,7 +295,7 @@ grid:
 
 ```bash
 sim/iq/run-iq-sweep.sh                                 # full grid, codes 0x00 0x80 0xC0 0xFF
-sim/iq/run-iq-sweep.sh --subset endpoints --jobs 8      # fast check, not for committed evidence
+sim/iq/run-iq-sweep.sh --subset endpoints           # fast check, not for committed evidence
 sim/iq/run-iq-sweep.sh --codes 0x00 0x40 0x80 0xC0 0xFF
 ```
 

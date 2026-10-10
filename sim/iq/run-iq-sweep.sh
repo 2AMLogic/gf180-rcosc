@@ -20,9 +20,10 @@
 #
 # Usage:
 #   sim/iq/run-iq-sweep.sh                       # full grid, codes 0x00 0x80 0xC0 0xFF
-#   sim/iq/run-iq-sweep.sh --jobs 8
 #   sim/iq/run-iq-sweep.sh --subset endpoints    # fast check: tt/ff/ss x 3T x 3V only
 #   sim/iq/run-iq-sweep.sh --codes 0x00 0x40 0x80 0xC0 0xFF
+#
+# Default --jobs is 2 (shared hosts); grids of more than a handful of corners belong in a `klt sim` corners request (see sim/startup/README.md, Run section); this driver is for single-unit/debug use or dedicated simulation hosts.
 #
 # All arguments are forwarded to sim/iq/iq_sweep.py (see --help there). The
 # full grid (252 points at the default 4 codes) took ~2.7-4.2 minutes at
