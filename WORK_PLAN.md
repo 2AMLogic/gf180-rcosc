@@ -19,13 +19,14 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#128**: Runtime discipline: model SOF reference loss and reacquisition offline
+_None._
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
-- **#119**: Consolidate five copy-pasted offline pytest workflows into one matrix workflow
+- **#139**: Cap legacy sweep drivers' default --jobs and point grid runs at klt sim requests
+- **#143**: README: reconcile accuracy summary and signed comparisons with DR-0017
 
 ## PRs Awaiting Review
 
@@ -49,7 +50,6 @@ Issues carrying `loom:curated`.
 
 - **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b) *(architect)*
 - **#131**: Decision record: enable/standby interface for rcosc_top and the start event behind the Startup and Iq rows *(architect)*
-- **#130**: Consolidate copy-pasted importlib module loaders in sim harnesses *(hermit)*
 
 ## Epics
 
@@ -61,11 +61,11 @@ Issues carrying `loom:curated`.
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
-| Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 1 |
+| Ready (`loom:issue`) | 0 |
+| In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 1 |
-| Architect / Hermit proposals | 3 |
+| Architect / Hermit proposals | 2 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->

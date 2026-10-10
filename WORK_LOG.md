@@ -4,6 +4,18 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-10
 
+- **Issue #140** (closed): Align netlist-consistency workflow action pins with the rest of CI (checkout@v4/setup-python@v5 -> v7)
+- **PR #142**: ci: align netlist-consistency action pins to v7 and split pytest install
+- **Issue #119** (closed): Consolidate five copy-pasted offline pytest workflows into one matrix workflow
+- **PR #141**: ci: consolidate offline pytest workflows into one matrix (#119)
+- **Issue #130** (closed): Consolidate copy-pasted importlib module loaders in sim harnesses
+- **PR #138**: refactor(sim): consolidate importlib module loaders in request generators
+- **Issue #135** (closed): Implement and unit-test the DR-0022 mismatch-injection generator offline ahead of the item-6 campaign
+- **PR #137**: feat(sim): offline DR-0022 mismatch-injection generator (#135)
+- **Issue #134** (closed): CI never runs sim/discipline/test_outage.py (SOF-loss model tests); add it and an orphaned-test guard
+- **PR #136**: ci: run discipline test_outage.py and guard against orphaned test files
+- **Issue #128** (closed): Runtime discipline: model SOF reference loss and reacquisition offline
+- **PR #133**: feat(sim): model SOF reference loss and reacquisition offline
 - **Issue #125** (closed): Interior-temperature sweep: measure frequency-vs-T curvature between the -40/27/85 C grid points
 - **PR #129**: feat(sim): offline interior-temperature curvature harness (#125)
 - **Issue #122** (closed): Clk output-load sensitivity: frequency and edge shift vs capacitive load (no load ever swept; --load-f unused)
