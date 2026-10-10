@@ -68,7 +68,7 @@ electrical-specification tables; all other rows are DR-0002's, re-verified.
 | Output frequency | 48.000 MHz | matches the crystal-less full-speed-USB precedent — ST `DS9826` Rev 6 Table 43 (`fHSI48` typ 48 MHz) and Silicon Labs CP2102N Rev 1.5 Table 3.5 (`fOSC` typ 48 MHz); explicit engineering choice, see DR-0002, citations verified in DR-0003 |
 | Trim interface | 8-bit digital trim, ±40% range (28.8–67.2 MHz), 0.314%/code (150.6 kHz/code LSB), half-LSB ±0.157%, single-point trim at test | range covers the sourced untrimmed spread (required pull −32.3%/+38.4%) with margin; full arithmetic in DR-0003 §"Row 2" |
 | Free-running, untrimmed (process spread, fixed T/V) | ±35% first-order (−27.7%/+47.6% exact in frequency) | **sourced** from gf180mcu-pdk `docs/analog/spice/elec_specs/`: poly-resistor spread ±20% (§5.1, §6.1A/B) + MIM-cap spread ±15.33% (§6.2(a)), summed worst-case as independent process modules — DR-0003 |
-| Free-running, post-trim, **at calibration point** (T = 27 °C, process, VDD ±10%) | **−2.9% / +2.0%** worst-case | quantization ±0.157% + trim-DAC mismatch ±0.300% + comparator offset ±0.300% (both still flagged assumptions) + the **measured** supply span at per-corner calibrated codes (−2.07%/+1.17%, campaign `sim/pvt/results/20260923T030125Z/`; the low-side comparator's supply slope is flattened by the complementary PMOS-input cell of issue #57 — delay share of the span 62–82% → 7.6–33%, probe `sim/pvt/results/20260923T030905Z/` — so the residual is now dominated by the charge-path term) — DR-0017 supersedes DR-0016's −9.2%/+6.5% (which superseded DR-0003's ±1.1%). Tighter than ST's shipped `ACC_HSI48` = −2.8/+2.9% at 25 °C on the low side, ~1.1× looser on the high side; the charge-path supply term is the next lever |
+| Free-running, post-trim, **at calibration point** (T = 27 °C, process, VDD ±10%) | **−2.9% / +2.0%** worst-case | quantization ±0.157% + trim-DAC mismatch ±0.300% + comparator offset ±0.300% (both still flagged assumptions) + the **measured** supply span at per-corner calibrated codes (−2.07%/+1.17%, campaign `sim/pvt/results/20260923T030125Z/`; the low-side comparator's supply slope is flattened by the complementary PMOS-input cell of issue #57 — delay share of the span 62–82% → 7.6–33%, probe `sim/pvt/results/20260923T030905Z/` — so the residual is now dominated by the charge-path term) — DR-0017 supersedes DR-0016's −9.2%/+6.5% (which superseded DR-0003's ±1.1%). Against ST's shipped `ACC_HSI48` = −2.8/+2.9% at 25 °C: slightly looser on the low side (−2.9% vs −2.8%), tighter on the high side (+2.0% vs +2.9%); the charge-path supply term is the next lever |
 | Free-running, post-trim, **full temperature range** (−40…+85 °C, VDD ±10%) | **+8.8% / −10.8%** worst-case | gf180mcu's published poly-resistor TCR of −1200 ppm/K (§6.1A), trimmed at 27 °C: ΔR/R = −6.96% at +85 °C (58 K) so f rises +6.84%, ΔR/R = +8.04% at −40 °C (67 K) so f falls −7.91%, plus the re-derived at-calibration figure above — DR-0017 (supersedes DR-0016's +13.4%/−17.1%; DR-0004 stands — no active TC compensation, the delay term is budgeted, not compensated — and closing the gap to USB compliance remains entirely the job of the runtime-disciplined row below) |
 | Runtime-disciplined (reserved, not designed) | ≤ ±0.25% (2,500 ppm) — USB full-speed compliance | USB 2.0 Rev 2.0 §7.1.11 `TFDRATE`, verified verbatim; the clause covers temperature and supply, with no pre-/post-discipline distinction. Precedented by ST's CRS peripheral (`RM0091` Rev 10 §7, SOF-based) and Silicon Labs' crystal-less USB parts — see DR-0003 |
 | Supply | 3.3 V core (3.0–3.6 V) | explicit engineering choice, matches gf180mcu's 3.3V-primary flavor and sibling canary `gf180-bandgap`'s own supply scope |
@@ -78,14 +78,20 @@ electrical-specification tables; all other rows are DR-0002's, re-verified.
 
 An oscillator spec without its trim math is not a spec: every accuracy claim
 above shows both the PVT-corner spread and the trim range/resolution that
-covers it — see DR-0003 for the current arithmetic and error-budget
-breakdown, and DR-0002 for the rows it did not change. **The free-running
-accuracy claim must always be quoted with its temperature condition**:
-≈±1% holds only at the calibration temperature, and the full-range figure
-is roughly ±8–9%. Several rows still carry explicit, flagged engineering
-assumptions (trim-DAC mismatch, comparator offset, supply drift) rather
-than invented precision; DR-0003 states exactly which, and what would
-supersede them.
+covers it. The current ratified post-trim error budget and its arithmetic
+are in
+[`spec/decision-records/0017-low-side-comparator-pmos-respin-supply-slope.md`](spec/decision-records/0017-low-side-comparator-pmos-respin-supply-slope.md)
+(DR-0017, superseding DR-0016, which superseded DR-0003's Row 3); DR-0003
+remains the background derivation for process spread, trim range/
+resolution and Iq, and DR-0002 for the rows neither changed. **The
+free-running accuracy claim must always be quoted with its temperature
+and supply conditions**: −2.9%/+2.0% holds only at the calibration point
+(27 °C, 3.0–3.6 V), and the full-range figure (−40…+85 °C, same supply)
+is −10.8%/+8.8%. In those budgets the supply span (−2.07%/+1.17%) is
+**measured**, not assumed; two terms are still explicit, flagged
+engineering assumptions rather than invented precision — trim-DAC
+mismatch (±0.300%) and comparator offset (±0.300%). DR-0003 states what
+would supersede them.
 
 Maturity ladder: spec ratified → schematic simulated across PVT → layout
 DRC/LVS-clean → post-layout re-verification → shuttle seat → measured
