@@ -1,0 +1,31 @@
+name: Module-loader offline suite
+
+# Runs the offline unit tests of sim/_module_loader.py (issue #130), the shared
+# importlib helper used by the supply-transient, temperature, trim-interface and
+# trim-transition generators. PDK-free, simulator-free, cloud-free: python3 +
+# pytest only. This job never writes into sim/ results and produces no
+# evidence. Like the other offline suites it has no `paths:` filter, so it (and
+# the four dependent generator suites) re-run on every PR, including edits to
+# sim/_module_loader.py. Separate from signoff.yml on purpose (that workflow is
+# a hashed, audited artifact).
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  module-loader-offline:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: python3 -m pip install pytest
+      - name: Run offline module-loader suite (synthetic, not evidence)
+        run: python3 -I -m pytest -p no:cacheprovider sim/test_module_loader.py

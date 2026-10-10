@@ -31,7 +31,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import json
 import subprocess
 import sys
@@ -39,19 +38,17 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
+_SIM = Path(__file__).resolve().parent.parent
+if str(_SIM) not in sys.path:
+    sys.path.insert(0, str(_SIM))
+from _module_loader import load_module  # noqa: E402
 WAVEFORM = REPO / "sim" / "waveform"
 
 
 def _load(name: str, path: Path):
     """Import a sibling harness module under a unique name (both directories
     hold a `prepare.py`/`analyze.py`; plain `import prepare` would collide)."""
-    if name in sys.modules:
-        return sys.modules[name]
-    spec = importlib.util.spec_from_file_location(name, path)
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
-    return mod
+    return load_module(name, path, reuse=True)
 
 
 wp = _load("rcosc_waveform_prepare", WAVEFORM / "prepare.py")

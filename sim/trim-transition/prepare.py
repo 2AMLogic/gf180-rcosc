@@ -21,21 +21,20 @@ Usage:  python3 -I sim/trim-transition/prepare.py [--out DIR]
 from __future__ import annotations
 
 import argparse
-import importlib.util
 import json
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
+_SIM = Path(__file__).resolve().parent.parent
+if str(_SIM) not in sys.path:
+    sys.path.insert(0, str(_SIM))
+from _module_loader import load_module  # noqa: E402
 
 
 def _load_waveform_prepare():
-    spec = importlib.util.spec_from_file_location("wf_prepare", REPO / "sim" / "waveform" / "prepare.py")
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules["wf_prepare"] = mod
-    spec.loader.exec_module(mod)
-    return mod
+    return load_module('wf_prepare', REPO / "sim" / "waveform" / "prepare.py", reuse=False)
 
 
 wf = _load_waveform_prepare()
