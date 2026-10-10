@@ -38,6 +38,20 @@ excepted() { # path -> prints reason, returns 0 if covered
   return 1
 }
 
+for rev in "$base" "$head"; do
+  if ! git rev-parse --verify --quiet "$rev^{commit}" >/dev/null; then
+    echo "ERROR: cannot resolve revision '$rev'; append-only comparison not performed." >&2
+    exit 2
+  fi
+done
+
+# Run the diff as an explicitly checked command (not in process substitution,
+# whose failure would be silently ignored) before evaluating any paths.
+if ! difflist="$(git diff --name-status --find-renames --diff-filter=ACDMRTUXB "$base" "$head" -- 'sim/*/results/*')"; then
+  echo "ERROR: git diff $base $head failed; append-only comparison not performed." >&2
+  exit 2
+fi
+
 fail=0
 while IFS=$'\t' read -r status p1 p2; do
   [ -z "$status" ] && continue
@@ -53,7 +67,7 @@ while IFS=$'\t' read -r status p1 p2; do
   else
     echo "VIOLATION $status ${paths[*]}" >&2; fail=1
   fi
-done < <(git diff --name-status --find-renames --diff-filter=ACDMRTUXB "$base" "$head" -- 'sim/*/results/*')
+done <<< "$difflist"
 
 if [ "$fail" = 1 ]; then
   echo "sim results are append-only: add a new timestamped run dir instead of editing prior runs." >&2
