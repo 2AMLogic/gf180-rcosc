@@ -1,0 +1,66 @@
+{
+  "runid": "20261010T120000Z",
+  "utc": "2026-10-10T09:16:24.726466+00:00",
+  "git_head": "aca64a5ddcb2b137a2d5ed6c1dcdf4bc22cc3946",
+  "python": "3.12.3",
+  "seed": 20261009,
+  "kind": "behavioural simulation, no analogue sim",
+  "inputs_sha256": {
+    "sim/pvt/results/20260923T030125Z/results.csv": "d69d7a820563194d25c35a36cbf042dedf6f8c74ed0fe3b5728eaa9bfa0f3894",
+    "sim/pvt-postlayout/results/20260923T152954Z/results.csv": "40649495db76114103b33b562d0ae6839fa794630f61a059292cfc5c7ffaa108",
+    "sim/pvt-postlayout/results/20260923T152954Z/guardrails.csv": "be943221c16046b2d4cdc46c0f5e9973d98a0a78a3442a33a3ac9647c604d0a6",
+    "sim/discipline/discipline_model.py": "27a9b850ad0f51e1d5fa2fd0c9d8aff22fdf201d9be8e8e9f8b18c945a8bf92b",
+    "sim/discipline/outage_model.py": "c327aa07e130c49623d56dec8db3d9087c63068c345125e54d45709c49855eaa",
+    "sim/discipline/results/20261009T010000Z/results.csv": "9d012f42e0209e7ac4f437d206844b53e04f80540af9879b63fb450cf12a2fae"
+  },
+  "controller_policy": {
+    "name": "freeze_reacquire",
+    "rule": "invalid observations are not delivered; trim code and all controller state frozen; first SOF after an outage is a baseline only; updates resume at the next one-frame observation",
+    "valid_observation": "not lost[i] and not lost[i-1]; lost[i] means SOF_{i+1} absent",
+    "status": "assumption for sensitivity analysis, not a hardware decision"
+  },
+  "outage_schedules": {
+    "cases": [
+      "constant_27C_3p3V",
+      "ramp_1C_per_s",
+      "ramp_20C_per_s",
+      "vdd_step_+27C",
+      "vdd_step_-40C"
+    ],
+    "lost_sofs": [
+      1,
+      16,
+      256
+    ],
+    "start": {
+      "constant_27C_3p3V": "frame 8000 after cold-start warm-up",
+      "ramp_*": "mid-ramp",
+      "vdd_step_*": "one frame before the 3.3 -> 3.0 V step"
+    },
+    "tail_frames_after_outage": 6000,
+    "warm_frames": 8000,
+    "durations_are_assumptions": true,
+    "jitter_ns_cases": [
+      0.0
+    ]
+  },
+  "recovery_definition": {
+    "band_pct": 0.25,
+    "hold_frames": 256,
+    "inst": "per-frame true error in band",
+    "avg16": "16-frame mean of true error in band",
+    "note": "both readings reported; neither is selected as the spec interpretation"
+  },
+  "no_loss_regression_vs_committed_20261009T010000Z": {
+    "compared_values": 120,
+    "max_abs_diff_pct": 4.6663184399553526e-05,
+    "committed_precision_pct": 5e-05
+  },
+  "limitations": [
+    "plant is the interpolated 24-code model of DR-0021 (sub-16-code structure and mismatch absent)",
+    "temperature/supply factor assumed code-independent (bounded 0.95-1.24 % in DR-0021)",
+    "outage lengths 1/16/256 ms and the freeze policy are engineering assumptions, not sourced USB figures",
+    "ideal counter and reference apart from SOF jitter; no jitter is applied in the sweep (jitter 0 only)",
+    "oscillator free-runs on the frozen code; no claim that runtime discipline exists in hardware"
+  ]
+}
