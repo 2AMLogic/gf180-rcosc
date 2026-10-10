@@ -55,7 +55,6 @@ import argparse
 import concurrent.futures
 import csv
 import json
-import os
 import re
 import subprocess
 import sys
@@ -67,6 +66,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from pvt_sweep import (  # noqa: E402
+    DEFAULT_JOBS,
     MEAS_FIRST_EDGE,
     NETLIST,
     PROCESS_CORNERS,
@@ -439,7 +439,8 @@ def main() -> int:
         help="prior campaign results dir to read per-corner calibrated codes from "
         "(default: newest sim/pvt/results/*/ with a calibration manifest)",
     )
-    ap.add_argument("--jobs", type=int, default=min(12, (os.cpu_count() or 8)))
+    ap.add_argument("--jobs", type=int, default=DEFAULT_JOBS,
+                    help="parallel ngspice processes (default %(default)s)")
     ap.add_argument("--keep-build", action="store_true", help="keep generated decks")
     args = ap.parse_args()
 

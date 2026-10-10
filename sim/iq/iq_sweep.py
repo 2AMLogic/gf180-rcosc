@@ -54,9 +54,10 @@ README.md), and refuses to start if that run id already has content.
 
 Usage:
   sim/iq/run-iq-sweep.sh                                # full grid, codes 0x00 0x80 0xC0 0xFF
-  sim/iq/run-iq-sweep.sh --jobs 8
   sim/iq/run-iq-sweep.sh --subset endpoints             # fast check: tt/ff/ss x 3T x 3V only
   sim/iq/run-iq-sweep.sh --codes 0x00 0x80 0xFF
+
+Default --jobs is 2 (shared hosts); grids of more than a handful of corners belong in a `klt sim` corners request (see sim/startup/README.md, Run section); this driver is for single-unit/debug use or dedicated simulation hosts.
 """
 
 from __future__ import annotations
@@ -85,6 +86,7 @@ sys.path.insert(0, SIM_PVT)
 sys.path.insert(0, os.path.join(REPO_ROOT, "sim"))
 import pdk_provenance  # noqa: E402  shared PDK-revision helper (#65)
 from pvt_sweep import (  # path insert above must precede this import
+    DEFAULT_JOBS,
     PROCESS_CORNERS,
     TEMPS_C,
     VDDS_V,
@@ -458,8 +460,8 @@ def write_results(runid, rows, results_dir, ngspice_ver, pdk_fields, git_sha,
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--jobs", type=int, default=6,
-                    help="parallel ngspice processes (default 6)")
+    ap.add_argument("--jobs", type=int, default=DEFAULT_JOBS,
+                    help="parallel ngspice processes (default %(default)s)")
     ap.add_argument("--codes", nargs="+", default=["0x00", "0x80", "0xC0", "0xFF"],
                     help="trim codes to sweep (default: 0x00 0x80 0xC0 0xFF)")
     ap.add_argument("--subset", choices=["full", "endpoints"], default="full",

@@ -85,6 +85,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+# Default --jobs for every legacy sweep driver (pvt_sweep, delay_probe,
+# iq_sweep, pex_pvt_sweep). Kept low because these run on shared multi-sweep
+# hosts; larger grids belong in a `klt sim` corners request (batch backend).
+# Pass --jobs N explicitly on a dedicated simulation host.
+DEFAULT_JOBS = 2
 sys.path.insert(0, str(REPO_ROOT / "sim"))
 import pdk_provenance  # noqa: E402  shared PDK-revision helper (#65)
 DESIGN_DIR = REPO_ROOT / "design"
@@ -550,7 +555,8 @@ def mhz(x: float | None) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--jobs", type=int, default=min(12, os.cpu_count() or 4))
+    ap.add_argument("--jobs", type=int, default=DEFAULT_JOBS,
+                    help="parallel ngspice processes (default %(default)s)")
     ap.add_argument(
         "--runid",
         default=datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"),

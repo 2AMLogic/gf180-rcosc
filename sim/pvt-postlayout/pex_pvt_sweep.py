@@ -490,7 +490,8 @@ def run_guardrail_passes(
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--jobs", type=int, default=8)
+    ap.add_argument("--jobs", type=int, default=base.DEFAULT_JOBS,
+                    help="parallel ngspice processes (default %(default)s)")
     ap.add_argument("--keep-build", action="store_true")
     ap.add_argument(
         "--baseline-runid",
