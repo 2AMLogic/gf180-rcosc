@@ -32,7 +32,7 @@ python3 -I sim/trim-interface/analyze.py v33_t3_bg1_m50=<report.json> ... \
 python3 -I -m pytest -p no:cacheprovider sim/trim-interface/test_harness.py   # offline, pytest only
 ```
 
-CI: `.github/workflows/trim-interface-offline.yml`.
+CI: `.github/workflows/offline-suites.yml` (matrix entry `trim-interface-offline`).
 
 ## Case matrix (1296 cases)
 

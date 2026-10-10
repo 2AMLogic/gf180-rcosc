@@ -38,8 +38,8 @@ python3 -I sim/supply-transient/analyze.py step_dn_r1us_tt=rep.json ... --bench-
 python3 -I -m pytest -p no:cacheprovider sim/supply-transient/test_harness.py
 ```
 
-CI: `.github/workflows/supply-transient-offline.yml` ("Supply-transient offline
-suite") runs exactly the pytest line above on every pull request and push to
+CI: `.github/workflows/offline-suites.yml` (matrix entry `supply-transient-offline`)
+runs exactly the pytest line above on every pull request and push to
 main (Python 3.12, pytest only; no PDK, klt, ngspice or batch credentials).
 
 `prepare.py` options (all recorded in `provenance.json`): `--cal-target
