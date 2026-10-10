@@ -26,3 +26,9 @@ jobs:
           python-version: "3.12"
       - name: Verify doc citations of sim/ run dirs
         run: python signoff/verify-doc-citations.py
+      # Orphaned-test guard (issue #134): every tracked test_*.py must be run
+      # by some workflow. Stdlib only, like the citation check above.
+      - name: Verify every tracked test_*.py is run by a workflow
+        run: python3 -I signoff/verify-test-coverage.py
+      - name: Run the orphaned-test guard's own tests (stdlib unittest)
+        run: python3 -I signoff/test_verify_test_coverage.py
