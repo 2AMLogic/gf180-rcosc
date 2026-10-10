@@ -85,6 +85,45 @@ sim/
 time. The driver refuses to start if a run id's directories already exist
 and are non-empty, so a re-run can never clobber committed evidence.
 
+## PDK revision provenance in campaign manifests (issue #65)
+
+Every campaign driver (`pvt/pvt_sweep.py`, `pvt-postlayout/pex_pvt_sweep.py`,
+`iq/iq_sweep.py`) takes its PDK block from one shared helper,
+[`pdk_provenance.py`](pdk_provenance.py) (unit tests:
+[`test_pdk_provenance.py`](test_pdk_provenance.py), PDK-free). A **newly
+minted** `manifest.json` carries:
+
+| field | meaning |
+|---|---|
+| `pdk` | family, e.g. `gf180mcuC` |
+| `pdk_revision` | the 40-hex open_pdks commit, or exactly `"unknown"`; never omitted |
+| `pdk_revision_source` | when resolved: `SOURCES` (the install's own `open_pdks <hash>` record), `volare-version-dir` (the `versions/<hash>` directory the variant link resolves to), or `SOURCES+volare-version-dir` when both agree |
+| `pdk_revision_reason` | when `"unknown"`: why it could not be established |
+| `model_dir` | ngspice model directory **relative to the PDK root** (omitted if not expressible portably) |
+
+`pdk_root` and absolute install paths are no longer written, and generated
+`summary.md`/`README.md` files print the revision instead of the install
+path. Detection never guesses: if `SOURCES` and the volare directory
+disagree, `SOURCES` is malformed, or neither exists, the result is `unknown`
+with a reason.
+
+**Committed evidence is not rewritten.** Historical manifests keep their
+`pdk_root`/`model_dir` fields and have no `pdk_revision`. What the committed
+campaigns are known to have used:
+
+- Schematic PVT campaigns (`pvt/results/*`), delay-probe runs and Iq runs
+  (`iq/results/*`): revision **unknown**; their manifests record family and
+  install path only. No revision is back-filled.
+- Post-layout runs (`pvt-postlayout/results/*`): the committed `klt extract`
+  envelopes record `open_pdks c6d73a35f524...` (current run
+  `20260923T152954Z`) and `open_pdks f6eeac7dad08...`
+  (`20260921T164434Z`, `20260922T004322Z`); the ngspice half of those runs
+  records no revision of its own.
+
+No new full campaign was run for this change; the field is demonstrated by
+fixture-backed manifest tests (a single-corner mode does not exist in the
+three drivers).
+
 ## PVT-corner campaign (issue #12)
 
 `sim/pvt/pvt_sweep.py` runs the full process x temperature x supply

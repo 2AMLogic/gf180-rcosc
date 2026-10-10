@@ -74,6 +74,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT / "sim" / "pvt"))
 import pvt_sweep as base  # noqa: E402  (sys.path must be set up first)
+sys.path.insert(0, str(REPO_ROOT / "sim"))
+import pdk_provenance  # noqa: E402  shared PDK-revision helper (#65)
 
 PVT_TB = REPO_ROOT / "design" / "netlist" / "pvt_tb.spice"
 GDS_PATH = REPO_ROOT / "layout" / "cells" / "rcosc_top.gds"
@@ -745,9 +747,7 @@ def main() -> None:
         "ngspice": base.tool_version(["ngspice", "-v"], line=1),
         "xschem": base.tool_version(["xschem", "--version"], line=0),
         "klt_version": base.tool_version(["klt", "version"], line=0),
-        "pdk_root": str(pdk_root),
-        "pdk": pdk,
-        "model_dir": str(model_dir),
+        **pdk_provenance.manifest_fields(pdk_root, pdk, model_dir),
         "layout_gds": str(GDS_PATH.relative_to(REPO_ROOT)),
         "extract_command": [
             "klt",
@@ -812,7 +812,7 @@ def main() -> None:
     )
     lines.append(f"| ngspice | {manifest['ngspice']} |")
     lines.append(f"| klt | {manifest['klt_version']} |")
-    lines.append(f"| PDK | {pdk} @ `{pdk_root}` |")
+    lines.append(f"| PDK | {pdk_provenance.display(manifest)} |")
     lines.append("| layout | `layout/cells/rcosc_top.gds` |")
     lines.append(
         "| extraction | `klt extract --deck gf180mcu --top rcosc_top "

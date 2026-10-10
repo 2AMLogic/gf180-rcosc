@@ -82,6 +82,8 @@ SIM_PVT = os.path.join(REPO_ROOT, "sim", "pvt")
 # two campaigns' corner definitions cannot drift apart. No behavior change
 # to pvt_sweep.py itself -- this is a read-only import.
 sys.path.insert(0, SIM_PVT)
+sys.path.insert(0, os.path.join(REPO_ROOT, "sim"))
+import pdk_provenance  # noqa: E402  shared PDK-revision helper (#65)
 from pvt_sweep import (  # path insert above must precede this import
     PROCESS_CORNERS,
     TEMPS_C,
@@ -269,7 +271,7 @@ def _matrix_for_code(by_point, code) -> str:
     return "\n".join(out)
 
 
-def write_results(runid, rows, results_dir, ngspice_ver, pdk_root, git_sha,
+def write_results(runid, rows, results_dir, ngspice_ver, pdk_fields, git_sha,
                   dirty, processes, codes, subset, wall_clock_s, jobs):
     fields = ["variant", "process", "temp_c", "vdd_v", "code",
              "iq_op_ua", "iq_run_ua", "f_mhz", "log"]
@@ -286,7 +288,7 @@ def write_results(runid, rows, results_dir, ngspice_ver, pdk_root, git_sha,
     with open(os.path.join(results_dir, "manifest.json"), "w") as fh:
         json.dump({
             "runid": runid, "git_sha": git_sha, "dirty_tree": dirty,
-            "ngspice": ngspice_ver, "pdk_root": pdk_root,
+            "ngspice": ngspice_ver, **pdk_fields,
             "target_ua": TARGET_UA,
             "netlist": "design/netlist/smoke_test.spice",
             "variant": "as-committed",
@@ -336,7 +338,7 @@ def write_results(runid, rows, results_dir, ngspice_ver, pdk_root, git_sha,
         "| | |", "|---|---|",
         f"| git sha | `{git_sha}`{' (dirty tree)' if dirty else ''} |",
         f"| ngspice | {ngspice_ver} |",
-        f"| PDK | gf180mcuC @ `{pdk_root}` |",
+        f"| PDK | {pdk_provenance.display(pdk_fields)} |",
         "| netlist | `design/netlist/smoke_test.spice` (from `design/smoke_test.sch`) |",
         "| sizing | `as-committed` only (see module docstring for why `pre-22`"
         " is not part of the grid) |",
@@ -517,7 +519,8 @@ def main():
 
     order = {p: i for i, p in enumerate(processes)}
     rows.sort(key=lambda r: (r["code"], order[r["process"]], r["temp_c"], r["vdd_v"]))
-    write_results(runid, rows, results_dir, ngspice_ver, str(pdk_root), git_sha,
+    write_results(runid, rows, results_dir, ngspice_ver,
+                 pdk_provenance.manifest_fields(pdk_root, pdk, model_dir), git_sha,
                  dirty, processes, codes, args.subset, wall_clock_s, args.jobs)
 
     failed = [r for r in rows if r["iq_op_ua"] is None or r["iq_run_ua"] is None]

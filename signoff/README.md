@@ -452,8 +452,12 @@ an open_pdks commit. The current run records `c6d73a35…`, while two
 earlier post-layout runs record `f6eeac7d…`, so runs were not all on one
 revision. (This section previously said the post-layout extraction pins
 `c6d73a35…`. That holds for the current run only.) Historical revisions
-that were not recorded stay unknown. Recording the revision on new runs is
-issue #65.
+that were not recorded stay unknown. **For new runs the gap is closed
+(issue #65):** the three campaign drivers write `pdk_revision` (an open_pdks
+commit with its source, or `"unknown"` plus a reason) via the shared
+`sim/pdk_provenance.py`, and no absolute install path. Every committed
+campaign above predates this and keeps its disclosed limitation; none was
+rewritten.
 
 ### met — item 10 (Repo hygiene): `signoff/repo-hygiene-envelope.json` → `.github/workflows/signoff.yml`
 

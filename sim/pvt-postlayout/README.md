@@ -134,3 +134,16 @@ include path (local backend), so it is not portable. To produce the full report
 once a compatible client exists, run `klt pex layout/cells/rcosc_top.gds
 sim/pvt-postlayout/klt-pex/request_v{30,33,36}.json` with the flags in
 `COMMAND.txt` and `--backend batch`, one run per request.
+
+## PDK revision provenance (issue #65)
+
+New manifests carry `pdk_revision` (an open_pdks commit, or `"unknown"` with
+`pdk_revision_reason`), `pdk_revision_source`, and a root-relative
+`model_dir`; no absolute install paths. See [`../README.md`](../README.md)
+and [`../pdk_provenance.py`](../pdk_provenance.py).
+
+Committed runs predate the field and are not rewritten. The simulation half
+of each records only family and install path; the only revision evidence is
+the committed `klt extract` envelope: `open_pdks c6d73a35...` for
+`20260923T152954Z`, `open_pdks f6eeac7d...` for `20260921T164434Z` and
+`20260922T004322Z`. Earlier runs are not asserted here.
