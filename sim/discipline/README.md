@@ -196,3 +196,21 @@ oscillator-side numbers are separate from the SOF-arrival jitter above: the
 +/-500 ns SOF assumption stays an external-reference assumption that
 oscillator measurements can neither validate nor replace, and nothing in this
 model is changed by the harness. See [sim/waveform/README.md](../waveform/README.md).
+
+## Related: interior-temperature curvature (prepared, not measured; issue #125)
+
+The plant's temperature factor `g_p(T,V)` above is bilinear over the three
+committed temperatures (-40 / 27 / 85 C) only; nothing between those points
+has been simulated, so the curvature of f(T) inside the range is an
+assumption of this model, not data. `sim/temperature/` prepares (offline only)
+a 36-point fixed-code campaign - tt/ss/ff at their ratified-target codes from
+`sim/pvt/results/20260923T030125Z`, 12 temperatures, 3.3 V - and an analyzer
+that reports slopes and the residual against the -40/27/85 C piecewise-linear
+interpolation. No measurement has run (it needs a compatible batch runner,
+klayout-tools#2851, and the schematic-equivalence check recorded there), so
+**this model and DR-0021 are unchanged and remain based on the three
+temperatures**. A measured fixed-code curve would also not by itself show the
+temperature factor is code-independent (the assumption bounded above at
+0.95-1.24 %); replacing `g_p(T,V)` is separate follow-up work that must keep
+the voltage grid and post-layout plants. See
+[sim/temperature/README.md](../temperature/README.md).
