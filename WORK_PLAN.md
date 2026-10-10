@@ -19,7 +19,7 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#128**: Runtime discipline: model SOF reference loss and reacquisition offline
 
 ## In Progress
 
@@ -48,8 +48,8 @@ Issues carrying `loom:curated`.
 ## Proposed (Architect / Hermit)
 
 - **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b) *(architect)*
-- **#122**: Clk output-load sensitivity: frequency and edge shift vs capacitive load (no load ever swept; --load-f unused) *(architect)*
-- **#125**: Interior-temperature sweep: measure frequency-vs-T curvature between the -40/27/85 C grid points *(architect)*
+- **#131**: Decision record: enable/standby interface for rcosc_top and the start event behind the Startup and Iq rows *(architect)*
+- **#130**: Consolidate copy-pasted importlib module loaders in sim harnesses *(hermit)*
 
 ## Epics
 
@@ -61,7 +61,7 @@ Issues carrying `loom:curated`.
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
-| Ready (`loom:issue`) | 0 |
+| Ready (`loom:issue`) | 1 |
 | In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |

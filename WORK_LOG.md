@@ -4,6 +4,10 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-10
 
+- **Issue #125** (closed): Interior-temperature sweep: measure frequency-vs-T curvature between the -40/27/85 C grid points
+- **PR #129**: feat(sim): offline interior-temperature curvature harness (#125)
+- **Issue #122** (closed): Clk output-load sensitivity: frequency and edge shift vs capacitive load (no load ever swept; --load-f unused)
+- **PR #127**: feat(waveform): offline clk output-load sensitivity sweep (#122)
 - **Issue #112** (closed): Guard decision: preserve confinement for raw sweep checkpoint setup in main
 - **Issue #109** (closed): Guard decision: keep unresolved write confinement for temporary research downloads
 - **Issue #120** (closed): Add offline regression tests and CI job for the DR-0021 discipline model (sim/discipline has none)
