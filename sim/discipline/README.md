@@ -214,3 +214,30 @@ temperature factor is code-independent (the assumption bounded above at
 0.95-1.24 %); replacing `g_p(T,V)` is separate follow-up work that must keep
 the voltage grid and post-layout plants. See
 [sim/temperature/README.md](../temperature/README.md).
+
+## Related: SOF reference loss and reacquisition (issue #128; behavioural, offline)
+
+`outage_model.py` (imports, never edits, `discipline_model.py`; tests in `test_outage.py`)
+adds a reference-availability schedule and one candidate **freeze-and-reacquire**
+policy: a lost SOF means the affected observations are not delivered, the trim code
+and all controller state are frozen, the first SOF back is a baseline only, and updates
+resume at the next one-frame interval (a multi-frame count is never presented as one
+48 000-count frame; `naive_nominal` exists only as a contrast fixture in the tests).
+A single lost SOF invalidates two observations; an L-SOF outage invalidates L+1.
+Outage lengths (1 / 16 / 256 ms) and the freeze behaviour are engineering assumptions
+for sensitivity analysis, not sourced USB guarantees and not a hardware decision. The
+plant keeps the interpolated 24-code uncertainty of DR-0021; the reserved
+runtime-disciplined row and DR-0021 are unchanged.
+
+Run `python3 -I sim/discipline/outage_model.py` (~45 s, one core, offline); output in a
+new `results/<runid>/` (`outage_results.csv`, `summary.md`, `manifest.json`). The
+committed run is `results/20261010T120000Z`, jitter 0 only. No-loss cold-start values
+reproduce the committed 20261009T010000Z `results.csv` to its 4-decimal printing
+precision (max diff 4.7e-5 %, recorded in the manifest); no-loss traces equal
+`run_loop` exactly in the tests. True frequency during the outage is reported apart
+from observed count error (none exists while the reference is absent); per-frame and
+16-frame-mean recovery are separate columns; there is no "locked" flag, and status is
+`recovered`, `plant_unreachable` or `controller_not_recovered`, each next to the
+no-loss baseline of the same profile. In this run no outage turned a recovering
+baseline into a non-recovering one; frozen-code drift follows the plant (about 1.8 %
+true error accrues across the -40 C 3.3 -> 3.0 V step regardless of outage length).
