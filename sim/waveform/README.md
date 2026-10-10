@@ -13,6 +13,8 @@ sim/waveform/
   prepare.py            offline bench + `klt sim` request generator (no simulator, no cloud)
   analyze.py            klt sim report / waveform analyzer
   test_harness.py       synthetic-fixture + request tests (22 tests)
+  loadsweep.py          offline clk-load sweep coordinator (issue #122): 45 requests + manifest, comparison
+  test_loadsweep.py     synthetic tests for loadsweep.py (8 tests)
   provenance.json       GENERATED: grid, library mapping, calibration source, settings (not evidence)
   rcosc_top_schematic.spice   GENERATED: DUT extracted from design/netlist/pvt_tb.spice (no device edited)
   tb_v{30,33,36}_{tt,ss,ff}.spice, request_v{30,33,36}_{tt,ss,ff}.json   GENERATED: nine benches/requests
@@ -31,7 +33,7 @@ python3 -I -m pytest -p no:cacheprovider sim/waveform
 
 # CI: .github/workflows/waveform-offline.yml ("Waveform offline suite") runs exactly
 #   python3 -I -m pytest -p no:cacheprovider sim/waveform/test_harness.py
-# on every pull request and push to main (Python 3.12, pytest only; no PDK, klt,
+# (plus sim/waveform/test_loadsweep.py) on every pull request and push to main (Python 3.12, pytest only; no PDK, klt,
 # ngspice or batch credentials). Its fixtures are SYNTHETIC, not measured evidence.
 
 # analysis of klt sim reports, one per request, nominal supply per report (new outdir each time)
@@ -81,6 +83,54 @@ dispatched corners, one transient per corner, three supply groups (`v30`, `v33`,
   step 200 ps, reltol 1e-3, abstol 1e-12 A, vntol 1e-6 V (all configurable and
   recorded). Steady window: final 2 us (>= 20 complete cycles required).
 - Units in generated JSON: seconds, volts, farads, amperes, degrees C.
+
+## Output-load sensitivity (issue #122, offline only)
+
+Prepared requests and synthetic analysis only; **no load sensitivity has been
+measured** and no maximum load is specified. Trim codes come from the unloaded
+calibration bench, so downstream capacitance is a separate question.
+
+Grid: extra `clk` capacitance **0, 1, 2, 5, 10 pF** x process `tt, ss, ff` x
+supply `3.0, 3.3, 3.6` V, all at 27 C = **45 unique points**. Supply and code are
+baked into a bench, so there are 45 one-corner requests (the existing `--probe`
+generation) in separate directories `points/<proc>_v<VV>_c<fF>f/`. Each process
+holds the code calibrated **unloaded** at its own 27 C / 3.3 V point
+(`--cal-run` mandatory, committed, validated and hashed exactly as above; target
+`ratified`); nothing is recalibrated under load. The 0 F point matches the
+calibration bench (`load_matches_calibration_bench: true`); non-zero loads are
+flagged as not matching it. `sweep_manifest.json` maps each request, expected
+report file `report_<id>.json`, load (F), process, temperature, supply, held
+code, calibration provenance and solver settings.
+
+```
+python3 -I sim/waveform/loadsweep.py prepare --cal-run sim/pvt/results/20260923T030125Z --out /tmp/loadsweep   # NEW dir only
+python3 -I sim/waveform/loadsweep.py analyze --manifest /tmp/loadsweep/sweep_manifest.json \
+    --reports-dir <dir with report_<id>.json> --outdir sim/waveform/results/<runid> [--synthetic]
+```
+
+Definitions: frequency = 1 / mean period (existing analyzer; all failure
+semantics reused). Each point is compared with the 0 F point of the same
+process and supply: relative frequency shift `100*(f/f0 - 1)` in percent, duty
+change (absolute ratio difference), rise/fall change in seconds and percent.
+Interval slopes are `d(relative shift %)/d(load pF)` between **adjacent sampled
+loads** (percent per pF); no linearity is assumed. Separately, the absolute
+error `100*(f/48 MHz - 1)` is reported and the **first sampled load** outside
+DR-0017's at-calibration -2.9 % / +2.0 % budget (or "zero-load baseline already
+outside budget", "not reached through 10 pF", or "indeterminate" when a failed
+row precedes any outside-budget load). The budget is contextual away from
+nominal 27 C / 3.3 V and ratifies no load specification; no maximum load is
+extrapolated. Missing/duplicate manifest mappings, a missing baseline or report,
+a wrong corner, or a failed waveform stop short of numbers (explicit FAIL, non-zero
+exit); failed rows are never turned into passes. Output directories are never
+overwritten, and synthetic runs carry `SYNTHETIC FIXTURE - NOT MEASURED EVIDENCE`
+in `results.json`, `summary.md` and every `results.csv` row.
+
+Deferred campaign: execute via `klt sim --backend batch` only after runner and
+client compatibility and waveform artifacts are demonstrated
+(2AMLogic/klayout-tools#2851 was OPEN on 2026-10-10); record failed submissions
+and tool/PDK revisions (#65), check numerical convergence, and commit immutable
+dated results. Material shifts could motivate a separate decision record and a
+separately ratified maximum load; circuit changes and buffering are separate work.
 
 ## Measurement definitions (analyze.py)
 
