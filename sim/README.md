@@ -68,6 +68,11 @@ sim/
     results/<runid>/       requests, benches, reports, model-mismatch evidence,
                            failed batch attempts; see mc-groundwork/README.md
                            for the feasibility verdict. No yield claim
+  temperature/
+    prepare.py, analyze.py interior-temperature curvature harness (issue #125): 12-point
+                           temperature axis x tt/ss/ff at the held ratified codes, 3.3 V;
+                           offline request generator, slope/curvature analyzer, synthetic
+                           tests only; no simulation run yet; see temperature/README.md
   discipline/
     discipline_model.py    behavioural SOF discipline-loop model against the
                            committed freq-vs-code data (issue #79); pure
