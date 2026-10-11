@@ -219,7 +219,10 @@ def run(text: str, point: "base.Point", logdir: Path, tag: str,
                             capture_output=True, text=True, timeout=1800)
         out = pr.stdout + "\n" + pr.stderr
         logdir.mkdir(parents=True, exist_ok=True)
-        (logdir / f"{tag}.log").write_text(
+        log = logdir / f"{tag}.log"
+        if log.exists() and attempt == 1:
+            raise FileExistsError(f"refusing to overwrite raw log {log} (log tags must be unique per run)")
+        log.write_text(
             f"# {tag}: {point.process} {point.temp_c:g}C {point.vdd_v:g}V "
             f"code 0x{point.code:02X} tstop {tstop_ns}n, "
             f"wall {time.time()-t0:.1f}s\n" + out)

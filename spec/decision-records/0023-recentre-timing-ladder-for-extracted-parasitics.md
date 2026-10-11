@@ -22,7 +22,9 @@ row edited, no earlier `sim/` result edited. All evidence:
 ### Where the slow-down comes from (AC 1)
 
 Single-corner ablations of the committed extracted netlist (93 serial runs,
-[`attribution.md`](../../sim/recentre/results/attribution/20261011T031527Z/attribution.md)).
+[`attribution.md`](../../sim/recentre/results/20261011T031527Z/attribution.md)).
+These are 31 netlist variants at three fixed corners, not a PVT matrix over one netlist, so a
+`klt sim` corners request cannot express them; each is one local ngspice process, run serially.
 Shares are of the period shift (ns), telescoping order, rows sum to 100 % with zero residual:
 
 | contributor | worst ff/-40/3.6 (+9.58 ns) | best ss/-40/3.6 (+6.39 ns) | centre tt/27/3.3 (+7.08 ns) |
@@ -90,7 +92,8 @@ The binding corners of the 0xA3 record also fit: ss/-40 C/3.0 V reaches 57.7 MHz
 (committed sizing, tt: 0xD9, LSB 0.87 %/code.) The codes sit at 0x59..0xD7: 40 codes of headroom to 0xFF at ss (24 under B) and 89 codes to
 0x00 at ff, versus 0xD9..0xF7 (8 codes of headroom at ss) before.
 
-**Predicted post-trim accuracy** (P3, model A, one trim code per process):
+**Predicted post-trim accuracy** (P3, model A, one trim code per process; every T/V row below is
+in [`summary.md`](../../sim/recentre/results/20261011T035649Z/summary.md) with the raw log behind it):
 
 * At the calibration point: |error| <= 0.26 % measured at tt/ff/ss, bounded by half
   the worst LSB (0.35 %). That is inside the ratified +/-1.1 % with 4x margin.
@@ -99,6 +102,12 @@ The binding corners of the 0xA3 record also fit: ss/-40 C/3.0 V reaches 57.7 MHz
   ff/85 C/3.0 V) against 48 MHz. Against the ratified +8 % / -9 % this misses at ff by
   0.41 and 0.16 points. Under model B the same probes give at worst -6.94 % / +5.17 %
   (ss), all inside.
+* Log provenance: in the first points runs the raw logs were named by trim code only, so
+  points sharing a code overwrote each other (27 of 44 rows, including ff/-40 C/3.6 V; listed in
+  each affected run's `ERRATUM.md`). Every overwritten row was re-run as its own single-corner
+  invocation (runs `20261011T035313Z` .. `20261011T035616Z` in `sim/recentre/results/`) and
+  reproduced bit-identically, so every T/V number in this record, for P3 and for both
+  alternatives, is now backed by a log that holds its own corner. No row is left without a log.
 
 **Cost** (against the committed sizing, extracted netlist, tt/27 C/3.3 V):
 
@@ -158,7 +167,7 @@ re-centre does not make the ratified LSB row true.
   went to the batch fleet and all failed with exit 87 (runner klt 0.5.0 vs client 0.7.0,
   klayout-tools#2851; jobs `klt-sim-71b47285a46d`, `klt-sim-06e10de5dae5`,
   `klt-sim-4e4b4ff9a358`,
-  [`summary.md`](../../sim/recentre/results/p3-27pt/20261011T034200Z/summary.md)). No local grid was run. The
+  [`summary.md`](../../sim/recentre/results/20261011T034200Z/summary.md)). No local grid was run. The
   numbers above are single-corner probes (tt/ff/ss at the calibration point, six T/V extremes,
   two binding-corner range checks) and must not be read as the 27-point result.
 * **Follow-ups named, not done here**: (1) layout respin of the trim bank and `klt pex` post-layout

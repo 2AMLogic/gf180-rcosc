@@ -43,7 +43,7 @@ CORNERS = {
 
 def main() -> None:
     runid = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    out = HERE / "results" / "attribution" / runid
+    out = HERE / "results" / runid  # sim/<bench>/results/<ts> layout
     if out.exists():
         sys.exit(f"refusing to overwrite {out}")
     logs = HERE / "corners" / f"attribution-{runid}"  # committed per-run logs

@@ -24,7 +24,15 @@ The supply is swept through `corners.supply_v` (VDD and the trim-high rail
 VHI move together).  Submit with KLT_SIM_BACKEND=batch (the daemon default);
 never as a hand-launched ngspice loop.
 
-Usage: python3 -I sim/recentre/gen_requests.py [--probe tt:27:3.3]
+PDK root: by default the requests carry only `models.pdk`, so `klt sim`
+resolves the root itself (on the dispatch worker it picked `~/.ciel`, while
+explore.py's probes resolved `~/.volare`; README "PDK root").  When the
+27-point requests are re-submitted, pass `--pdk-root <root>` to pin
+`models.pdk_root` to the root the probes used, provided that root exists on
+the runner.  The committed request files carry no absolute path (repo PDK
+provenance rule, sim/pdk_provenance.py).
+
+Usage: python3 -I sim/recentre/gen_requests.py [--probe tt:27:3.3] [--pdk-root DIR]
 """
 import argparse
 import json
@@ -80,18 +88,21 @@ def write_tb(proc: str) -> str:
     return name
 
 
-def request(proc: str, tbname: str, temps, vdds) -> dict:
+def request(proc: str, tbname: str, temps, vdds, pdk_root: str | None = None) -> dict:
     fets, res, mim = L.base.PROCESS_CORNERS[proc]
     meas = []
     for tag in ("lo", "hi", "cal"):
         for nm, rise in (("ta", FIRST), ("tb", LAST)):
             meas.append({"name": f"{nm}_{tag}", "unit": "s",
                          "spice": f".meas tran {nm}_{tag} WHEN v(clk_{tag})=v(vmid) RISE={rise}"})
+    models = {"pdk": "gf180mcuC", "lib": "libs.tech/ngspice/sm141064.ngspice"}
+    if pdk_root:
+        models["pdk_root"] = pdk_root
     return {
         "netlist": tbname,
         "engine": "ngspice",
         "netlist_source": "extracted",
-        "models": {"pdk": "gf180mcuC", "lib": "libs.tech/ngspice/sm141064.ngspice"},
+        "models": models,
         "corners": {
             "process": [{"name": proc, "sections": [fets, res, mim, "cap_mim"]}],
             "supply_v": {"VDD": list(vdds), "VHI": list(vdds)},
@@ -108,19 +119,20 @@ def request(proc: str, tbname: str, temps, vdds) -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--probe", help="proc:temp:vdd -> request_probe.json (ONE corner, for --backend local)")
+    ap.add_argument("--pdk-root", help="pin models.pdk_root in the generated requests (re-submission)")
     a = ap.parse_args()
     write_dut()
     if a.probe:
         p, t, v = a.probe.split(":")
         tb = write_tb(p)
-        req = request(p, tb, [float(t)], [float(v)])
+        req = request(p, tb, [float(t)], [float(v)], a.pdk_root)
         req.pop("batch")
         (OUT / "request_probe.json").write_text(json.dumps(req, indent=2) + "\n")
         return
     for p in PROCS:
         tb = write_tb(p)
         (OUT / f"request_{p}.json").write_text(
-            json.dumps(request(p, tb, TEMPS, VDDS), indent=2) + "\n")
+            json.dumps(request(p, tb, TEMPS, VDDS, a.pdk_root), indent=2) + "\n")
 
 
 if __name__ == "__main__":

@@ -3,7 +3,7 @@
 
 Pure post-processing: reads results.csv, writes attribution.md next to it.
 Refuses to overwrite.  Usage:
-    python3 -I sim/recentre/report_attribution.py sim/recentre/results/attribution/<runid>
+    python3 -I sim/recentre/report_attribution.py sim/recentre/results/<runid>
 """
 import csv
 import json

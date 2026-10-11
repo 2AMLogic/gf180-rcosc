@@ -45,7 +45,10 @@ def main() -> None:
     a = ap.parse_args()
     proc, t, v = a.corner.split(":")
     runid = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    out = HERE / "results" / "explore" / f"{runid}-{a.mode}"
+    # results/<runid>/ (the repo-wide sim/<bench>/results/<ts> layout the
+    # citation verifier resolves); the mode is recorded in results.csv and
+    # command.txt.  Raw logs stay in corners/explore-<runid>-<mode>/.
+    out = HERE / "results" / runid
     logs = HERE / "corners" / f"explore-{runid}-{a.mode}"
     out.mkdir(parents=True)
     base_cards = L.load_cards()
@@ -53,7 +56,11 @@ def main() -> None:
 
     def probe(name, text, code, tag, pt=None):
         pt = pt or L.base.Point(proc, float(t), float(v), code)
-        r = L.run(text, pt, logs, f"{name}_{tag}_0x{code:02X}")
+        # the corner is part of the log name: several points of one run share
+        # a trim code, and a code-only name made their logs overwrite each
+        # other (PR #158 review).  pexlib.run also refuses to overwrite.
+        ctag = f"{pt.process}_{pt.temp_c:g}C_{pt.vdd_v:g}V".replace("-", "m")
+        r = L.run(text, pt, logs, f"{name}_{tag}_{ctag}_0x{code:02X}")
         rows.append({"candidate": name, "mode": a.mode, "corner": f"{pt.process}:{pt.temp_c:g}:{pt.vdd_v:g}",
                      "substrate": "hard-tied" if a.tie else "as-extracted",
                      "vc_c_scale": a.vc_c_scale,
