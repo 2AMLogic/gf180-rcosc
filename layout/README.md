@@ -166,9 +166,9 @@ and byte-identical cell reproduction (and the re-spin's own bias/top
 evidence) holds under exactly that pair, while `klt erc` requires the
 newer build `layout/run_checks.sh` pins for it (`klt 0.5.0+g2b1e55e51bb8…`,
 the same version string `reports/rcosc_top.erc.json` records), and `klt
-signoff` grading uses the build `signoff/README.md` pins (klayout-tools
-`3a75c3ae…` since issue #64). The ERC and grader pins differ on purpose:
-the `3a75c3ae` build's `klt erc` refuses the committed supply spec's
+signoff` grading uses the build `signoff/README.md` pins (currently the
+klayout-tools 0.7.0 release; `3a75c3ae…` from issue #64 until issue #72). The
+ERC and grader pins differ on purpose: the `3a75c3ae` grader build's `klt erc` refuses the committed supply spec's
 `_comment` annotation
 ([klayout-tools#2822](https://github.com/2AMLogic/klayout-tools/issues/2822)),
 while its `klt signoff` accepts the committed ERC envelope unchanged. `klt gen`'s
@@ -229,9 +229,9 @@ What the committed report says, and on what each part rests:
   outside what this run can ask; device-level body verification stays
   with item 4's full-connectivity LVS, matching with `VDD`/`VSS` in
   `net_correspondence` as pins. (Why `ties[]` was previously omitted and
-  why that is obsolete under the pinned grader: the pre-#2169 model
+  why that is obsolete under the `2b1e55e5` ERC build and later: the pre-#2169 model
   collapsed routed layouts into one island — see the gaps list below;
-  the pinned grader ships the fix, and `klt signoff`'s item 11 now
+  the ERC build and later grader pins ship the fix, and `klt signoff`'s item 11 now
   *requires* a declared tie — "an uncomputed check is not a clean one".)
 - **The report's overall `status` is `"violations"`, and item 11 does
   not grade that.** Its findings (60 on the current, issue-#50 re-spun
@@ -393,14 +393,14 @@ included for completeness — one worked as documented, needing no new issue):
   upstream by the time this issue started; confirmed working as documented,
   not a new gap to file.
 - **[klayout-tools#2169](https://github.com/2AMLogic/klayout-tools/issues/2169)**
-  (*fixed* in the pinned grader): `klt erc`'s pre-fix `ties[]` model
+  (*fixed* in the `2b1e55e5` ERC build, and in every later grader pin): `klt erc`'s pre-fix `ties[]` model
   registered the whole well layer as a conductor and shared its graph
   with `gates[]`, so a declared tie collapsed a real routed layout into
   one electrical island and reported a **false** `erc.supply_short`
   (reproduced four ways in `gf180-drone-fc`'s FRICTION F-034). Hit here
   while building the T1 item-11 supply spec ("Supply ERC" above):
   originally worked around by committing the spec without `ties[]`;
-  the pinned grader (`0.5.0+g2b1e55e51bb8`) ships the fix — a declared
+  the ERC build (`0.5.0+g2b1e55e51bb8`, the `layout/run_checks.sh` pin) ships the fix — a declared
   well is never a conductor, a tie contributes only its `tap_requires`
   tap sites, and `ties[]` runs in an extraction that cannot alter any
   other rule — so the spec now declares the tie (`Comp` intersected
