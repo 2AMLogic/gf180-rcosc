@@ -4,6 +4,11 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-11
 
+- **PR #168**: test: offline negative fixtures for signoff artifact provenance and binding guards
+- **Issue #165** (closed): Signoff: add offline negative fixtures for artifact provenance and binding guards
+
+### 2026-10-11
+
 - **Issue #68** (closed): signoff docs: correct post-layout open_pdks revision disclosure and stale 'pinned grader' wording (follow-up to #67)
 - **Issue #98** (closed): Prepare offline trim-code batch requests and step-analysis harness
 - **Issue #150** (closed): Tests: cover unresolved recursive deletion and shared-stash guard denials
