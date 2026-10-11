@@ -41,7 +41,6 @@ from __future__ import annotations
 import argparse
 import csv
 import datetime
-import importlib.util
 import json
 import math
 import sys
@@ -52,12 +51,12 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from _module_loader import load_module  # noqa: E402
+
+
 def _load(name, path):
-    spec = importlib.util.spec_from_file_location(name, path)
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
-    return mod
+    return load_module(name, path, reuse=False)
 
 
 prepare = _load("ti_prepare", HERE / "prepare.py")

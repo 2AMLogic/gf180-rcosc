@@ -9,7 +9,6 @@ simulation, PDK or ngspice is used and nothing is written.
 Run:  python3 -I -m pytest -p no:cacheprovider sim/legacy-analysis/test_jobs_defaults.py
 """
 import argparse
-import importlib.util
 import sys
 from pathlib import Path
 
@@ -24,12 +23,12 @@ class _Captured(Exception):
         self.parser = parser
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from _module_loader import load_module  # noqa: E402
+
+
 def _load(name, path):
-    spec = importlib.util.spec_from_file_location(name, path)
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
-    return mod
+    return load_module(name, path, reuse=False)
 
 
 @pytest.fixture(scope="module")

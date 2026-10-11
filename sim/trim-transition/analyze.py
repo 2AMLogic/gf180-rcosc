@@ -47,7 +47,6 @@ from __future__ import annotations
 import argparse
 import csv
 import datetime
-import importlib.util
 import json
 import sys
 from bisect import bisect_right
@@ -58,12 +57,12 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from _module_loader import load_module  # noqa: E402
+
+
 def _load(name, rel):
-    spec = importlib.util.spec_from_file_location(name, REPO / rel)
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
-    return mod
+    return load_module(name, REPO / rel, reuse=False)
 
 
 wfa = _load("wf_analyze", "sim/waveform/analyze.py")

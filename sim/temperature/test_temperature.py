@@ -13,7 +13,6 @@ Run:  python3 -I -m pytest -p no:cacheprovider sim/temperature sim/waveform
 """
 import bisect
 import csv
-import importlib.util
 import json
 import math
 import shutil
@@ -27,14 +26,12 @@ import pytest
 HERE = Path(__file__).resolve().parent
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from _module_loader import load_module  # noqa: E402
+
+
 def _load(name, path):
-    if name in sys.modules:
-        return sys.modules[name]
-    spec = importlib.util.spec_from_file_location(name, path)
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
-    return mod
+    return load_module(name, path, reuse=True)
 
 
 tp = _load("rcosc_temperature_prepare", HERE / "prepare.py")
