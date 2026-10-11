@@ -48,7 +48,6 @@ import argparse
 import bisect
 import csv
 import datetime
-import importlib.util
 import json
 import math
 import sys
@@ -60,12 +59,12 @@ REPO = HERE.parent.parent
 SYN_BANNER = "SYNTHETIC FIXTURE - NOT MEASURED EVIDENCE"
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from _module_loader import load_module  # noqa: E402
+
+
 def _load(name, rel):
-    spec = importlib.util.spec_from_file_location(name, REPO / rel)
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
-    return mod
+    return load_module(name, REPO / rel, reuse=False)
 
 
 wfa = _load("wf_analyze", "sim/waveform/analyze.py")

@@ -4,7 +4,6 @@ simulator or cloud operation is invoked.
 
 Run:  python3 -I -m pytest -p no:cacheprovider sim/trim-transition/test_harness.py
 """
-import importlib.util
 import json
 import re
 import subprocess
@@ -16,12 +15,12 @@ import pytest
 HERE = Path(__file__).resolve().parent
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from _module_loader import load_module  # noqa: E402
+
+
 def _load(name, fname):
-    spec = importlib.util.spec_from_file_location(name, HERE / fname)
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod
-    spec.loader.exec_module(mod)
-    return mod
+    return load_module(name, HERE / fname, reuse=False)
 
 
 prepare = _load("tt_prepare", "prepare.py")

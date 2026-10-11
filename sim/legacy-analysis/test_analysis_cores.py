@@ -9,7 +9,6 @@ nothing is written under sim/*/results/.
 
 Run:  python3 -I -m pytest -p no:cacheprovider sim/legacy-analysis/test_analysis_cores.py
 """
-import importlib.util
 import json
 import math
 import sys
@@ -20,12 +19,12 @@ import pytest
 SIM = Path(__file__).resolve().parents[1]
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from _module_loader import load_module  # noqa: E402
+
+
 def _load(name, path):
-    spec = importlib.util.spec_from_file_location(name, path)
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[name] = mod  # dataclasses need the module registered
-    spec.loader.exec_module(mod)
-    return mod
+    return load_module(name, path, reuse=False)
 
 
 pvt = _load("pvt_sweep", SIM / "pvt" / "pvt_sweep.py")
