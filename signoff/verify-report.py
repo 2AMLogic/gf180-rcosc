@@ -15,7 +15,8 @@ PDK, xschem, or ngspice):
     drift fails: a manifest or evidence envelope that changed without
     re-grading and re-committing the report rots loudly instead of passing
     -- this is the anti-rot gate for the part the grader itself does not
-    check.
+    check. Item row order is ignored; repeated (tier, id) keys in either
+    report are rejected (tested in signoff/test_verify_report_drift.py).
 3.  Re-hash the committed artifacts each citation pins and compare against
     the hashes recorded in the cited envelope AND in the manifest, so a
     citation whose artifact has since changed fails rather than rotting --
@@ -253,7 +254,26 @@ def grade_drift(fresh: dict, committed: dict) -> list[str]:
         tuple(item.get(field) for field in ITEM_FIELDS)
         for item in committed.get("items", [])
     ]
-    if fresh_rows != committed_rows:
+    # Row order is NOT meaningful: items are compared as a mapping keyed by
+    # (tier, id), so reordering unique rows is not drift. Repeated keys are
+    # rejected outright (a dict would let the last row win, or let an extra
+    # identical row pass), and then the unique tables are compared.
+    dup_problems = []
+    for label, rows in (("fresh grade", fresh_rows), ("committed report", committed_rows)):
+        seen: set = set()
+        reported: set = set()
+        for row in rows:
+            key = (row[0], row[1])
+            if key in seen and key not in reported:
+                reported.add(key)
+                count = sum(1 for r in rows if (r[0], r[1]) == key)
+                dup_problems.append(
+                    f"{label} has duplicate item key {key} ({count} rows); "
+                    "item (tier, id) keys must be unique"
+                )
+            seen.add(key)
+    problems += dup_problems
+    if not dup_problems:
         fresh_by_key = {(t[0], t[1]): t for t in fresh_rows}
         committed_by_key = {(t[0], t[1]): t for t in committed_rows}
         for key in sorted(
