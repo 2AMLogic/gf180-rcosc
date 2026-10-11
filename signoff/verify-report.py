@@ -525,6 +525,49 @@ def verify_power_delivery_citation(evidence: dict[str, Any]) -> list[str]:
     return problems
 
 
+def verify_workflow_concurrency() -> list[str]:
+    """Configuration check on the signoff workflow (issue #153): both
+    triggers present, the ref-specific concurrency group retained, and
+    cancel-in-progress unconditionally false (no started run is cancelled).
+    Text-based on purpose: CI runs this with python3 only, no YAML parser."""
+    rel = ".github/workflows/signoff.yml"
+    path = REPO_ROOT / rel
+    if not path.is_file():
+        return [f"{rel} is missing"]
+    lines = [
+        re.sub(r"(^|\s)#.*$", "", ln).rstrip()
+        for ln in path.read_text().splitlines()
+    ]
+    lines = [ln for ln in lines if ln.strip()]
+    text = "\n".join(lines)
+    problems: list[str] = []
+    on = re.search(r"^on:\n((?:[ ]+.*\n|\n)*)", text + "\n", re.M)
+    on_body = on.group(1) if on else ""
+    if not re.search(r"^  pull_request:", on_body, re.M):
+        problems.append(f"{rel}: missing the pull_request trigger")
+    if not (
+        re.search(r"^  push:", on_body, re.M)
+        and re.search(r"^    branches: \[main\]\s*$", on_body, re.M)
+    ):
+        problems.append(f"{rel}: missing the push-to-main trigger")
+    conc = re.search(r"^concurrency:\n((?:[ ]+.*\n)+)", text + "\n", re.M)
+    body = conc.group(1) if conc else ""
+    if not re.search(
+        r"^  group: signoff-\$\{\{ github\.ref \}\}\s*$", body, re.M
+    ):
+        problems.append(
+            f"{rel}: concurrency group must stay 'signoff-${{{{ github.ref }}}}'"
+        )
+    cancels = re.findall(r"^  cancel-in-progress:\s*(\S+)\s*$", body, re.M)
+    if cancels != ["false"]:
+        problems.append(
+            f"{rel}: concurrency.cancel-in-progress must be the literal "
+            f"false (found {cancels or 'none'}); a started signoff run must "
+            "never be cancelled"
+        )
+    return problems
+
+
 def main() -> None:
     if not MANIFEST.is_file():
         sys.exit(f"missing {MANIFEST.relative_to(REPO_ROOT)}")
@@ -544,6 +587,7 @@ def main() -> None:
     problems += verify_pins(manifest)
     problems += verify_bindings(fresh)
     problems += verify_inventories()
+    problems += verify_workflow_concurrency()
     if problems:
         fail(problems)
 
@@ -554,6 +598,7 @@ def main() -> None:
     print(f"OK: every pinned citation's content_hash matches the current artifact bytes")
     print(f"OK: items {', '.join(ARTIFACT_BOUND_ITEMS)} that grade met are bound to their audited artifact (input_verified)")
     print(f"OK: every path the committed inventories list exists")
+    print(f"OK: signoff workflow keeps both triggers, its ref group, and cancel-in-progress: false")
     print(f"OK: klt pin {fresh['source_doc_content_hash']} rulebook, {t1_total} T1 items -> {tier}")
 
 
