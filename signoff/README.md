@@ -400,7 +400,7 @@ trim code `0xA3` held), a schematic DUT wrapper, and `gen_requests.py`. The
 section's mechanical grade is unchanged (`no_evidence`). The blocker is the
 Spot batch fleet, which is where the grid must run: its runner has klt 0.5.0,
 which refuses every client that can submit to batch (0.6.0 and later, including
-the pinned grader build and the host's 0.7.0; 0.5.0 itself has no batch
+the earlier `3a75c3ae` grader build and the current 0.7.0 pin; 0.5.0 itself has no batch
 backend). Every submitted corner came back as `batch_runner_version_mismatch`
 (tracked upstream as klayout-tools#2851), and `klt pex` reports those as
 bare `error` rows without the diagnostic (klayout-tools#2872). The grid was
@@ -448,10 +448,15 @@ campaign and both delay-probe runs record only the family name
 run's `manifest.json` records only the install path; the family name
 appears only in its generated README. The smoke-test log records no PDK
 identity at all. Only the post-layout runs' `klt extract` envelopes record
-an open_pdks commit. The current run records `c6d73a35…`, while two
-earlier post-layout runs record `f6eeac7d…`, so runs were not all on one
-revision. (This section previously said the post-layout extraction pins
-`c6d73a35…`. That holds for the current run only.) Historical revisions
+an open_pdks commit, and they were not all on one revision. Per run
+(historical except where noted): the first run
+`sim/pvt-postlayout/results/20260907T131703Z` (historical) records `c6d73a35…`;
+`sim/pvt-postlayout/results/20260921T164434Z` (historical) and
+`sim/pvt-postlayout/results/20260922T004322Z` (historical) record `f6eeac7d…`;
+the current run `20260923T152954Z` and the `20261008T220500Z` single-corner
+`klt pex` probe record `c6d73a35…`. (This section previously said the
+post-layout extraction pins `c6d73a35…` for the current run only; the
+per-run commits above are what each run's `klt extract` envelope records.) Historical revisions
 that were not recorded stay unknown. **For new runs the gap is closed
 (issue #65):** the three campaign drivers write `pdk_revision` (an open_pdks
 commit with its source, or `"unknown"` plus a reason) via the shared
