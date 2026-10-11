@@ -25,7 +25,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#165**: Signoff: add offline negative fixtures for artifact provenance and binding guards
+_None._
 
 ## PRs Awaiting Review
 
@@ -37,7 +37,7 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#168**: test: offline negative fixtures for signoff artifact provenance and binding guards
+_None._
 
 ## Proposed
 
@@ -45,7 +45,6 @@ Issues carrying `loom:curated`.
 
 - **#66**: design: re-centre the oscillator for extracted parasitics and size a trim range that covers them (T1 item 5; operator ruling 2026-10-08) *(curated)*
 - **#91**: Characterize clk output pulse width and period jitter (unspecified quantities the discipline model assumes) *(curated)*
-- **#165**: Signoff: add offline negative fixtures for artifact provenance and binding guards *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -63,10 +62,10 @@ Issues carrying `loom:curated`.
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 1 |
-| Curated | 3 |
+| Approved PRs awaiting merge | 0 |
+| Curated | 2 |
 | Architect / Hermit proposals | 2 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
