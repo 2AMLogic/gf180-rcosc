@@ -4,6 +4,10 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-10
 
+- **PR #154**: fix(sim): default legacy sweep drivers to --jobs 2 (#139)
+- **PR #152**: docs(readme): reconcile accuracy summary and ST comparison with DR-0017
+- **Issue #139** (closed): Cap legacy sweep drivers' default --jobs and point grid runs at klt sim requests
+- **Issue #143** (closed): README: reconcile accuracy summary and signed comparisons with DR-0017
 - **Issue #146** (closed): Append-only guard: fail when Git comparison fails instead of certifying unchecked evidence
 - **PR #147**: fix(sim): append-only guard fails when git comparison fails
 - **Issue #65** (closed): T1 item 9: record the PDK revision in every simulation campaign manifest, not only the PDK family name

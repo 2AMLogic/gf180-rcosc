@@ -25,8 +25,8 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#139**: Cap legacy sweep drivers' default --jobs and point grid runs at klt sim requests
-- **#143**: README: reconcile accuracy summary and signed comparisons with DR-0017
+- **#66**: design: re-centre the oscillator for extracted parasitics and size a trim range that covers them (T1 item 5; operator ruling 2026-10-08)
+- **#155**: Consolidate remaining importlib loaders in sim analyzers and tests onto _module_loader
 
 ## PRs Awaiting Review
 
@@ -44,12 +44,14 @@ _None._
 
 Issues carrying `loom:curated`.
 
+- **#66**: design: re-centre the oscillator for extracted parasitics and size a trim range that covers them (T1 item 5; operator ruling 2026-10-08) *(curated)*
 - **#91**: Characterize clk output pulse width and period jitter (unspecified quantities the discipline model assumes) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
 - **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b) *(architect)*
 - **#131**: Decision record: enable/standby interface for rcosc_top and the start event behind the Startup and Iq rows *(architect)*
+- **#153**: CI: preserve started main signoff checks while superseding PR runs *(architect)*
 
 ## Epics
 
@@ -65,7 +67,7 @@ Issues carrying `loom:curated`.
 | In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
-| Curated | 1 |
-| Architect / Hermit proposals | 2 |
+| Curated | 2 |
+| Architect / Hermit proposals | 3 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
