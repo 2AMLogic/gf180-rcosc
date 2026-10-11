@@ -1,0 +1,85 @@
+{
+  "netlist": "tb_ff.spice",
+  "engine": "ngspice",
+  "netlist_source": "extracted",
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "ff",
+        "sections": [
+          "ff",
+          "res_ff",
+          "mimcap_ff",
+          "cap_mim"
+        ]
+      }
+    ],
+    "supply_v": {
+      "VDD": [
+        3.0,
+        3.3,
+        3.6
+      ],
+      "VHI": [
+        3.0,
+        3.3,
+        3.6
+      ]
+    },
+    "temperature_c": [
+      -40.0,
+      27.0,
+      85.0
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "200p 1200n"
+  },
+  "measurements": [
+    {
+      "name": "ta_lo",
+      "unit": "s",
+      "spice": ".meas tran ta_lo WHEN v(clk_lo)=v(vmid) RISE=5"
+    },
+    {
+      "name": "tb_lo",
+      "unit": "s",
+      "spice": ".meas tran tb_lo WHEN v(clk_lo)=v(vmid) RISE=25"
+    },
+    {
+      "name": "ta_hi",
+      "unit": "s",
+      "spice": ".meas tran ta_hi WHEN v(clk_hi)=v(vmid) RISE=5"
+    },
+    {
+      "name": "tb_hi",
+      "unit": "s",
+      "spice": ".meas tran tb_hi WHEN v(clk_hi)=v(vmid) RISE=25"
+    },
+    {
+      "name": "ta_cal",
+      "unit": "s",
+      "spice": ".meas tran ta_cal WHEN v(clk_cal)=v(vmid) RISE=5"
+    },
+    {
+      "name": "tb_cal",
+      "unit": "s",
+      "spice": ".meas tran tb_cal WHEN v(clk_cal)=v(vmid) RISE=25"
+    }
+  ],
+  "batch": {
+    "capacity_wait_s": 1200
+  },
+  "options": {
+    "timeout_s": 3600,
+    "keep_artifacts": true,
+    "ngspice_init": [
+      "set measureprec=8"
+    ]
+  }
+}
