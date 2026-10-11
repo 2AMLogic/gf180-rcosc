@@ -26,7 +26,6 @@ _None._
 Issues currently being built (`loom:building`).
 
 - **#66**: design: re-centre the oscillator for extracted parasitics and size a trim range that covers them (T1 item 5; operator ruling 2026-10-08)
-- **#155**: Consolidate remaining importlib loaders in sim analyzers and tests onto _module_loader
 
 ## PRs Awaiting Review
 
@@ -64,7 +63,7 @@ Issues carrying `loom:curated`.
 | Operator merge-risk holds | 0 |
 | Operator priority | 0 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 2 |

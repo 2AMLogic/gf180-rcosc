@@ -2,6 +2,12 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-10-11
+
+- **PR #158**: design: re-centre the timing ladder for extracted parasitics, DR-0023 proposed (Part of #66)
+- **PR #157**: refactor(sim): consolidate remaining importlib loaders onto _module_loader
+- **Issue #155** (closed): Consolidate remaining importlib loaders in sim analyzers and tests onto _module_loader
+
 ### 2026-10-10
 
 - **PR #154**: fix(sim): default legacy sweep drivers to --jobs 2 (#139)
