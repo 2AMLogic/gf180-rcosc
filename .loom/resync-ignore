@@ -1,0 +1,9 @@
+# .loom/resync-ignore — paths Loom must not overwrite or delete
+#
+# Repo-owned guard regression suite (issue #150): tests THIS repo's installed
+# guard-destructive dispatch against the rm-scope-unresolved-var and
+# stash-scope:create-redirect denials. Intentionally new here, no upstream
+# counterpart in Loom's defaults/ (upstreaming would move the coverage out of
+# the repo whose installed guard it exercises).
+scripts/tests/test-guard-scratch-protection.sh
+scripts/tests/README-guard-scratch-protection.md
