@@ -2,7 +2,8 @@ name: Offline suites
 
 # Runs the offline, synthetic-fixture pytest suites (sim/waveform,
 # sim/supply-transient, sim/trim-interface, sim/trim-transition, sim/trim-dense, and the
-# layout/run_checks.sh toolchain-pin preflight, signoff/ grade-drift comparator). PDK-free, simulator-free,
+# layout/run_checks.sh toolchain-pin preflight, signoff/ grade-drift comparator and
+# artifact-provenance/binding guards). PDK-free, simulator-free,
 # cloud-free: python3 + pytest only. Fixtures are SYNTHETIC and are built in
 # memory / temporary directories; this job never writes into sim/ results and
 # produces no signoff evidence. A separate workflow from signoff.yml on
@@ -42,6 +43,8 @@ jobs:
             tests: layout/test_run_checks_preflight.py
           - name: signoff-drift-offline
             tests: signoff/test_verify_report_drift.py
+          - name: signoff-artifacts-offline
+            tests: signoff/test_verify_report_artifacts.py
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
