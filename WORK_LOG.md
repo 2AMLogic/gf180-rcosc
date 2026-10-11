@@ -4,6 +4,20 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-11
 
+- **Issue #68** (closed): signoff docs: correct post-layout open_pdks revision disclosure and stale 'pinned grader' wording (follow-up to #67)
+- **Issue #98** (closed): Prepare offline trim-code batch requests and step-analysis harness
+- **Issue #150** (closed): Tests: cover unresolved recursive deletion and shared-stash guard denials
+- **Issue #153** (closed): CI: preserve all started signoff checks while superseding pending runs
+- **Issue #161** (closed): Guard decision: preserve installed-file write protection for unresolved scratch fixture copies
+- **Issue #163** (closed): Signoff: reject duplicate item keys before comparing fresh and committed grades
+- **PR #160**: test: add offline regression suite for guard scratch-protection denials
+- **PR #162**: CI: preserve all started signoff checks while superseding pending runs
+- **PR #164**: docs: correct per-run open_pdks record and ERC/grader wording (#68)
+- **PR #166**: signoff: reject duplicate item keys before comparing grades
+- **PR #167**: Offline dense trim-code batch request generator and step analyzer (#98)
+
+### 2026-10-11
+
 - **PR #158**: design: re-centre the timing ladder for extracted parasitics, DR-0023 proposed (Part of #66)
 - **PR #157**: refactor(sim): consolidate remaining importlib loaders onto _module_loader
 - **Issue #155** (closed): Consolidate remaining importlib loaders in sim analyzers and tests onto _module_loader
