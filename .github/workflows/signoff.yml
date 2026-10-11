@@ -52,7 +52,10 @@ permissions:
 
 concurrency:
   group: signoff-${{ github.ref }}
-  cancel-in-progress: true
+  # Never cancel a started run (every distinct commit keeps its verdict, for
+  # pushes and pull requests alike); the group may still supersede *pending*
+  # runs, which have no verdict. Asserted by signoff/verify-report.py.
+  cancel-in-progress: false
 
 jobs:
   signoff:
