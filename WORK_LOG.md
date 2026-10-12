@@ -2,6 +2,10 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-10-12
+
+- **Issue #148** (closed): Auditor Capability Request: Python runtime for offline signoff validation
+
 ### 2026-10-11
 
 - **PR #168**: test: offline negative fixtures for signoff artifact provenance and binding guards
