@@ -127,14 +127,28 @@ DUT wrapper from `design/netlist/pvt_tb.spice`. Trim code `0xA3`. The earlier
 `--pins` now exist. Two remaining gaps are filed as klayout-tools#2890 (pin
 order) and #2891 (relative include on the local backend).
 
-Status: the 27-point grid is **not yet run**; the batch fleet runner (klt 0.5.0)
-rejects every batch-capable client. The only committed `klt pex` output is the
-single-corner probe in `results/20261008T220500Z/klt-pex-probe/` (tt / 27 C /
-3.3 V; command in `COMMAND.txt`). The probe's testbench carries an absolute
-include path (local backend), so it is not portable. To produce the full report
-once a compatible client exists, run `klt pex layout/cells/rcosc_top.gds
-sim/pvt-postlayout/klt-pex/request_v{30,33,36}.json` with the flags in
-`COMMAND.txt` and `--backend batch`, one run per request.
+Status: the 27-point grid has **been submitted to the batch fleet and
+produced no measurement** (run `results/20261014T1000Z-klt-pex-batch/`,
+2026-10-14, `klayout-tools==0.7.0`). The earlier version-skew blocker
+(klayout-tools#2851) is resolved: the job report records `runner_klt_version`
+0.7.0, `client_klt_version` 0.7.0, `runner_compatibility: match`. A new
+blocker replaced it: the runner image carries `gf180mcuD` only, and every
+corner failed with `no supported-layout PDK install providing variant
+'gf180mcuC' was found` (filed generically as klayout-tools#3251). The
+`klt pex` report there has `status: error`, 81 `error` delta rows (3 requests x
+9 corners x 3 measurements), 0 passed, 0 failed, and no per-corner diagnostic
+(the cause was found by re-running the schematic leg of `request_v30.json`
+alone with `klt sim`: `diag-sim-schematic-v30/`, job `klt-sim-f1b20c55cce8`).
+The `klt pex` report records no batch job ids, so the pex run's own job ids are
+not available. That report is diagnostic evidence only; it is not cited for
+item 7 and no finite measurement exists. The grid was not run locally.
+`body_bias` in it: `biased`, 0 unbiased devices. The only committed finite
+`klt pex` output remains the single-corner probe in
+`results/20261008T220500Z/klt-pex-probe/` (tt / 27 C / 3.3 V). The probe's
+testbench carries an absolute include path (local backend), so it is not
+portable. The 2026-10-14 run uses the portable requests in `klt-pex/`; its
+generated `artifacts/*` files embed absolute worktree paths (tool output,
+left as produced). Command: `COMMAND.txt` in each results directory.
 
 ## PDK revision provenance (issue #65)
 
