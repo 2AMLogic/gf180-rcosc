@@ -391,24 +391,36 @@ extraction report **no unbiased PMOS body nets** (`unbiased_pmos_body_nets:
 []`) — the extracted netlist's device bodies have DC bias paths, so the
 post-layout numbers were not measured on a physically-wrong netlist.
 
-**Issue #70 status (a `klt pex` report is prepared but not yet produced).**
+**Issue #70 status (batch campaign attempted 2026-10-14; no finite measurement, still not cited).**
 The inputs for the grader-readable layer are committed under
 `sim/pvt-postlayout/klt-pex/`: three `klt sim` requests (one per VDD, each a
 tt/ff/ss x -40/27/85 C grid, together the same 27 corner-endpoint points,
-trim code `0xA3` held), a schematic DUT wrapper, and `gen_requests.py`. The
-27-point grid has **not** run, so nothing is cited for item 7 and this
-section's mechanical grade is unchanged (`no_evidence`). The blocker is the
-Spot batch fleet, which is where the grid must run: its runner has klt 0.5.0,
-which refuses every client that can submit to batch (0.6.0 and later, including
-the earlier `3a75c3ae` grader build and the current 0.7.0 pin; 0.5.0 itself has no batch
-backend). Every submitted corner came back as `batch_runner_version_mismatch`
-(tracked upstream as klayout-tools#2851), and `klt pex` reports those as
-bare `error` rows without the diagnostic (klayout-tools#2872). The grid was
-not run locally.
+trim code `0xA3` held), a schematic DUT wrapper, and `gen_requests.py`.
+The 27-point grid was submitted to the Spot batch fleet with the 0.7.0
+release (`klayout-tools==0.7.0`, the grader pin; command and report in
+`sim/pvt-postlayout/results/20261014T1000Z-klt-pex-batch/`). The earlier
+version-skew blocker (klayout-tools#2851, closed) is cleared: the job report
+records `runner_klt_version: 0.7.0`, `client_klt_version: 0.7.0`,
+`runner_compatibility: match`. The campaign still produced nothing: the
+runner image carries the `gf180mcuD` PDK only, so all corners fail with
+`no supported-layout PDK install providing variant 'gf180mcuC' was found`
+(tracked upstream as klayout-tools#3251; this design's PDK is `gf180mcuC` and
+is not changed to suit the fleet). The `klt pex` report is `status: error`
+with 81 `error` rows and 0 passed/failed, and no diagnostic text; the cause
+was read from a `klt sim` re-run of one schematic-leg request (job
+`klt-sim-f1b20c55cce8`). That report is committed as diagnostic evidence
+only. It is not a passing envelope, nothing is cited for item 7 in
+`block-manifest.json`, `signoff-report.json` is unchanged, and this section's
+mechanical grade stays `no_evidence`. The grid was not run locally. This item
+stays open until the fleet can run `gf180mcuC` (or the PDK variant question is
+otherwise settled) and the three requests return finite values on both legs.
+
+The grader pin (0.7.0) and the batch client/runner (0.7.0) agree, so no
+pin move is needed for this item.
 
 One single-corner local probe (tt / 27 C / 3.3 V, `0xA3`) is committed at
 `sim/pvt-postlayout/results/20261008T220500Z/klt-pex-probe/`, produced by the
-pinned build `0.6.0+g3a75c3ae705b` (command in `COMMAND.txt`). It is **not**
+build `0.6.0+g3a75c3ae705b` (a development build; command in `COMMAND.txt`). It is **not**
 cited in the manifest: one corner is not the item's campaign. It shows the
 flow works end to end and records the expected delta (`fosc` 48.206 MHz
 schematic vs 35.961 MHz extracted, -25.40%, consistent with DR-0018's -18.78%
