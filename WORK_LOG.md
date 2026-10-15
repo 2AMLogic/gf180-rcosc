@@ -2,6 +2,11 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-10-15
+
+- **PR #176**: docs(spec): DR-0024 free-running rcosc_top, no enable pin
+- **Issue #131** (closed): Decision record: enable/standby interface for rcosc_top and the start event behind the Startup and Iq rows
+
 ### 2026-10-14
 
 - **PR #172**: Item 7: batch klt pex campaign attempt (blocked on fleet PDK variant)
