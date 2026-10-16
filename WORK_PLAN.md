@@ -19,6 +19,7 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
+- **#66**: design: re-centre the oscillator for extracted parasitics and size a trim range that covers them (T1 item 5; operator ruling 2026-10-08)
 - **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
 
 ## Ready
@@ -66,7 +67,7 @@ Issues carrying `loom:curated`.
 |------|-------|
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
-| Important | 1 |
+| Important | 2 |
 | Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
