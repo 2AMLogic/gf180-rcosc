@@ -349,6 +349,26 @@ running the campaign through `klt sim` — distinct follow-up work, tracked via
 the tracker's "Next" section (the design-side gap itself is issue #39's
 PVT-sensitivity work).
 
+**Request set and row map (issue #185).** `sim/item5/` now holds the `klt sim`
+side of that follow-up: `ROWS.md` maps every DR-0019 ratified row (1-10) to
+the corner request(s) that will decide it or declares the gap (row 6,
+reserved per DR-0004; and the Monte Carlo remainder of the statistical rows
+2, 4, 5, which a corner request does not cover), `gen_requests.py`
+regenerates the 15 requests (5 trim codes x 3 supplies, each 7 process x 3
+temperature corners) from `design/netlist/` with one command
+(`python3 sim/item5/gen_requests.py`, byte-identical on re-run), and
+`test_item5_rows.py` (CI job `item5-rows-offline`) checks every request parses
+and every row is mapped or a declared gap. Row 9 reuses `sim/startup/`'s
+requests. **The manifest is deliberately unchanged:** the pinned 0.7.0 grader
+reads item 5 only from a `klt sim` envelope; citing a non-envelope row
+declaration grades `unmet / unreadable_evidence`, not a coverage reason, so
+there is no declared-row-set field to put the map in. Item 5 stays
+`unmet / no_evidence`. What still blocks a pass: #66 settling the sizing, a
+batch runner that provides `gf180mcuC`, running the requests through `klt
+sim`'s batch backend (nothing has been run; the requests only validate with
+`klt sim --dry-run`), and the Monte Carlo remainder (DR-0019 claims S1-S3)
+for rows 2, 4, 5.
+
 ### unmet — item 6 (Statistical claims carry Monte Carlo evidence): nothing to back, nothing cited
 
 There is no Monte Carlo or `klt yield` run anywhere under `sim/`, so the
