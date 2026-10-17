@@ -389,6 +389,25 @@ the campaign runs after #66 settles the sizing. The item stays `unmet` until
 that campaign lands a `yield` envelope; both the MC run and this row change
 together.
 
+**What exists toward it (issue #186, pipeline groundwork, not a yield claim).**
+`sim/mc-groundwork/gen_bench.py --inject-mismatch` wires the DR-0022 §4
+mismatch injector into the Monte Carlo benches (default off; committed benches
+unchanged), with offline tests. The smoke attempt is committed as a diagnostic
+under `sim/mc-groundwork/results/20261017T200500Z/`: both batch submits failed
+because the fleet runner has no `gf180mcuC` PDK, so there are no simulation
+results and the negative controls were not run. `klayout-tools[yield]==0.7.0`
+also does not resolve (`klt-yield-native` is not in the registry), so no `klt
+yield` report exists either.
+
+**Still owed.** (1) A fleet runner with the PDK, then the mismatch-on smoke and
+the negative controls; (2) an installable `klt yield` at the pin; (3) a
+block-manifest item-6 entry. `klt 0.7.0 --describe-grader` lists no way to
+declare which spec rows are statistical, so the manifest is deliberately left
+unchanged and item 6 stays `unmet` / `no_evidence` rather than gaining an
+entry the pinned grader would ignore or reject. `testbench-inventory.md` is
+also unchanged (it is a hashed artifact, and the diagnostic is not a claimed
+measurement); a row for the final campaign lands with its re-grade.
+
 ### unmet — item 7 (Post-layout verification): campaign committed, not a `klt pex` report
 
 The post-layout re-verification is committed under
