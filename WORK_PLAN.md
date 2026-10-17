@@ -33,7 +33,6 @@ _None._
 Issues currently being built (`loom:building`).
 
 - **#182**: Consolidate five remaining offline-suite workflows into offline-suites.yml matrix
-- **#186**: T1 item 6: wire the DR-0022 mismatch injector into the MC bench, prove a klt yield envelope end to end, and declare the statistical row set
 
 ## PRs Awaiting Review
 
@@ -46,7 +45,6 @@ _None._
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
 - **#183**: ci: fold five offline-suite workflows into offline-suites matrix
-- **#189**: docs(signoff): record item-6 Monte Carlo groundwork status and open gaps
 
 ## Proposed
 
@@ -71,9 +69,9 @@ Issues carrying `loom:curated`.
 | Very important | 0 |
 | Important | 2 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 2 |
+| Approved PRs awaiting merge | 1 |
 | Curated | 2 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 1 |
