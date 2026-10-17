@@ -393,7 +393,7 @@ together.
 `sim/mc-groundwork/gen_bench.py --inject-mismatch` wires the DR-0022 §4
 mismatch injector into the Monte Carlo benches (default off; committed benches
 unchanged), with offline tests. The smoke attempt is committed as a diagnostic
-under `sim/mc-groundwork/results/20261017T200500Z/`: both batch submits failed
+under `sim/mc-groundwork/results/20261017T200500Z/` (retried once in `20261017T202900Z/`, same failure): every batch submit failed
 because the fleet runner has no `gf180mcuC` PDK, so there are no simulation
 results and the negative controls were not run. `klayout-tools[yield]==0.7.0`
 also does not resolve (`klt-yield-native` is not in the registry), so no `klt
