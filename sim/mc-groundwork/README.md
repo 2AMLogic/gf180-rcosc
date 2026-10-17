@@ -32,7 +32,7 @@ failure on unmapped `ppolyf_u_1k`/`cap_mim_1f0fF` cards, per-instance
 manifest). It is wired into `gen_bench.py` behind `--inject-mismatch` (default off; the
 committed benches are unchanged; the flag writes `_inj`-suffixed benches,
 requests and `<bench>.mismatch.json` manifests). The first pipeline smoke
-(issue #186, `results/20261017T200500Z/`) failed on the batch fleet because the
+(issue #186, `results/20261017T200500Z/`, retried in `results/20261017T202900Z/`) failed on the batch fleet because the
 runner has no `gf180mcuC` PDK install, so it has **produced no simulation
 evidence** and no yield. Sigmas are
 DR-0022's flagged assumptions. Existing benches, requests and `results/` are
