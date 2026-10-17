@@ -3,7 +3,18 @@ name: Offline suites
 # Runs the offline, synthetic-fixture pytest suites (sim/waveform,
 # sim/supply-transient, sim/trim-interface, sim/trim-transition, sim/trim-dense, and the
 # layout/run_checks.sh toolchain-pin preflight, signoff/ grade-drift comparator and
-# artifact-provenance/binding guards). PDK-free, simulator-free,
+# artifact-provenance/binding guards), plus:
+#   - discipline-offline: sim/discipline model tests (issue #120; test_outage.py,
+#     the SOF-loss/reacquisition model tests, added by #134).
+#   - legacy-analysis-offline: pure analysis cores of sim/pvt, sim/startup and
+#     sim/iq (issue #121).
+#   - mc-groundwork-offline: DR-0022 section 4 mismatch injector (issue #135).
+#   - module-loader-offline: sim/_module_loader.py (issue #130), the shared
+#     importlib helper used by the supply-transient, temperature, trim-interface
+#     and trim-transition generators, and the sim/ PDK-provenance guards.
+#   - temperature-offline: sim/temperature interior-temperature request
+#     generation and curvature analysis (issue #125 subset).
+# PDK-free, simulator-free,
 # cloud-free: python3 + pytest only. Fixtures are SYNTHETIC and are built in
 # memory / temporary directories; this job never writes into sim/ results and
 # produces no signoff evidence. A separate workflow from signoff.yml on
@@ -45,6 +56,16 @@ jobs:
             tests: signoff/test_verify_report_drift.py
           - name: signoff-artifacts-offline
             tests: signoff/test_verify_report_artifacts.py
+          - name: discipline-offline
+            tests: sim/discipline/test_harness.py sim/discipline/test_outage.py
+          - name: legacy-analysis-offline
+            tests: sim/legacy-analysis/test_analysis_cores.py sim/legacy-analysis/test_jobs_defaults.py
+          - name: mc-groundwork-offline
+            tests: sim/mc-groundwork/test_mismatch_inject.py
+          - name: module-loader-offline
+            tests: sim/test_module_loader.py sim/test_pdk_provenance.py
+          - name: temperature-offline
+            tests: sim/temperature/test_temperature.py
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
