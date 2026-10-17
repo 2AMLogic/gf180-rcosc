@@ -2,6 +2,12 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-10-17
+
+- **PR #188**: feat(mc-groundwork): add --inject-mismatch flag to gen_bench
+- **PR #187**: feat(sim): add item-5 corner request set, row map and offline check
+- **Issue #185** (closed): T1 item 5: express the ratified spec rows as klt sim corner requests and declare the item-5 row set in the manifest
+
 ### 2026-10-15
 
 - **PR #176**: docs(spec): DR-0024 free-running rcosc_top, no enable pin
