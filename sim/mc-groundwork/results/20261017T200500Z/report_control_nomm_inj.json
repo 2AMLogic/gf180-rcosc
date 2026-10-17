@@ -1,0 +1,666 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/mc-groundwork/results/20261017T200500Z/tb_trimsel_nomm_inj.spice",
+    "scope": "repo"
+  },
+  "status": "error",
+  "corner_count": 3,
+  "passed": 0,
+  "failed": 0,
+  "errored": 3,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {
+      "batch_job_failed": 3
+    },
+    "by_severity": {
+      "error": 3
+    },
+    "corners_with_diagnostics": 3
+  },
+  "metrics": {
+    "sim__corner__count": 3,
+    "sim__corner__passed_count": 0,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 3,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": null,
+    "ngspice_binary": "/usr/bin/ngspice",
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+    "netlist_sha256": "369d8f03bcbf4f2aead1ff2f5fe8afd9d1babfb867769913f91da6a169fc275f",
+    "netlist_closure": [
+      {
+        "path": "sim/mc-groundwork/results/20261017T200500Z/tb_trimsel_nomm_inj.spice",
+        "scope": "repo",
+        "sha256": "369d8f03bcbf4f2aead1ff2f5fe8afd9d1babfb867769913f91da6a169fc275f"
+      }
+    ],
+    "netlist_source": "schematic",
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-3123505a837e",
+      "bucket": "2am-batch-jobs-221082181346",
+      "region": "us-east-1",
+      "instance_id": "i-07ea904f408f6fb8b",
+      "instance_type": "m6i.4xlarge",
+      "availability_zone": "us-east-1f",
+      "ami_id": "ami-0e0bec04ad8e81877",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "failed",
+      "exit_code": "1",
+      "concurrency": "1",
+      "physical_cores": "8",
+      "elapsed_seconds": 6,
+      "runner_klt_version": "0.7.0",
+      "client_klt_version": "0.7.0",
+      "runner_compatibility": "match"
+    },
+    "monte_carlo": {
+      "n": 3,
+      "seed": 20261008,
+      "vary": "mismatch",
+      "family_mismatch": [
+        {
+          "family": "other",
+          "active": null,
+          "note": "mismatch activity for the 'other' family is not independently verified for PDK family 'gf180mcu'; treat any sampled spread for it as unconfirmed."
+        },
+        {
+          "family": "capacitor",
+          "active": null,
+          "note": "mismatch activity for the 'capacitor' family is not independently verified for PDK family 'gf180mcu'; treat any sampled spread for it as unconfirmed."
+        },
+        {
+          "family": "mosfet",
+          "active": true,
+          "note": "MOS per-instance mismatch (the fets_mm include) is gated by the model-level sw_stat_mismatch switch and scales the per-device delvto/mulu0 terms -- active whenever that switch is set (see docs/cli/sim.md's 'Known-good mismatch mechanisms')."
+        }
+      ]
+    }
+  },
+  "coverage": {
+    "corners_simulated": 3,
+    "measurements_declared": 5,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [],
+    "skipped": [
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"code_sel\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"f_hold_hz\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"f_sel_hz\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"hold_gap_hz\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"resid_pct\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"code_sel\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"f_hold_hz\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"f_sel_hz\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"hold_gap_hz\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"resid_pct\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"code_sel\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"f_hold_hz\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"f_sel_hz\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"hold_gap_hz\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"resid_pct\"]/observation",
+        "reason": "unavailable_measurement"
+      }
+    ],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"code_sel\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"f_hold_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"f_sel_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"hold_gap_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/27C/mc0\",\"resid_pct\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"code_sel\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"f_hold_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"f_sel_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"hold_gap_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C/mc1\",\"resid_pct\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"code_sel\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"f_hold_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"f_sel_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"hold_gap_hz\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/27C/mc2\",\"resid_pct\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": true,
+    "nothing_checked_reasons": [
+      "characterization_without_limits",
+      "unavailable_measurement"
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.7.0",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "gf180mcuC",
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
+    },
+    "deck": {
+      "name": "sm141064.ngspice",
+      "content_hash": "sha256:f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:369d8f03bcbf4f2aead1ff2f5fe8afd9d1babfb867769913f91da6a169fc275f",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "code_sel",
+      "unit": "",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "tt/novdd/27C/mc0",
+        "value": null,
+        "margin": null
+      },
+      "monte_carlo": {
+        "n": 0,
+        "errored": 3,
+        "inconclusive": 0,
+        "mean": null,
+        "stddev": null,
+        "min": null,
+        "max": null,
+        "quantiles": {
+          "p5": null,
+          "p50": null,
+          "p95": null
+        },
+        "sigma_window": null,
+        "by_corner": [
+          {
+            "corner_id": "tt/novdd/27C",
+            "n": 0,
+            "errored": 3,
+            "inconclusive": 0,
+            "mean": null,
+            "stddev": null,
+            "min": null,
+            "max": null,
+            "quantiles": {
+              "p5": null,
+              "p50": null,
+              "p95": null
+            },
+            "sigma_window": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "f_sel_hz",
+      "unit": "Hz",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "tt/novdd/27C/mc0",
+        "value": null,
+        "margin": null
+      },
+      "monte_carlo": {
+        "n": 0,
+        "errored": 3,
+        "inconclusive": 0,
+        "mean": null,
+        "stddev": null,
+        "min": null,
+        "max": null,
+        "quantiles": {
+          "p5": null,
+          "p50": null,
+          "p95": null
+        },
+        "sigma_window": null,
+        "by_corner": [
+          {
+            "corner_id": "tt/novdd/27C",
+            "n": 0,
+            "errored": 3,
+            "inconclusive": 0,
+            "mean": null,
+            "stddev": null,
+            "min": null,
+            "max": null,
+            "quantiles": {
+              "p5": null,
+              "p50": null,
+              "p95": null
+            },
+            "sigma_window": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "f_hold_hz",
+      "unit": "Hz",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "tt/novdd/27C/mc0",
+        "value": null,
+        "margin": null
+      },
+      "monte_carlo": {
+        "n": 0,
+        "errored": 3,
+        "inconclusive": 0,
+        "mean": null,
+        "stddev": null,
+        "min": null,
+        "max": null,
+        "quantiles": {
+          "p5": null,
+          "p50": null,
+          "p95": null
+        },
+        "sigma_window": null,
+        "by_corner": [
+          {
+            "corner_id": "tt/novdd/27C",
+            "n": 0,
+            "errored": 3,
+            "inconclusive": 0,
+            "mean": null,
+            "stddev": null,
+            "min": null,
+            "max": null,
+            "quantiles": {
+              "p5": null,
+              "p50": null,
+              "p95": null
+            },
+            "sigma_window": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "resid_pct",
+      "unit": "%",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "tt/novdd/27C/mc0",
+        "value": null,
+        "margin": null
+      },
+      "monte_carlo": {
+        "n": 0,
+        "errored": 3,
+        "inconclusive": 0,
+        "mean": null,
+        "stddev": null,
+        "min": null,
+        "max": null,
+        "quantiles": {
+          "p5": null,
+          "p50": null,
+          "p95": null
+        },
+        "sigma_window": null,
+        "by_corner": [
+          {
+            "corner_id": "tt/novdd/27C",
+            "n": 0,
+            "errored": 3,
+            "inconclusive": 0,
+            "mean": null,
+            "stddev": null,
+            "min": null,
+            "max": null,
+            "quantiles": {
+              "p5": null,
+              "p50": null,
+              "p95": null
+            },
+            "sigma_window": null
+          }
+        ]
+      }
+    },
+    {
+      "name": "hold_gap_hz",
+      "unit": "Hz",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "tt/novdd/27C/mc0",
+        "value": null,
+        "margin": null
+      },
+      "monte_carlo": {
+        "n": 0,
+        "errored": 3,
+        "inconclusive": 0,
+        "mean": null,
+        "stddev": null,
+        "min": null,
+        "max": null,
+        "quantiles": {
+          "p5": null,
+          "p50": null,
+          "p95": null
+        },
+        "sigma_window": null,
+        "by_corner": [
+          {
+            "corner_id": "tt/novdd/27C",
+            "n": 0,
+            "errored": 3,
+            "inconclusive": 0,
+            "mean": null,
+            "stddev": null,
+            "min": null,
+            "max": null,
+            "quantiles": {
+              "p5": null,
+              "p50": null,
+              "p95": null
+            },
+            "sigma_window": null
+          }
+        ]
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "tt/novdd/27C/mc0",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 27,
+      "status": "error",
+      "runtime_s": 0.0,
+      "measurements": [
+        {
+          "name": "code_sel",
+          "value": null,
+          "unit": "",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "f_sel_hz",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "f_hold_hz",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "resid_pct",
+          "value": null,
+          "unit": "%",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "hold_gap_hz",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-3123505a837e finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`)."
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": {
+        "sample_index": 0,
+        "seed": 1316784515,
+        "process_seed": 1896205814,
+        "mismatch_seed": 224639185
+      }
+    },
+    {
+      "corner_id": "tt/novdd/27C/mc1",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 27,
+      "status": "error",
+      "runtime_s": 0.0,
+      "measurements": [
+        {
+          "name": "code_sel",
+          "value": null,
+          "unit": "",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "f_sel_hz",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "f_hold_hz",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "resid_pct",
+          "value": null,
+          "unit": "%",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "hold_gap_hz",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-3123505a837e finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`)."
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": {
+        "sample_index": 1,
+        "seed": 1540059332,
+        "process_seed": 1896205814,
+        "mismatch_seed": 1360771492
+      }
+    },
+    {
+      "corner_id": "tt/novdd/27C/mc2",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 27,
+      "status": "error",
+      "runtime_s": 0.0,
+      "measurements": [
+        {
+          "name": "code_sel",
+          "value": null,
+          "unit": "",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "f_sel_hz",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "f_hold_hz",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "resid_pct",
+          "value": null,
+          "unit": "%",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "hold_gap_hz",
+          "value": null,
+          "unit": "Hz",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-3123505a837e finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`)."
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": {
+        "sample_index": 2,
+        "seed": 1563452231,
+        "process_seed": 1896205814,
+        "mismatch_seed": 1458937685
+      }
+    }
+  ]
+}
