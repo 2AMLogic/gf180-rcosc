@@ -10,7 +10,8 @@ row is touched; the tolerances below are harness criteria, not spec values.
 ```
 sim/mc-groundwork/
   gen_bench.py                 writes the benches and requests below (DUT inlined from design/netlist/pvt_tb.spice)
-  mismatch_inject.py           DR-0022 section 4 injector (pure text; unit-tested only, not wired into gen_bench.py)
+  mismatch_inject.py           DR-0022 section 4 injector (pure text; wired into gen_bench.py behind --inject-mismatch)
+  test_gen_bench.py            offline tests for the --inject-mismatch wiring
   test_mismatch_inject.py      offline synthetic-fixture tests (CI: offline-suites.yml, mc-groundwork-offline)
   run-groundwork.sh            cold start: gen_bench.py, then the three requests into a NEW results/<runid>/
   tb_trimsel_nomm.spice        per-sample trim-selection bench, sw_stat_mismatch=0
@@ -28,8 +29,12 @@ open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b`,
 section 4 netlist-body injector (`m='1/(1+d_<inst>)'` resistors,
 `m='(1+d_<inst>)'` capacitor, `d_<inst>` gated by `sw_stat_mismatch`, loud
 failure on unmapped `ppolyf_u_1k`/`cap_mim_1f0fF` cards, per-instance
-manifest). It exists and is **unit-tested only**: it has been run in no
-simulation and has **produced no evidence** and no yield. Sigmas are
+manifest). It is wired into `gen_bench.py` behind `--inject-mismatch` (default off; the
+committed benches are unchanged; the flag writes `_inj`-suffixed benches,
+requests and `<bench>.mismatch.json` manifests). The first pipeline smoke
+(issue #186, `results/20261017T200500Z/`, retried in `results/20261017T202900Z/`) failed on the batch fleet because the
+runner has no `gf180mcuC` PDK install, so it has **produced no simulation
+evidence** and no yield. Sigmas are
 DR-0022's flagged assumptions. Existing benches, requests and `results/` are
 unchanged.
 

@@ -1,7 +1,7 @@
 name: Offline suites
 
 # Runs the offline, synthetic-fixture pytest suites (sim/waveform,
-# sim/supply-transient, sim/trim-interface, sim/trim-transition, sim/trim-dense, and the
+# sim/supply-transient, sim/trim-interface, sim/trim-transition, sim/trim-dense, the sim/item5 row-map check, and the
 # layout/run_checks.sh toolchain-pin preflight, signoff/ grade-drift comparator and
 # artifact-provenance/binding guards), plus:
 #   - discipline-offline: sim/discipline model tests (issue #120; test_outage.py,
@@ -61,11 +61,13 @@ jobs:
           - name: legacy-analysis-offline
             tests: sim/legacy-analysis/test_analysis_cores.py sim/legacy-analysis/test_jobs_defaults.py
           - name: mc-groundwork-offline
-            tests: sim/mc-groundwork/test_mismatch_inject.py
+            tests: sim/mc-groundwork/test_mismatch_inject.py sim/mc-groundwork/test_gen_bench.py
           - name: module-loader-offline
             tests: sim/test_module_loader.py sim/test_pdk_provenance.py
           - name: temperature-offline
             tests: sim/temperature/test_temperature.py
+          - name: item5-rows-offline
+            tests: sim/item5/test_item5_rows.py
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7

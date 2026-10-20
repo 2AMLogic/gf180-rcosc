@@ -349,6 +349,26 @@ running the campaign through `klt sim` — distinct follow-up work, tracked via
 the tracker's "Next" section (the design-side gap itself is issue #39's
 PVT-sensitivity work).
 
+**Request set and row map (issue #185).** `sim/item5/` now holds the `klt sim`
+side of that follow-up: `ROWS.md` maps every DR-0019 ratified row (1-10) to
+the corner request(s) that will decide it or declares the gap (row 6,
+reserved per DR-0004; and the Monte Carlo remainder of the statistical rows
+2, 4, 5, which a corner request does not cover), `gen_requests.py`
+regenerates the 15 requests (5 trim codes x 3 supplies, each 7 process x 3
+temperature corners) from `design/netlist/` with one command
+(`python3 sim/item5/gen_requests.py`, byte-identical on re-run), and
+`test_item5_rows.py` (CI job `item5-rows-offline`) checks every request parses
+and every row is mapped or a declared gap. Row 9 reuses `sim/startup/`'s
+requests. **The manifest is deliberately unchanged:** the pinned 0.7.0 grader
+reads item 5 only from a `klt sim` envelope; citing a non-envelope row
+declaration grades `unmet / unreadable_evidence`, not a coverage reason, so
+there is no declared-row-set field to put the map in. Item 5 stays
+`unmet / no_evidence`. What still blocks a pass: #66 settling the sizing, a
+batch runner that provides `gf180mcuC`, running the requests through `klt
+sim`'s batch backend (nothing has been run; the requests only validate with
+`klt sim --dry-run`), and the Monte Carlo remainder (DR-0019 claims S1-S3)
+for rows 2, 4, 5.
+
 ### unmet — item 6 (Statistical claims carry Monte Carlo evidence): nothing to back, nothing cited
 
 There is no Monte Carlo or `klt yield` run anywhere under `sim/`, so the
@@ -368,6 +388,25 @@ sim` `monte_carlo` request submitted to the batch fleet), and the sequencing:
 the campaign runs after #66 settles the sizing. The item stays `unmet` until
 that campaign lands a `yield` envelope; both the MC run and this row change
 together.
+
+**What exists toward it (issue #186, pipeline groundwork, not a yield claim).**
+`sim/mc-groundwork/gen_bench.py --inject-mismatch` wires the DR-0022 §4
+mismatch injector into the Monte Carlo benches (default off; committed benches
+unchanged), with offline tests. The smoke attempt is committed as a diagnostic
+under `sim/mc-groundwork/results/20261017T200500Z/` (retried once in `20261017T202900Z/`, same failure): every batch submit failed
+because the fleet runner has no `gf180mcuC` PDK, so there are no simulation
+results and the negative controls were not run. `klayout-tools[yield]==0.7.0`
+also does not resolve (`klt-yield-native` is not in the registry), so no `klt
+yield` report exists either.
+
+**Still owed.** (1) A fleet runner with the PDK, then the mismatch-on smoke and
+the negative controls; (2) an installable `klt yield` at the pin; (3) a
+block-manifest item-6 entry. `klt 0.7.0 --describe-grader` lists no way to
+declare which spec rows are statistical, so the manifest is deliberately left
+unchanged and item 6 stays `unmet` / `no_evidence` rather than gaining an
+entry the pinned grader would ignore or reject. `testbench-inventory.md` is
+also unchanged (it is a hashed artifact, and the diagnostic is not a claimed
+measurement); a row for the final campaign lands with its re-grade.
 
 ### unmet — item 7 (Post-layout verification): campaign committed, not a `klt pex` report
 
