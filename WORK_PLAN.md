@@ -26,7 +26,7 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
 
 ## In Progress
 
@@ -68,7 +68,7 @@ Issues carrying `loom:curated`.
 | Operator merge-risk holds | 1 |
 | Very important | 0 |
 | Important | 2 |
-| Ready (`loom:issue`) | 0 |
+| Ready (`loom:issue`) | 1 |
 | In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 1 |
