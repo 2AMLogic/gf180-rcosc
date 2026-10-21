@@ -2,6 +2,11 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-10-21
+
+- **PR #183**: ci: fold five offline-suite workflows into offline-suites matrix
+- **Issue #182** (closed): Consolidate five remaining offline-suite workflows into offline-suites.yml matrix
+
 ### 2026-10-17
 
 - **PR #191**: sim(mc-groundwork): record retried batch smoke as a second diagnostic
