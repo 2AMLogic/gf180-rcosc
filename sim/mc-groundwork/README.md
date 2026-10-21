@@ -12,7 +12,7 @@ sim/mc-groundwork/
   gen_bench.py                 writes the benches and requests below (DUT inlined from design/netlist/pvt_tb.spice)
   mismatch_inject.py           DR-0022 section 4 injector (pure text; wired into gen_bench.py behind --inject-mismatch)
   test_gen_bench.py            offline tests for the --inject-mismatch wiring
-  test_mismatch_inject.py      offline synthetic-fixture tests (CI: mc-groundwork-offline.yml)
+  test_mismatch_inject.py      offline synthetic-fixture tests (CI: offline-suites.yml, mc-groundwork-offline)
   run-groundwork.sh            cold start: gen_bench.py, then the three requests into a NEW results/<runid>/
   tb_trimsel_nomm.spice        per-sample trim-selection bench, sw_stat_mismatch=0
   tb_trimsel_mm.spice          same bench, sw_stat_mismatch=1

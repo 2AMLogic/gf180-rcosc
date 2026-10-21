@@ -38,7 +38,7 @@ python3 -I sim/temperature/analyze.py rep_tt.json rep_ss.json rep_ff.json \
     --manifest <new dir>/provenance.json --outdir sim/temperature/results/<runid>
 ```
 
-CI: `.github/workflows/temperature-offline.yml` runs
+CI: `.github/workflows/offline-suites.yml` (`temperature-offline` matrix entry) runs
 `python3 -I -m pytest -p no:cacheprovider sim/temperature/test_temperature.py`
 (Python 3.12, pytest only; no PDK, klt, ngspice or batch credentials).
 
