@@ -126,6 +126,37 @@ No new full campaign was run for this change; the field is demonstrated by
 fixture-backed manifest tests (a single-corner mode does not exist in the
 three drivers).
 
+## Stored evidence (issue #196)
+
+From issue #196 the raw output of new `sim/pvt`, `sim/iq`, `sim/pvt-postlayout`
+and `sim/recentre` runs is **not committed**. Each driver stages its
+`corners/<runid>/` and `results/<runid>/` trees in git-ignored scratch
+(`sim/build/evidence/<bench>/<runid>/`), then `sim/evidence_stage.py` puts every
+file through `klt artifact put` and git gains only:
+
+- `manifests/artifacts/<bench>-<runid>.manifest.json` (name, size, sha256 and an
+  `artifact:<key>` uri per object; see `manifests/artifacts/README.md`), and
+- `sim/<bench>/results/<runid>/summary.md` (`README.md` for `sim/iq`) with a
+  "Stored evidence" table. Commit both; the logical paths in the summary are
+  the manifest `name`s.
+
+Fail closed: with `$KLT_ARTIFACT_BROKER` unset, a `klt` without `artifact put`
+(or older than klayout-tools `7e3561f`), or an unreachable broker, the driver
+refuses to start; a put that fails after the run exits 10, commits nothing and
+leaves the staged bytes in scratch. There is no fallback to committing bytes.
+Fetch one object, hash-verified, with `klt artifact get <manifest>#<name> -o
+<out>`; check a whole run with `klt artifact verify <manifest>`. CI
+(`artifact-manifests.yml`) validates manifests and fails if a stored object's
+bytes are also committed. Already-committed runs stay where they are.
+
+Consequences: `pex_pvt_sweep.py`'s default baseline (`find_latest_schematic_baseline`)
+only sees committed `sim/pvt/results/<runid>/manifest.json`, so after a stored
+`sim/pvt` run fetch its `manifest.json` into a scratch copy or pass
+`--baseline-runid` of a committed run. `sim/recentre/report_explore.py`
+likewise collates only committed runs. A new run's `corners/<runid>/` directory
+does not exist in git, so doc citations (`signoff/verify-doc-citations.py`) of
+that run should cite `results/<runid>/`.
+
 ## PVT-corner campaign (issue #12)
 
 `sim/pvt/pvt_sweep.py` runs the full process x temperature x supply
