@@ -92,6 +92,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_JOBS = 2
 sys.path.insert(0, str(REPO_ROOT / "sim"))
 import pdk_provenance  # noqa: E402  shared PDK-revision helper (#65)
+import evidence_stage  # noqa: E402  scratch staging + artifact store (#196)
 DESIGN_DIR = REPO_ROOT / "design"
 NETLIST = DESIGN_DIR / "netlist" / "pvt_tb.spice"
 SIM_PVT = REPO_ROOT / "sim" / "pvt"
@@ -574,14 +575,15 @@ def main() -> int:
     netlist_text = NETLIST.read_text()
 
     pdk_root, pdk, model_dir = resolve_pdk()
-    log_dir = SIM_PVT / "corners" / args.runid
-    res_dir = SIM_PVT / "results" / args.runid
-    for d in (log_dir, res_dir):
-        if d.exists() and any(d.iterdir()):
-            sys.exit(
-                f"ERROR: {d} already exists and is non-empty; evidence is append-only."
-            )
-        d.mkdir(parents=True, exist_ok=True)
+    # Raw output is staged in git-ignored scratch and stored through the
+    # artifact store at the end (issue #196); fail closed before simulating.
+    try:
+        stage = evidence_stage.open_stage("pvt", args.runid)
+    except evidence_stage.StoreError as exc:
+        sys.exit(f"ERROR: evidence cannot be stored, not starting (fail closed): {exc}")
+    log_dir, res_dir = stage.corners / args.runid, stage.results / args.runid
+    log_dir.mkdir(parents=True)
+    res_dir.mkdir(parents=True)
     build_dir = BUILD_ROOT / args.runid
     build_dir.mkdir(parents=True, exist_ok=True)
 
@@ -793,11 +795,11 @@ def main() -> int:
         f"\n== campaign complete: {len(camp.cache)} unique points, "
         f"{len(camp.pass_rows)} recorded rows, {len(failures)} failures, "
         f"{elapsed / 60:.1f} min ==\n"
-        f"   logs    : sim/pvt/corners/{args.runid}/\n"
-        f"   results : sim/pvt/results/{args.runid}/",
+        f"   staged  : {stage.root.relative_to(REPO_ROOT)}/",
         flush=True,
     )
-    return 1 if failures else 0
+    stored = evidence_stage.finish_or_report(stage)
+    return stored or (1 if failures else 0)
 
 
 def build_summary(

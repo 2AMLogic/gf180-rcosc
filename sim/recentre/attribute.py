@@ -33,6 +33,9 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import pexlib as L  # noqa: E402
 
+sys.path.insert(0, str(HERE.parent))
+import evidence_stage  # noqa: E402  scratch staging + artifact store (#196)
+
 CODE = 0xA3
 CORNERS = {
     "worst": ("ff", -40.0, 3.6),
@@ -43,10 +46,14 @@ CORNERS = {
 
 def main() -> None:
     runid = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    out = HERE / "results" / runid  # sim/<bench>/results/<ts> layout
-    if out.exists():
-        sys.exit(f"refusing to overwrite {out}")
-    logs = HERE / "corners" / f"attribution-{runid}"  # committed per-run logs
+    # Raw output is staged in git-ignored scratch and stored through the
+    # artifact store at the end (issue #196); fail closed before simulating.
+    try:
+        stage = evidence_stage.open_stage("recentre", runid)
+    except evidence_stage.StoreError as exc:
+        sys.exit(f"ERROR: evidence cannot be stored, not starting (fail closed): {exc}")
+    out = stage.results / runid  # mirrors the sim/<bench>/results/<ts> layout
+    logs = stage.corners / f"attribution-{runid}"
     out.mkdir(parents=True)
     logs.mkdir(parents=True)
     cards = L.load_cards()
@@ -99,7 +106,13 @@ def main() -> None:
         "git_sha": L.base.git_sha(),
     }
     (out / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-    print("wrote", out)
+    (out / "summary.md").write_text(
+        f"# recentre attribution {runid}\n\n"
+        f"Command: `{' '.join(sys.argv)}`\n\n"
+        f"{len(rows)} single-corner runs at trim code 0x{CODE:02X}; `results.csv`, "
+        f"`manifest.json` and the raw logs under `corners/attribution-{runid}/` are in "
+        "the artifact store.\n")
+    sys.exit(evidence_stage.finish_or_report(stage))
 
 
 if __name__ == "__main__":

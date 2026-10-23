@@ -1,0 +1,39 @@
+name: Artifact manifests
+
+# Stored-evidence manifests (issue #196): schema, artifact:-only URIs, and no
+# stored object's bytes committed beside its manifest. Offline: no broker
+# contact, so a pass means "schema valid", not "hash verified" (use
+# `klt artifact verify` from a fleet worker for that). A separate workflow
+# from signoff.yml on purpose: signoff.yml is a hashed, audited artifact.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  artifact-manifests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install pytest
+        run: python3 -m pip install pytest
+      - name: Writer and checker tests (stub klt and broker, synthetic repos)
+        run: >-
+          python3 -I -m pytest -p no:cacheprovider
+          sim/harness/tests/test_evidence_stage.py
+          sim/harness/tests/test_evidence_store.py
+          scripts/tests/test_check_artifact_manifests.py
+      - name: Check committed manifests
+        run: python3 -I scripts/check_artifact_manifests.py check --tree HEAD
+      - name: No storage location named under manifests/
+        run: |
+          if git grep -nE 's3://|arn:aws:' -- manifests/; then
+            echo "::error::manifests/ names a storage location"; exit 1
+          fi

@@ -76,6 +76,7 @@ sys.path.insert(0, str(REPO_ROOT / "sim" / "pvt"))
 import pvt_sweep as base  # noqa: E402  (sys.path must be set up first)
 sys.path.insert(0, str(REPO_ROOT / "sim"))
 import pdk_provenance  # noqa: E402  shared PDK-revision helper (#65)
+import evidence_stage  # noqa: E402  scratch staging + artifact store (#196)
 
 PVT_TB = REPO_ROOT / "design" / "netlist" / "pvt_tb.spice"
 GDS_PATH = REPO_ROOT / "layout" / "cells" / "rcosc_top.gds"
@@ -510,8 +511,14 @@ def main() -> None:
     args = ap.parse_args()
 
     runid = args.runid or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    corner_dir = CORNER_DIR / runid
-    res_dir = RESULTS_DIR / runid
+    # Raw output is staged in git-ignored scratch and stored through the
+    # artifact store at the end (issue #196); fail closed before simulating.
+    try:
+        stage = evidence_stage.open_stage("pvt-postlayout", runid)
+    except evidence_stage.StoreError as exc:
+        sys.exit(f"ERROR: evidence cannot be stored, not starting (fail closed): {exc}")
+    corner_dir = stage.corners / runid
+    res_dir = stage.results / runid
     build_dir = BUILD_ROOT / runid
     for d in (corner_dir, res_dir, build_dir):
         if d.exists() and any(d.iterdir()):
@@ -1056,12 +1063,15 @@ def main() -> None:
 
     (res_dir / "summary.md").write_text("\n".join(lines) + "\n")
 
-    print(f"\n== done: {res_dir} ==", flush=True)
+    print(f"\n== done: staged in {stage.root.relative_to(REPO_ROOT)} ==", flush=True)
     if not args.keep_build:
         import shutil
 
         shutil.rmtree(build_dir, ignore_errors=True)
 
+    stored = evidence_stage.finish_or_report(stage)
+    if stored:
+        sys.exit(stored)
     if failures:
         sys.exit(f"ERROR: {len(failures)} run(s) failed -- see summary.md")
 

@@ -85,6 +85,7 @@ SIM_PVT = os.path.join(REPO_ROOT, "sim", "pvt")
 sys.path.insert(0, SIM_PVT)
 sys.path.insert(0, os.path.join(REPO_ROOT, "sim"))
 import pdk_provenance  # noqa: E402  shared PDK-revision helper (#65)
+import evidence_stage  # noqa: E402  scratch staging + artifact store (#196)
 from pvt_sweep import (  # path insert above must precede this import
     DEFAULT_JOBS,
     PROCESS_CORNERS,
@@ -479,13 +480,16 @@ def main():
 
     runid = args.runid or datetime.datetime.now(
         datetime.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    corners_dir = os.path.join(SIM_IQ, "corners", runid)
-    results_dir = os.path.join(SIM_IQ, "results", runid)
-    for d in (corners_dir, results_dir):
-        if os.path.isdir(d) and os.listdir(d):
-            sys.exit(f"ERROR: run id {runid} already has content at {d} — "
-                     "evidence is append-only, pick a new run id")
-        os.makedirs(d, exist_ok=True)
+    # Raw output is staged in git-ignored scratch and stored through the
+    # artifact store at the end (issue #196); fail closed before simulating.
+    try:
+        stage = evidence_stage.open_stage("iq", runid, summary_name="README.md")
+    except evidence_stage.StoreError as exc:
+        sys.exit(f"ERROR: evidence cannot be stored, not starting (fail closed): {exc}")
+    corners_dir = str(stage.corners / runid)
+    results_dir = str(stage.results / runid)
+    os.makedirs(corners_dir)
+    os.makedirs(results_dir)
 
     codes = [int(c, 0) for c in args.codes]
     processes = list(PROCESS_CORNERS) if args.subset == "full" else list(ENDPOINT_PROCESSES)
@@ -528,9 +532,9 @@ def main():
     failed = [r for r in rows if r["iq_op_ua"] is None or r["iq_run_ua"] is None]
     print(f"== sweep complete: {len(rows)} points, {len(failed)} failures,"
          f" {wall_clock_s / 60:.1f} min at {args.jobs} jobs ==")
-    print(f"   logs    : sim/iq/corners/{runid}/")
-    print(f"   results : sim/iq/results/{runid}/")
-    return 1 if failed else 0
+    print(f"   staged  : {stage.root.relative_to(REPO_ROOT)}/")
+    stored = evidence_stage.finish_or_report(stage)
+    return stored or (1 if failed else 0)
 
 
 if __name__ == "__main__":

@@ -28,6 +28,9 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import pexlib as L  # noqa: E402
 
+sys.path.insert(0, str(HERE.parent))
+import evidence_stage  # noqa: E402  scratch staging + artifact store (#196)
+
 TARGET = 48.0e6
 
 
@@ -48,8 +51,14 @@ def main() -> None:
     # results/<runid>/ (the repo-wide sim/<bench>/results/<ts> layout the
     # citation verifier resolves); the mode is recorded in results.csv and
     # command.txt.  Raw logs stay in corners/explore-<runid>-<mode>/.
-    out = HERE / "results" / runid
-    logs = HERE / "corners" / f"explore-{runid}-{a.mode}"
+    # Raw output is staged in git-ignored scratch and stored through the
+    # artifact store at the end (issue #196); fail closed before simulating.
+    try:
+        stage = evidence_stage.open_stage("recentre", runid)
+    except evidence_stage.StoreError as exc:
+        sys.exit(f"ERROR: evidence cannot be stored, not starting (fail closed): {exc}")
+    out = stage.results / runid
+    logs = stage.corners / f"explore-{runid}-{a.mode}"
     out.mkdir(parents=True)
     base_cards = L.load_cards()
     rows = []
@@ -113,6 +122,12 @@ def main() -> None:
         w.writeheader()
         w.writerows(rows)
     (out / "command.txt").write_text(" ".join(sys.argv) + "\n" + a.note + "\n")
+    (out / "summary.md").write_text(
+        f"# recentre explore {runid} ({a.mode})\n\n"
+        f"Command: `{' '.join(sys.argv)}`\n\n{a.note}\n\n"
+        f"{len(rows)} single-corner probes; `results.csv`, `command.txt` and the raw "
+        f"logs under `corners/explore-{runid}-{a.mode}/` are in the artifact store.\n")
+    sys.exit(evidence_stage.finish_or_report(stage))
 
 
 if __name__ == "__main__":
