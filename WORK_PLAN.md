@@ -32,7 +32,7 @@ Human-approved issues ready for implementation (`loom:issue`).
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#196**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact)
 
 ## PRs Awaiting Review
 
@@ -44,7 +44,7 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#197**: feat(sim): store new campaign evidence via klt artifact manifests
 
 ## Proposed
 
@@ -52,6 +52,7 @@ Issues carrying `loom:curated`.
 
 - **#66**: design: re-centre the oscillator for extracted parasitics and size a trim range that covers them (T1 item 5; operator ruling 2026-10-08) *(curated)*
 - **#91**: Characterize clk output pulse width and period jitter (unspecified quantities the discipline model assumes) *(curated)*
+- **#196**: Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -69,10 +70,10 @@ Issues carrying `loom:curated`.
 | Very important | 0 |
 | Important | 2 |
 | Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 0 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 0 |
-| Curated | 2 |
+| Approved PRs awaiting merge | 1 |
+| Curated | 3 |
 | Architect / Hermit proposals | 1 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
