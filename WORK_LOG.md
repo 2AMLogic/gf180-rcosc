@@ -2,6 +2,11 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-10-23
+
+- **PR #197**: feat(sim): store new campaign evidence via klt artifact, commit only manifests
+- **Issue #196** (closed): Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact)
+
 ### 2026-10-21
 
 - **PR #183**: ci: fold five offline-suite workflows into offline-suites matrix
