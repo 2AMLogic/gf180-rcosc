@@ -6,11 +6,17 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 - **PR #197**: feat(sim): store new campaign evidence via klt artifact, commit only manifests
 - **Issue #196** (closed): Adopt the common artifact store for sim evidence (manifests in git, bytes via klt artifact)
+- **PR #214**: feat(sim): device-inclusive C_SN of the compact v2 array
 
 ### 2026-10-21
 
 - **PR #183**: ci: fold five offline-suite workflows into offline-suites matrix
 - **Issue #182** (closed): Consolidate five remaining offline-suite workflows into offline-suites.yml matrix
+
+### 2026-10-20
+
+- **PR #209**: feat: re-characterise C_SN, parasitics and leakage for the compact bitcell layouts
+- **Issue #100** (closed): Decision: 2T bitcell is 2.4x larger than public sky130 6T SRAM cell; README density requirement unmet
 
 ### 2026-10-17
 
@@ -20,15 +26,38 @@ Chronological record of merged pull requests and closed issues, maintained by th
 - **PR #188**: feat(mc-groundwork): add --inject-mismatch flag to gen_bench
 - **PR #187**: feat(sim): add item-5 corner request set, row map and offline check
 - **Issue #185** (closed): T1 item 5: express the ratified spec rows as klt sim corner requests and declare the item-5 row set in the manifest
+- **PR #199**: refactor: share anchor-mutant helpers across integration mutation scripts
+- **PR #198**: refactor: share klt sim request skeleton across sim generators
+- **PR #193**: refactor: share mutation-check harness across digital run_mutation.sh scripts
+- **PR #186**: refactor(sim): share sha256 and decided() helpers via _evidence_common
+- **Issue #197** (closed): Consolidate anchor-style mutant helpers left over after #191 (3 run_mutation scripts)
+- **Issue #191** (closed): Consolidate duplicated mutation-harness loop across digital/*/run_mutation.sh
+- **Issue #187** (closed): Consolidate 6 copies of the gzip-aware JSON report loader into _evidence_common
+
+### 2026-10-16
+
+- **PR #181**: sim: re-qualify sense-stage under open_pdks f6eeac7
+- **PR #178**: docs(layout): re-qualify G5 layout and sign-off records under open_pdks f6eeac7
+- **Issue #172** (closed): Re-verify G5 layout and sign-off evidence under open_pdks f6eeac7
+- **Issue #170** (closed): Re-qualify G3 sense-path records under open_pdks f6eeac7
 
 ### 2026-10-15
 
 - **PR #176**: docs(spec): DR-0024 free-running rcosc_top, no enable pin
 - **Issue #131** (closed): Decision record: enable/standby interface for rcosc_top and the start event behind the Startup and Iq rows
+- **PR #173**: docs(pdk): inventory reference records to re-qualify under open_pdks f6eeac7
+- **Issue #175** (closed): docs(pdk): reconcile stamped-file counts in pdk-requalification-inventory.md
+- **Issue #117** (closed): Isolation-gate sizing and offset study: stored-'1' sense input erodes at fs/27 C with the #114 column slice
+- **Issue #114** (closed): Design the column periphery (precharge, write driver, column select) to replace ideal sources in the read/write studies
 
 ### 2026-10-14
 
 - **PR #172**: Item 7: batch klt pex campaign attempt (blocked on fleet PDK variant)
+
+### 2026-10-13
+
+- **PR #155**: feat(leakage): geometry-matched access-device leakage at extracted AD/AS/PD/PS (#149)
+- **Issue #149** (closed): Geometry-matched access-device leakage: re-measure with extracted AD/AS/PD/PS (testbench passes none)
 
 ### 2026-10-12
 
@@ -38,9 +67,6 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 - **PR #168**: test: offline negative fixtures for signoff artifact provenance and binding guards
 - **Issue #165** (closed): Signoff: add offline negative fixtures for artifact provenance and binding guards
-
-### 2026-10-11
-
 - **Issue #68** (closed): signoff docs: correct post-layout open_pdks revision disclosure and stale 'pinned grader' wording (follow-up to #67)
 - **Issue #98** (closed): Prepare offline trim-code batch requests and step-analysis harness
 - **Issue #150** (closed): Tests: cover unresolved recursive deletion and shared-stash guard denials
@@ -52,12 +78,16 @@ Chronological record of merged pull requests and closed issues, maintained by th
 - **PR #164**: docs: correct per-run open_pdks record and ERC/grader wording (#68)
 - **PR #166**: signoff: reject duplicate item keys before comparing grades
 - **PR #167**: Offline dense trim-code batch request generator and step analyzer (#98)
-
-### 2026-10-11
-
 - **PR #158**: design: re-centre the timing ladder for extracted parasitics, DR-0023 proposed (Part of #66)
 - **PR #157**: refactor(sim): consolidate remaining importlib loaders onto _module_loader
 - **Issue #155** (closed): Consolidate remaining importlib loaders in sim analyzers and tests onto _module_loader
+- **PR #153**: feat(layout): pin the array generation toolchain and compare --check output with the committed 4x4
+- **PR #151**: feat(digital): SPI-configured scheduler driving the phase sequencer (#146)
+- **PR #150**: Array-context C_SN comparison and proposed retention-input decision (#89)
+- **Issue #91** (closed): Committed 4x4 array GDS no longer reproduces from generate_array.sh with current klt (0.6.0 vs 0.7.0 geometry drift)
+- **Issue #89** (closed): Array-context storage-node capacitance is 17-22% below the single-cell C_SN used by retention
+- **Issue #157** (closed): Define the physical SPI crossing and reset architecture before controller synthesis
+- **Issue #156** (closed): Guard telemetry: retain confinement for unresolved scratch writes
 
 ### 2026-10-10
 
@@ -97,6 +127,14 @@ Chronological record of merged pull requests and closed issues, maintained by th
 - **PR #116**: CI guard: offline netlist consistency check (#107)
 - **PR #114**: Offline trim-input DC selection and static-current characterization harness
 - **Issue #106** (closed): Prepare offline trim-input DC selection and static-current characterization harness
+- **PR #140**: Couple scheduler budgets to phase durations and verify executed-refresh deadlines (#138)
+- **PR #126**: docs(sim): narrow 'a PR cannot weaken the check' claim
+- **PR #122**: sim: closed-loop refresh operation, measured t_row_refresh_op (#110)
+- **Issue #62** (closed): CI: enforce append-only sim/ results mechanically
+- **Issue #138** (closed): Couple scheduler budgets to phase durations and verify executed-refresh deadlines
+- **Issue #132** (closed): Auditor guard review: worktree-write-confinement-unresolved-var
+- **Issue #110** (closed): Measure t_row_refresh_op with a closed-loop sense and write-back refresh operation
+- **Issue #104** (closed): Auditor: worktree confinement rejects scratch-directory layout validation with shell variables
 
 ### 2026-10-09
 
@@ -121,6 +159,36 @@ Chronological record of merged pull requests and closed issues, maintained by th
 - **Issue #79** (closed): Runtime-discipline trim-math: behavioural SOF loop model against the committed freq-vs-code data
 - **Issue #77** (closed): Item 6 groundwork: verify gf180mcu mismatch models under klt sim monte_carlo and build the per-sample-trim MC bench
 - **Issue #76** (closed): Keep unresolved removal scope guard for historical external-checkout cleanup
+- **PR #99**: feat(digital): integrate SPI config with runtime refresh scheduler (#93)
+- **PR #95**: Monte Carlo mismatch study of the sense stage: input-referred offset at the restricted corners (#81)
+- **PR #87**: feat(digital): proposed SPI control interface model (#83)
+- **PR #79**: Refresh scheduler behavioral model with deadline-invariant testbench (#24 item 3)
+- **PR #77**: Sense-stage characterization at the restricted corners (#60)
+- **PR #71**: ci(sim): guard simulation evidence with exact byte-prefix comparisons
+- **PR #70**: spec: proposed operating-range restriction for the cold corner (outcome C)
+- **PR #69**: fix(signoff): scope T1 items 3/4 evidence to analog partition (met 5 -> 3)
+- **PR #66**: refactor(sim): consolidate duplicated SPICE/waveform helpers (#58)
+- **PR #65**: feat: refresh-overhead envelope (N_rows x t_row_refresh_op) (#59)
+- **PR #64**: ci: run evidence-chain Python checks (test_analysis, test_variants, check_evidence_index)
+- **PR #113**: feat(digital): analog phase-control contract, sequencer and mutation suite
+- **PR #112**: design: sense latch schematic + derived netlist tied to sense-stage deck (#109)
+- **PR #106**: CI: run behavioral SPI and refresh Verilog regressions with pinned Icarus (#105)
+- **PR #103**: docs(sim): define correction-record mechanism for appended evidence
+- **PR #101**: Density vs 6T SRAM: area per bit from committed 4x4 array (#97)
+- **Issue #83** (closed): Propose the SPI control interface spec with a behavioral SPI-slave model and testbench (#24 item 4)
+- **Issue #82** (closed): Draft macro-level pass conditions for epic #24 items 2-6 as a PROPOSED record
+- **Issue #81** (closed): Monte Carlo mismatch study of the sense stage: input-referred offset at the restricted corners
+- **Issue #80** (closed): Extract read-bitline and wordline parasitics from the 4x4 array to replace the C_RBL assumption
+- **Issue #74** (closed): Refresh scheduler behavioral model with deadline-invariant testbench (#24 item 3)
+- **Issue #67** (closed): CI: guard simulation evidence with exact byte-prefix comparisons
+- **Issue #63** (closed): README: reflect cold-corner finding and restricted operating range by reference (after #56)
+- **Issue #60** (closed): Sense-stage characterization at the restricted corners (after #56)
+- **Issue #59** (closed): Refresh-overhead envelope: evaluate the ratified §7 formula over N_rows x t_row_refresh_op
+- **Issue #58** (closed): Consolidate duplicated waveform/SPICE helpers in sim runners into _evidence_common
+- **Issue #56** (closed): spec: write the operating-range restriction for the cold corner as a proposed decision record (outcome C, operator ruling 2026-10-08)
+- **Issue #55** (closed): T1 items 3 and 4: stop the bitcell's DRC/LVS reports grading the unbuilt digital partition
+- **Issue #108** (closed): Define the digital-to-analog phase-control contract with an ordering-checked sequencer model
+- **Issue #105** (closed): CI: run behavioral SPI and refresh Verilog regressions with a pinned simulator
 
 ### 2026-10-08
 
@@ -133,6 +201,16 @@ Chronological record of merged pull requests and closed issues, maintained by th
 - **Issue #72** (closed): Evaluate moving the signoff grader pin from a klayout-tools git commit to the 0.7.0 release
 - **Issue #71** (closed): Item 6: decision record classifying spec rows as statistical vs deterministic, with the Monte Carlo evidence plan
 - **Issue #64** (closed): T1 items 1, 9, 10 (and item 2's binding): cite artifact-anchored evidence now that klt signoff can bind it (klayout-tools#2843)
+- **PR #57**: feat: cite T1 item 11 (analog) via psub substrate tie; pin klt v0.6.0 (#54)
+- **Issue #54** (closed): T1 item 11 (analog): declare the array's substrate tie, re-run klt erc and LVS, and cite the power-delivery row
+
+### 2026-10-07
+
+- **PR #50**: Prepare supply and reliability decision record for the sense-path contract (#49)
+
+### 2026-10-05
+
+- **Issue #45** (closed): [Epic #24] Characterize achievable stored levels and loaded-column read separation
 
 ### 2026-09-23
 
