@@ -252,17 +252,16 @@ echo "== rcosc_top: ERC (T1 item 11 supply spec) =="
 # through a separate build even though the geometry verbs above stay on
 # 0.4.0.
 #
-# Since issue #64 this ERC pin is NOT the signoff grader pin. The grader
-# moved to klayout-tools 3a75c3ae (signoff/README.md), but that build's
-# `klt erc` rejects layout/erc-supply-spec.json outright: its strict
-# unknown-key check refuses the spec's `_comment` annotation
-# (klayout-tools#2822, open). The committed ERC envelope was written by
-# this 2b1e55e5 build, and the 3a75c3ae grader accepts it unchanged (item 11
-# still grades met, with input_verified true), so ERC evidence stays on the
-# build that can read the committed spec. Move this pin only once a build
-# accepts annotation keys, or together with a spec migration and an erc
-# re-run per signoff/README.md's refresh contract.
-ERC_KLT=(uv run --quiet --with "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@2b1e55e51bb803c082e8857da44687f3e37ebfc0" klt)
+# Since issue #203 this ERC step runs on the klayout-tools 0.8.0 release, the
+# same build as the signoff grader (signoff/README.md). Until then it stayed
+# on the 2b1e55e5 dev build because the newer graders' `klt erc` rejected
+# layout/erc-supply-spec.json outright over its `_comment` annotation key
+# (klayout-tools#2822, now closed). 0.8.0 reads the committed spec unchanged:
+# same input and spec content hashes as the committed envelope, and no supply
+# findings. The committed envelope itself is still the 2b1e55e5 build's
+# output; it is rewritten only when this script regenerates layout/reports/
+# (signoff/README.md's refresh contract).
+ERC_KLT=(uv run --quiet --with "klayout-tools==0.8.0" klt)
 
 set +e
 ( cd "$REPO_ROOT" && "${ERC_KLT[@]}" erc layout/cells/rcosc_top.gds \

@@ -45,7 +45,7 @@ partition that does not exist. `analog` is the honest declaration.
 it does not run the gates — so the grading can be re-run anywhere:
 
 ```bash
-python -m pip install "klayout-tools==0.7.0"
+python -m pip install "klayout-tools==0.8.0"
 klt signoff --manifest signoff/block-manifest.json --format json > signoff/signoff-report.json
 python3 signoff/verify-report.py
 ```
@@ -55,7 +55,7 @@ a throwaway `uv` environment (`uv run --with` puts the pinned `klt` beside the
 interpreter, which is where `verify-report.py` looks first):
 
 ```bash
-PIN="klayout-tools==0.7.0"
+PIN="klayout-tools==0.8.0"
 uv run --no-project --with "$PIN" klt signoff --manifest signoff/block-manifest.json --format json > signoff/signoff-report.json
 uv run --no-project --with "$PIN" python3 signoff/verify-report.py
 ```
@@ -75,14 +75,22 @@ klayout-tools#2878.
 **The grader pin is load-bearing.** The committed report records the build
 that graded it (`build.git_commit`) and the hash of the rulebook it graded
 under (`source_doc_content_hash`), and `verify-report.py` fails if either
-differs from a fresh grade. The pin is the klayout-tools **0.7.0** release from PyPI
-(`klt --version`: `0.7.0`; the report records `git_tag: v0.7.0`,
-`is_release: true`, `git_commit: 0e2362bd…`). Its rulebook is the one that first graded T1
+differs from a fresh grade. The pin is the klayout-tools **0.8.0** release from PyPI
+(`klt --version`: `klt 0.8.0`; the report records `git_tag: v0.8.0`,
+`is_release: true`, `git_commit: c572046b…`). Its rulebook is the one that first graded T1
 items 1, 2, 9 and 10 from an **artifact-bound generic envelope**
 (klayout-tools#2718; see "Items 1, 2, 9, and 10: bind them to an audited
 artifact" in klayout-tools `docs/cli/signoff.md`). When moving it, follow the
 refresh contract below, starting with a pin-only re-grade of the unchanged
 manifest.
+
+**Pin move to 0.8.0 (issue #203).** The pin was the 0.7.0 release
+(`git_commit: 0e2362bd…`). The unchanged manifest graded identically: no row
+changed status or reason (8 of 11 `met`; items 5, 6, 7 `no_evidence`). What
+changed is the `build` block, `source_doc_content_hash`,
+`grading_ruleset_id`, some rulebook item text, and item 10's envelope hash
+(the workflow bytes moved, so the repo-hygiene envelope, manifest pin and
+report were refreshed together).
 
 **Pin move to 0.7.0 (issue #72).** The pin was klayout-tools commit
 `3a75c3ae…` (`0.6.0+g3a75c3ae705b`, a development build, git-pinned). The

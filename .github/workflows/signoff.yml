@@ -71,7 +71,7 @@ jobs:
       - name: Install the pinned klt grader
         run: |
           python -m pip install --upgrade pip
-          python -m pip install "klayout-tools==0.7.0"
+          python -m pip install "klayout-tools==0.8.0"
           klt --version
 
       - name: Re-grade the manifest and verify the committed pins
