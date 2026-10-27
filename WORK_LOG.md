@@ -2,6 +2,11 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-10-27
+
+- **PR #205**: chore: move signoff and ERC klt pins to 0.8.0
+- **Issue #203** (closed): Bump klayout-tools pin 0.4.0, 0.7.0, 2b1e55e51bb8 → 0.8.0
+
 ### 2026-10-23
 
 - **PR #197**: feat(sim): store new campaign evidence via klt artifact, commit only manifests
