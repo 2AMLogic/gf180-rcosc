@@ -2,6 +2,11 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-10-28
+
+- **PR #208**: docs: state graded T1 verdict and missed ratified rows in README status
+- **Issue #207** (closed): T1 status: correct README status and maturity-ladder claim — graded 8/11, items 5/6/7 unmet, two ratified rows missed
+
 ### 2026-10-27
 
 - **PR #205**: chore: move signoff and ERC klt pins to 0.8.0
