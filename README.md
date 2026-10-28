@@ -6,12 +6,26 @@ open PDK — designed by AI agents driving
 [klayout-tools](https://github.com/2AMLogic/klayout-tools) and the
 open-source xschem + ngspice flow.
 
-**Status: spec ratified.** The target spec (frequency, trim math, PVT
-accuracy budget) is ratified — see below and
-[`spec/`](spec/README.md). Schematic capture, the full PVT-corner
-campaign, DRC-clean/LVS-matched layout, and a first post-layout (PEX)
-re-verification pass are all committed (see the maturity ladder below);
-a shuttle seat and measured silicon remain the next work items.
+**Status: spec ratified; T1 not awarded.**
+<!-- current-t1-status:begin -->
+The graded T1 verdict in
+[`signoff/signoff-report.json`](signoff/signoff-report.json) is **8 of 11
+items met, tier not yet awarded** — items 5 (corner verification), 6
+(Monte Carlo) and 7 (post-layout) are unmet. Two ratified spec rows are
+missed: **post-trim accuracy** is over the ±1.1 % budget (schematic and
+post-layout) and **trim range** is "Not met". The operator ruled on
+2026-10-08 that both are design fixes, not disclosed exceptions;
+[issue #66](https://github.com/2AMLogic/gf180-rcosc/issues/66) owns the
+fix. The post-layout (PEX) pass committed so far is a diagnostic campaign
+(27-point subset, extracted frequency 19–37 % slow), not item-7 evidence;
+[issue #70](https://github.com/2AMLogic/gf180-rcosc/issues/70) owns the
+`klt pex` report. The next work items are #66 and #70; a shuttle seat is
+not the next step while ratified rows fail.
+<!-- current-t1-status:end -->
+The target spec (frequency, trim math, PVT accuracy budget) is ratified —
+see below and [`spec/`](spec/README.md). Schematic capture, the PVT-corner
+campaign and DRC-clean/LVS-matched layout are committed (see the maturity
+ladder below).
 
 **Built agent-native.** Every specification, decision record, testbench, and
 line of documentation here is produced by AI agents working from a ratified
@@ -96,16 +110,23 @@ would supersede them.
 Maturity ladder: spec ratified → schematic simulated across PVT → layout
 DRC/LVS-clean → post-layout re-verification → shuttle seat → measured
 silicon. **Current position: spec ratified, schematic simulated across
-PVT, layout DRC/LVS-clean against the post-#43 schematic, post-layout
-(PEX) re-verification re-done against the re-spun bias and trim cells —
-still pre-shuttle-seat, pre-silicon.** The comparator/bias-path PVT
+PVT, layout DRC/LVS-clean against the post-#43 schematic; post-layout
+(PEX) work is a diagnostic campaign only, and the graded T1 verdict is
+8 of 11 items met with post-trim accuracy and trim range missed (see the
+status above and [issue #66](https://github.com/2AMLogic/gf180-rcosc/issues/66)).
+The post-layout rung is not complete (item 7 is owned by
+[issue #70](https://github.com/2AMLogic/gf180-rcosc/issues/70)), so the
+shuttle-seat rung is not yet in reach; no silicon exists.**
+
+The comparator/bias-path PVT
 revision ([issue #39](https://github.com/2AMLogic/gf180-rcosc/issues/39),
 [DR-0012](spec/decision-records/0012-comparator-bias-path-pvt-revision.md))
 changed `design/rcosc_bias.sch` and the trim-bank pass-switch restructure
 ([issue #43](https://github.com/2AMLogic/gf180-rcosc/issues/43),
 [DR-0014](spec/decision-records/0014-trim-bank-pass-switch-restructure.md))
 changed `design/rcosc_trim_bank.sch` after the layout was verified; both
-cells have since been re-drawn and the whole hierarchy re-verified
+cells have since been re-drawn and the whole hierarchy re-run through the
+post-layout diagnostic campaign
 ([issue #44](https://github.com/2AMLogic/gf180-rcosc/issues/44),
 [DR-0013](spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md);
 [issue #50](https://github.com/2AMLogic/gf180-rcosc/issues/50),
@@ -113,7 +134,7 @@ cells have since been re-drawn and the whole hierarchy re-verified
 and the comparator re-reference ([issue
 #61](https://github.com/2AMLogic/gf180-rcosc/issues/61),
 [DR-0018](spec/decision-records/0018-comparator-pmos-respin-postlayout-pex-reverification.md))
-re-verifies the post-#60 hierarchy post-layout — which supersedes
+re-runs that diagnostic on the post-#60 hierarchy — which supersedes
 [DR-0010](spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)'s,
 DR-0013's and DR-0015's post-layout figures for it — the parasitic shift
 persists, always slower, −18.78 % to −36.86 % on the current pass (mean
