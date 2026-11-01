@@ -4,11 +4,17 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-28
 
+- **PR #237**: build: attest T1 items 1, 9 and 10 with klt --attest inventories and CI drift checks
 - **PR #208**: docs: state graded T1 verdict and missed ratified rows in README status
 - **Issue #207** (closed): T1 status: correct README status and maturity-ladder claim — graded 8/11, items 5/6/7 unmet, two ratified rows missed
 
 ### 2026-10-27
 
+- **PR #235**: refactor: share stream-generator scaffolding in flow/_stream_gen.py
+- **PR #233**: build: re-stamp LVS/STA evidence under klt 0.8.0, cite functional-verification for T1 item 5
+- **PR #229**: build: pin signoff grader to klayout-tools 0.8.0 and regenerate tier report
+- **PR #226**: refactor: share one load_module helper across flow scripts and tests
+- **PR #222**: docs(sim): document generated inputs and cold-clone runnability of benches
 - **PR #205**: chore: move signoff and ERC klt pins to 0.8.0
 - **Issue #203** (closed): Bump klayout-tools pin 0.4.0, 0.7.0, 2b1e55e51bb8 → 0.8.0
 
@@ -30,6 +36,7 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-17
 
+- **PR #215**: feat: add paired netlist/SDF identifier sanitizer and item 7 retry record
 - **PR #191**: sim(mc-groundwork): record retried batch smoke as a second diagnostic
 - **PR #189**: docs(signoff): record item-6 Monte Carlo groundwork status and open gaps
 - **Issue #186** (closed): T1 item 6: wire the DR-0022 mismatch injector into the MC bench, prove a klt yield envelope end to end, and declare the statistical row set
@@ -66,6 +73,7 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-13
 
+- **PR #132**: ci: reproduce routability-corpus fixtures with flow/corpus.sh (#129)
 - **PR #155**: feat(leakage): geometry-matched access-device leakage at extracted AD/AS/PD/PS (#149)
 - **Issue #149** (closed): Geometry-matched access-device leakage: re-measure with extracted AD/AS/PD/PS (testbench passes none)
 
@@ -101,6 +109,17 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-10
 
+- **PR #201**: verification: validate ConfigMem map and transaction input before functional verdicts (#200)
+- **PR #194**: docs(flow): document gate-sim scripts and add script-to-evidence index
+- **PR #192**: Gate verification: replay route diagnostics on the synthesized tile (#189)
+- **PR #190**: feat(flow): enforce append-only on sim/ evidence ledgers at PR time (#183)
+- **PR #185**: feat(sim): control-jump directional route diagnostic through frame programming (#181)
+- **PR #182**: Pin-index experiment: registered regcasc case with one-register transition equivalence (#160)
+- **PR #179**: feat(sim): LUT-input directional route diagnostic through frame programming (#176)
+- **PR #175**: G5: LUT basis diagnostic, every truth-table address on every BEL through the generated tile (#172)
+- **PR #174**: ci: select generated-tile differential replay on its RTL and helper dependencies
+- **PR #171**: ci: trigger harness-format drift check on document and fixture changes
+- **PR #159**: Bound simulator processes; timeouts are infrastructure failures (#157)
 - **PR #154**: fix(sim): default legacy sweep drivers to --jobs 2 (#139)
 - **PR #152**: docs(readme): reconcile accuracy summary and ST comparison with DR-0017
 - **Issue #139** (closed): Cap legacy sweep drivers' default --jobs and point grid runs at klt sim requests
@@ -148,6 +167,20 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-09
 
+- **PR #146**: Gate-sim negative controls: require completed functional rejection (#141)
+- **PR #139**: G5: replay routability corpus against composed-tile gate netlist
+- **PR #134**: G6: generate as-built harness bitstream-format table with drift check
+- **PR #128**: G5: bounded single-tile routability corpus to inform ADR-0004 (#115)
+- **PR #121**: feat(sim): gate-level bitstream-driven run on composed-tile netlist (#119)
+- **PR #111**: feat(layout): experimental DRC/LVS/ERC observations + routing pitch on composed tile (G3, #108)
+- **PR #110**: ci: run flow/audit-evidence.sh on PRs (#109)
+- **PR #107**: feat(layout): experimental composed-tile physical canary (G2, #102)
+- **PR #104**: Verify switch-matrix RTL against FABulous; fix generator select order (#96)
+- **PR #93**: feat(rtl): composed LOGIC4 tile (BELs + switch matrix), RTL-only (#90)
+- **PR #91**: G1: run pinned nextpnr on the generated LOGIC4 model (#87)
+- **PR #88**: Generate LOGIC4 switch-matrix RTL and verify in sim/
+- **PR #84**: spec: ADR-0004 for the five G1 tile-description discrepancies
+- **PR #81**: feat(timing): cite a multi-corner klt sta envelope for T1 item 5 (#68)
 - **Issue #97** (closed): Guard decision: preserve rejection of gh api literal body=@path
 - **Issue #95** (closed): Keep stash scope guard and document explicit scoped alternatives
 - **PR #108**: sim/supply-transient: offline supply-step and ripple bench (generator, analyzer, tests, CI)
@@ -202,6 +235,7 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-10-08
 
+- **PR #76**: feat(design): pin FABulous 2.2.0 and commit LOGIC4 tile description (G1)
 - **PR #80**: feat(sim): startup-time testbench for the 10 us row (partial evidence) (#78)
 - **Issue #78** (closed): Add a startup-time testbench for the ratified 10 us row (currently not evaluated)
 - **PR #75**: Item 7: klt pex inputs + single-corner probe (grid blocked by fleet runner version) (#70)
