@@ -38,7 +38,7 @@ _None._
 
 PRs waiting on Judge (`loom:review-requested`).
 
-_None._
+- **#214**: docs: record failed batch preflight for waveform campaign
 
 ## Approved (Awaiting Merge)
 
@@ -51,8 +51,8 @@ _None._
 Issues carrying `loom:curated`.
 
 - **#66**: design: re-centre the oscillator for extracted parasitics and size a trim range that covers them (T1 item 5; operator ruling 2026-10-08) *(curated)*
-- **#91**: Characterize clk output pulse width and period jitter (unspecified quantities the discipline model assumes) *(curated)*
 - **#204**: Move layout geometry pin klt 0.4.0 → 0.8.0 and regenerate committed cells/reports *(curated)*
+- **#213**: Physical clock pulse-width and jitter campaign (deferred from #91) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -71,7 +71,7 @@ Issues carrying `loom:curated`.
 | Important | 2 |
 | Ready (`loom:issue`) | 1 |
 | In Progress (`loom:building`) | 0 |
-| PRs awaiting review | 0 |
+| PRs awaiting review | 1 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 3 |
 | Architect / Hermit proposals | 1 |
