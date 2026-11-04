@@ -93,6 +93,7 @@ DEFAULT_JOBS = 2
 sys.path.insert(0, str(REPO_ROOT / "sim"))
 import pdk_provenance  # noqa: E402  shared PDK-revision helper (#65)
 import evidence_stage  # noqa: E402  scratch staging + artifact store (#196)
+import git_provenance  # noqa: E402  shared git HEAD/dirty helper (#216)
 DESIGN_DIR = REPO_ROOT / "design"
 NETLIST = DESIGN_DIR / "netlist" / "pvt_tb.spice"
 SIM_PVT = REPO_ROOT / "sim" / "pvt"
@@ -255,29 +256,11 @@ def tool_version(cmd: list[str], line: int = 0) -> str:
 
 
 def git_sha() -> str:
-    try:
-        out = subprocess.run(
-            ["git", "-C", str(REPO_ROOT), "rev-parse", "HEAD"],
-            capture_output=True,
-            text=True,
-            timeout=60,
-        )
-        return out.stdout.strip() or "unknown"
-    except Exception:  # pragma: no cover
-        return "unknown"
+    return git_provenance.head_sha(REPO_ROOT)
 
 
 def git_dirty() -> bool:
-    try:
-        out = subprocess.run(
-            ["git", "-C", str(REPO_ROOT), "status", "--porcelain"],
-            capture_output=True,
-            text=True,
-            timeout=60,
-        )
-        return bool(out.stdout.strip())
-    except Exception:  # pragma: no cover
-        return True
+    return git_provenance.is_dirty(REPO_ROOT)
 
 
 # ---------------------------------------------------------------------------
