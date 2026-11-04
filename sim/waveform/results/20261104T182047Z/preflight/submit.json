@@ -1,0 +1,327 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/waveform/results/20261104T182047Z/preflight/tb_v33_tt.spice",
+    "scope": "repo"
+  },
+  "status": "error",
+  "corner_count": 3,
+  "passed": 0,
+  "failed": 0,
+  "errored": 3,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {
+      "batch_job_failed": 3
+    },
+    "by_severity": {
+      "error": 3
+    },
+    "corners_with_diagnostics": 3
+  },
+  "metrics": {
+    "sim__corner__count": 3,
+    "sim__corner__passed_count": 0,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 3,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": null,
+    "ngspice_binary": "/usr/local/bin/ngspice",
+    "engine_build": {
+      "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Sat Aug  1 17:32:09 UTC 2026\n******",
+      "binary_sha256": "555e04b8ddf17a382fe28d409251ce8968ba983b8c82396fb78e1ff542aa5dd5",
+      "probe": "ok",
+      "reason": null
+    },
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+    "models_lib_sha256_scope": "client",
+    "netlist_sha256": "9b881f897d2dfe75a3b02da2e9fcf09febc8915b8961d275b615d90368b4dcf8",
+    "netlist_closure": [
+      {
+        "path": "sim/waveform/results/20261104T182047Z/preflight/tb_v33_tt.spice",
+        "scope": "repo",
+        "sha256": "9b881f897d2dfe75a3b02da2e9fcf09febc8915b8961d275b615d90368b4dcf8"
+      },
+      {
+        "path": "sim/waveform/results/20261104T182047Z/preflight/rcosc_top_schematic.spice",
+        "scope": "repo",
+        "sha256": "ea387d532b106ad9cc9ce072679011f83a3071926c6a8d91b4b3d1ddc08542ef"
+      }
+    ],
+    "netlist_identity": "sha256:4ed7cb3e340271dcc28a1181b385a2d401546b470aab7af38582c7833874ea1d",
+    "netlist_source": "schematic",
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-d4811d4414d4",
+      "region": "us-east-1",
+      "instance_id": "i-02cd5504ae9585225",
+      "instance_type": "m7i.4xlarge",
+      "availability_zone": "us-east-1a",
+      "ami_id": "ami-0fa5ef830209100bd",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "failed",
+      "exit_code": "1",
+      "concurrency": "1",
+      "physical_cores": "8",
+      "elapsed_seconds": 5,
+      "client_submitted_at": "2026-11-04T18:21:03.742118Z",
+      "client_launched_at": "2026-11-04T18:21:29.067275Z",
+      "client_status_terminal_at": "2026-11-04T18:22:00.542960Z",
+      "client_collected_at": null,
+      "runner_klt_version": "0.8.0",
+      "client_klt_version": "0.8.1.dev1317+ga2804ab99263",
+      "runner_compatibility": "match",
+      "runner_request_features": {
+        "required": [
+          "options.ngspice_init"
+        ],
+        "missing": [],
+        "status": "supported"
+      },
+      "worker_environment": {
+        "capture": "ok",
+        "simulator": {
+          "requested_binary": "ngspice",
+          "binary_source": "PATH",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+          "version_probe": "ok"
+        },
+        "pdk": {
+          "variant": "gf180mcuC",
+          "root": "/opt/pdk",
+          "stamp_scheme": null,
+          "stamp_sha256": null,
+          "stamp_text": null,
+          "models_staged": false,
+          "stamp_scope": "executed"
+        },
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+        "omp_num_threads": null,
+        "image_manifest": null,
+        "model_inputs": null,
+        "diagnostics": [
+          "pdk stamp unreadable: FileNotFoundError"
+        ],
+        "pdk_stamp_comparison": {
+          "status": "not_comparable",
+          "reason": "worker_stamp_unavailable"
+        },
+        "engine_build_comparison": {
+          "status": "mismatch",
+          "warning": "the worker's ngspice --version banner differs from the local binary's; build options (e.g. FFT linkage) may differ, so results derived from them can differ from a local run"
+        }
+      },
+      "runner_model_inputs": null,
+      "job_ceiling": {
+        "basis": "conservative_serial_bound",
+        "unit_count": 3,
+        "per_unit_timeout_s": 3600,
+        "overhead_s": 120.0,
+        "job_bound_s": 10920.0,
+        "max_job_seconds": 3600.0,
+        "max_job_seconds_source": "fleet_config",
+        "exceeds_ceiling": true,
+        "check": "warn",
+        "max_units_per_job": 0,
+        "recommended_hosts": null,
+        "warning": "batch job bound 10920s (options.timeout_s 3600s x 3 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. No remote.hosts value fits: a single unit's bound exceeds the ceiling -- lower options.timeout_s to at most 3480s"
+      }
+    },
+    "engine_host": "worker",
+    "client_ngspice_binary": "/home/ubuntu/.local/bin/ngspice",
+    "backend": {
+      "resolved": "batch",
+      "source": "flag",
+      "requested": "batch"
+    }
+  },
+  "coverage": {
+    "corners_simulated": 3,
+    "measurements_declared": 1,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [],
+    "skipped": [
+      {
+        "id": "measurement:[0,\"tt/novdd/-40C\",\"t_first_edge\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C\",\"t_first_edge\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/85C\",\"t_first_edge\"]/observation",
+        "reason": "unavailable_measurement"
+      }
+    ],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"tt/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": true,
+    "nothing_checked_reasons": [
+      "characterization_without_limits",
+      "unavailable_measurement"
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.8.1.dev1317+ga2804ab99263",
+    "klt_git_commit": "a2804ab992639612e5fceb84cee6bad5fb917b1f",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@a2804ab992639612e5fceb84cee6bad5fb917b1f",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "gf180mcuC",
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
+    },
+    "deck": {
+      "name": "sm141064.ngspice",
+      "content_hash": "sha256:f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:9b881f897d2dfe75a3b02da2e9fcf09febc8915b8961d275b615d90368b4dcf8",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "t_first_edge",
+      "unit": "s",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "tt/novdd/-40C",
+        "value": null,
+        "margin": null
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "tt/novdd/-40C",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "error",
+      "runtime_s": 0.0,
+      "engine_exit_code": null,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-d4811d4414d4 finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`). [engine log unavailable: no ngspice.log/xyce.log in the collected outputs (engine logs are retrieved only when artifacts are kept)]"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/novdd/27C",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "error",
+      "runtime_s": 0.0,
+      "engine_exit_code": null,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-d4811d4414d4 finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`). [engine log unavailable: no ngspice.log/xyce.log in the collected outputs (engine logs are retrieved only when artifacts are kept)]"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/novdd/85C",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "error",
+      "runtime_s": 0.0,
+      "engine_exit_code": null,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-d4811d4414d4 finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`). [engine log unavailable: no ngspice.log/xyce.log in the collected outputs (engine logs are retrieved only when artifacts are kept)]"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    }
+  ]
+}
