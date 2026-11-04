@@ -8,10 +8,12 @@ Writes a NEW results/<runid>/ directory and refuses to overwrite one.
 
 Plant and assumptions are documented in sim/discipline/README.md.
 """
-import argparse, csv, datetime, hashlib, json, math, os, platform, random, subprocess, sys
+import argparse, csv, datetime, hashlib, json, math, os, platform, random, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
+sys.path.insert(0, os.path.join(ROOT, "sim"))
+import git_provenance  # noqa: E402  shared git HEAD/dirty helper (#216)
 SCH_CSV = "sim/pvt/results/20260923T030125Z/results.csv"
 EXT_CSV = "sim/pvt-postlayout/results/20260923T152954Z/results.csv"
 GRD_CSV = "sim/pvt-postlayout/results/20260923T152954Z/guardrails.csv"
@@ -332,10 +334,7 @@ def main():
         for i in range(400):
             w.writerow([i] + [x for c, e in cols_t for x in (c[i], f"{e[i]:.4f}")])
 
-    try:
-        sha_git = subprocess.run(["git", "-C", ROOT, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
-    except Exception:
-        sha_git = ""
+    sha_git = git_provenance.head_sha(ROOT)
     man = {"runid": a.runid, "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
            "git_head": sha_git, "python": platform.python_version(), "seed": SEED,
            "inputs_sha256": {p: sha(p) for p in (SCH_CSV, EXT_CSV, GRD_CSV)},

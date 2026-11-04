@@ -26,7 +26,6 @@ import argparse
 import hashlib
 import json
 import re
-import subprocess
 import sys
 from pathlib import Path
 
@@ -36,6 +35,7 @@ _SIM = Path(__file__).resolve().parent.parent
 if str(_SIM) not in sys.path:
     sys.path.insert(0, str(_SIM))
 from _module_loader import load_module  # noqa: E402
+import git_provenance  # noqa: E402  shared git HEAD/dirty helper (#216)
 sys.path.insert(0, str(REPO / "sim" / "pvt"))
 from pvt_sweep import PROCESS_CORNERS, TEMPS_C, VDDS_V  # noqa: E402
 
@@ -81,11 +81,6 @@ def sha256(path: Path) -> str:
 
 def sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode()).hexdigest()
-
-
-def _git(*args: str) -> str:
-    r = subprocess.run(["git", *args], capture_output=True, text=True, cwd=REPO)
-    return r.stdout.strip() if r.returncode == 0 else ""
 
 
 # ------------------------------------------------------------- extraction --
@@ -267,12 +262,12 @@ def generate(out: Path, cfg: dict | None = None) -> dict:
     n_expected = len(PROCESSES) * len(TEMPS_C) * len(VDDS_V) * TRIM_BITS * len(cfg["backgrounds"]) * len(cfg["m_fracs"])
     if len(seen) != n_expected or len(pts) != 27:
         raise PrepareError("case count does not match the matrix")
-    dirty = bool(_git("status", "--porcelain", "--", "design/netlist/pvt_tb.spice"))
+    dirty = git_provenance.is_dirty(REPO, "design/netlist/pvt_tb.spice")
     prov = {
         "kind": "trim-interface-dc-requests",
         "evidence": "NOT EVIDENCE: offline request generation, no simulation was run",
         "issue": 106,
-        "git_revision": _git("rev-parse", "HEAD") or None,
+        "git_revision": git_provenance.head_sha(REPO),
         "source_dirty": dirty,
         "grid": {"processes": list(PROCESSES), "temperature_c": TEMPS_C, "vdd_v": VDDS_V, "pvt_points": len(pts),
                  "pins": TRIM_BITS, "backgrounds": list(cfg["backgrounds"]), "m_fracs": list(cfg["m_fracs"]),

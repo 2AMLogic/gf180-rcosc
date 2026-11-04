@@ -25,7 +25,7 @@ hardware design decision and not a sourced reference guarantee):
 mode="naive_nominal" is a CONTRAST FIXTURE ONLY: it delivers the multi-frame span count to the
 controller as if it were a single frame.  It is not a candidate policy and is not swept.
 """
-import argparse, csv, datetime, hashlib, importlib.util, json, math, os, platform, random, subprocess, sys
+import argparse, csv, datetime, hashlib, importlib.util, json, math, os, platform, random, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -259,7 +259,7 @@ def main():
         for r in rows:
             w.writerow([fmt(r[k]) for k in cols])
     man = {"runid": a.runid, "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-           "git_head": subprocess.run(["git", "-C", dm.ROOT, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip(),
+           "git_head": dm.git_provenance.head_sha(dm.ROOT),
            "python": platform.python_version(), "seed": dm.SEED, "kind": "behavioural simulation, no analogue sim",
            "inputs_sha256": {p: dm.sha(p) for p in (dm.SCH_CSV, dm.EXT_CSV, dm.GRD_CSV,
                                                     "sim/discipline/discipline_model.py",

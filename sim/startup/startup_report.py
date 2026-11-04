@@ -35,6 +35,8 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent))
+import git_provenance  # noqa: E402  shared git HEAD/dirty helper (#216)
 RAMP_NS = 1000
 TAIL_NS = 2000
 TAIL_TOL = 0.005
@@ -94,10 +96,6 @@ def analyse(wf_path, vdd_nom):
         else:
             r[f"t_settle_{label}_ns"] = e[bad[-1] + 1] * 1e9
     return r, e
-
-
-def git(*a):
-    return subprocess.run(["git", *a], capture_output=True, text=True, cwd=HERE).stdout.strip()
 
 
 def main():
@@ -165,8 +163,8 @@ def main():
     for lab, _ in BANDS:
         ts = [r.get(f"t_settle_{lab}_ns") for r in rows if r.get(f"t_settle_{lab}_ns") is not None]
         worst[lab] = max(ts) if ts else None
-    json.dump({"runid": a.runid, "git_sha": git("rev-parse", "HEAD"),
-               "dirty_tree": bool(git("status", "--porcelain", "--", str(HERE), str(HERE.parent.parent / "design" / "netlist"))),
+    json.dump({"runid": a.runid, "git_sha": git_provenance.head_sha(HERE),
+               "dirty_tree": git_provenance.is_dirty(HERE, HERE, HERE.parent.parent / "design" / "netlist"),
                "klt": subprocess.run(["klt", "--version"], capture_output=True, text=True).stdout.strip(),
                "ramp_ns": RAMP_NS, "tail_ns": TAIL_NS, "tail_tol": TAIL_TOL, "spec_us": SPEC_US,
                "bands": dict(BANDS), "primary_band": PRIMARY, "trim_code": "0xA3",

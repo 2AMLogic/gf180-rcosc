@@ -42,6 +42,7 @@ _SIM = Path(__file__).resolve().parent.parent
 if str(_SIM) not in sys.path:
     sys.path.insert(0, str(_SIM))
 from _module_loader import load_module  # noqa: E402
+import git_provenance  # noqa: E402  shared git HEAD/dirty helper (#216)
 WAVEFORM = REPO / "sim" / "waveform"
 
 
@@ -129,8 +130,8 @@ def design_revision() -> dict:
     git_sha.  Schematic equivalence with the calibration revision is not
     established here.  Refuses a dirty design/ tree (the DUT hash would then
     match no revision)."""
-    rc, head = _git("rev-parse", "HEAD")
-    if rc != 0 or not head:
+    head = git_provenance.head_sha(REPO)
+    if head == git_provenance.UNKNOWN:
         raise PrepareError("cannot determine the current git revision")
     rc, dirty_design = _git("status", "--porcelain", "--", "design")
     if rc != 0:

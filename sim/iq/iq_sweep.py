@@ -86,6 +86,7 @@ sys.path.insert(0, SIM_PVT)
 sys.path.insert(0, os.path.join(REPO_ROOT, "sim"))
 import pdk_provenance  # noqa: E402  shared PDK-revision helper (#65)
 import evidence_stage  # noqa: E402  scratch staging + artifact store (#196)
+import git_provenance  # noqa: E402  shared git HEAD/dirty helper (#216)
 from pvt_sweep import (  # path insert above must precede this import
     DEFAULT_JOBS,
     PROCESS_CORNERS,
@@ -498,10 +499,8 @@ def main():
 
     ngspice_ver = subprocess.run(["ngspice", "-v"], capture_output=True,
                                  text=True).stdout.splitlines()[1].strip()
-    git_sha = subprocess.run(["git", "-C", REPO_ROOT, "rev-parse", "HEAD"],
-                             capture_output=True, text=True).stdout.strip()
-    dirty = bool(subprocess.run(["git", "-C", REPO_ROOT, "status", "--porcelain"],
-                                capture_output=True, text=True).stdout.strip())
+    git_sha = git_provenance.head_sha(REPO_ROOT)
+    dirty = git_provenance.is_dirty(REPO_ROOT)
 
     print(f"== gf180-rcosc Iq PVT sweep {runid}: {len(points)} points"
          f" ({args.subset} subset, {len(codes)} codes) ==")
