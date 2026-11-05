@@ -117,7 +117,7 @@ per corner x step x direction x skew, aggregated over the four phases
   (runner klt 0.5.0, client 0.7.0), the same refusal as `sim/startup/batch-attempts/`.
   Not worked around by a local multi-corner run. A runner image update (or a
   compatible client) is needed before the campaign can run.
-- `batch-attempts/20261105T080624Z_klt0.9.0_runner/`: re-run of
+- `batch-attempts/*_klt0.9.0_runner/` (the 2026-11-05 attempt directory): re-run of
   `run-transition.sh --backend batch` on the eda-batch-runner v10 image (runner klt
   0.9.0, `runner_compatibility=match`). All nine requests (27 units) ended
   `batch_job_failed`, exit 1: "no supported-layout PDK install providing variant
