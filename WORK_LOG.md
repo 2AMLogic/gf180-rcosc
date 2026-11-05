@@ -2,6 +2,11 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-04
+
+- **PR #217**: refactor: share git HEAD/dirty capture across sim drivers
+- **Issue #216** (closed): Consolidate duplicated git-revision helpers across sim drivers (inconsistent provenance on failure)
+
 ### 2026-10-28
 
 - **PR #237**: build: attest T1 items 1, 9 and 10 with klt --attest inventories and CI drift checks
