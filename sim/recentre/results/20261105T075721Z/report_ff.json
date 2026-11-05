@@ -1,0 +1,1344 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/recentre/p3/tb_ff.spice",
+    "scope": "repo"
+  },
+  "status": "error",
+  "corner_count": 9,
+  "passed": 0,
+  "failed": 0,
+  "errored": 9,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {
+      "batch_job_failed": 9
+    },
+    "by_severity": {
+      "error": 9
+    },
+    "corners_with_diagnostics": 9
+  },
+  "metrics": {
+    "sim__corner__count": 9,
+    "sim__corner__passed_count": 0,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 9,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": null,
+    "ngspice_binary": "/usr/local/bin/ngspice",
+    "engine_build": {
+      "version_banner": "******\n** ngspice-42 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2023, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Sun Mar 31 20:15:14 UTC 2024\n******",
+      "binary_sha256": "820658317b0b54035208da41936fd6871ce924036e5ea4113a4168b821b7fc45",
+      "probe": "ok",
+      "reason": null
+    },
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+    "models_lib_sha256_scope": "client",
+    "netlist_sha256": "42e6e993e0f0ab5aad2c0c4d5f75f491940e38389d205c3ee7aba781081f1ceb",
+    "corner_coverage": {
+      "pdk": "gf180mcuC",
+      "sections": [
+        {
+          "process": "ff",
+          "unmoved_devices": [
+            "06v0",
+            "06v0_nvt",
+            "fets_mm",
+            "noise_corner"
+          ]
+        }
+      ]
+    },
+    "netlist_closure": [
+      {
+        "path": "sim/recentre/p3/tb_ff.spice",
+        "scope": "repo",
+        "sha256": "42e6e993e0f0ab5aad2c0c4d5f75f491940e38389d205c3ee7aba781081f1ceb"
+      },
+      {
+        "path": "sim/recentre/p3/rcosc_top_p3.spice",
+        "scope": "repo",
+        "sha256": "9e0f04606250aa491be2b666b6b8d9bdb454b22e37eb6d91ce936e6e2b7b725e"
+      }
+    ],
+    "netlist_identity": "sha256:d0910081d44b31e77583f8a10096abd925514887dda3e78338a00495e5efb0f7",
+    "netlist_source": "extracted",
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-562932977223",
+      "region": "us-east-1",
+      "instance_id": "i-05e285bcd22e365db",
+      "instance_type": "m7i.4xlarge",
+      "availability_zone": "us-east-1a",
+      "ami_id": "ami-04591566329422a44",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "failed",
+      "exit_code": "1",
+      "concurrency": "1",
+      "physical_cores": "8",
+      "elapsed_seconds": 5,
+      "client_submitted_at": "2026-11-05T07:58:15.164610Z",
+      "client_launched_at": "2026-11-05T07:58:33.479864Z",
+      "client_status_terminal_at": "2026-11-05T07:59:04.795364Z",
+      "client_collected_at": null,
+      "runner_klt_version": "0.9.0",
+      "client_klt_version": "0.9.1.dev17+gd76e6fe1cb7a",
+      "runner_compatibility": "match",
+      "runner_request_features": {
+        "required": [
+          "options.ngspice_init"
+        ],
+        "missing": [],
+        "status": "supported"
+      },
+      "worker_environment": {
+        "capture": "ok",
+        "simulator": {
+          "requested_binary": "ngspice",
+          "binary_source": "PATH",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+          "version_probe": "ok"
+        },
+        "pdk": {
+          "variant": "gf180mcuC",
+          "root": "/opt/pdk",
+          "stamp_scheme": null,
+          "stamp_sha256": null,
+          "stamp_text": null,
+          "models_staged": false,
+          "stamp_scope": "executed"
+        },
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+        "omp_num_threads": null,
+        "image_manifest": null,
+        "model_inputs": null,
+        "diagnostics": [
+          "pdk stamp unreadable: FileNotFoundError"
+        ],
+        "pdk_stamp_comparison": {
+          "status": "not_comparable",
+          "reason": "worker_stamp_unavailable"
+        },
+        "engine_build_comparison": {
+          "status": "mismatch",
+          "warning": "the worker's ngspice --version banner differs from the local binary's; build options (e.g. FFT linkage) may differ, so results derived from them can differ from a local run"
+        }
+      },
+      "runner_model_inputs": null,
+      "job_ceiling": {
+        "basis": "conservative_serial_bound",
+        "unit_count": 9,
+        "per_unit_timeout_s": 3600,
+        "overhead_s": 120.0,
+        "job_bound_s": 32520.0,
+        "max_job_seconds": 3600.0,
+        "max_job_seconds_source": "fleet_config",
+        "exceeds_ceiling": true,
+        "check": "warn",
+        "max_units_per_job": 0,
+        "recommended_hosts": null,
+        "warning": "batch job bound 32520s (options.timeout_s 3600s x 9 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. No remote.hosts value fits: a single unit's bound exceeds the ceiling -- lower options.timeout_s to at most 3480s"
+      }
+    },
+    "engine_host": "worker",
+    "client_ngspice_binary": "/usr/bin/ngspice",
+    "backend": {
+      "resolved": "batch",
+      "source": "env",
+      "requested": "batch"
+    }
+  },
+  "coverage": {
+    "corners_simulated": 9,
+    "measurements_declared": 6,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [],
+    "skipped": [
+      {
+        "id": "measurement:[0,\"ff/VDD=3.000_VHI=3.000V/-40C\",\"ta_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[0,\"ff/VDD=3.000_VHI=3.000V/-40C\",\"ta_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[0,\"ff/VDD=3.000_VHI=3.000V/-40C\",\"ta_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[0,\"ff/VDD=3.000_VHI=3.000V/-40C\",\"tb_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[0,\"ff/VDD=3.000_VHI=3.000V/-40C\",\"tb_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[0,\"ff/VDD=3.000_VHI=3.000V/-40C\",\"tb_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"ff/VDD=3.000_VHI=3.000V/27C\",\"ta_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"ff/VDD=3.000_VHI=3.000V/27C\",\"ta_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"ff/VDD=3.000_VHI=3.000V/27C\",\"ta_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"ff/VDD=3.000_VHI=3.000V/27C\",\"tb_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"ff/VDD=3.000_VHI=3.000V/27C\",\"tb_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[1,\"ff/VDD=3.000_VHI=3.000V/27C\",\"tb_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"ff/VDD=3.000_VHI=3.000V/85C\",\"ta_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"ff/VDD=3.000_VHI=3.000V/85C\",\"ta_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"ff/VDD=3.000_VHI=3.000V/85C\",\"ta_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"ff/VDD=3.000_VHI=3.000V/85C\",\"tb_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"ff/VDD=3.000_VHI=3.000V/85C\",\"tb_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[2,\"ff/VDD=3.000_VHI=3.000V/85C\",\"tb_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[3,\"ff/VDD=3.300_VHI=3.300V/-40C\",\"ta_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[3,\"ff/VDD=3.300_VHI=3.300V/-40C\",\"ta_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[3,\"ff/VDD=3.300_VHI=3.300V/-40C\",\"ta_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[3,\"ff/VDD=3.300_VHI=3.300V/-40C\",\"tb_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[3,\"ff/VDD=3.300_VHI=3.300V/-40C\",\"tb_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[3,\"ff/VDD=3.300_VHI=3.300V/-40C\",\"tb_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[4,\"ff/VDD=3.300_VHI=3.300V/27C\",\"ta_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[4,\"ff/VDD=3.300_VHI=3.300V/27C\",\"ta_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[4,\"ff/VDD=3.300_VHI=3.300V/27C\",\"ta_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[4,\"ff/VDD=3.300_VHI=3.300V/27C\",\"tb_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[4,\"ff/VDD=3.300_VHI=3.300V/27C\",\"tb_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[4,\"ff/VDD=3.300_VHI=3.300V/27C\",\"tb_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[5,\"ff/VDD=3.300_VHI=3.300V/85C\",\"ta_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[5,\"ff/VDD=3.300_VHI=3.300V/85C\",\"ta_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[5,\"ff/VDD=3.300_VHI=3.300V/85C\",\"ta_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[5,\"ff/VDD=3.300_VHI=3.300V/85C\",\"tb_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[5,\"ff/VDD=3.300_VHI=3.300V/85C\",\"tb_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[5,\"ff/VDD=3.300_VHI=3.300V/85C\",\"tb_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[6,\"ff/VDD=3.600_VHI=3.600V/-40C\",\"ta_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[6,\"ff/VDD=3.600_VHI=3.600V/-40C\",\"ta_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[6,\"ff/VDD=3.600_VHI=3.600V/-40C\",\"ta_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[6,\"ff/VDD=3.600_VHI=3.600V/-40C\",\"tb_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[6,\"ff/VDD=3.600_VHI=3.600V/-40C\",\"tb_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[6,\"ff/VDD=3.600_VHI=3.600V/-40C\",\"tb_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[7,\"ff/VDD=3.600_VHI=3.600V/27C\",\"ta_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[7,\"ff/VDD=3.600_VHI=3.600V/27C\",\"ta_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[7,\"ff/VDD=3.600_VHI=3.600V/27C\",\"ta_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[7,\"ff/VDD=3.600_VHI=3.600V/27C\",\"tb_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[7,\"ff/VDD=3.600_VHI=3.600V/27C\",\"tb_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[7,\"ff/VDD=3.600_VHI=3.600V/27C\",\"tb_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[8,\"ff/VDD=3.600_VHI=3.600V/85C\",\"ta_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[8,\"ff/VDD=3.600_VHI=3.600V/85C\",\"ta_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[8,\"ff/VDD=3.600_VHI=3.600V/85C\",\"ta_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[8,\"ff/VDD=3.600_VHI=3.600V/85C\",\"tb_cal\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[8,\"ff/VDD=3.600_VHI=3.600V/85C\",\"tb_hi\"]/observation",
+        "reason": "unavailable_measurement"
+      },
+      {
+        "id": "measurement:[8,\"ff/VDD=3.600_VHI=3.600V/85C\",\"tb_lo\"]/observation",
+        "reason": "unavailable_measurement"
+      }
+    ],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"ff/VDD=3.000_VHI=3.000V/-40C\",\"ta_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ff/VDD=3.000_VHI=3.000V/-40C\",\"ta_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ff/VDD=3.000_VHI=3.000V/-40C\",\"ta_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ff/VDD=3.000_VHI=3.000V/-40C\",\"tb_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ff/VDD=3.000_VHI=3.000V/-40C\",\"tb_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ff/VDD=3.000_VHI=3.000V/-40C\",\"tb_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"ff/VDD=3.000_VHI=3.000V/27C\",\"ta_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"ff/VDD=3.000_VHI=3.000V/27C\",\"ta_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"ff/VDD=3.000_VHI=3.000V/27C\",\"ta_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"ff/VDD=3.000_VHI=3.000V/27C\",\"tb_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"ff/VDD=3.000_VHI=3.000V/27C\",\"tb_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"ff/VDD=3.000_VHI=3.000V/27C\",\"tb_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"ff/VDD=3.000_VHI=3.000V/85C\",\"ta_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"ff/VDD=3.000_VHI=3.000V/85C\",\"ta_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"ff/VDD=3.000_VHI=3.000V/85C\",\"ta_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"ff/VDD=3.000_VHI=3.000V/85C\",\"tb_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"ff/VDD=3.000_VHI=3.000V/85C\",\"tb_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"ff/VDD=3.000_VHI=3.000V/85C\",\"tb_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"ff/VDD=3.300_VHI=3.300V/-40C\",\"ta_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"ff/VDD=3.300_VHI=3.300V/-40C\",\"ta_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"ff/VDD=3.300_VHI=3.300V/-40C\",\"ta_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"ff/VDD=3.300_VHI=3.300V/-40C\",\"tb_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"ff/VDD=3.300_VHI=3.300V/-40C\",\"tb_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"ff/VDD=3.300_VHI=3.300V/-40C\",\"tb_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"ff/VDD=3.300_VHI=3.300V/27C\",\"ta_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"ff/VDD=3.300_VHI=3.300V/27C\",\"ta_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"ff/VDD=3.300_VHI=3.300V/27C\",\"ta_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"ff/VDD=3.300_VHI=3.300V/27C\",\"tb_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"ff/VDD=3.300_VHI=3.300V/27C\",\"tb_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"ff/VDD=3.300_VHI=3.300V/27C\",\"tb_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"ff/VDD=3.300_VHI=3.300V/85C\",\"ta_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"ff/VDD=3.300_VHI=3.300V/85C\",\"ta_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"ff/VDD=3.300_VHI=3.300V/85C\",\"ta_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"ff/VDD=3.300_VHI=3.300V/85C\",\"tb_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"ff/VDD=3.300_VHI=3.300V/85C\",\"tb_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"ff/VDD=3.300_VHI=3.300V/85C\",\"tb_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[6,\"ff/VDD=3.600_VHI=3.600V/-40C\",\"ta_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[6,\"ff/VDD=3.600_VHI=3.600V/-40C\",\"ta_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[6,\"ff/VDD=3.600_VHI=3.600V/-40C\",\"ta_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[6,\"ff/VDD=3.600_VHI=3.600V/-40C\",\"tb_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[6,\"ff/VDD=3.600_VHI=3.600V/-40C\",\"tb_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[6,\"ff/VDD=3.600_VHI=3.600V/-40C\",\"tb_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[7,\"ff/VDD=3.600_VHI=3.600V/27C\",\"ta_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[7,\"ff/VDD=3.600_VHI=3.600V/27C\",\"ta_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[7,\"ff/VDD=3.600_VHI=3.600V/27C\",\"ta_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[7,\"ff/VDD=3.600_VHI=3.600V/27C\",\"tb_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[7,\"ff/VDD=3.600_VHI=3.600V/27C\",\"tb_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[7,\"ff/VDD=3.600_VHI=3.600V/27C\",\"tb_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[8,\"ff/VDD=3.600_VHI=3.600V/85C\",\"ta_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[8,\"ff/VDD=3.600_VHI=3.600V/85C\",\"ta_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[8,\"ff/VDD=3.600_VHI=3.600V/85C\",\"ta_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[8,\"ff/VDD=3.600_VHI=3.600V/85C\",\"tb_cal\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[8,\"ff/VDD=3.600_VHI=3.600V/85C\",\"tb_hi\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[8,\"ff/VDD=3.600_VHI=3.600V/85C\",\"tb_lo\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": true,
+    "nothing_checked_reasons": [
+      "characterization_without_limits",
+      "unavailable_measurement"
+    ]
+  },
+  "provenance": {
+    "klt_version": "0.9.1.dev17+gd76e6fe1cb7a",
+    "klt_git_commit": "d76e6fe1cb7afe591b87a7906dd417125cb7a147",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@d76e6fe1cb7afe591b87a7906dd417125cb7a147",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "gf180mcuC",
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
+    },
+    "deck": {
+      "name": "sm141064.ngspice",
+      "content_hash": "sha256:f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:42e6e993e0f0ab5aad2c0c4d5f75f491940e38389d205c3ee7aba781081f1ceb",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "ta_lo",
+      "unit": "s",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "ff/VDD=3.000_VHI=3.000V/-40C",
+        "value": null,
+        "margin": null
+      }
+    },
+    {
+      "name": "tb_lo",
+      "unit": "s",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "ff/VDD=3.000_VHI=3.000V/-40C",
+        "value": null,
+        "margin": null
+      }
+    },
+    {
+      "name": "ta_hi",
+      "unit": "s",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "ff/VDD=3.000_VHI=3.000V/-40C",
+        "value": null,
+        "margin": null
+      }
+    },
+    {
+      "name": "tb_hi",
+      "unit": "s",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "ff/VDD=3.000_VHI=3.000V/-40C",
+        "value": null,
+        "margin": null
+      }
+    },
+    {
+      "name": "ta_cal",
+      "unit": "s",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "ff/VDD=3.000_VHI=3.000V/-40C",
+        "value": null,
+        "margin": null
+      }
+    },
+    {
+      "name": "tb_cal",
+      "unit": "s",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "ff/VDD=3.000_VHI=3.000V/-40C",
+        "value": null,
+        "margin": null
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "ff/VDD=3.000_VHI=3.000V/-40C",
+      "process": "ff",
+      "supply_v": {
+        "VDD": 3.0,
+        "VHI": 3.0
+      },
+      "temperature_c": -40.0,
+      "status": "error",
+      "runtime_s": 0.0,
+      "engine_exit_code": null,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "ta_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-562932977223 finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`). [engine log unavailable: no ngspice.log/xyce.log in the collected outputs (engine logs are retrieved only when artifacts are kept)]"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/VDD=3.000_VHI=3.000V/27C",
+      "process": "ff",
+      "supply_v": {
+        "VDD": 3.0,
+        "VHI": 3.0
+      },
+      "temperature_c": 27.0,
+      "status": "error",
+      "runtime_s": 0.0,
+      "engine_exit_code": null,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "ta_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-562932977223 finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`). [engine log unavailable: no ngspice.log/xyce.log in the collected outputs (engine logs are retrieved only when artifacts are kept)]"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/VDD=3.000_VHI=3.000V/85C",
+      "process": "ff",
+      "supply_v": {
+        "VDD": 3.0,
+        "VHI": 3.0
+      },
+      "temperature_c": 85.0,
+      "status": "error",
+      "runtime_s": 0.0,
+      "engine_exit_code": null,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "ta_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-562932977223 finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`). [engine log unavailable: no ngspice.log/xyce.log in the collected outputs (engine logs are retrieved only when artifacts are kept)]"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/VDD=3.300_VHI=3.300V/-40C",
+      "process": "ff",
+      "supply_v": {
+        "VDD": 3.3,
+        "VHI": 3.3
+      },
+      "temperature_c": -40.0,
+      "status": "error",
+      "runtime_s": 0.0,
+      "engine_exit_code": null,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "ta_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-562932977223 finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`). [engine log unavailable: no ngspice.log/xyce.log in the collected outputs (engine logs are retrieved only when artifacts are kept)]"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/VDD=3.300_VHI=3.300V/27C",
+      "process": "ff",
+      "supply_v": {
+        "VDD": 3.3,
+        "VHI": 3.3
+      },
+      "temperature_c": 27.0,
+      "status": "error",
+      "runtime_s": 0.0,
+      "engine_exit_code": null,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "ta_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-562932977223 finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`). [engine log unavailable: no ngspice.log/xyce.log in the collected outputs (engine logs are retrieved only when artifacts are kept)]"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/VDD=3.300_VHI=3.300V/85C",
+      "process": "ff",
+      "supply_v": {
+        "VDD": 3.3,
+        "VHI": 3.3
+      },
+      "temperature_c": 85.0,
+      "status": "error",
+      "runtime_s": 0.0,
+      "engine_exit_code": null,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "ta_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-562932977223 finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`). [engine log unavailable: no ngspice.log/xyce.log in the collected outputs (engine logs are retrieved only when artifacts are kept)]"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/VDD=3.600_VHI=3.600V/-40C",
+      "process": "ff",
+      "supply_v": {
+        "VDD": 3.6,
+        "VHI": 3.6
+      },
+      "temperature_c": -40.0,
+      "status": "error",
+      "runtime_s": 0.0,
+      "engine_exit_code": null,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "ta_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-562932977223 finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`). [engine log unavailable: no ngspice.log/xyce.log in the collected outputs (engine logs are retrieved only when artifacts are kept)]"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/VDD=3.600_VHI=3.600V/27C",
+      "process": "ff",
+      "supply_v": {
+        "VDD": 3.6,
+        "VHI": 3.6
+      },
+      "temperature_c": 27.0,
+      "status": "error",
+      "runtime_s": 0.0,
+      "engine_exit_code": null,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "ta_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-562932977223 finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`). [engine log unavailable: no ngspice.log/xyce.log in the collected outputs (engine logs are retrieved only when artifacts are kept)]"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/VDD=3.600_VHI=3.600V/85C",
+      "process": "ff",
+      "supply_v": {
+        "VDD": 3.6,
+        "VHI": 3.6
+      },
+      "temperature_c": 85.0,
+      "status": "error",
+      "runtime_s": 0.0,
+      "engine_exit_code": null,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "ta_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_lo",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_hi",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "ta_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        },
+        {
+          "name": "tb_cal",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "batch_job_failed",
+          "message": "batch job klt-sim-562932977223 finished 'failed' (job command exited 1): the job's klt reported: no supported-layout PDK install providing variant 'gf180mcuC' was found. Searched, in order: PDK_ROOT environment variable (/opt/pdk), search root: ~/.ciel (/root/.ciel), search root: ~/.volare (/root/.volare), search root: ~/pdks (/root/pdks), search root: /usr/local/share/pdk (/usr/local/share/pdk), search root: /usr/share/pdk (/usr/share/pdk), search root: ~/share/pdk (/root/share/pdk). Point $PDK_ROOT (or --pdk-root) at an install, or install one, e.g. `ciel enable --pdk-family sky130 <version>` (or build open_pdks with `make install`). [engine log unavailable: no ngspice.log/xyce.log in the collected outputs (engine logs are retrieved only when artifacts are kept)]"
+        }
+      ],
+      "artifacts": {
+        "log": null,
+        "raw": null,
+        "waveform": null,
+        "deck": null
+      },
+      "monte_carlo": null
+    }
+  ]
+}
