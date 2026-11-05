@@ -2,6 +2,12 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-05
+
+- **PR #221**: docs: record failed nine-corner batch re-run on v10 runner
+- **PR #219**: sim: record second batch attempt of the P3 27-point grid
+- **PR #220**: docs(sim): record startup batch attempt on runner v10 (worker lacks gf180mcuC PDK)
+
 ### 2026-11-04
 
 - **PR #217**: refactor: share git HEAD/dirty capture across sim drivers
