@@ -39,6 +39,15 @@ before simulating anything (`batch-attempts/`):
   without a usable report".
 - `klt 0.5.0` has no `batch` backend (`supported: local, local-parallel, remote`).
 
+- Runner image `eda-batch-runner` v10 (`ami-04591566329422a44`, runner klt
+  0.9.0, `runner_compatibility: match`; client klt `0.9.1.dev18+gc663b4c`,
+  2026-11-05): jobs `klt-sim-1410c9044c01` (v30), `klt-sim-2b23c329351d`
+  (v33), `klt-sim-34c8f65a8ba2` (v36) all failed in ~5 s, every unit
+  `batch_job_failed` (job command exit 1): "no supported-layout PDK install
+  providing variant 'gf180mcuC' was found" (searched `PDK_ROOT=/opt/pdk`,
+  `~/.ciel`, `~/.volare`, ...). The version mismatch is fixed; the worker image
+  carries no gf180mcuC PDK. Reports: `batch-attempts/klt0.9.1dev_runner0.9.0_*`.
+
 Per host policy the grid was not run locally as a fallback. What exists is two
 single-corner local probes (`results/20261008T235538Z/`):
 `ss`/-40 C/3.0 V (the expected slowest corner) and `tt`/27 C/3.3 V, both
