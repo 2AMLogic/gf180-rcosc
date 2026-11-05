@@ -8,10 +8,12 @@ runtime-discipline claim (DR-0004, DR-0021) assumes a code rewrite does not
 corrupt the clock. This bench tests that assumption. Schematic level only, no
 design change.
 
-**Status (2026-10-09): generator, analyzer, offline tests and one single-corner
-local probe are committed. The nine-corner campaign has NOT produced results:
-the batch submit failed (runner/client version mismatch, below), so the
-"committed results for all nine corners" acceptance item is PENDING.** Nothing
+**Status (2026-11-05): generator, analyzer, offline tests and one single-corner
+local probe are committed. The nine-corner campaign has STILL NOT produced
+results: the 2026-11-05 re-run on the v10 runner (klt 0.9.0, version match)
+failed all nine requests because the runner image has no `gf180mcuC` PDK install
+(below), so the "committed results for all nine corners" acceptance item is
+PENDING.** Nothing
 here changes a ratified spec row; no decision record is added (see "Verdict").
 
 ```
@@ -115,6 +117,14 @@ per corner x step x direction x skew, aggregated over the four phases
   (runner klt 0.5.0, client 0.7.0), the same refusal as `sim/startup/batch-attempts/`.
   Not worked around by a local multi-corner run. A runner image update (or a
   compatible client) is needed before the campaign can run.
+- `batch-attempts/*_klt0.9.0_runner/` (the 2026-11-05 attempt directory): re-run of
+  `run-transition.sh --backend batch` on the eda-batch-runner v10 image (runner klt
+  0.9.0, `runner_compatibility=match`). All nine requests (27 units) ended
+  `batch_job_failed`, exit 1: "no supported-layout PDK install providing variant
+  'gf180mcuC' was found" (`/opt/pdk` and the other search roots empty on the
+  runner). Job ids are in each `report_*.json` (e.g. `klt-sim-e9c43a8073a7`). No
+  local fallback was run. Tracked at 2AMLogic/klayout-tools#4947. Re-run once the
+  runner image ships the PDK.
 - `results/20261009T152100Z/`: the single-corner debug probe
   (tt, 3.3 V, 27 C, `lsb_first`, `klt sim --backend local`, ~90 s). Preliminary and
   one corner of 27; the rows, not these notes, are the record.
