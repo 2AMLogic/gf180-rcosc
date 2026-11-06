@@ -250,11 +250,36 @@ def analyse_report(tag, report_path: Path, bench_dir: Path, p: Params = Params()
         if artifacts_root:
             wfp = Path(artifacts_root) / wfp.parent.name / wfp.name
         try:
-            t, clk, vdd = wfa.load_waveform(wfp)
+            t, clk, vdd = load_waveform_dedup(wfp)
             rows += [cb | x for x in analyse_corner(t, clk, vdd, sched, p)]
         except AnalysisError as e:
             rows.append(cb | {"verdict": "FAIL", "status": f"FAIL: {e}"})
     return rows, meta
+
+
+def load_waveform_dedup(path: Path):
+    """Like waveform.load_waveform, but drops exact-duplicate timestamps.
+
+    ngspice can emit a repeated time point (zero-length retry step, values equal to
+    ~1e-15) when it recovers from a near-"timestep too small" at a PWL breakpoint;
+    only exact repeats of the previous time are dropped (the first sample is kept).
+    Out-of-order time still fails in parse_waveform.
+    """
+    try:
+        w = json.loads(Path(path).read_text())
+    except OSError as e:
+        raise AnalysisError(f"waveform unreadable: {e}") from e
+    except ValueError as e:
+        raise AnalysisError(f"waveform is not valid JSON: {e}") from e
+    pts = w.get("points") if isinstance(w, dict) else None
+    if isinstance(pts, list):
+        keep = []
+        for p in pts:
+            if keep and isinstance(p, list) and p and isinstance(keep[-1], list) and keep[-1] and p[0] == keep[-1][0]:
+                continue
+            keep.append(p)
+        w = dict(w, points=keep)
+    return wfa.parse_waveform(w)
 
 
 # ---------------------------------------------------------------- reports --
