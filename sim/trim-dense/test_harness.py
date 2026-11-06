@@ -403,7 +403,20 @@ def test_cli_prepare_end_to_end(tmp_path):
 
 
 def test_no_measured_artifacts_in_tree():
-    assert not (HERE / "results").exists()
+    # A results/ tree may hold a Step 0 fleet-gate record (issue #87 acceptance 1: one
+    # single-corner batch request, no trim-step verdict). It must never hold campaign
+    # evidence: a filled manifest, analyzer outputs, or per-code reports.
+    res = HERE / "results"
+    if not res.exists():
+        return
+    campaign = {"manifest.json", "results.json", "steps.csv"}
+    bad = [str(p.relative_to(HERE)) for p in res.rglob("*") if p.is_file() and p.name in campaign]
+    assert not bad, f"campaign artifacts present: {bad}"
+    for run in (d for d in res.iterdir() if d.is_dir()):
+        readme = (run / "README.md").read_text()
+        assert "Step 0 fleet gate only" in readme and "NOT run" in readme, run
+        extra = [d.name for d in run.iterdir() if d.is_dir() and d.name != "step0"]
+        assert not extra, f"non-gate directories in {run.name}: {extra}"
 
 
 def test_permuted_pin_order_is_followed(tmp_path):

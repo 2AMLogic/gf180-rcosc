@@ -1,8 +1,9 @@
 # sim/trim-dense - dense trim-step request generator and analyzer (offline)
 
-Issue #98, the offline-preparation subset of #87. **No simulation was run and
-no measured result exists here.** This directory holds only tooling and tests;
-there is no `results/` directory and nothing in it is evidence. Every curve in
+Issue #98, the offline-preparation subset of #87. **The dense campaign was not
+run and no trim-step result exists here.** This directory holds tooling and tests;
+the only `results/` content permitted is a Step 0 single-corner fleet-gate record
+(see `test_no_measured_artifacts_in_tree`), which is not campaign evidence. Every curve in
 `test_harness.py` is a labeled synthetic fixture. The campaign, its evidence
 and its decision record stay in #87; no ratified row, existing result, design
 file or DR-0021 is changed by this directory.
