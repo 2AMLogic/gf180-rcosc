@@ -4,6 +4,8 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-06
 
+- **PR #253**: sim(trim-dense): run campaign slice 6 on batch fleet (jobs 118-163 of 1536)
+- **PR #252**: sim(trim-dense): run campaign slice 5 on batch fleet (jobs 77-116 of 1536)
 - **PR #250**: sim(trim-dense): run campaign slice 4 on batch fleet (jobs 62-76 of 1536)
 - **PR #249**: docs: guard write-confinement investigation report and repro harness
 - **PR #248**: sim(trim-dense): run campaign slice 3 on batch fleet (jobs 42-61 of 1536)
