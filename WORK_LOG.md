@@ -4,6 +4,7 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-06
 
+- **PR #245**: sim(trim-dense): campaign slice 2, 40 more batch jobs (42/1536)
 - **PR #242**: sim(trim-dense): freeze campaign manifest, validate batch driver on live fleet slice
 - **PR #241**: sim(trim-dense): resumable batch driver for the dense trim campaign
 - **PR #240**: docs(item5): cite the 0xA4 -> 0xA5 step in ROWS row 2
