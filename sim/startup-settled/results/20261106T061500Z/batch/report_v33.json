@@ -1,0 +1,1223 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/startup-settled/tb_v33.spice",
+    "scope": "repo"
+  },
+  "status": "error",
+  "corner_count": 21,
+  "passed": 20,
+  "failed": 0,
+  "errored": 1,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {
+      "measurement": 1
+    },
+    "by_severity": {
+      "error": 1
+    },
+    "corners_with_diagnostics": 1
+  },
+  "metrics": {
+    "sim__corner__count": 21,
+    "sim__corner__passed_count": 20,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 1,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "46",
+    "ngspice_binary": "/usr/local/bin/ngspice",
+    "engine_build": {
+      "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******",
+      "binary_sha256": "dc859418bedd0478ff439a2d3e2e09f4386a7f4d5e3f17671953e101a000cc60",
+      "probe": "ok",
+      "reason": null
+    },
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+    "models_lib_sha256_scope": "client",
+    "netlist_sha256": "1bcba41707660d4b74eca5f4ff77356ffe65b813108b9086b24b1cda57ed2e5c",
+    "corner_coverage": {
+      "pdk": "gf180mcuC",
+      "sections": [
+        {
+          "process": "ff",
+          "unmoved_devices": [
+            "06v0",
+            "06v0_nvt",
+            "fets_mm",
+            "noise_corner"
+          ]
+        },
+        {
+          "process": "ss",
+          "unmoved_devices": [
+            "06v0",
+            "06v0_nvt",
+            "fets_mm",
+            "noise_corner"
+          ]
+        },
+        {
+          "process": "fs",
+          "unmoved_devices": [
+            "06v0",
+            "06v0_nvt",
+            "fets_mm",
+            "noise_corner"
+          ]
+        },
+        {
+          "process": "sf",
+          "unmoved_devices": [
+            "06v0",
+            "06v0_nvt",
+            "fets_mm",
+            "noise_corner"
+          ]
+        }
+      ]
+    },
+    "netlist_closure": [
+      {
+        "path": "sim/startup-settled/tb_v33.spice",
+        "scope": "repo",
+        "sha256": "1bcba41707660d4b74eca5f4ff77356ffe65b813108b9086b24b1cda57ed2e5c"
+      },
+      {
+        "path": "sim/startup-settled/rcosc_top_p3.spice",
+        "scope": "repo",
+        "sha256": "9e0f04606250aa491be2b666b6b8d9bdb454b22e37eb6d91ce936e6e2b7b725e"
+      }
+    ],
+    "netlist_identity": "sha256:6da1905578c583728d8b0ba17d9c2647dfd3dd22d36753a9294b48db0eee66d3",
+    "netlist_source": "extracted",
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-077f87f7e2da",
+      "region": "us-east-1",
+      "instance_id": "i-0a15d7040785921b0",
+      "instance_type": "m7i.4xlarge",
+      "availability_zone": "us-east-1d",
+      "ami_id": "ami-095c25ae241a4d360",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "failed",
+      "exit_code": "4",
+      "concurrency": "1",
+      "physical_cores": "8",
+      "elapsed_seconds": 145,
+      "client_submitted_at": "2026-11-06T05:55:45.887916Z",
+      "client_launched_at": "2026-11-06T05:56:26.016305Z",
+      "client_status_terminal_at": "2026-11-06T05:59:31.199421Z",
+      "client_collected_at": "2026-11-06T05:59:32.947048Z",
+      "runner_klt_version": "0.9.0",
+      "client_klt_version": "0.9.2.dev47+g581de87616d8",
+      "runner_compatibility": "match",
+      "runner_request_features": {
+        "required": [
+          "options.ngspice_init"
+        ],
+        "missing": [],
+        "status": "supported"
+      },
+      "worker_environment": {
+        "capture": "ok",
+        "simulator": {
+          "requested_binary": "ngspice",
+          "binary_source": "PATH",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+          "version_probe": "ok"
+        },
+        "pdk": {
+          "variant": "gf180mcuC",
+          "root": "/opt/pdk",
+          "stamp_scheme": "sources-sha256",
+          "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+          "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+          "models_staged": false,
+          "stamp_scope": "executed"
+        },
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+        "omp_num_threads": null,
+        "image_manifest": null,
+        "model_inputs": null,
+        "diagnostics": [],
+        "pdk_stamp_comparison": {
+          "status": "not_comparable",
+          "reason": "client_stamp_unavailable"
+        },
+        "engine_build_comparison": {
+          "status": "match"
+        }
+      },
+      "runner_model_inputs": null,
+      "exit_reason": {
+        "exit_code": 4,
+        "report_status": "error",
+        "nothing_checked": false,
+        "nothing_checked_reasons": [],
+        "message": "klt sim exited 4 (errored / not_checked / inconclusive): aggregate status 'error'; the job state is failed because of this verdict exit code, not a runner crash and not the whole-job ceiling (a ceiling kill reports state timeout, exit 124)",
+        "units": {
+          "total": 21,
+          "by_status": {
+            "pass": 20,
+            "error": 1
+          },
+          "first_not_passed": [
+            {
+              "corner_id": "fs/novdd/-40C",
+              "status": "error",
+              "code": "measurement",
+              "message": "measurement 't_edge_50' produced no value -- options.save_mode is \"netlist\", so klt emitted no `save all` and only the vectors the netlist's own .save cards retain were available: add every signal this measurement reads to the netlist's .save card, or omit options.save_mode (default \"all\") -- ngspic"
+            }
+          ]
+        }
+      },
+      "job_ceiling": {
+        "basis": "conservative_serial_bound",
+        "unit_count": 21,
+        "per_unit_timeout_s": 1800,
+        "overhead_s": 120.0,
+        "job_bound_s": 37920.0,
+        "max_job_seconds": 3600.0,
+        "max_job_seconds_source": "fleet_config",
+        "exceeds_ceiling": true,
+        "check": "warn",
+        "max_units_per_job": 1,
+        "recommended_hosts": 21,
+        "warning": "batch job bound 37920s (options.timeout_s 1800s x 21 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. Set request.remote.hosts to at least 21 to run one job per shard of at most 1 units, each within the ceiling"
+      }
+    },
+    "engine_host": "worker",
+    "client_ngspice_binary": "/home/ubuntu/.local/bin/ngspice",
+    "backend": {
+      "resolved": "batch",
+      "source": "env",
+      "requested": "batch"
+    },
+    "timeout_preflight_warning": "options.timeout_s (1800s) looks implausible for a tran analysis with ~1e+05 timepoints (200p step, 20000n window) -- even 50 timepoints/s (a generous floor, not a real engine-rate estimate) would need 2e+03s per corner. This is only a coarse, advisory pre-grid heuristic -- it does not block the sweep, and a plausible-looking budget can still turn out to be too short in practice."
+  },
+  "coverage": {
+    "corners_simulated": 21,
+    "measurements_declared": 2,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "measurement:[0,\"tt/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[0,\"tt/novdd/-40C\",\"t_first_edge\"]/observation",
+      "measurement:[1,\"tt/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[1,\"tt/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[10,\"fs/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[10,\"fs/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[11,\"fs/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[11,\"fs/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[12,\"sf/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[12,\"sf/novdd/-40C\",\"t_first_edge\"]/observation",
+      "measurement:[13,\"sf/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[13,\"sf/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[14,\"sf/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[14,\"sf/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[15,\"rc_f/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[15,\"rc_f/novdd/-40C\",\"t_first_edge\"]/observation",
+      "measurement:[16,\"rc_f/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[16,\"rc_f/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[17,\"rc_f/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[17,\"rc_f/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[18,\"rc_s/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[18,\"rc_s/novdd/-40C\",\"t_first_edge\"]/observation",
+      "measurement:[19,\"rc_s/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[19,\"rc_s/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[2,\"tt/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[2,\"tt/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[20,\"rc_s/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[20,\"rc_s/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[3,\"ff/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[3,\"ff/novdd/-40C\",\"t_first_edge\"]/observation",
+      "measurement:[4,\"ff/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[4,\"ff/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[5,\"ff/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[5,\"ff/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[6,\"ss/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[6,\"ss/novdd/-40C\",\"t_first_edge\"]/observation",
+      "measurement:[7,\"ss/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[7,\"ss/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[8,\"ss/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[8,\"ss/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[9,\"fs/novdd/-40C\",\"t_first_edge\"]/observation"
+    ],
+    "skipped": [
+      {
+        "id": "measurement:[9,\"fs/novdd/-40C\",\"t_edge_50\"]/observation",
+        "reason": "unavailable_measurement"
+      }
+    ],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"tt/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[10,\"fs/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[10,\"fs/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[11,\"fs/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[11,\"fs/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[12,\"sf/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[12,\"sf/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[13,\"sf/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[13,\"sf/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[14,\"sf/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[14,\"sf/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[15,\"rc_f/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[15,\"rc_f/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[16,\"rc_f/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[16,\"rc_f/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[17,\"rc_f/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[17,\"rc_f/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[18,\"rc_s/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[18,\"rc_s/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[19,\"rc_s/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[19,\"rc_s/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[20,\"rc_s/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[20,\"rc_s/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"ff/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"ff/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"ff/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"ff/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"ff/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"ff/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[6,\"ss/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[6,\"ss/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[7,\"ss/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[7,\"ss/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[8,\"ss/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[8,\"ss/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[9,\"fs/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[9,\"fs/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
+  },
+  "provenance": {
+    "klt_version": "0.9.2.dev47+g581de87616d8",
+    "klt_git_commit": "581de87616d81655e11bb44c5ddeefa8520d348f",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@581de87616d81655e11bb44c5ddeefa8520d348f",
+    "klayout_version": "0.30.13",
+    "pdk": {
+      "name": "gf180mcuC",
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
+    },
+    "deck": {
+      "name": "sm141064.ngspice",
+      "content_hash": "sha256:f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:1bcba41707660d4b74eca5f4ff77356ffe65b813108b9086b24b1cda57ed2e5c",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "t_first_edge",
+      "unit": "s",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/novdd/-40C",
+        "value": 5.53978729e-07,
+        "margin": null
+      }
+    },
+    {
+      "name": "t_edge_50",
+      "unit": "s",
+      "limits": null,
+      "status": "error",
+      "worst_case": {
+        "corner_id": "tt/novdd/-40C",
+        "value": 1.63552441e-06,
+        "margin": null
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "tt/novdd/-40C",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 46.163,
+      "peak_rss_bytes": 49999872,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.53978729e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.63552441e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/tt_novdd_n40C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/tt_novdd_n40C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/tt_novdd_n40C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/tt_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/novdd/27C",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 45.605,
+      "peak_rss_bytes": 49999872,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.69393383e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.60206461e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/tt_novdd_27C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/tt_novdd_27C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/tt_novdd_27C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/tt_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/novdd/85C",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 43.687,
+      "peak_rss_bytes": 49999872,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.65030288e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.5442488e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/tt_novdd_85C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/tt_novdd_85C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/tt_novdd_85C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/tt_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/novdd/-40C",
+      "process": "ff",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 49.178,
+      "peak_rss_bytes": 49999872,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.69990116e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.49886729e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/ff_novdd_n40C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/ff_novdd_n40C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/ff_novdd_n40C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/ff_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/novdd/27C",
+      "process": "ff",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 48.648,
+      "peak_rss_bytes": 49999872,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.63609182e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.36891455e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/ff_novdd_27C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/ff_novdd_27C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/ff_novdd_27C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/ff_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/novdd/85C",
+      "process": "ff",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 48.374,
+      "peak_rss_bytes": 49999872,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.68498416e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.28006758e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/ff_novdd_85C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/ff_novdd_85C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/ff_novdd_85C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/ff_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ss/novdd/-40C",
+      "process": "ss",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 45.986,
+      "peak_rss_bytes": 49999872,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.72974433e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.89807706e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/ss_novdd_n40C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/ss_novdd_n40C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/ss_novdd_n40C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/ss_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ss/novdd/27C",
+      "process": "ss",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 42.725,
+      "peak_rss_bytes": 49999872,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.57745321e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.84632107e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/ss_novdd_27C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/ss_novdd_27C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/ss_novdd_27C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/ss_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ss/novdd/85C",
+      "process": "ss",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 41.167,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.62407227e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.81051695e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/ss_novdd_85C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/ss_novdd_85C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/ss_novdd_85C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/ss_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "fs/novdd/-40C",
+      "process": "fs",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "error",
+      "runtime_s": 27.63,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 6.02694942e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": null,
+          "unit": "s",
+          "status": "error",
+          "margin": null
+        }
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "measurement",
+          "message": "measurement 't_edge_50' produced no value -- options.save_mode is \"netlist\", so klt emitted no `save all` and only the vectors the netlist's own .save cards retain were available: add every signal this measurement reads to the netlist's .save card, or omit options.save_mode (default \"all\") -- ngspice reported: out of interval"
+        }
+      ],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/fs_novdd_n40C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/fs_novdd_n40C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/fs_novdd_n40C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/fs_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "fs/novdd/27C",
+      "process": "fs",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 43.459,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 6.10025909e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.81969108e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/fs_novdd_27C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/fs_novdd_27C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/fs_novdd_27C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/fs_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "fs/novdd/85C",
+      "process": "fs",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 44.666,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.99531772e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.5247686e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/fs_novdd_85C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/fs_novdd_85C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/fs_novdd_85C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/fs_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "sf/novdd/-40C",
+      "process": "sf",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 50.027,
+      "peak_rss_bytes": 50130944,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.40005576e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.61713253e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/sf_novdd_n40C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/sf_novdd_n40C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/sf_novdd_n40C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/sf_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "sf/novdd/27C",
+      "process": "sf",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 47.484,
+      "peak_rss_bytes": 50130944,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.44750203e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.59411981e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/sf_novdd_27C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/sf_novdd_27C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/sf_novdd_27C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/sf_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "sf/novdd/85C",
+      "process": "sf",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 43.072,
+      "peak_rss_bytes": 50130944,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.23685768e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.54354665e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/sf_novdd_85C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/sf_novdd_85C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/sf_novdd_85C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/sf_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "rc_f/novdd/-40C",
+      "process": "rc_f",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 51.536,
+      "peak_rss_bytes": 50130944,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.74127414e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.44780233e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/rc_f_novdd_n40C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/rc_f_novdd_n40C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/rc_f_novdd_n40C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/rc_f_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "rc_f/novdd/27C",
+      "process": "rc_f",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 49.309,
+      "peak_rss_bytes": 50130944,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.68337824e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.37468738e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/rc_f_novdd_27C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/rc_f_novdd_27C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/rc_f_novdd_27C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/rc_f_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "rc_f/novdd/85C",
+      "process": "rc_f",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 48.603,
+      "peak_rss_bytes": 50130944,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.67530077e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.2922974e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/rc_f_novdd_85C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/rc_f_novdd_85C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/rc_f_novdd_85C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/rc_f_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "rc_s/novdd/-40C",
+      "process": "rc_s",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 44.818,
+      "peak_rss_bytes": 50130944,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.638669e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.85754315e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/rc_s_novdd_n40C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/rc_s_novdd_n40C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/rc_s_novdd_n40C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/rc_s_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "rc_s/novdd/27C",
+      "process": "rc_s",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 43.443,
+      "peak_rss_bytes": 50130944,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.62391545e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.81143362e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/rc_s_novdd_27C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/rc_s_novdd_27C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/rc_s_novdd_27C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/rc_s_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "rc_s/novdd/85C",
+      "process": "rc_s",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 42.725,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.55598454e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.7653064e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/tmp/p227/su/v33/rc_s_novdd_85C/ngspice.log",
+        "raw": "/tmp/p227/su/v33/rc_s_novdd_85C/waveform.raw",
+        "waveform": "/tmp/p227/su/v33/rc_s_novdd_85C/waveform.raw.json",
+        "deck": "/tmp/p227/su/v33/rc_s_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    }
+  ]
+}

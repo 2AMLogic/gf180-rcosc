@@ -1,0 +1,189 @@
+{
+  "label": "Analysis of simulator output; evidence status is set by the originating campaign record",
+  "synthetic": false,
+  "utc": "2026-11-06T04:55:37.990107+00:00",
+  "params": {
+    "window_s": 2.0000000000000003e-06,
+    "min_cycles": 20,
+    "min_samples_per_cycle": 10.0,
+    "drift_tol": 0.005,
+    "vdd_tol": 0.02
+  },
+  "note": "issue #213 convergence: tmax/tstep 50p, reltol 1e-4, abstol 1e-13, vntol 1e-7",
+  "reports": [
+    {
+      "report": "submit.json",
+      "vdd_v": 3.3,
+      "status": "pass",
+      "corner_count": 1,
+      "remote": {
+        "provider": "aws-batch-fleet",
+        "job_id": "klt-sim-24afedd86c47",
+        "region": "us-east-1",
+        "instance_id": "i-08e63d5c1676469f1",
+        "instance_type": "m7i.4xlarge",
+        "availability_zone": "us-east-1c",
+        "ami_id": "ami-095c25ae241a4d360",
+        "lifecycle": "spot",
+        "spot": true,
+        "state": "done",
+        "exit_code": "0",
+        "concurrency": "1",
+        "physical_cores": "8",
+        "elapsed_seconds": 76,
+        "client_submitted_at": "2026-11-06T04:53:43.050867Z",
+        "client_launched_at": "2026-11-06T04:54:03.076345Z",
+        "client_status_terminal_at": "2026-11-06T04:55:36.211775Z",
+        "client_collected_at": "2026-11-06T04:55:37.222758Z",
+        "runner_klt_version": "0.9.0",
+        "client_klt_version": "0.9.2.dev42+g94b54d114210",
+        "runner_compatibility": "match",
+        "runner_request_features": {
+          "required": [
+            "options.ngspice_init"
+          ],
+          "missing": [],
+          "status": "supported"
+        },
+        "worker_environment": {
+          "capture": "ok",
+          "simulator": {
+            "requested_binary": "ngspice",
+            "binary_source": "PATH",
+            "selected_path": "/usr/local/bin/ngspice",
+            "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+            "version_probe": "ok"
+          },
+          "pdk": {
+            "variant": "gf180mcuC",
+            "root": "/opt/pdk",
+            "stamp_scheme": "sources-sha256",
+            "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+            "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+            "models_staged": false,
+            "stamp_scope": "executed"
+          },
+          "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+          "omp_num_threads": null,
+          "image_manifest": null,
+          "model_inputs": null,
+          "diagnostics": [],
+          "pdk_stamp_comparison": {
+            "status": "not_comparable",
+            "reason": "client_stamp_unavailable"
+          },
+          "engine_build_comparison": {
+            "status": "match"
+          }
+        },
+        "runner_model_inputs": null,
+        "job_ceiling": {
+          "basis": "conservative_serial_bound",
+          "unit_count": 1,
+          "per_unit_timeout_s": 3600,
+          "overhead_s": 120.0,
+          "job_bound_s": 3720.0,
+          "max_job_seconds": 3600.0,
+          "max_job_seconds_source": "fleet_config",
+          "exceeds_ceiling": true,
+          "check": "warn",
+          "max_units_per_job": 0,
+          "recommended_hosts": null,
+          "warning": "batch job bound 3720s (options.timeout_s 3600s x 1 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. No remote.hosts value fits: a single unit's bound exceeds the ceiling -- lower options.timeout_s to at most 3480s"
+        }
+      },
+      "synthetic": false
+    }
+  ],
+  "n_corners": 1,
+  "n_fail": 0,
+  "all_ok": true,
+  "corners": [
+    {
+      "report": "submit.json",
+      "vdd_v": 3.3,
+      "process": "tt",
+      "temp_c": 27.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.65,
+        "vdd_nominal_v": 3.3,
+        "vdd_window_mean_v": 3.3,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 95,
+        "samples_per_cycle": 445.0,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 95,
+          "mean": 2.0703623231411238e-08,
+          "min": 2.0703623230999206e-08,
+          "max": 2.0703623231710714e-08,
+          "peak_to_peak": 7.115076756936123e-19,
+          "std_deterministic": 1.6007607475635646e-19
+        },
+        "frequency_mean_hz": 48300724.41053769,
+        "pulse_high_s": {
+          "count": 95,
+          "mean": 1.936434470430147e-09,
+          "min": 1.9364344702927673e-09,
+          "max": 1.936434470540101e-09,
+          "peak_to_peak": 2.473336205982557e-19,
+          "std_deterministic": 4.296602354074544e-20
+        },
+        "pulse_low_s": {
+          "count": 95,
+          "mean": 1.8767188760981092e-08,
+          "min": 1.8767188760570913e-08,
+          "max": 1.876718876124854e-08,
+          "peak_to_peak": 6.776263578034403e-19,
+          "std_deterministic": 1.5044125287431054e-19
+        },
+        "duty": {
+          "count": 95,
+          "mean": 0.09353118769531203,
+          "min": 0.09353118768905318,
+          "max": 0.0935311877002673,
+          "peak_to_peak": 1.1214126849345973e-11,
+          "std_deterministic": 1.9427177597058137e-12
+        },
+        "rise_time_10_90_s": {
+          "count": 96,
+          "mean": 8.30560951583873e-10,
+          "min": 8.305609515711675e-10,
+          "max": 8.305609515982726e-10,
+          "peak_to_peak": 2.710505431213761e-20,
+          "std_deterministic": 6.185854028816852e-21
+        },
+        "fall_time_90_10_s": {
+          "count": 95,
+          "mean": 3.262322739656307e-10,
+          "min": 3.262322739322487e-10,
+          "max": 3.262322740067876e-10,
+          "peak_to_peak": 7.453889935837843e-20,
+          "std_deterministic": 1.5207656464573322e-20
+        },
+        "cycle_to_cycle_s": {
+          "count": 94,
+          "mean": 4.109010893063415e-21,
+          "min": -4.70950318673391e-19,
+          "max": 5.963111948670274e-19,
+          "peak_to_peak": 1.0672615135404184e-18,
+          "std_deterministic": 2.0749213660815e-19,
+          "max_abs": 5.963111948670274e-19
+        },
+        "tail_drift_fraction": -1.711285005569349e-12,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    }
+  ]
+}

@@ -1,0 +1,279 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/startup-bisect/probes/tb_p3_c3_fs_m40_v33.spice",
+    "scope": "repo"
+  },
+  "status": "pass",
+  "corner_count": 1,
+  "passed": 1,
+  "failed": 0,
+  "errored": 0,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {},
+    "by_severity": {},
+    "corners_with_diagnostics": 0
+  },
+  "metrics": {
+    "sim__corner__count": 1,
+    "sim__corner__passed_count": 1,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 0,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "46",
+    "ngspice_binary": "/home/ubuntu/.local/bin/ngspice",
+    "engine_build": {
+      "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******",
+      "binary_sha256": "dc859418bedd0478ff439a2d3e2e09f4386a7f4d5e3f17671953e101a000cc60",
+      "probe": "ok",
+      "reason": null
+    },
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+    "models_lib_sha256_scope": "local",
+    "netlist_sha256": "00f4d20c169e1f5bd118b5d02c1f7637e468e8ed674bef9919b1c4dc74c9a925",
+    "corner_coverage": {
+      "pdk": "gf180mcuC",
+      "sections": [
+        {
+          "process": "fs",
+          "unmoved_devices": [
+            "06v0",
+            "06v0_nvt",
+            "fets_mm",
+            "noise_corner"
+          ]
+        }
+      ]
+    },
+    "netlist_closure": [
+      {
+        "path": "sim/startup-bisect/probes/tb_p3_c3_fs_m40_v33.spice",
+        "scope": "repo",
+        "sha256": "00f4d20c169e1f5bd118b5d02c1f7637e468e8ed674bef9919b1c4dc74c9a925"
+      },
+      {
+        "path": "sim/startup-bisect/probes/dut_p3_c3.spice",
+        "scope": "repo",
+        "sha256": "fad2a1a1a732d0b447421603ff86fddab41fbb70235248c36694b920ae5b0dad"
+      }
+    ],
+    "netlist_identity": "sha256:72cb4b219da67b515b060986fad523ae73bac70427d7265d04b76ad3e3865b9d",
+    "netlist_source": "extracted",
+    "engine_host": "local",
+    "backend": {
+      "resolved": "local",
+      "source": "flag",
+      "requested": "local"
+    }
+  },
+  "coverage": {
+    "corners_simulated": 1,
+    "measurements_declared": 6,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "measurement:[0,\"fs/novdd/-40C\",\"clk_max\"]/observation",
+      "measurement:[0,\"fs/novdd/-40C\",\"clk_min\"]/observation",
+      "measurement:[0,\"fs/novdd/-40C\",\"fosc\"]/observation",
+      "measurement:[0,\"fs/novdd/-40C\",\"iq_run_ua\"]/observation",
+      "measurement:[0,\"fs/novdd/-40C\",\"ta\"]/observation",
+      "measurement:[0,\"fs/novdd/-40C\",\"tb\"]/observation"
+    ],
+    "skipped": [],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"fs/novdd/-40C\",\"clk_max\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"fs/novdd/-40C\",\"clk_min\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"fs/novdd/-40C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"fs/novdd/-40C\",\"iq_run_ua\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"fs/novdd/-40C\",\"ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"fs/novdd/-40C\",\"tb\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
+  },
+  "provenance": {
+    "klt_version": "0.9.2.dev33+g684a7569e857",
+    "klt_git_commit": "684a7569e8570b41f451f12aadcc00dbdf909a58",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@684a7569e8570b41f451f12aadcc00dbdf909a58",
+    "klayout_version": "0.30.13",
+    "pdk": {
+      "name": "gf180mcuC",
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
+    },
+    "deck": {
+      "name": "sm141064.ngspice",
+      "content_hash": "sha256:f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:00f4d20c169e1f5bd118b5d02c1f7637e468e8ed674bef9919b1c4dc74c9a925",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "ta",
+      "unit": "s",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "fs/novdd/-40C",
+        "value": 9.01518729e-08,
+        "margin": null
+      }
+    },
+    {
+      "name": "tb",
+      "unit": "s",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "fs/novdd/-40C",
+        "value": 5.13584107e-07,
+        "margin": null
+      }
+    },
+    {
+      "name": "fosc",
+      "unit": "Hz",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "fs/novdd/-40C",
+        "value": 47233059.7,
+        "margin": null
+      }
+    },
+    {
+      "name": "clk_max",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "fs/novdd/-40C",
+        "value": 3.1607394,
+        "margin": null
+      }
+    },
+    {
+      "name": "clk_min",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "fs/novdd/-40C",
+        "value": -0.0260987854,
+        "margin": null
+      }
+    },
+    {
+      "name": "iq_run_ua",
+      "unit": "uA",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "fs/novdd/-40C",
+        "value": 320.150977,
+        "margin": null
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "fs/novdd/-40C",
+      "process": "fs",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 2.981,
+      "peak_rss_bytes": 50233344,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "ta",
+          "value": 9.01518729e-08,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "tb",
+          "value": 5.13584107e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": 47233059.7,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "clk_max",
+          "value": 3.1607394,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "clk_min",
+          "value": -0.0260987854,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "iq_run_ua",
+          "value": 320.150977,
+          "unit": "uA",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/startup-bisect/probes/out_p3_c3_v33/fs_novdd_n40C/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/startup-bisect/probes/out_p3_c3_v33/fs_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    }
+  ]
+}

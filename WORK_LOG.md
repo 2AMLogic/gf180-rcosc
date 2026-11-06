@@ -2,6 +2,17 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-06
+
+- **PR #230**: sim(startup): fs/-40 C no-oscillation is a real settled-netlist failure; settled startup bench run
+- **PR #228**: sim(item5): run the 15-envelope corner campaign on the settled netlist; item 5 graded, still unmet
+- **PR #224**: feat(sim): measured 27-point clk waveform campaign, convergence check and DR-0025
+- **PR #223**: sim(recentre): P3 27-point batch confirmation and range/accuracy grader
+- **Issue #227** (closed): Investigate fs / -40 C / VDD >= 3.3 V no-oscillation on the settled netlist; run startup bench (row 9) on it
+- **Issue #213** (closed): Physical clock pulse-width and jitter campaign (deferred from #91)
+- **Issue #201** (closed): T1 item 5 (corner verification): run the sim/item5 klt sim requests on the settled sizing and cite them with the row set
+- **Issue #66** (closed): design: re-centre the oscillator for extracted parasitics and size a trim range that covers them (T1 item 5; operator ruling 2026-10-08)
+
 ### 2026-11-05
 
 - **PR #221**: docs: record failed nine-corner batch re-run on v10 runner

@@ -68,6 +68,11 @@ DEFAULTS = {
     "tstep": "100p",     # 200p leaves ~0.2 % solver edge-time noise on the period; 40p hit "timestep too small" at an edge
     "tmax": "100p",
     "reltol": 1e-3, "abstol": 1e-12, "vntol": 1e-6,
+    # Series driver resistance between each ideal select PWL source and the trim pin.
+    # With ideal (0 ohm) sources every lsb_first bench aborted "timestep too small" at the
+    # same instant (30.7 us) at all corners and under itl4/gear/tmax changes; 50 ohm
+    # (a realistic digital driver, tau ~ ps against the gate load) converges.
+    "drv_ohm": 50,
 }
 
 
@@ -176,8 +181,11 @@ def tb_text(vdd: float, skew: str, sched: dict, changes: list[dict], cfg: dict, 
             lines.append(f"VT{i} t{i} 0 DC 0")
             continue
         pl = _pwl(pts)
-        lines.append(f"VT{i} t{i} 0 " + pl[0])
+        lines.append(f"VT{i} t{i}d 0 " + pl[0])
         lines += pl[1:]
+    for i in range(TRIM_BITS):
+        if any(l.startswith(f"VT{i} t{i}d ") for l in lines):
+            lines.append(f"RT{i} t{i}d t{i} {cfg['drv_ohm']:g}")
     lines.append(".save v(clk) v(vdd)")
     return "\n".join(lines) + "\n"
 
