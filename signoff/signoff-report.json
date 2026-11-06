@@ -162,9 +162,216 @@
         "Both require the spec table itself to be ratified \u2014 verdicts against a draft spec are provisional by construction."
       ],
       "status": "unmet",
-      "reason": "no_evidence",
+      "reason": "check_failed",
       "graded_by_build": true,
-      "citation": null
+      "citation": null,
+      "citations_graded": [
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_c00_v30.json",
+          "rows": [
+            "2",
+            "10"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_c00_v33.json",
+          "rows": [
+            "2",
+            "10"
+          ],
+          "status": "unmet",
+          "reason": "check_failed"
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_c00_v36.json",
+          "rows": [
+            "2",
+            "10"
+          ],
+          "status": "unmet",
+          "reason": "check_failed"
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_c80_v30.json",
+          "rows": [
+            "3",
+            "10"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_c80_v33.json",
+          "rows": [
+            "3",
+            "10"
+          ],
+          "status": "unmet",
+          "reason": "check_failed"
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_c80_v36.json",
+          "rows": [
+            "3",
+            "10"
+          ],
+          "status": "unmet",
+          "reason": "check_failed"
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_ca9_v30.json",
+          "rows": [
+            "2",
+            "4",
+            "5",
+            "7",
+            "8",
+            "10"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_ca9_v33.json",
+          "rows": [
+            "1",
+            "2",
+            "4",
+            "5",
+            "7",
+            "8",
+            "10"
+          ],
+          "status": "unmet",
+          "reason": "check_failed"
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_ca9_v36.json",
+          "rows": [
+            "2",
+            "4",
+            "5",
+            "7",
+            "8",
+            "10"
+          ],
+          "status": "unmet",
+          "reason": "check_failed"
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_caa_v30.json",
+          "rows": [
+            "2",
+            "10"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_caa_v33.json",
+          "rows": [
+            "2",
+            "10"
+          ],
+          "status": "unmet",
+          "reason": "check_failed"
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_caa_v36.json",
+          "rows": [
+            "2",
+            "10"
+          ],
+          "status": "unmet",
+          "reason": "check_failed"
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_cff_v30.json",
+          "rows": [
+            "2",
+            "10"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_cff_v33.json",
+          "rows": [
+            "2",
+            "10"
+          ],
+          "status": "unmet",
+          "reason": "check_failed"
+        },
+        {
+          "citation": "sim/item5/results/20261106T051832Z/report_cff_v36.json",
+          "rows": [
+            "2",
+            "10"
+          ],
+          "status": "unmet",
+          "reason": "check_failed"
+        }
+      ],
+      "detail": {
+        "critical_metric_blockers": [
+          {
+            "metric": "sim__corner__errored_count",
+            "value": 1,
+            "higher_is_better": false
+          }
+        ],
+        "failed_citations": [
+          "sim/item5/results/20261106T051832Z/report_c00_v33.json",
+          "sim/item5/results/20261106T051832Z/report_c00_v36.json",
+          "sim/item5/results/20261106T051832Z/report_c80_v33.json",
+          "sim/item5/results/20261106T051832Z/report_c80_v36.json",
+          "sim/item5/results/20261106T051832Z/report_ca9_v33.json",
+          "sim/item5/results/20261106T051832Z/report_ca9_v36.json",
+          "sim/item5/results/20261106T051832Z/report_caa_v33.json",
+          "sim/item5/results/20261106T051832Z/report_caa_v36.json",
+          "sim/item5/results/20261106T051832Z/report_cff_v33.json",
+          "sim/item5/results/20261106T051832Z/report_cff_v36.json"
+        ],
+        "failed_rows": [
+          "1"
+        ],
+        "uncovered_rows": [],
+        "declared_gaps": [
+          {
+            "id": "6",
+            "gap": "reserved, not designed (DR-0004); no discipline loop exists to simulate"
+          },
+          {
+            "id": "9",
+            "gap": "startup bench (sim/startup) not run on the settled netlist; tracked in #227"
+          },
+          {
+            "id": "2.mc",
+            "gap": "Monte Carlo remainder of row 2 (DR-0019 claim S1); a klt sim corner request cannot express it"
+          },
+          {
+            "id": "4.mc",
+            "gap": "Monte Carlo remainder of row 4 (DR-0019 claim S2)"
+          },
+          {
+            "id": "5.mc",
+            "gap": "Monte Carlo remainder of row 5 (DR-0019 claim S3)"
+          }
+        ],
+        "unratified_rows": [],
+        "row_sources": {
+          "10": "asserted",
+          "2": "asserted",
+          "3": "asserted",
+          "4": "asserted",
+          "5": "asserted",
+          "7": "asserted",
+          "8": "asserted"
+        }
+      }
     },
     {
       "tier": "T1",

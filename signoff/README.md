@@ -337,45 +337,29 @@ envelope records is re-verified against the spec's current bytes on every
 CI run alongside it — the compound-entry extension of the artifact table
 at the top of `verify-report.py`.
 
-### unmet — item 5 (Full corner verification vs a ratified spec): campaign committed, not a gradeable envelope — and the record shows missed rows
+### unmet — item 5 (Full corner verification vs a ratified spec): campaign run on the settled netlist, `check_failed`
 
-The pre-layout PVT campaign is committed under `sim/pvt/results/`
-(`20260907T090653Z`, historical and superseded by the DR-0017
-campaign `20260923T030125Z`: full 7-process × 3-temp × 3-VDD factorial, 277 unique
-points, 0 sim failures) as this repo's own append-only evidence format
-(`manifest.json` + `results.csv` + `summary.md`), not a `klt sim` JSON
-envelope — so the grader has nothing it can read, mechanically `no_evidence`.
-Beyond the format gap, in the characterization record's own §4 verdict
-vocabulary: row 2 is **Not met** (trim range: ±35.50% realized vs ±40%
-ratified) and rows 5–6 **Exceed** the ratified post-trim accuracy budget
-(−34.85%/+54.78% at the calibration point vs ±1.1%, both methodologies; row
-9 likewise exceeds off-reference for Iq) — whether a full-corner campaign with
-missing spec rows can satisfy this item is a separate question the tracker
-has deliberately parked as needing a human/Architect call, since it is
-evidence-vs-passes, not evidence-existence. Making this row gradeable means
-running the campaign through `klt sim` — distinct follow-up work, tracked via
-the tracker's "Next" section (the design-side gap itself is issue #39's
-PVT-sensitivity work).
+Issue #201 ran the item-5 requests (`sim/item5/`, regenerated on the settled
+P3 netlist of #66 / DR-0023) through `klt sim`'s batch backend: 15 envelopes,
+315 points, `sim/item5/results/20261106T051832Z/` (`summary.md`, per-row
+verdicts in `rows.md` from `report_rows.py`). The manifest cites all 15 with
+per-citation `rows` and declares the row set under `spec_rows."5"`; the
+grader reports no `uncovered_rows`, and the only declared gaps are row 6
+(reserved, DR-0004), row 9 (startup not run on the settled netlist) and the
+Monte Carlo remainders of rows 2, 4 and 5 (DR-0019 S1-S3). Content hashes
+pin each envelope's `provenance.input.content_hash` (the bench netlist).
 
-**Request set and row map (issue #185).** `sim/item5/` now holds the `klt sim`
-side of that follow-up: `ROWS.md` maps every DR-0019 ratified row (1-10) to
-the corner request(s) that will decide it or declares the gap (row 6,
-reserved per DR-0004; and the Monte Carlo remainder of the statistical rows
-2, 4, 5, which a corner request does not cover), `gen_requests.py`
-regenerates the 15 requests (5 trim codes x 3 supplies, each 7 process x 3
-temperature corners) from `design/netlist/` with one command
-(`python3 sim/item5/gen_requests.py`, byte-identical on re-run), and
-`test_item5_rows.py` (CI job `item5-rows-offline`) checks every request parses
-and every row is mapped or a declared gap. Row 9 reuses `sim/startup/`'s
-requests. **The manifest is deliberately unchanged:** the pinned 0.7.0 grader
-reads item 5 only from a `klt sim` envelope; citing a non-envelope row
-declaration grades `unmet / unreadable_evidence`, not a coverage reason, so
-there is no declared-row-set field to put the map in. Item 5 stays
-`unmet / no_evidence`. What still blocks a pass: #66 settling the sizing, a
-batch runner that provides `gf180mcuC`, running the requests through `klt
-sim`'s batch backend (nothing has been run; the requests only validate with
-`klt sim --dry-run`), and the Monte Carlo remainder (DR-0019 claims S1-S3)
-for rows 2, 4, 5.
+The item reads `unmet` / `check_failed`, and the record says why. The five
+3.0 V envelopes pass. The ten 3.3 V and 3.6 V envelopes error at one corner,
+fs / -40 C, where the oscillator does not start in the bench (follow-up
+filed). Per row on the ratified numbers: rows 1 and 3 pass; row 2 fails on the
+LSB step (0.501 %/code vs 0.314 %/code; the range ends pass); rows 4 and 5
+fail with one calibration code held across process corners; row 8 fails at
+ff / 85 C / 3.6 V (576.2 uA at the tt code); rows 7 and 10 fail on the
+fs / -40 C no-oscillation. Only two corner-wide limits are declared in the
+requests (`fosc` >= 1 MHz, and `iq_run_ua` < 500 uA on the calibration-code
+requests) because the grader requires a checked limit and the other rows are
+not corner-wide limits. Nothing in the ratified spec was relaxed.
 
 ### unmet — item 6 (Statistical claims carry Monte Carlo evidence): nothing to back, nothing cited
 

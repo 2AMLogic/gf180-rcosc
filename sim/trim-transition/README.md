@@ -8,13 +8,15 @@ runtime-discipline claim (DR-0004, DR-0021) assumes a code rewrite does not
 corrupt the clock. This bench tests that assumption. Schematic level only, no
 design change.
 
-**Status (2026-11-05): generator, analyzer, offline tests and one single-corner
-local probe are committed. The nine-corner campaign has STILL NOT produced
-results: the 2026-11-05 re-run on the v10 runner (klt 0.9.0, version match)
-failed all nine requests because the runner image has no `gf180mcuC` PDK install
-(below), so the "committed results for all nine corners" acceptance item is
-PENDING.** Nothing
-here changes a ratified spec row; no decision record is added (see "Verdict").
+**Status (2026-11-06): the batch campaign RAN on the v11 runner (runner klt
+0.9.0, gf180mcuC present) into `results/20261106T050454Z/` (below). It is
+PARTIAL: six of nine benches (`none`, `msb_first` at 3.0/3.3/3.6 V x tt/ss/ff,
+576 events) were simulated and analysed; the three `lsb_first` benches aborted in
+ngspice (`timestep_too_small`, all 9 corners), so the lsb_first skew has no batch
+evidence.** No runt pulse and no missing/extra edge in any simulated event; 22
+events fail the "never settles" screen (see "Verdict").  Decision record:
+`spec/decision-records/0026-live-trim-code-transition-bench-batch-result.md`.
+Nothing here changes a ratified spec row.
 
 ```
 sim/trim-transition/
@@ -141,13 +143,48 @@ period (a small slow tail, 3.3 % excursion). Whether the other 26 corner x skew
 combinations change this is unknown until the campaign runs; extrapolating from
 one corner is not claimed.
 
+## Batch campaign `results/20261106T050454Z/` (2026-11-06, v11 runner)
+
+`run-transition.sh --backend batch`; nine `klt sim` jobs (job ids in each
+`report_*.json` under `environment.remote`), runner klt 0.9.0, `runner_compatibility=match`,
+open_pdks `f6eeac7`, ngspice 46, 3 corners per job. Analysis:
+`results/20261106T050454Z/analysis/{summary.md,results.csv,results.json}`
+(`analyze.py` over all nine reports, 585 event rows). The raw waveforms
+(~1.1 GB) are not committed; benches, requests, schedules, reports and
+`corner.cir` decks are.
+
+| skew | corners simulated | events | PASS | FLAG | VIOLATION | FAIL |
+|---|---|---|---|---|---|---|
+| none | 9/9 | 288 | 172 | 102 | 14 | 0 |
+| msb_first | 9/9 | 288 | 133 | 147 | 8 | 0 |
+| lsb_first | 0/9 (ngspice abort) | 9 | 0 | 0 | 0 | 9 |
+| **all** | 18/27 | 585 | 305 | 249 | 22 | 9 |
+
+- **Runt pulses: none. Missing/extra edges: none** (every simulated event).
+- **22 VIOLATION rows, all "never settles" within the 8-cycle steady window**
+  (no runt, no missing edge): 17 at ff/3.6 V, 4 at ff/3.3 V, 1 at tt/3.3 V,
+  mostly the 0x3F<->0x40 and 0x7F<->0x80 carries, two non-carry 0xA3->0xA2 downs
+  at ff/3.6 V. Several have a small excursion (0.006-0.4 %), so this is a slow
+  tail past `settle_tol` at the fastest corners rather than a glitch; whether it
+  is a real slow settle or a screen artefact of the steady-window definition
+  at ff/3.6 V is not resolved here.
+- **249 FLAGs** (excursion > 5 % or settle > 3 cycles), concentrated at the
+  major carries: the up step 0x7F->0x80 reaches up to 31 % excursion with
+  `msb_first` skew (ff, 3.0 V) and 10-14 % without skew.
+- **lsb_first aborted at the same instant (30.7 us) in every corner**, while the
+  2026-10-09 local probe (tt, 3.3 V, ngspice local) completed the same bench.
+  The same-instant abort points at the PWL stimulus/ngspice-version
+  interaction, not a corner effect. Not debugged in this run (out of scope:
+  no generator change); not retried locally per the batch-only host rule.
+
 ## Verdict (current)
 
-Pending the nine-corner run. If the campaign shows a VIOLATION (runt, missing
-edge, never settles) at any corner, add a decision record under `spec/decision-records/`
-and a cross-reference in DR-0021's follow-ups; FLAG-only outcomes inform the
-discipline model (a skewed update can cost one off-envelope cycle) but do not
-alter a ratified row.
+Partial. No glitch-class failure (runt / missing edge) on the six simulated
+benches, but 22 "never settles" violations and 9 aborted lsb_first corners mean
+the discipline model's no-glitch-on-update assumption is **not confirmed**
+across all nine corners. Recorded in DR-0026 and cross-referenced from DR-0021;
+no ratified row is relaxed. Follow-up needed: lsb_first convergence and the
+ff/3.6 V settle behaviour.
 
 ## Limitations
 

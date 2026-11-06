@@ -1,7 +1,7 @@
 {
   "netlist": "tb_c80_v36.spice",
   "engine": "ngspice",
-  "netlist_source": "schematic",
+  "netlist_source": "extracted",
   "models": {
     "pdk": "gf180mcuC",
     "lib": "libs.tech/ngspice/sm141064.ngspice"
@@ -96,7 +96,10 @@
     {
       "name": "fosc",
       "spice": ".meas tran fosc PARAM='20/(tb-ta)'",
-      "unit": "Hz"
+      "unit": "Hz",
+      "limits": {
+        "min": 1000000.0
+      }
     },
     {
       "name": "iq_run_ua",
@@ -108,7 +111,7 @@
     "capacity_wait_s": 1200
   },
   "options": {
-    "timeout_s": 600,
+    "timeout_s": 3600,
     "keep_artifacts": true,
     "ngspice_init": [
       "set measureprec=8"
