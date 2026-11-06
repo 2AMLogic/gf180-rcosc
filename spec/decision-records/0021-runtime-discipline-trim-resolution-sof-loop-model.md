@@ -33,3 +33,4 @@ Nothing in the ratified spec is changed or relaxed, and DR-0019 row 6 stays "res
 - If the row is read per-frame, no digital policy can meet it without a finer trim DAC (about 0.2 %/code or less, monotone) - a design change, not made here.
 - Not covered: mismatch (DR-0019 S1), RTL/area, real SOF-jitter figures (+/-500 ns is an assumed parameter), successive-approximation acquisition over the non-monotone code map, post-layout fs/sf/rc_f/rc_s.
 - Live trim-code transition bench (issue #103): see [0026](0026-live-trim-code-transition-bench-batch-result.md) - no runt/missing edge in the simulated benches, but settle violations at ff and no lsb_first batch evidence, so the no-glitch-on-update assumption is not yet confirmed.
+- Follow-up run, all nine corners x three skews (issue #103): see [0027](0027-live-trim-code-transition-bench-nine-corner-result.md) - no runt or missing edge in 864 events; the "never settles" screen is noise-limited at fast corners.
