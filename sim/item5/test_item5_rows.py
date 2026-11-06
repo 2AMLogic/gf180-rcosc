@@ -66,7 +66,9 @@ def test_requests_parse_and_reference_existing_netlists():
         assert len(req["corners"]["process"]) == 7
         assert req["corners"]["temperature_c"] == [-40.0, 27.0, 85.0]
         assert {m["name"] for m in req["measurements"]} >= {"fosc", "iq_run_ua"}
-        assert "limits" not in json.dumps(req)
+        lim = {m["name"]: m.get("limits") for m in req["measurements"]}
+        assert lim["fosc"] == {"min": 1.0e6}
+        assert lim["iq_run_ua"] == ({"max": 500.0} if f.name.startswith("request_ca9_") else None)
 
 
 def test_regeneration_is_byte_identical(tmp_path):
