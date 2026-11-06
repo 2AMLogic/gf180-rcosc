@@ -241,3 +241,11 @@ from observed count error (none exists while the reference is absent); per-frame
 no-loss baseline of the same profile. In this run no outage turned a recovering
 baseline into a non-recovering one; frozen-code drift follows the plant (about 1.8 %
 true error accrues across the -40 C 3.3 -> 3.0 V step regardless of outage length).
+
+## Related: measured oscillator-side waveform figures (issue #213)
+
+Measured clk pulse width, duty and rise/fall now exist (informational, not
+ratified): [sim/waveform/results/20261106T044600Z/README.md](../waveform/results/20261106T044600Z/README.md).
+The +/-500 ns SOF-arrival jitter above remains an external-reference
+assumption; the deterministic period spread in those results is a
+solver-dependent artifact, not jitter, and does not validate or replace it.

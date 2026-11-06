@@ -1,0 +1,50 @@
+{
+  "netlist": "tb_v30_ff.spice",
+  "engine": "ngspice",
+  "netlist_source": "schematic",
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "ff",
+        "sections": [
+          "ff",
+          "res_ff",
+          "mimcap_ff",
+          "cap_mim"
+        ]
+      }
+    ],
+    "temperature_c": [
+      -40.0,
+      27.0,
+      85.0
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "200p 20000n 0 200p"
+  },
+  "measurements": [
+    {
+      "name": "t_first_edge",
+      "unit": "s",
+      "spice": ".meas tran t_first_edge WHEN v(clk)=1.5000 RISE=1"
+    }
+  ],
+  "batch": {
+    "capacity_wait_s": 1200
+  },
+  "options": {
+    "timeout_s": 3600,
+    "keep_artifacts": true,
+    "waveforms": true,
+    "save_mode": "netlist",
+    "ngspice_init": [
+      "set measureprec=8"
+    ]
+  }
+}

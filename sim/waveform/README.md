@@ -191,3 +191,13 @@ timestamped immutable results with tool/PDK revision provenance (coordinate with
 #65), check time-step/tolerance convergence, publish an informational table and
 decision record (no ratified row is altered), and assess stochastic-noise
 support separately; unsupported noise coverage is a limitation, not a number.
+
+## Measured results (issue #213)
+
+The 27-point campaign was run through the batch fleet: see
+[results/20261106T044600Z/README.md](results/20261106T044600Z/README.md) and
+[decision record 0025](../../spec/decision-records/0025-clock-pulse-width-informational.md).
+Informational, not ratified; 26 points measured, one analyzer failure recorded;
+default-settings period spread / cycle-to-cycle columns are solver artifacts
+(convergence check in that README). The sections above describing "no measured
+results" refer to the harness as delivered in #91.
