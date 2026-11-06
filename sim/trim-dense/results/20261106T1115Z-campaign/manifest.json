@@ -1,0 +1,37 @@
+{
+  "git_sha": "d294c6b1362bccc20448495e7bdc2cc2edb58892",
+  "git_dirty": false,
+  "klt_version": "klayout-tools 0.9.0 client via uvx (runner klt 0.9.0)",
+  "engine": "ngspice",
+  "engine_version": "46",
+  "pdk": "gf180mcuC",
+  "pdk_revision": "unknown",
+  "backend": "batch",
+  "executed_utc": "2026-11-06T10:08:48Z",
+  "provenance_sha256": "d1d24253eb61ecdaa861670e2261f2d0f140f3d5d184331eda6cb217f0abe2d1",
+  "issue": 87,
+  "pdk_revision_source": null,
+  "pdk_revision_reason": "campaign runs on the batch fleet runner image; the client reports models_lib_sha256 (f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24) but not the runner's open_pdks SOURCES commit",
+  "model_dir": "libs.tech/ngspice",
+  "solver": {
+    "reltol": 0.001,
+    "abstol": 1e-12,
+    "vntol": 1e-06,
+    "tstep": "200p",
+    "tstop": "2000n"
+  },
+  "engine_version_expected": "unspecified",
+  "netlists": {
+    "ext": {
+      "path": "sim/cmph-fix/rcosc_top_p3_cmphfix.spice",
+      "sha256": "7afa433a227b9e8fc94f0bfa17e9ae8e10a244092769885a25719b0a9d72aeb3",
+      "sizing": "DR-0023 P3 extracted, MBUFN W=1u (DR-0028 cmph-fix)"
+    },
+    "sch": {
+      "path": "sim/pvt-postlayout/klt-pex/rcosc_top_schematic.spice",
+      "sha256": "258e5e7673ade279045e9b73b895fda809183bc85ac71bd2eb13d49648d3c521",
+      "sizing": "pre-P3 trim sizing (not DR-0023 P3), MBUFN W=1u; carry verdicts for sch are for THIS netlist only"
+    }
+  },
+  "driver": "sim/trim-dense/run_batch.py --backend batch, concurrency 2"
+}
