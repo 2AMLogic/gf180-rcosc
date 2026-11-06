@@ -13,7 +13,7 @@ netlist, ladder R x0.70, PDK MiM) and were run on the batch fleet; envelopes and
 [`results/20261106T051832Z/`](results/20261106T051832Z/summary.md) (`python3 -I sim/item5/report_rows.py <dir>`
 writes `rows.md`). Result: all 3.0 V envelopes pass; the 3.3 V and 3.6 V envelopes error at fs / -40 C (no
 oscillation, see the summary); rows 2, 4, 5, 7, 8, 10 fail, rows 1 and 3 pass. Item 5 stays `unmet`
-(`check_failed`). No ratified row or DR-0019 is edited. Row 9 and the Monte Carlo remainders are declared gaps.
+(`check_failed`). No ratified row or DR-0019 is edited. Row 9 is now measured on the settled netlist (`../startup-settled/`, issue #227): 61/63 start, fs / -40 C at 3.3 and 3.6 V do not. The fs / -40 C no-oscillation is a real failure of the settled netlist, not a simulator artifact (`../startup-fs-m40c/`). The Monte Carlo remainders are declared gaps.
 Every request spans 7 process x 3 temperature corners (21 points); the file name encodes trim code and
 supply (`request_c<code, lowercase hex>_v<VDD*10>.json`). Each reports `fosc` and `iq_run_ua`, with
 `fosc >= 1 MHz` (a clock is produced) on all and `iq_run_ua < 500 uA` on the calibration-code requests as the only
@@ -32,5 +32,5 @@ supplies.
 | 6 | Runtime-disciplined, <= +/-0.25 % | none | none | declared gap: reserved, not designed (DR-0004); no discipline loop exists to simulate; re-classify when one is designed |
 | 7 | Supply, 3.0-3.6 V | `requests/request_ca9_v30.json`, `requests/request_ca9_v33.json`, `requests/request_ca9_v36.json` | the supply is the per-request axis | none |
 | 8 | Quiescent current, < 500 uA (running) | `requests/request_ca9_v*.json` | `iq_run_ua` at every corner of the calibration-code requests; worst case is the max over the grid (window is a fixed 200-1200 ns, not whole periods) | none |
-| 9 | Startup time, <= 10 us | `../startup/request_v30.json`, `../startup/request_v33.json`, `../startup/request_v36.json` | none run on the settled netlist: these requests target the pre-re-centre schematic at code 0xA3 and their 63-point factorial has not been run | declared gap: startup on the settled netlist not run; #227 (also covers the fs / -40 C no-oscillation finding) |
+| 9 | Startup time, <= 10 us | `../startup-settled/request_v30.json`, `../startup-settled/request_v33.json`, `../startup-settled/request_v36.json` | 1 us VDD ramp (trim bits ramp with it) on the settled netlist at calibration code 0xA9, 7 process x 3 T per supply, DR-0020 analysis: [`../startup-settled/results/20261106T061500Z/`](../startup-settled/results/20261106T061500Z/summary.md) (batch fleet): 61/63 points start and settle within 10 us (worst 2.56 us); fs / -40 C at 3.3 V and 3.6 V are NON-START | measured fail, not a gap: the two NON-START points are the real design failure traced in [`../startup-fs-m40c/results/20261106T061000Z/`](../startup-fs-m40c/results/20261106T061000Z/summary.md) (#227); the 63-point pre-re-centre campaign and DR-0020 stay with #82; design fix tracked in #229 |
 | 10 | Temperature range, -40..+85 C | every request in `requests/` | the temperature is a corner axis of each request | none |
