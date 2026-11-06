@@ -38,7 +38,8 @@ MAIN_CLEAN_BASELINE=".loom/sweep-checkpoint/main-clean-baseline-${RUN_ID}.txt"
 ```
 
 `RUN_ID` shape is from `.loom/scripts/sweep-run-registry.sh:405-407`:
-`sweep-<UTC ts>-<pid part>-<8 hex>`, e.g. `sweep-20260722T231500Z-84213-a3f9c1b2`.
+`sweep-<UTC ts>-<pid part>-<8 hex>` (the repro harness uses a fixed example
+value of that shape).
 The `mkdir .loom/sweep-checkpoint` in the telemetry is not in that step; it is
 presumably issued by the orchestrator before it. The telemetry's complete
 original commands and cwd were **not recoverable** here (only the two
