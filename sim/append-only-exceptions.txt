@@ -4,3 +4,4 @@
 # The reason is mandatory; an empty reason fails the guard. Match is by path
 # prefix (use a run directory, not a blanket glob). Entries are reviewed in
 # the PR that adds them. Default: no exceptions.
+sim/trim-dense/results/20261106T1115Z-campaign/ledger.jsonl | run_batch.py appends one JSONL line per finished job across sessions; the diff must be pure line additions (checked in the PR)
