@@ -1,0 +1,50 @@
+{
+ "netlist": "noise_smoke.spice",
+ "engine": "ngspice",
+ "netlist_source": "schematic",
+ "models": {
+  "pdk": "gf180mcuC",
+  "lib": "libs.tech/ngspice/sm141064.ngspice"
+ },
+ "corners": {
+  "process": [
+   {
+    "name": "tt",
+    "sections": [
+     "typical",
+     "res_typical",
+     "mimcap_typical",
+     "cap_mim"
+    ]
+   }
+  ],
+  "temperature_c": [
+   27.0
+  ]
+ },
+ "analysis": {
+  "kind": "tran",
+  "args": "1n 20u 0 1n"
+ },
+ "measurements": [
+  {
+   "name": "vrms",
+   "unit": "V",
+   "spice": ".meas tran vrms RMS v(out) from=2u to=20u"
+  },
+  {
+   "name": "vpp",
+   "unit": "V",
+   "spice": ".meas tran vpp PP v(out) from=2u to=20u"
+  }
+ ],
+ "batch": {
+  "capacity_wait_s": 1200
+ },
+ "options": {
+  "timeout_s": 300,
+  "keep_artifacts": true,
+  "waveforms": false,
+  "save_mode": "netlist"
+ }
+}

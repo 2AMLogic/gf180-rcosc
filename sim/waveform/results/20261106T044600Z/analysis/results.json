@@ -1,0 +1,3010 @@
+{
+  "label": "Analysis of simulator output; evidence status is set by the originating campaign record",
+  "synthetic": false,
+  "utc": "2026-11-06T04:53:16.850498+00:00",
+  "params": {
+    "window_s": 2.0000000000000003e-06,
+    "min_cycles": 20,
+    "min_samples_per_cycle": 10.0,
+    "drift_tol": 0.005,
+    "vdd_tol": 0.02
+  },
+  "note": "issue #213 campaign; v33_tt from preflight job",
+  "reports": [
+    {
+      "report": "report.json",
+      "vdd_v": 3.0,
+      "status": "pass",
+      "corner_count": 3,
+      "remote": {
+        "provider": "aws-batch-fleet",
+        "job_id": "klt-sim-bb8b1b3a0e08",
+        "region": "us-east-1",
+        "instance_id": "i-04bbb23bcb3663a51",
+        "instance_type": "m7i.4xlarge",
+        "availability_zone": "us-east-1c",
+        "ami_id": "ami-095c25ae241a4d360",
+        "lifecycle": "spot",
+        "spot": true,
+        "state": "done",
+        "exit_code": "0",
+        "concurrency": "1",
+        "physical_cores": "8",
+        "elapsed_seconds": 37,
+        "client_submitted_at": "2026-11-06T04:48:29.184636Z",
+        "client_launched_at": "2026-11-06T04:48:49.682575Z",
+        "client_status_terminal_at": "2026-11-06T04:49:52.175815Z",
+        "client_collected_at": "2026-11-06T04:49:53.270741Z",
+        "runner_klt_version": "0.9.0",
+        "client_klt_version": "0.9.2.dev42+g94b54d114210",
+        "runner_compatibility": "match",
+        "runner_request_features": {
+          "required": [
+            "options.ngspice_init"
+          ],
+          "missing": [],
+          "status": "supported"
+        },
+        "worker_environment": {
+          "capture": "ok",
+          "simulator": {
+            "requested_binary": "ngspice",
+            "binary_source": "PATH",
+            "selected_path": "/usr/local/bin/ngspice",
+            "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+            "version_probe": "ok"
+          },
+          "pdk": {
+            "variant": "gf180mcuC",
+            "root": "/opt/pdk",
+            "stamp_scheme": "sources-sha256",
+            "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+            "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+            "models_staged": false,
+            "stamp_scope": "executed"
+          },
+          "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+          "omp_num_threads": null,
+          "image_manifest": null,
+          "model_inputs": null,
+          "diagnostics": [],
+          "pdk_stamp_comparison": {
+            "status": "not_comparable",
+            "reason": "client_stamp_unavailable"
+          },
+          "engine_build_comparison": {
+            "status": "match"
+          }
+        },
+        "runner_model_inputs": null,
+        "job_ceiling": {
+          "basis": "conservative_serial_bound",
+          "unit_count": 3,
+          "per_unit_timeout_s": 3600,
+          "overhead_s": 120.0,
+          "job_bound_s": 10920.0,
+          "max_job_seconds": 3600.0,
+          "max_job_seconds_source": "fleet_config",
+          "exceeds_ceiling": true,
+          "check": "warn",
+          "max_units_per_job": 0,
+          "recommended_hosts": null,
+          "warning": "batch job bound 10920s (options.timeout_s 3600s x 3 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. No remote.hosts value fits: a single unit's bound exceeds the ceiling -- lower options.timeout_s to at most 3480s"
+        }
+      },
+      "synthetic": false
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.0,
+      "status": "pass",
+      "corner_count": 3,
+      "remote": {
+        "provider": "aws-batch-fleet",
+        "job_id": "klt-sim-267a55bf6a8a",
+        "region": "us-east-1",
+        "instance_id": "i-06d29a5f9709121e2",
+        "instance_type": "m7i.4xlarge",
+        "availability_zone": "us-east-1c",
+        "ami_id": "ami-095c25ae241a4d360",
+        "lifecycle": "spot",
+        "spot": true,
+        "state": "done",
+        "exit_code": "0",
+        "concurrency": "1",
+        "physical_cores": "8",
+        "elapsed_seconds": 37,
+        "client_submitted_at": "2026-11-06T04:47:04.134229Z",
+        "client_launched_at": "2026-11-06T04:47:25.553069Z",
+        "client_status_terminal_at": "2026-11-06T04:48:28.027992Z",
+        "client_collected_at": "2026-11-06T04:48:29.049613Z",
+        "runner_klt_version": "0.9.0",
+        "client_klt_version": "0.9.2.dev42+g94b54d114210",
+        "runner_compatibility": "match",
+        "runner_request_features": {
+          "required": [
+            "options.ngspice_init"
+          ],
+          "missing": [],
+          "status": "supported"
+        },
+        "worker_environment": {
+          "capture": "ok",
+          "simulator": {
+            "requested_binary": "ngspice",
+            "binary_source": "PATH",
+            "selected_path": "/usr/local/bin/ngspice",
+            "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+            "version_probe": "ok"
+          },
+          "pdk": {
+            "variant": "gf180mcuC",
+            "root": "/opt/pdk",
+            "stamp_scheme": "sources-sha256",
+            "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+            "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+            "models_staged": false,
+            "stamp_scope": "executed"
+          },
+          "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+          "omp_num_threads": null,
+          "image_manifest": null,
+          "model_inputs": null,
+          "diagnostics": [],
+          "pdk_stamp_comparison": {
+            "status": "not_comparable",
+            "reason": "client_stamp_unavailable"
+          },
+          "engine_build_comparison": {
+            "status": "match"
+          }
+        },
+        "runner_model_inputs": null,
+        "job_ceiling": {
+          "basis": "conservative_serial_bound",
+          "unit_count": 3,
+          "per_unit_timeout_s": 3600,
+          "overhead_s": 120.0,
+          "job_bound_s": 10920.0,
+          "max_job_seconds": 3600.0,
+          "max_job_seconds_source": "fleet_config",
+          "exceeds_ceiling": true,
+          "check": "warn",
+          "max_units_per_job": 0,
+          "recommended_hosts": null,
+          "warning": "batch job bound 10920s (options.timeout_s 3600s x 3 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. No remote.hosts value fits: a single unit's bound exceeds the ceiling -- lower options.timeout_s to at most 3480s"
+        }
+      },
+      "synthetic": false
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.0,
+      "status": "pass",
+      "corner_count": 3,
+      "remote": {
+        "provider": "aws-batch-fleet",
+        "job_id": "klt-sim-547053932e84",
+        "region": "us-east-1",
+        "instance_id": "i-0f1826d2b11e618fb",
+        "instance_type": "m7i.4xlarge",
+        "availability_zone": "us-east-1d",
+        "ami_id": "ami-095c25ae241a4d360",
+        "lifecycle": "spot",
+        "spot": true,
+        "state": "done",
+        "exit_code": "0",
+        "concurrency": "1",
+        "physical_cores": "8",
+        "elapsed_seconds": 35,
+        "client_submitted_at": "2026-11-06T04:47:04.133695Z",
+        "client_launched_at": "2026-11-06T04:47:26.254693Z",
+        "client_status_terminal_at": "2026-11-06T04:48:28.716152Z",
+        "client_collected_at": "2026-11-06T04:48:29.768994Z",
+        "runner_klt_version": "0.9.0",
+        "client_klt_version": "0.9.2.dev42+g94b54d114210",
+        "runner_compatibility": "match",
+        "runner_request_features": {
+          "required": [
+            "options.ngspice_init"
+          ],
+          "missing": [],
+          "status": "supported"
+        },
+        "worker_environment": {
+          "capture": "ok",
+          "simulator": {
+            "requested_binary": "ngspice",
+            "binary_source": "PATH",
+            "selected_path": "/usr/local/bin/ngspice",
+            "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+            "version_probe": "ok"
+          },
+          "pdk": {
+            "variant": "gf180mcuC",
+            "root": "/opt/pdk",
+            "stamp_scheme": "sources-sha256",
+            "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+            "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+            "models_staged": false,
+            "stamp_scope": "executed"
+          },
+          "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+          "omp_num_threads": null,
+          "image_manifest": null,
+          "model_inputs": null,
+          "diagnostics": [],
+          "pdk_stamp_comparison": {
+            "status": "not_comparable",
+            "reason": "client_stamp_unavailable"
+          },
+          "engine_build_comparison": {
+            "status": "match"
+          }
+        },
+        "runner_model_inputs": null,
+        "job_ceiling": {
+          "basis": "conservative_serial_bound",
+          "unit_count": 3,
+          "per_unit_timeout_s": 3600,
+          "overhead_s": 120.0,
+          "job_bound_s": 10920.0,
+          "max_job_seconds": 3600.0,
+          "max_job_seconds_source": "fleet_config",
+          "exceeds_ceiling": true,
+          "check": "warn",
+          "max_units_per_job": 0,
+          "recommended_hosts": null,
+          "warning": "batch job bound 10920s (options.timeout_s 3600s x 3 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. No remote.hosts value fits: a single unit's bound exceeds the ceiling -- lower options.timeout_s to at most 3480s"
+        }
+      },
+      "synthetic": false
+    },
+    {
+      "report": "submit.json",
+      "vdd_v": 3.3,
+      "status": "pass",
+      "corner_count": 3,
+      "remote": {
+        "provider": "aws-batch-fleet",
+        "job_id": "klt-sim-2a8309a6a73f",
+        "region": "us-east-1",
+        "instance_id": "i-0ffe6df520eb72296",
+        "instance_type": "m7i.4xlarge",
+        "availability_zone": "us-east-1c",
+        "ami_id": "ami-095c25ae241a4d360",
+        "lifecycle": "spot",
+        "spot": true,
+        "state": "done",
+        "exit_code": "0",
+        "concurrency": "1",
+        "physical_cores": "8",
+        "elapsed_seconds": 36,
+        "client_submitted_at": "2026-11-06T04:45:34.079425Z",
+        "client_launched_at": "2026-11-06T04:45:54.155681Z",
+        "client_status_terminal_at": "2026-11-06T04:46:56.521453Z",
+        "client_collected_at": "2026-11-06T04:46:57.524878Z",
+        "runner_klt_version": "0.9.0",
+        "client_klt_version": "0.9.2.dev42+g94b54d114210",
+        "runner_compatibility": "match",
+        "runner_request_features": {
+          "required": [
+            "options.ngspice_init"
+          ],
+          "missing": [],
+          "status": "supported"
+        },
+        "worker_environment": {
+          "capture": "ok",
+          "simulator": {
+            "requested_binary": "ngspice",
+            "binary_source": "PATH",
+            "selected_path": "/usr/local/bin/ngspice",
+            "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+            "version_probe": "ok"
+          },
+          "pdk": {
+            "variant": "gf180mcuC",
+            "root": "/opt/pdk",
+            "stamp_scheme": "sources-sha256",
+            "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+            "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+            "models_staged": false,
+            "stamp_scope": "executed"
+          },
+          "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+          "omp_num_threads": null,
+          "image_manifest": null,
+          "model_inputs": null,
+          "diagnostics": [],
+          "pdk_stamp_comparison": {
+            "status": "not_comparable",
+            "reason": "client_stamp_unavailable"
+          },
+          "engine_build_comparison": {
+            "status": "match"
+          }
+        },
+        "runner_model_inputs": null,
+        "job_ceiling": {
+          "basis": "conservative_serial_bound",
+          "unit_count": 3,
+          "per_unit_timeout_s": 3600,
+          "overhead_s": 120.0,
+          "job_bound_s": 10920.0,
+          "max_job_seconds": 3600.0,
+          "max_job_seconds_source": "fleet_config",
+          "exceeds_ceiling": true,
+          "check": "warn",
+          "max_units_per_job": 0,
+          "recommended_hosts": null,
+          "warning": "batch job bound 10920s (options.timeout_s 3600s x 3 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. No remote.hosts value fits: a single unit's bound exceeds the ceiling -- lower options.timeout_s to at most 3480s"
+        }
+      },
+      "synthetic": false
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.3,
+      "status": "pass",
+      "corner_count": 3,
+      "remote": {
+        "provider": "aws-batch-fleet",
+        "job_id": "klt-sim-9389c50ccd6f",
+        "region": "us-east-1",
+        "instance_id": "i-09c0120289b2611eb",
+        "instance_type": "m7i.4xlarge",
+        "availability_zone": "us-east-1d",
+        "ami_id": "ami-095c25ae241a4d360",
+        "lifecycle": "spot",
+        "spot": true,
+        "state": "done",
+        "exit_code": "0",
+        "concurrency": "1",
+        "physical_cores": "8",
+        "elapsed_seconds": 37,
+        "client_submitted_at": "2026-11-06T04:49:53.425697Z",
+        "client_launched_at": "2026-11-06T04:50:18.231443Z",
+        "client_status_terminal_at": "2026-11-06T04:51:21.024067Z",
+        "client_collected_at": "2026-11-06T04:51:22.181574Z",
+        "runner_klt_version": "0.9.0",
+        "client_klt_version": "0.9.2.dev42+g94b54d114210",
+        "runner_compatibility": "match",
+        "runner_request_features": {
+          "required": [
+            "options.ngspice_init"
+          ],
+          "missing": [],
+          "status": "supported"
+        },
+        "worker_environment": {
+          "capture": "ok",
+          "simulator": {
+            "requested_binary": "ngspice",
+            "binary_source": "PATH",
+            "selected_path": "/usr/local/bin/ngspice",
+            "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+            "version_probe": "ok"
+          },
+          "pdk": {
+            "variant": "gf180mcuC",
+            "root": "/opt/pdk",
+            "stamp_scheme": "sources-sha256",
+            "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+            "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+            "models_staged": false,
+            "stamp_scope": "executed"
+          },
+          "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+          "omp_num_threads": null,
+          "image_manifest": null,
+          "model_inputs": null,
+          "diagnostics": [],
+          "pdk_stamp_comparison": {
+            "status": "not_comparable",
+            "reason": "client_stamp_unavailable"
+          },
+          "engine_build_comparison": {
+            "status": "match"
+          }
+        },
+        "runner_model_inputs": null,
+        "job_ceiling": {
+          "basis": "conservative_serial_bound",
+          "unit_count": 3,
+          "per_unit_timeout_s": 3600,
+          "overhead_s": 120.0,
+          "job_bound_s": 10920.0,
+          "max_job_seconds": 3600.0,
+          "max_job_seconds_source": "fleet_config",
+          "exceeds_ceiling": true,
+          "check": "warn",
+          "max_units_per_job": 0,
+          "recommended_hosts": null,
+          "warning": "batch job bound 10920s (options.timeout_s 3600s x 3 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. No remote.hosts value fits: a single unit's bound exceeds the ceiling -- lower options.timeout_s to at most 3480s"
+        }
+      },
+      "synthetic": false
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.3,
+      "status": "pass",
+      "corner_count": 3,
+      "remote": {
+        "provider": "aws-batch-fleet",
+        "job_id": "klt-sim-13b40f52bc85",
+        "region": "us-east-1",
+        "instance_id": "i-0c700216308e44f32",
+        "instance_type": "m7i.4xlarge",
+        "availability_zone": "us-east-1d",
+        "ami_id": "ami-095c25ae241a4d360",
+        "lifecycle": "spot",
+        "spot": true,
+        "state": "done",
+        "exit_code": "0",
+        "concurrency": "1",
+        "physical_cores": "8",
+        "elapsed_seconds": 37,
+        "client_submitted_at": "2026-11-06T04:48:29.891159Z",
+        "client_launched_at": "2026-11-06T04:48:49.992077Z",
+        "client_status_terminal_at": "2026-11-06T04:49:52.514392Z",
+        "client_collected_at": "2026-11-06T04:49:53.662840Z",
+        "runner_klt_version": "0.9.0",
+        "client_klt_version": "0.9.2.dev42+g94b54d114210",
+        "runner_compatibility": "match",
+        "runner_request_features": {
+          "required": [
+            "options.ngspice_init"
+          ],
+          "missing": [],
+          "status": "supported"
+        },
+        "worker_environment": {
+          "capture": "ok",
+          "simulator": {
+            "requested_binary": "ngspice",
+            "binary_source": "PATH",
+            "selected_path": "/usr/local/bin/ngspice",
+            "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+            "version_probe": "ok"
+          },
+          "pdk": {
+            "variant": "gf180mcuC",
+            "root": "/opt/pdk",
+            "stamp_scheme": "sources-sha256",
+            "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+            "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+            "models_staged": false,
+            "stamp_scope": "executed"
+          },
+          "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+          "omp_num_threads": null,
+          "image_manifest": null,
+          "model_inputs": null,
+          "diagnostics": [],
+          "pdk_stamp_comparison": {
+            "status": "not_comparable",
+            "reason": "client_stamp_unavailable"
+          },
+          "engine_build_comparison": {
+            "status": "match"
+          }
+        },
+        "runner_model_inputs": null,
+        "job_ceiling": {
+          "basis": "conservative_serial_bound",
+          "unit_count": 3,
+          "per_unit_timeout_s": 3600,
+          "overhead_s": 120.0,
+          "job_bound_s": 10920.0,
+          "max_job_seconds": 3600.0,
+          "max_job_seconds_source": "fleet_config",
+          "exceeds_ceiling": true,
+          "check": "warn",
+          "max_units_per_job": 0,
+          "recommended_hosts": null,
+          "warning": "batch job bound 10920s (options.timeout_s 3600s x 3 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. No remote.hosts value fits: a single unit's bound exceeds the ceiling -- lower options.timeout_s to at most 3480s"
+        }
+      },
+      "synthetic": false
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.6,
+      "status": "pass",
+      "corner_count": 3,
+      "remote": {
+        "provider": "aws-batch-fleet",
+        "job_id": "klt-sim-b926efdc1341",
+        "region": "us-east-1",
+        "instance_id": "i-0b64538fb246f4ccb",
+        "instance_type": "m7i.4xlarge",
+        "availability_zone": "us-east-1d",
+        "ami_id": "ami-095c25ae241a4d360",
+        "lifecycle": "spot",
+        "spot": true,
+        "state": "done",
+        "exit_code": "0",
+        "concurrency": "1",
+        "physical_cores": "8",
+        "elapsed_seconds": 39,
+        "client_submitted_at": "2026-11-06T04:51:22.458915Z",
+        "client_launched_at": "2026-11-06T04:51:45.842409Z",
+        "client_status_terminal_at": "2026-11-06T04:52:48.232365Z",
+        "client_collected_at": "2026-11-06T04:52:49.294536Z",
+        "runner_klt_version": "0.9.0",
+        "client_klt_version": "0.9.2.dev42+g94b54d114210",
+        "runner_compatibility": "match",
+        "runner_request_features": {
+          "required": [
+            "options.ngspice_init"
+          ],
+          "missing": [],
+          "status": "supported"
+        },
+        "worker_environment": {
+          "capture": "ok",
+          "simulator": {
+            "requested_binary": "ngspice",
+            "binary_source": "PATH",
+            "selected_path": "/usr/local/bin/ngspice",
+            "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+            "version_probe": "ok"
+          },
+          "pdk": {
+            "variant": "gf180mcuC",
+            "root": "/opt/pdk",
+            "stamp_scheme": "sources-sha256",
+            "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+            "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+            "models_staged": false,
+            "stamp_scope": "executed"
+          },
+          "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+          "omp_num_threads": null,
+          "image_manifest": null,
+          "model_inputs": null,
+          "diagnostics": [],
+          "pdk_stamp_comparison": {
+            "status": "not_comparable",
+            "reason": "client_stamp_unavailable"
+          },
+          "engine_build_comparison": {
+            "status": "match"
+          }
+        },
+        "runner_model_inputs": null,
+        "job_ceiling": {
+          "basis": "conservative_serial_bound",
+          "unit_count": 3,
+          "per_unit_timeout_s": 3600,
+          "overhead_s": 120.0,
+          "job_bound_s": 10920.0,
+          "max_job_seconds": 3600.0,
+          "max_job_seconds_source": "fleet_config",
+          "exceeds_ceiling": true,
+          "check": "warn",
+          "max_units_per_job": 0,
+          "recommended_hosts": null,
+          "warning": "batch job bound 10920s (options.timeout_s 3600s x 3 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. No remote.hosts value fits: a single unit's bound exceeds the ceiling -- lower options.timeout_s to at most 3480s"
+        }
+      },
+      "synthetic": false
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.6,
+      "status": "pass",
+      "corner_count": 3,
+      "remote": {
+        "provider": "aws-batch-fleet",
+        "job_id": "klt-sim-8f2d479015d8",
+        "region": "us-east-1",
+        "instance_id": "i-034a2000f90e5bc93",
+        "instance_type": "m7i.4xlarge",
+        "availability_zone": "us-east-1d",
+        "ami_id": "ami-095c25ae241a4d360",
+        "lifecycle": "spot",
+        "spot": true,
+        "state": "done",
+        "exit_code": "0",
+        "concurrency": "1",
+        "physical_cores": "8",
+        "elapsed_seconds": 37,
+        "client_submitted_at": "2026-11-06T04:51:22.391722Z",
+        "client_launched_at": "2026-11-06T04:51:45.901448Z",
+        "client_status_terminal_at": "2026-11-06T04:52:48.217108Z",
+        "client_collected_at": "2026-11-06T04:52:49.245177Z",
+        "runner_klt_version": "0.9.0",
+        "client_klt_version": "0.9.2.dev42+g94b54d114210",
+        "runner_compatibility": "match",
+        "runner_request_features": {
+          "required": [
+            "options.ngspice_init"
+          ],
+          "missing": [],
+          "status": "supported"
+        },
+        "worker_environment": {
+          "capture": "ok",
+          "simulator": {
+            "requested_binary": "ngspice",
+            "binary_source": "PATH",
+            "selected_path": "/usr/local/bin/ngspice",
+            "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+            "version_probe": "ok"
+          },
+          "pdk": {
+            "variant": "gf180mcuC",
+            "root": "/opt/pdk",
+            "stamp_scheme": "sources-sha256",
+            "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+            "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+            "models_staged": false,
+            "stamp_scope": "executed"
+          },
+          "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+          "omp_num_threads": null,
+          "image_manifest": null,
+          "model_inputs": null,
+          "diagnostics": [],
+          "pdk_stamp_comparison": {
+            "status": "not_comparable",
+            "reason": "client_stamp_unavailable"
+          },
+          "engine_build_comparison": {
+            "status": "match"
+          }
+        },
+        "runner_model_inputs": null,
+        "job_ceiling": {
+          "basis": "conservative_serial_bound",
+          "unit_count": 3,
+          "per_unit_timeout_s": 3600,
+          "overhead_s": 120.0,
+          "job_bound_s": 10920.0,
+          "max_job_seconds": 3600.0,
+          "max_job_seconds_source": "fleet_config",
+          "exceeds_ceiling": true,
+          "check": "warn",
+          "max_units_per_job": 0,
+          "recommended_hosts": null,
+          "warning": "batch job bound 10920s (options.timeout_s 3600s x 3 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. No remote.hosts value fits: a single unit's bound exceeds the ceiling -- lower options.timeout_s to at most 3480s"
+        }
+      },
+      "synthetic": false
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.6,
+      "status": "pass",
+      "corner_count": 3,
+      "remote": {
+        "provider": "aws-batch-fleet",
+        "job_id": "klt-sim-a3c41690ed6d",
+        "region": "us-east-1",
+        "instance_id": "i-0b6da8d4716b3084c",
+        "instance_type": "m7i.4xlarge",
+        "availability_zone": "us-east-1c",
+        "ami_id": "ami-095c25ae241a4d360",
+        "lifecycle": "spot",
+        "spot": true,
+        "state": "done",
+        "exit_code": "0",
+        "concurrency": "1",
+        "physical_cores": "8",
+        "elapsed_seconds": 38,
+        "client_submitted_at": "2026-11-06T04:49:53.819312Z",
+        "client_launched_at": "2026-11-06T04:50:18.193896Z",
+        "client_status_terminal_at": "2026-11-06T04:51:21.062513Z",
+        "client_collected_at": "2026-11-06T04:51:22.267824Z",
+        "runner_klt_version": "0.9.0",
+        "client_klt_version": "0.9.2.dev42+g94b54d114210",
+        "runner_compatibility": "match",
+        "runner_request_features": {
+          "required": [
+            "options.ngspice_init"
+          ],
+          "missing": [],
+          "status": "supported"
+        },
+        "worker_environment": {
+          "capture": "ok",
+          "simulator": {
+            "requested_binary": "ngspice",
+            "binary_source": "PATH",
+            "selected_path": "/usr/local/bin/ngspice",
+            "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+            "version_probe": "ok"
+          },
+          "pdk": {
+            "variant": "gf180mcuC",
+            "root": "/opt/pdk",
+            "stamp_scheme": "sources-sha256",
+            "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+            "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+            "models_staged": false,
+            "stamp_scope": "executed"
+          },
+          "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+          "omp_num_threads": null,
+          "image_manifest": null,
+          "model_inputs": null,
+          "diagnostics": [],
+          "pdk_stamp_comparison": {
+            "status": "not_comparable",
+            "reason": "client_stamp_unavailable"
+          },
+          "engine_build_comparison": {
+            "status": "match"
+          }
+        },
+        "runner_model_inputs": null,
+        "job_ceiling": {
+          "basis": "conservative_serial_bound",
+          "unit_count": 3,
+          "per_unit_timeout_s": 3600,
+          "overhead_s": 120.0,
+          "job_bound_s": 10920.0,
+          "max_job_seconds": 3600.0,
+          "max_job_seconds_source": "fleet_config",
+          "exceeds_ceiling": true,
+          "check": "warn",
+          "max_units_per_job": 0,
+          "recommended_hosts": null,
+          "warning": "batch job bound 10920s (options.timeout_s 3600s x 3 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. No remote.hosts value fits: a single unit's bound exceeds the ceiling -- lower options.timeout_s to at most 3480s"
+        }
+      },
+      "synthetic": false
+    }
+  ],
+  "n_corners": 27,
+  "n_fail": 1,
+  "all_ok": false,
+  "corners": [
+    {
+      "report": "report.json",
+      "vdd_v": 3.0,
+      "process": "tt",
+      "temp_c": -40.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.5,
+        "vdd_nominal_v": 3.0,
+        "vdd_window_mean_v": 3.0,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 90,
+        "samples_per_cycle": 111.0111111111111,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 90,
+          "mean": 2.190258744886187e-08,
+          "min": 2.1804126002484647e-08,
+          "max": 2.2078554584401163e-08,
+          "peak_to_peak": 2.744285819165156e-10,
+          "std_deterministic": 6.28063004029056e-11
+        },
+        "frequency_mean_hz": 45656706.19212449,
+        "pulse_high_s": {
+          "count": 90,
+          "mean": 2.004856065987063e-09,
+          "min": 1.9499394040431114e-09,
+          "max": 2.062924365216174e-09,
+          "peak_to_peak": 1.129849611730628e-10,
+          "std_deterministic": 3.021921029626485e-11
+        },
+        "pulse_low_s": {
+          "count": 90,
+          "mean": 1.9897731382874808e-08,
+          "min": 1.9823063110048766e-08,
+          "max": 2.0029422938281288e-08,
+          "peak_to_peak": 2.063598282325222e-10,
+          "std_deterministic": 5.471825511688723e-11
+        },
+        "duty": {
+          "count": 90,
+          "mean": 0.0915339364232638,
+          "min": 0.08899472547277519,
+          "max": 0.09365851756308224,
+          "peak_to_peak": 0.0046637920903070534,
+          "std_deterministic": 0.0012705882458077405
+        },
+        "rise_time_10_90_s": {
+          "count": 91,
+          "mean": 7.66609192676312e-10,
+          "min": 7.377154489498702e-10,
+          "max": 7.967023235252481e-10,
+          "peak_to_peak": 5.898687457537785e-11,
+          "std_deterministic": 1.2014198588041373e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 90,
+          "mean": 3.9454790222328643e-10,
+          "min": 3.514435861944119e-10,
+          "max": 4.2974723995389233e-10,
+          "peak_to_peak": 7.830365375948042e-11,
+          "std_deterministic": 2.5472743593427353e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 89,
+          "mean": 7.335498548758857e-13,
+          "min": -1.6585948225942052e-10,
+          "max": 1.884074051625357e-10,
+          "peak_to_peak": 3.5426688742195623e-10,
+          "std_deterministic": 7.756782320616487e-11,
+          "max_abs": 1.884074051625357e-10
+        },
+        "tail_drift_fraction": -0.0003014957344193796,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.0,
+      "process": "tt",
+      "temp_c": 27.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.5,
+        "vdd_nominal_v": 3.0,
+        "vdd_window_mean_v": 3.0,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 94,
+        "samples_per_cycle": 106.17021276595744,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 94,
+          "mean": 2.0980483996827903e-08,
+          "min": 2.0895811378394426e-08,
+          "max": 2.1049070975597098e-08,
+          "peak_to_peak": 1.5325959720267185e-10,
+          "std_deterministic": 3.873131844137964e-11
+        },
+        "frequency_mean_hz": 47663342.759451725,
+        "pulse_high_s": {
+          "count": 94,
+          "mean": 1.9689167357006525e-09,
+          "min": 1.9248300799179865e-09,
+          "max": 1.987822257008663e-09,
+          "peak_to_peak": 6.299217709067654e-11,
+          "std_deterministic": 1.8440027420990215e-11
+        },
+        "pulse_low_s": {
+          "count": 94,
+          "mean": 1.901156726112725e-08,
+          "min": 1.8964555671976236e-08,
+          "max": 1.9065220530532307e-08,
+          "peak_to_peak": 1.006648585560703e-10,
+          "std_deterministic": 2.7685892900286212e-11
+        },
+        "duty": {
+          "count": 94,
+          "mean": 0.09384425273908605,
+          "min": 0.09195339025408197,
+          "max": 0.09474810584702381,
+          "peak_to_peak": 0.0027947155929418377,
+          "std_deterministic": 0.0007582179949169002
+        },
+        "rise_time_10_90_s": {
+          "count": 95,
+          "mean": 9.266216388511965e-10,
+          "min": 9.041305674212447e-10,
+          "max": 9.395056714310644e-10,
+          "peak_to_peak": 3.537510400981967e-11,
+          "std_deterministic": 6.947407465210835e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 94,
+          "mean": 4.4102184402541383e-10,
+          "min": 3.8881461129552995e-10,
+          "max": 4.665637907350908e-10,
+          "peak_to_peak": 7.774917943956087e-11,
+          "std_deterministic": 2.4882927954950124e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 93,
+          "mean": 1.899129559244727e-13,
+          "min": -1.0715637141582015e-10,
+          "max": 1.0955522532796213e-10,
+          "peak_to_peak": 2.1671159674378228e-10,
+          "std_deterministic": 4.2409658410624206e-11,
+          "max_abs": 1.0955522532796213e-10
+        },
+        "tail_drift_fraction": 0.00022789435114406364,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.0,
+      "process": "tt",
+      "temp_c": 85.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.5,
+        "vdd_nominal_v": 3.0,
+        "vdd_window_mean_v": 3.0,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 97,
+        "samples_per_cycle": 104.02061855670104,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 97,
+          "mean": 2.031765798652619e-08,
+          "min": 2.0295647054851764e-08,
+          "max": 2.0335694795132412e-08,
+          "peak_to_peak": 4.004774028064785e-11,
+          "std_deterministic": 5.00533775429449e-12
+        },
+        "frequency_mean_hz": 49218271.154242165,
+        "pulse_high_s": {
+          "count": 97,
+          "mean": 1.944121984716344e-09,
+          "min": 1.9218082829295985e-09,
+          "max": 1.94516048079396e-09,
+          "peak_to_peak": 2.335219786436132e-11,
+          "std_deterministic": 2.8038948380548226e-12
+        },
+        "pulse_low_s": {
+          "count": 97,
+          "mean": 1.8373536001809845e-08,
+          "min": 1.836660881156821e-08,
+          "max": 1.83933496955335e-08,
+          "peak_to_peak": 2.674088396529173e-11,
+          "std_deterministic": 4.4875236560630295e-12
+        },
+        "duty": {
+          "count": 97,
+          "mean": 0.09568631331319105,
+          "min": 0.09469066335927347,
+          "max": 0.0957513664372872,
+          "peak_to_peak": 0.0010607030780137305,
+          "std_deterministic": 0.00012910614407071527
+        },
+        "rise_time_10_90_s": {
+          "count": 98,
+          "mean": 1.0472746349183152e-09,
+          "min": 1.0356356516040858e-09,
+          "max": 1.0619697581303609e-09,
+          "peak_to_peak": 2.6334106526275033e-11,
+          "std_deterministic": 3.21562389949253e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 97,
+          "mean": 4.8131831665678e-10,
+          "min": 4.6459195693316583e-10,
+          "max": 4.916802272298554e-10,
+          "peak_to_peak": 2.7088270296689526e-11,
+          "std_deterministic": 2.6752591396213204e-12
+        },
+        "cycle_to_cycle_s": {
+          "count": 96,
+          "mean": -1.6685216392210066e-13,
+          "min": -4.004774028064785e-11,
+          "max": 2.3110816340895287e-11,
+          "peak_to_peak": 6.315855662154314e-11,
+          "std_deterministic": 8.818100962904191e-12,
+          "max_abs": 4.004774028064785e-11
+        },
+        "tail_drift_fraction": -4.807596160487244e-05,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.0,
+      "process": "ss",
+      "temp_c": -40.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.5,
+        "vdd_nominal_v": 3.0,
+        "vdd_window_mean_v": 3.0,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 90,
+        "samples_per_cycle": 112.93333333333334,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 90,
+          "mean": 2.1972621174630482e-08,
+          "min": 2.1868756266173655e-08,
+          "max": 2.2051049803165914e-08,
+          "peak_to_peak": 1.8229353699225864e-10,
+          "std_deterministic": 4.014513972010173e-11
+        },
+        "frequency_mean_hz": 45511183.76148026,
+        "pulse_high_s": {
+          "count": 90,
+          "mean": 2.4603259227879522e-09,
+          "min": 2.403018481530512e-09,
+          "max": 2.5144330711106668e-09,
+          "peak_to_peak": 1.1141458958015466e-10,
+          "std_deterministic": 2.5229510296144167e-11
+        },
+        "pulse_low_s": {
+          "count": 90,
+          "mean": 1.951229525184253e-08,
+          "min": 1.9452119416779216e-08,
+          "max": 1.955702213610289e-08,
+          "peak_to_peak": 1.0490271932367401e-10,
+          "std_deterministic": 2.540305135168861e-11
+        },
+        "duty": {
+          "count": 90,
+          "mean": 0.11197105793665404,
+          "min": 0.10981470765360332,
+          "max": 0.11416169227161208,
+          "peak_to_peak": 0.0043469846180087535,
+          "std_deterministic": 0.0009943375677835787
+        },
+        "rise_time_10_90_s": {
+          "count": 91,
+          "mean": 9.027007068598453e-10,
+          "min": 8.851801727043952e-10,
+          "max": 9.219731090981029e-10,
+          "peak_to_peak": 3.67929363937077e-11,
+          "std_deterministic": 9.60844569912003e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 90,
+          "mean": 4.082522685279923e-10,
+          "min": 3.7811305510769035e-10,
+          "max": 4.480658349773417e-10,
+          "peak_to_peak": 6.995277986965136e-11,
+          "std_deterministic": 1.5029173066990375e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 89,
+          "mean": -2.1772531040196025e-13,
+          "min": -1.4147912671995866e-10,
+          "max": 1.1530045841701142e-10,
+          "peak_to_peak": 2.567795851369701e-10,
+          "std_deterministic": 5.3344802259062e-11,
+          "max_abs": 1.4147912671995866e-10
+        },
+        "tail_drift_fraction": -0.0004940554058191146,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.0,
+      "process": "ss",
+      "temp_c": 27.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.5,
+        "vdd_nominal_v": 3.0,
+        "vdd_window_mean_v": 3.0,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 93,
+        "samples_per_cycle": 108.2258064516129,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 93,
+          "mean": 2.1183770317451503e-08,
+          "min": 2.1133205732900933e-08,
+          "max": 2.121848720942947e-08,
+          "peak_to_peak": 8.528147652853754e-11,
+          "std_deterministic": 1.949629757357889e-11
+        },
+        "frequency_mean_hz": 47205949.88589851,
+        "pulse_high_s": {
+          "count": 93,
+          "mean": 2.4083856369828048e-09,
+          "min": 2.380961982128817e-09,
+          "max": 2.4296433680707867e-09,
+          "peak_to_peak": 4.868138594196986e-11,
+          "std_deterministic": 1.3566257305629018e-11
+        },
+        "pulse_low_s": {
+          "count": 93,
+          "mean": 1.87753846804687e-08,
+          "min": 1.875038908251124e-08,
+          "max": 1.8799460631520538e-08,
+          "peak_to_peak": 4.907154900929715e-11,
+          "std_deterministic": 9.299089529025875e-12
+        },
+        "duty": {
+          "count": 93,
+          "mean": 0.1136896955994983,
+          "min": 0.1125946080548734,
+          "max": 0.1146167199821175,
+          "peak_to_peak": 0.002022111927244108,
+          "std_deterministic": 0.00054792870075784
+        },
+        "rise_time_10_90_s": {
+          "count": 94,
+          "mean": 1.0785566936949523e-09,
+          "min": 1.0631888070129249e-09,
+          "max": 1.0947389056366688e-09,
+          "peak_to_peak": 3.155009862374392e-11,
+          "std_deterministic": 9.077815729511158e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 93,
+          "mean": 4.6216753150660167e-10,
+          "min": 4.20975003774792e-10,
+          "max": 4.81142772948721e-10,
+          "peak_to_peak": 6.016776917392905e-11,
+          "std_deterministic": 1.0742045471177662e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 92,
+          "mean": 4.915520016580356e-13,
+          "min": -5.355742318209687e-11,
+          "max": 5.110015619739887e-11,
+          "peak_to_peak": 1.0465757937949574e-10,
+          "std_deterministic": 2.5556639445656837e-11,
+          "max_abs": 5.355742318209687e-11
+        },
+        "tail_drift_fraction": -0.0002895861825446032,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.0,
+      "process": "ss",
+      "temp_c": 85.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.5,
+        "vdd_nominal_v": 3.0,
+        "vdd_window_mean_v": 3.0,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 96,
+        "samples_per_cycle": 105.38541666666667,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 96,
+          "mean": 2.07266982466302e-08,
+          "min": 2.0704502342801956e-08,
+          "max": 2.074461241096187e-08,
+          "peak_to_peak": 4.01100681599151e-11,
+          "std_deterministic": 8.461157806633486e-12
+        },
+        "frequency_mean_hz": 48246951.25585584,
+        "pulse_high_s": {
+          "count": 96,
+          "mean": 2.3896071699194996e-09,
+          "min": 2.3724936146861234e-09,
+          "max": 2.399050589539924e-09,
+          "peak_to_peak": 2.655697485380061e-11,
+          "std_deterministic": 6.285211626247264e-12
+        },
+        "pulse_low_s": {
+          "count": 96,
+          "mean": 1.8337091076710702e-08,
+          "min": 1.8324656283694174e-08,
+          "max": 1.83526143576503e-08,
+          "peak_to_peak": 2.7958073956125965e-11,
+          "std_deterministic": 7.639499182733106e-12
+        },
+        "duty": {
+          "count": 96,
+          "mean": 0.11529121847014778,
+          "min": 0.11455355479414624,
+          "max": 0.1157626605278704,
+          "peak_to_peak": 0.0012091057337241667,
+          "std_deterministic": 0.00028293844567610127
+        },
+        "rise_time_10_90_s": {
+          "count": 97,
+          "mean": 1.2219052226262395e-09,
+          "min": 1.203975889542782e-09,
+          "max": 1.2349830882841682e-09,
+          "peak_to_peak": 3.100719874138619e-11,
+          "std_deterministic": 8.116631568440647e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 96,
+          "mean": 5.18051905912268e-10,
+          "min": 4.932365847202494e-10,
+          "max": 5.5067377669252e-10,
+          "peak_to_peak": 5.743719197227057e-11,
+          "std_deterministic": 1.7667570397467617e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 95,
+          "mean": -2.113671301387053e-13,
+          "min": -3.375015647475734e-11,
+          "max": 2.932008939972438e-11,
+          "peak_to_peak": 6.307024587448172e-11,
+          "std_deterministic": 1.3112112855921786e-11,
+          "max_abs": 3.375015647475734e-11
+        },
+        "tail_drift_fraction": -6.0218598065842006e-05,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.0,
+      "process": "ff",
+      "temp_c": -40.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.5,
+        "vdd_nominal_v": 3.0,
+        "vdd_window_mean_v": 3.0,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 90,
+        "samples_per_cycle": 110.05555555555556,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 90,
+          "mean": 2.1883481663147093e-08,
+          "min": 2.1738835125992436e-08,
+          "max": 2.2130126784592624e-08,
+          "peak_to_peak": 3.9129165860018805e-10,
+          "std_deterministic": 1.0816283057018642e-10
+        },
+        "frequency_mean_hz": 45696567.639145434,
+        "pulse_high_s": {
+          "count": 90,
+          "mean": 1.59649446135767e-09,
+          "min": 1.5235859885698343e-09,
+          "max": 1.6595939647626743e-09,
+          "peak_to_peak": 1.3600797619283994e-10,
+          "std_deterministic": 3.2176351145604253e-11
+        },
+        "pulse_low_s": {
+          "count": 90,
+          "mean": 2.0286987201789424e-08,
+          "min": 2.0189163362575847e-08,
+          "max": 2.055258867011045e-08,
+          "peak_to_peak": 3.634253075346025e-10,
+          "std_deterministic": 9.869522494547627e-11
+        },
+        "duty": {
+          "count": 90,
+          "mean": 0.0729529664641877,
+          "min": 0.06997658690745562,
+          "max": 0.07561295570469061,
+          "peak_to_peak": 0.005636368797234989,
+          "std_deterministic": 0.001356335869502338
+        },
+        "rise_time_10_90_s": {
+          "count": 91,
+          "mean": 6.881235564668546e-10,
+          "min": 6.443094279372957e-10,
+          "max": 7.20766307779581e-10,
+          "peak_to_peak": 7.645687984228532e-11,
+          "std_deterministic": 2.7240059413602536e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 90,
+          "mean": 3.8696728687803227e-10,
+          "min": 3.5027482548174354e-10,
+          "max": 4.1628684686864973e-10,
+          "peak_to_peak": 6.601202138690619e-11,
+          "std_deterministic": 2.4147182986625153e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 89,
+          "mean": -5.67819371285106e-13,
+          "min": -3.123684347716303e-10,
+          "max": 3.016855116755508e-10,
+          "peak_to_peak": 6.140539464471811e-10,
+          "std_deterministic": 1.572490684041898e-10,
+          "max_abs": 3.123684347716303e-10
+        },
+        "tail_drift_fraction": -6.05605145166503e-05,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.0,
+      "process": "ff",
+      "temp_c": 27.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.5,
+        "vdd_nominal_v": 3.0,
+        "vdd_window_mean_v": 3.0,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 95,
+        "samples_per_cycle": 104.77894736842106,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 95,
+          "mean": 2.0823108454237656e-08,
+          "min": 2.0731724104759296e-08,
+          "max": 2.091445710973599e-08,
+          "peak_to_peak": 1.8273300497669573e-10,
+          "std_deterministic": 4.3283088811247676e-11
+        },
+        "frequency_mean_hz": 48023569.68930317,
+        "pulse_high_s": {
+          "count": 95,
+          "mean": 1.5571058460902927e-09,
+          "min": 1.5090889325924256e-09,
+          "max": 1.601652475892516e-09,
+          "peak_to_peak": 9.25635433000904e-11,
+          "std_deterministic": 2.5549876614318853e-11
+        },
+        "pulse_low_s": {
+          "count": 95,
+          "mean": 1.9266002608147365e-08,
+          "min": 1.9199824274603803e-08,
+          "max": 1.936266883197172e-08,
+          "peak_to_peak": 1.628445573679182e-10,
+          "std_deterministic": 4.6585460582686497e-11
+        },
+        "duty": {
+          "count": 95,
+          "mean": 0.07477769142800027,
+          "min": 0.07258156074754382,
+          "max": 0.07695258947678185,
+          "peak_to_peak": 0.00437102872923803,
+          "std_deterministic": 0.0012125506626336476
+        },
+        "rise_time_10_90_s": {
+          "count": 96,
+          "mean": 8.14544006403342e-10,
+          "min": 7.654110561066709e-10,
+          "max": 8.352013465628505e-10,
+          "peak_to_peak": 6.979029045617964e-11,
+          "std_deterministic": 1.7220425787970516e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 95,
+          "mean": 4.134509600603345e-10,
+          "min": 3.738474675195455e-10,
+          "max": 4.5064943593001194e-10,
+          "peak_to_peak": 7.680196841046644e-11,
+          "std_deterministic": 2.8509647975313374e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 94,
+          "mean": 4.6075588139055734e-14,
+          "min": -1.253072971584392e-10,
+          "max": 9.578977523089596e-11,
+          "peak_to_peak": 2.2109707238933515e-10,
+          "std_deterministic": 6.124416004779091e-11,
+          "max_abs": 1.253072971584392e-10
+        },
+        "tail_drift_fraction": -0.0010466206700525317,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.0,
+      "process": "ff",
+      "temp_c": 85.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.5,
+        "vdd_nominal_v": 3.0,
+        "vdd_window_mean_v": 3.0,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 101,
+        "samples_per_cycle": 100.18811881188118,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 101,
+          "mean": 1.971561046123567e-08,
+          "min": 1.966174636501184e-08,
+          "max": 1.9776119527062532e-08,
+          "peak_to_peak": 1.1437316205069065e-10,
+          "std_deterministic": 2.800429492051677e-11
+        },
+        "frequency_mean_hz": 50721229.351035036,
+        "pulse_high_s": {
+          "count": 101,
+          "mean": 1.545084584407861e-09,
+          "min": 1.5156295004606845e-09,
+          "max": 1.578297680733759e-09,
+          "peak_to_peak": 6.266818027307456e-11,
+          "std_deterministic": 1.8629061113037755e-11
+        },
+        "pulse_low_s": {
+          "count": 101,
+          "mean": 1.8170525876827806e-08,
+          "min": 1.8135573001574698e-08,
+          "max": 1.8227863934649243e-08,
+          "peak_to_peak": 9.229093307454566e-11,
+          "std_deterministic": 2.352092775988827e-11
+        },
+        "duty": {
+          "count": 101,
+          "mean": 0.07836800406733906,
+          "min": 0.07681448039311192,
+          "max": 0.07998003110444897,
+          "peak_to_peak": 0.003165550711337048,
+          "std_deterministic": 0.0008877619312949837
+        },
+        "rise_time_10_90_s": {
+          "count": 102,
+          "mean": 9.211469257694863e-10,
+          "min": 9.067027606121084e-10,
+          "max": 9.412240601409277e-10,
+          "peak_to_peak": 3.452129952881931e-11,
+          "std_deterministic": 8.046911570965489e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 101,
+          "mean": 4.4223814201896595e-10,
+          "min": 3.98748775013271e-10,
+          "max": 4.699178151703937e-10,
+          "peak_to_peak": 7.116904015712269e-11,
+          "std_deterministic": 1.546289274838474e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 100,
+          "mean": -2.974539966551712e-14,
+          "min": -9.241502473285421e-11,
+          "max": 1.0593448035147108e-10,
+          "peak_to_peak": 1.9834950508432528e-10,
+          "std_deterministic": 4.337499074012452e-11,
+          "max_abs": 1.0593448035147108e-10
+        },
+        "tail_drift_fraction": 0.0005126767101454383,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "submit.json",
+      "vdd_v": 3.3,
+      "process": "tt",
+      "temp_c": -40.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.65,
+        "vdd_nominal_v": 3.3,
+        "vdd_window_mean_v": 3.3000000000000003,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 91,
+        "samples_per_cycle": 113.7032967032967,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 91,
+          "mean": 2.1711086038526317e-08,
+          "min": 2.158558747912022e-08,
+          "max": 2.190062117392655e-08,
+          "peak_to_peak": 3.1503369480633046e-10,
+          "std_deterministic": 6.45223768064541e-11
+        },
+        "frequency_mean_hz": 46059418.59497495,
+        "pulse_high_s": {
+          "count": 91,
+          "mean": 2.0033907996547273e-09,
+          "min": 1.9352305685480333e-09,
+          "max": 2.0844324079893136e-09,
+          "peak_to_peak": 1.4920183944128022e-10,
+          "std_deterministic": 3.96186214297234e-11
+        },
+        "pulse_low_s": {
+          "count": 91,
+          "mean": 1.9707695238871588e-08,
+          "min": 1.962523052827754e-08,
+          "max": 1.9816188765937236e-08,
+          "peak_to_peak": 1.9095823765969506e-10,
+          "std_deterministic": 4.548096717808076e-11
+        },
+        "duty": {
+          "count": 91,
+          "mean": 0.09227194404578916,
+          "min": 0.08946854129110118,
+          "max": 0.09544023754597572,
+          "peak_to_peak": 0.005971696254874537,
+          "std_deterministic": 0.001639660284542497
+        },
+        "rise_time_10_90_s": {
+          "count": 92,
+          "mean": 7.157879878578302e-10,
+          "min": 6.899997804566717e-10,
+          "max": 7.454982226870043e-10,
+          "peak_to_peak": 5.549844223033261e-11,
+          "std_deterministic": 1.432456195538094e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 91,
+          "mean": 3.6677681305472615e-10,
+          "min": 3.2503401304408456e-10,
+          "max": 4.16164654671561e-10,
+          "peak_to_peak": 9.113064162747644e-11,
+          "std_deterministic": 2.1231769108720058e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 90,
+          "mean": 3.4250932472770815e-12,
+          "min": -2.0223970127020803e-10,
+          "max": 2.113145056309993e-10,
+          "peak_to_peak": 4.1355420690120733e-10,
+          "std_deterministic": 8.946825673974379e-11,
+          "max_abs": 2.113145056309993e-10
+        },
+        "tail_drift_fraction": 0.0018627391976476176,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "submit.json",
+      "vdd_v": 3.3,
+      "process": "tt",
+      "temp_c": 27.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.65,
+        "vdd_nominal_v": 3.3,
+        "vdd_window_mean_v": 3.3,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 95,
+        "samples_per_cycle": 107.52631578947368,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 95,
+          "mean": 2.0781144001039255e-08,
+          "min": 2.0690782431991342e-08,
+          "max": 2.0850656942478978e-08,
+          "peak_to_peak": 1.598745104876352e-10,
+          "std_deterministic": 3.757697317082404e-11
+        },
+        "frequency_mean_hz": 48120546.20043971,
+        "pulse_high_s": {
+          "count": 95,
+          "mean": 1.9744069662000757e-09,
+          "min": 1.9094922003004805e-09,
+          "max": 2.010051711905228e-09,
+          "peak_to_peak": 1.0055951160474735e-10,
+          "std_deterministic": 2.815504430178297e-11
+        },
+        "pulse_low_s": {
+          "count": 95,
+          "mean": 1.880673703483918e-08,
+          "min": 1.8751175663591187e-08,
+          "max": 1.8856820763626887e-08,
+          "peak_to_peak": 1.0564510003569991e-10,
+          "std_deterministic": 2.4234761679061386e-11
+        },
+        "duty": {
+          "count": 95,
+          "mean": 0.09500797812886684,
+          "min": 0.09198294635412285,
+          "max": 0.09681528550229566,
+          "peak_to_peak": 0.004832339148172812,
+          "std_deterministic": 0.001229765193341674
+        },
+        "rise_time_10_90_s": {
+          "count": 96,
+          "mean": 8.591203828210998e-10,
+          "min": 8.311922370139247e-10,
+          "max": 8.786614656756909e-10,
+          "peak_to_peak": 4.746922866176624e-11,
+          "std_deterministic": 1.1287032656483537e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 95,
+          "mean": 4.108751871113318e-10,
+          "min": 3.7029691757285623e-10,
+          "max": 4.5774832602962757e-10,
+          "peak_to_peak": 8.745140845677134e-11,
+          "std_deterministic": 1.820798461316992e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 94,
+          "mean": 1.7870541821306816e-13,
+          "min": -1.1079999383403283e-10,
+          "max": 1.4315221777815175e-10,
+          "peak_to_peak": 2.539522116121846e-10,
+          "std_deterministic": 5.5410193384158006e-11,
+          "max_abs": 1.4315221777815175e-10
+        },
+        "tail_drift_fraction": 0.0003507524325889309,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "submit.json",
+      "vdd_v": 3.3,
+      "process": "tt",
+      "temp_c": 85.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.65,
+        "vdd_nominal_v": 3.3,
+        "vdd_window_mean_v": 3.2999999999999994,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 99,
+        "samples_per_cycle": 104.06060606060606,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 0
+        },
+        "period_s": {
+          "count": 99,
+          "mean": 2.016272818843488e-08,
+          "min": 2.0119465258018745e-08,
+          "max": 2.0208549228233687e-08,
+          "peak_to_peak": 8.908397021494202e-11,
+          "std_deterministic": 2.3001168469898268e-11
+        },
+        "frequency_mean_hz": 49596462.87220144,
+        "pulse_high_s": {
+          "count": 99,
+          "mean": 1.935408198071871e-09,
+          "min": 1.9108899564856355e-09,
+          "max": 1.958538284382302e-09,
+          "peak_to_peak": 4.764832789666638e-11,
+          "std_deterministic": 1.4706148736091683e-11
+        },
+        "pulse_low_s": {
+          "count": 99,
+          "mean": 1.822731999036301e-08,
+          "min": 1.819875986810071e-08,
+          "max": 1.8255860995637966e-08,
+          "peak_to_peak": 5.7101127537255436e-11,
+          "std_deterministic": 1.3992753506978189e-11
+        },
+        "duty": {
+          "count": 99,
+          "mean": 0.09598884996587571,
+          "min": 0.09484289422691064,
+          "max": 0.09704368825450788,
+          "peak_to_peak": 0.002200794027597236,
+          "std_deterministic": 0.0006435079806324428
+        },
+        "rise_time_10_90_s": {
+          "count": 100,
+          "mean": 9.714840741595356e-10,
+          "min": 9.59325601114947e-10,
+          "max": 9.897759220024987e-10,
+          "peak_to_peak": 3.045032088755178e-11,
+          "std_deterministic": 8.740473962015974e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 99,
+          "mean": 4.680632863743657e-10,
+          "min": 4.207380441055119e-10,
+          "max": 4.891817895819517e-10,
+          "peak_to_peak": 6.844374547643976e-11,
+          "std_deterministic": 2.16486020725974e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 98,
+          "mean": -1.1338339024262857e-13,
+          "min": -8.908397021494202e-11,
+          "max": 8.160759955712187e-11,
+          "peak_to_peak": 1.706915697720639e-10,
+          "std_deterministic": 4.1536923125968673e-11,
+          "max_abs": 8.908397021494202e-11
+        },
+        "tail_drift_fraction": -3.959336613938737e-05,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.3,
+      "process": "ss",
+      "temp_c": -40.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.65,
+        "vdd_nominal_v": 3.3,
+        "vdd_window_mean_v": 3.3,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 92,
+        "samples_per_cycle": 109.45652173913044,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 92,
+          "mean": 2.159260584090716e-08,
+          "min": 2.1483164130329618e-08,
+          "max": 2.1709774265574715e-08,
+          "peak_to_peak": 2.266101352450963e-10,
+          "std_deterministic": 5.487690374461001e-11
+        },
+        "frequency_mean_hz": 46312149.972445734,
+        "pulse_high_s": {
+          "count": 92,
+          "mean": 2.4602335228312505e-09,
+          "min": 2.402486997145066e-09,
+          "max": 2.511862621381271e-09,
+          "peak_to_peak": 1.0937562423620514e-10,
+          "std_deterministic": 2.9145033821438357e-11
+        },
+        "pulse_low_s": {
+          "count": 92,
+          "mean": 1.913237231807591e-08,
+          "min": 1.907274255630664e-08,
+          "max": 1.9219193620761033e-08,
+          "peak_to_peak": 1.464510644543914e-10,
+          "std_deterministic": 3.980158423466726e-11
+        },
+        "duty": {
+          "count": 92,
+          "mean": 0.1139369976819359,
+          "min": 0.11154359683095397,
+          "max": 0.11577783490753472,
+          "peak_to_peak": 0.004234238076580757,
+          "std_deterministic": 0.001162267914447103
+        },
+        "rise_time_10_90_s": {
+          "count": 93,
+          "mean": 8.286003760773134e-10,
+          "min": 8.064395923642513e-10,
+          "max": 8.462856536800296e-10,
+          "peak_to_peak": 3.984606131577826e-11,
+          "std_deterministic": 9.370453941438785e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 92,
+          "mean": 4.211049592299942e-10,
+          "min": 3.7428300160853687e-10,
+          "max": 4.4648182542553444e-10,
+          "peak_to_peak": 7.219882381699757e-11,
+          "std_deterministic": 2.175856159772023e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 91,
+          "mean": -1.0025490049422566e-12,
+          "min": -1.2470097722575577e-10,
+          "max": 1.370990556291121e-10,
+          "peak_to_peak": 2.618000328548679e-10,
+          "std_deterministic": 6.111735467375435e-11,
+          "max_abs": 1.370990556291121e-10
+        },
+        "tail_drift_fraction": -0.002777550913883643,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.3,
+      "process": "ss",
+      "temp_c": 27.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.65,
+        "vdd_nominal_v": 3.3,
+        "vdd_window_mean_v": 3.3000000000000003,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 96,
+        "samples_per_cycle": 106.69791666666667,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 0
+        },
+        "period_s": {
+          "count": 96,
+          "mean": 2.0799179980377245e-08,
+          "min": 2.0754686503363757e-08,
+          "max": 2.0851342957712177e-08,
+          "peak_to_peak": 9.66564543484203e-11,
+          "std_deterministic": 1.8283719437971476e-11
+        },
+        "frequency_mean_hz": 48078818.53724228,
+        "pulse_high_s": {
+          "count": 96,
+          "mean": 2.3811583880789617e-09,
+          "min": 2.3503906845635607e-09,
+          "max": 2.4155262068242312e-09,
+          "peak_to_peak": 6.513552226067049e-11,
+          "std_deterministic": 1.346791376582691e-11
+        },
+        "pulse_low_s": {
+          "count": 96,
+          "mean": 1.8418021592298284e-08,
+          "min": 1.8399557985353097e-08,
+          "max": 1.8450893562279495e-08,
+          "peak_to_peak": 5.1335576926398374e-11,
+          "std_deterministic": 9.018781413532159e-12
+        },
+        "duty": {
+          "count": 96,
+          "mean": 0.11448286859726037,
+          "min": 0.11321202507640929,
+          "max": 0.11594983144171024,
+          "peak_to_peak": 0.0027378063653009516,
+          "std_deterministic": 0.0005606852359265233
+        },
+        "rise_time_10_90_s": {
+          "count": 97,
+          "mean": 9.812832577347396e-10,
+          "min": 9.64772847416841e-10,
+          "max": 9.974028293275976e-10,
+          "peak_to_peak": 3.2629981910756644e-11,
+          "std_deterministic": 8.590214950512381e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 96,
+          "mean": 4.463204851242758e-10,
+          "min": 4.1121028881857817e-10,
+          "max": 4.816974320200789e-10,
+          "peak_to_peak": 7.048714320150072e-11,
+          "std_deterministic": 1.7562449905733025e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 95,
+          "mean": 7.73791953556507e-13,
+          "min": -5.827166875383653e-11,
+          "max": 8.92411500464296e-11,
+          "peak_to_peak": 1.4751281880026612e-10,
+          "std_deterministic": 2.4793841994596204e-11,
+          "max_abs": 8.92411500464296e-11
+        },
+        "tail_drift_fraction": 8.9859696635324e-05,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.3,
+      "process": "ss",
+      "temp_c": 85.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.65,
+        "vdd_nominal_v": 3.3,
+        "vdd_window_mean_v": 3.3,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 97,
+        "samples_per_cycle": 104.26804123711341,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 97,
+          "mean": 2.036007707994509e-08,
+          "min": 2.034447908439384e-08,
+          "max": 2.0372580426088812e-08,
+          "peak_to_peak": 2.8101341694971357e-11,
+          "std_deterministic": 6.606342573674392e-12
+        },
+        "frequency_mean_hz": 49115727.61112046,
+        "pulse_high_s": {
+          "count": 97,
+          "mean": 2.36048921400667e-09,
+          "min": 2.3493984832168426e-09,
+          "max": 2.3686955830540886e-09,
+          "peak_to_peak": 1.9297099837246043e-11,
+          "std_deterministic": 4.3988360039633e-12
+        },
+        "pulse_low_s": {
+          "count": 97,
+          "mean": 1.799958786593842e-08,
+          "min": 1.798835617912903e-08,
+          "max": 1.8010373882802213e-08,
+          "peak_to_peak": 2.2017703673184e-11,
+          "std_deterministic": 4.230176978827817e-12
+        },
+        "duty": {
+          "count": 97,
+          "mean": 0.1159371030681656,
+          "min": 0.11547970377784159,
+          "max": 0.11630182916928862,
+          "peak_to_peak": 0.0008221253914470344,
+          "std_deterministic": 0.00018836569888292968
+        },
+        "rise_time_10_90_s": {
+          "count": 98,
+          "mean": 1.11491871332607e-09,
+          "min": 1.0984714885575286e-09,
+          "max": 1.1264122780779175e-09,
+          "peak_to_peak": 2.7940789520388906e-11,
+          "std_deterministic": 6.764514540746977e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 97,
+          "mean": 5.029583901993634e-10,
+          "min": 4.703309005349193e-10,
+          "max": 5.267166367097604e-10,
+          "peak_to_peak": 5.638573617484108e-11,
+          "std_deterministic": 1.2224211179625086e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 96,
+          "mean": 3.5460049272776664e-14,
+          "min": -1.7921084995625508e-11,
+          "max": 1.9046657060242146e-11,
+          "peak_to_peak": 3.6967742055867654e-11,
+          "std_deterministic": 7.42424280157419e-12,
+          "max_abs": 1.9046657060242146e-11
+        },
+        "tail_drift_fraction": 0.00024308240926861397,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.3,
+      "process": "ff",
+      "temp_c": -40.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.65,
+        "vdd_nominal_v": 3.3,
+        "vdd_window_mean_v": 3.3,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 91,
+        "samples_per_cycle": 111.14285714285714,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 91,
+          "mean": 2.1760794585726406e-08,
+          "min": 2.1583303266665483e-08,
+          "max": 2.1976266770690764e-08,
+          "peak_to_peak": 3.9296350402528144e-10,
+          "std_deterministic": 8.134970060032841e-11
+        },
+        "frequency_mean_hz": 45954204.29435659,
+        "pulse_high_s": {
+          "count": 91,
+          "mean": 1.5925210439333963e-09,
+          "min": 1.5117642595730463e-09,
+          "max": 1.653557626588709e-09,
+          "peak_to_peak": 1.4179336701566274e-10,
+          "std_deterministic": 3.9034166241809477e-11
+        },
+        "pulse_low_s": {
+          "count": 91,
+          "mean": 2.016827354179301e-08,
+          "min": 2.0016895145987614e-08,
+          "max": 2.038872513475989e-08,
+          "peak_to_peak": 3.7182998877227755e-10,
+          "std_deterministic": 7.094512530614496e-11
+        },
+        "duty": {
+          "count": 91,
+          "mean": 0.07318077756419437,
+          "min": 0.06957756052550927,
+          "max": 0.07599339262973684,
+          "peak_to_peak": 0.006415832104227567,
+          "std_deterministic": 0.0016766245193504032
+        },
+        "rise_time_10_90_s": {
+          "count": 92,
+          "mean": 6.450989459918841e-10,
+          "min": 6.019813596509619e-10,
+          "max": 6.889786014690829e-10,
+          "peak_to_peak": 8.699724181812098e-11,
+          "std_deterministic": 1.774001791776405e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 91,
+          "mean": 3.5913378348456426e-10,
+          "min": 3.051631345859227e-10,
+          "max": 4.1607321622484867e-10,
+          "peak_to_peak": 1.1091008163892596e-10,
+          "std_deterministic": 2.939904776315277e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 90,
+          "mean": -2.127501563275854e-13,
+          "min": -3.8001371372378017e-10,
+          "max": 3.308463521726904e-10,
+          "peak_to_peak": 7.108600658964706e-10,
+          "std_deterministic": 1.0956325273692934e-10,
+          "max_abs": 3.8001371372378017e-10
+        },
+        "tail_drift_fraction": -0.0013720473230326967,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.3,
+      "process": "ff",
+      "temp_c": 27.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.65,
+        "vdd_nominal_v": 3.3,
+        "vdd_window_mean_v": 3.2999999999999994,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 96,
+        "samples_per_cycle": 105.57291666666667,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 96,
+          "mean": 2.072779826093846e-08,
+          "min": 2.06403757661505e-08,
+          "max": 2.0822289983150866e-08,
+          "peak_to_peak": 1.819142170003652e-10,
+          "std_deterministic": 4.431589197174397e-11
+        },
+        "frequency_mean_hz": 48244390.81330217,
+        "pulse_high_s": {
+          "count": 96,
+          "mean": 1.5498423561382164e-09,
+          "min": 1.5138559162176186e-09,
+          "max": 1.5991814417865588e-09,
+          "peak_to_peak": 8.532552556894018e-11,
+          "std_deterministic": 2.423818161291984e-11
+        },
+        "pulse_low_s": {
+          "count": 96,
+          "mean": 1.9177955904800244e-08,
+          "min": 1.909239565420505e-08,
+          "max": 1.9264750123900804e-08,
+          "peak_to_peak": 1.7235446969575386e-10,
+          "std_deterministic": 4.032839171982761e-11
+        },
+        "duty": {
+          "count": 96,
+          "mean": 0.07477046646822753,
+          "min": 0.07312346142150661,
+          "max": 0.07691084223629718,
+          "peak_to_peak": 0.003787380814790575,
+          "std_deterministic": 0.0011097329789415587
+        },
+        "rise_time_10_90_s": {
+          "count": 97,
+          "mean": 7.546088451779149e-10,
+          "min": 7.090163650046437e-10,
+          "max": 7.985073800770683e-10,
+          "peak_to_peak": 8.949101507242456e-11,
+          "std_deterministic": 2.4959858137149375e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 96,
+          "mean": 3.8362666349618583e-10,
+          "min": 3.5320693669044115e-10,
+          "max": 4.444478812454624e-10,
+          "peak_to_peak": 9.124094455502125e-11,
+          "std_deterministic": 2.0858197018078135e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 95,
+          "mean": -1.3760048912124393e-13,
+          "min": -1.5692748970335606e-10,
+          "max": 1.6225861833204765e-10,
+          "peak_to_peak": 3.191861080354037e-10,
+          "std_deterministic": 5.888839683771947e-11,
+          "max_abs": 1.6225861833204765e-10
+        },
+        "tail_drift_fraction": -0.0008092001058684021,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.3,
+      "process": "ff",
+      "temp_c": 85.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.65,
+        "vdd_nominal_v": 3.3,
+        "vdd_window_mean_v": 3.2999999999999994,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 100,
+        "samples_per_cycle": 102.0,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 100,
+          "mean": 1.9906275780447884e-08,
+          "min": 1.98361749424287e-08,
+          "max": 1.9974059589166306e-08,
+          "peak_to_peak": 1.378846467376077e-10,
+          "std_deterministic": 3.4633395159352095e-11
+        },
+        "frequency_mean_hz": 50235413.74736749,
+        "pulse_high_s": {
+          "count": 100,
+          "mean": 1.5591508511776558e-09,
+          "min": 1.5207707812875902e-09,
+          "max": 1.6028194124960155e-09,
+          "peak_to_peak": 8.20486312084253e-11,
+          "std_deterministic": 2.5469651433648828e-11
+        },
+        "pulse_low_s": {
+          "count": 100,
+          "mean": 1.834712492927023e-08,
+          "min": 1.829623192594411e-08,
+          "max": 1.842285631972488e-08,
+          "peak_to_peak": 1.266243937807709e-10,
+          "std_deterministic": 2.7909296889696837e-11
+        },
+        "duty": {
+          "count": 100,
+          "mean": 0.07832347553109227,
+          "min": 0.07625787707281272,
+          "max": 0.08039590730054653,
+          "peak_to_peak": 0.004138030227733819,
+          "std_deterministic": 0.0012008179070272364
+        },
+        "rise_time_10_90_s": {
+          "count": 101,
+          "mean": 8.670528261776411e-10,
+          "min": 8.481249920811275e-10,
+          "max": 8.848484703433688e-10,
+          "peak_to_peak": 3.672347826224123e-11,
+          "std_deterministic": 1.270991381860697e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 100,
+          "mean": 4.405508756876521e-10,
+          "min": 3.9177524359095147e-10,
+          "max": 4.744663063690157e-10,
+          "peak_to_peak": 8.269106277806419e-11,
+          "std_deterministic": 2.2839481030449336e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 99,
+          "mean": 9.039527122234288e-14,
+          "min": -1.0116677207265101e-10,
+          "max": 1.1870927949059694e-10,
+          "peak_to_peak": 2.1987605156324795e-10,
+          "std_deterministic": 6.138172465823644e-11,
+          "max_abs": 1.1870927949059694e-10
+        },
+        "tail_drift_fraction": -0.00020139776259431994,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.6,
+      "process": "tt",
+      "temp_c": -40.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.8,
+        "vdd_nominal_v": 3.6,
+        "vdd_window_mean_v": 3.6,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 92,
+        "samples_per_cycle": 112.16304347826087,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 92,
+          "mean": 2.148204940412342e-08,
+          "min": 2.1358469732845632e-08,
+          "max": 2.1650849021302926e-08,
+          "peak_to_peak": 2.923792884572938e-10,
+          "std_deterministic": 6.125256037810766e-11
+        },
+        "frequency_mean_hz": 46550493.4463121,
+        "pulse_high_s": {
+          "count": 92,
+          "mean": 1.9702920646426214e-09,
+          "min": 1.9008734605521695e-09,
+          "max": 2.0525092344798337e-09,
+          "peak_to_peak": 1.5163577392766415e-10,
+          "std_deterministic": 3.458518963517879e-11
+        },
+        "pulse_low_s": {
+          "count": 92,
+          "mean": 1.9511757339480795e-08,
+          "min": 1.94318992943617e-08,
+          "max": 1.9622321059540237e-08,
+          "peak_to_peak": 1.9042176517853758e-10,
+          "std_deterministic": 4.241388560714098e-11
+        },
+        "duty": {
+          "count": 92,
+          "mean": 0.09171540154500443,
+          "min": 0.08888448796404823,
+          "max": 0.09505305698678732,
+          "peak_to_peak": 0.006168569022739087,
+          "std_deterministic": 0.001426041704193703
+        },
+        "rise_time_10_90_s": {
+          "count": 93,
+          "mean": 6.717668007634056e-10,
+          "min": 6.427658870311755e-10,
+          "max": 7.0779051657526e-10,
+          "peak_to_peak": 6.502462954408451e-11,
+          "std_deterministic": 1.67451886889777e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 92,
+          "mean": 3.65014322101199e-10,
+          "min": 3.1593198723310167e-10,
+          "max": 4.2072196909391014e-10,
+          "peak_to_peak": 1.0478998186080847e-10,
+          "std_deterministic": 2.7248373419337926e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 91,
+          "mean": 1.3203562287666565e-12,
+          "min": -2.1142950495304895e-10,
+          "max": 2.152619523739874e-10,
+          "peak_to_peak": 4.2669145732703636e-10,
+          "std_deterministic": 8.067235265376419e-11,
+          "max_abs": 2.152619523739874e-10
+        },
+        "tail_drift_fraction": -0.0014233625076621199,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.6,
+      "process": "tt",
+      "temp_c": 27.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.8,
+        "vdd_nominal_v": 3.6,
+        "vdd_window_mean_v": 3.6,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 97,
+        "samples_per_cycle": 105.78350515463917,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 0
+        },
+        "period_s": {
+          "count": 97,
+          "mean": 2.058477438000261e-08,
+          "min": 2.0491326185333495e-08,
+          "max": 2.068509532725997e-08,
+          "peak_to_peak": 1.9376914192647567e-10,
+          "std_deterministic": 4.381938994729391e-11
+        },
+        "frequency_mean_hz": 48579594.876272485,
+        "pulse_high_s": {
+          "count": 97,
+          "mean": 1.9549704510910984e-09,
+          "min": 1.881872227595452e-09,
+          "max": 2.0127969180875574e-09,
+          "peak_to_peak": 1.3092469049210526e-10,
+          "std_deterministic": 3.5191355501421394e-11
+        },
+        "pulse_low_s": {
+          "count": 97,
+          "mean": 1.862980392891151e-08,
+          "min": 1.857988388773976e-08,
+          "max": 1.8702414006461165e-08,
+          "peak_to_peak": 1.225301187214047e-10,
+          "std_deterministic": 2.269648001953255e-11
+        },
+        "duty": {
+          "count": 97,
+          "mean": 0.09496898276762811,
+          "min": 0.09181723734654014,
+          "max": 0.09759300609489294,
+          "peak_to_peak": 0.005775768748352797,
+          "std_deterministic": 0.0015405053334560854
+        },
+        "rise_time_10_90_s": {
+          "count": 98,
+          "mean": 8.034887416021932e-10,
+          "min": 7.758056226990907e-10,
+          "max": 8.300490878162539e-10,
+          "peak_to_peak": 5.424346511716314e-11,
+          "std_deterministic": 1.344026915697117e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 97,
+          "mean": 3.9161577259290487e-10,
+          "min": 3.558134358879622e-10,
+          "max": 4.5729507830314037e-10,
+          "peak_to_peak": 1.0148164241517818e-10,
+          "std_deterministic": 2.2368478841074038e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 96,
+          "mean": 7.496371892513816e-13,
+          "min": -1.6957925462010473e-10,
+          "max": 1.2719110320701045e-10,
+          "peak_to_peak": 2.967703578271152e-10,
+          "std_deterministic": 6.60725749535975e-11,
+          "max_abs": 1.6957925462010473e-10
+        },
+        "tail_drift_fraction": -0.0005511229431065048,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.6,
+      "process": "tt",
+      "temp_c": 85.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.8,
+        "vdd_nominal_v": 3.6,
+        "vdd_window_mean_v": 3.6000000000000005,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 99,
+        "samples_per_cycle": 100.07070707070707,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 99,
+          "mean": 2.0001435594470107e-08,
+          "min": 1.998946147559419e-08,
+          "max": 2.003443540033519e-08,
+          "peak_to_peak": 4.497392474099994e-11,
+          "std_deterministic": 7.670670846462779e-12
+        },
+        "frequency_mean_hz": 49996411.27142268,
+        "pulse_high_s": {
+          "count": 99,
+          "mean": 1.943603335661249e-09,
+          "min": 1.9164718882428637e-09,
+          "max": 1.9670736132218177e-09,
+          "peak_to_peak": 5.0601724978953985e-11,
+          "std_deterministic": 1.0249192431853143e-11
+        },
+        "pulse_low_s": {
+          "count": 99,
+          "mean": 1.805783225880886e-08,
+          "min": 1.8042952240067384e-08,
+          "max": 1.8093450808417185e-08,
+          "peak_to_peak": 5.049856834980055e-11,
+          "std_deterministic": 1.0188739913365976e-11
+        },
+        "duty": {
+          "count": 99,
+          "mean": 0.09717313095914022,
+          "min": 0.09584149847170798,
+          "max": 0.09827229621574606,
+          "peak_to_peak": 0.0024307977440380796,
+          "std_deterministic": 0.0004992822404756477
+        },
+        "rise_time_10_90_s": {
+          "count": 100,
+          "mean": 9.169053573367239e-10,
+          "min": 9.024007198836525e-10,
+          "max": 9.216096200198565e-10,
+          "peak_to_peak": 1.9208900136204014e-11,
+          "std_deterministic": 3.856949186613468e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 99,
+          "mean": 4.475138109678845e-10,
+          "min": 4.1416434923269557e-10,
+          "max": 4.81562030144278e-10,
+          "peak_to_peak": 6.73976809115824e-11,
+          "std_deterministic": 8.468891414304962e-12
+        },
+        "cycle_to_cycle_s": {
+          "count": 98,
+          "mean": 2.3254358764089717e-14,
+          "min": -4.0402075589029756e-11,
+          "max": 3.007298821791171e-11,
+          "peak_to_peak": 7.047506380694147e-11,
+          "std_deterministic": 9.583244355409252e-12,
+          "max_abs": 4.0402075589029756e-11
+        },
+        "tail_drift_fraction": 9.556417754006778e-05,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.6,
+      "process": "ss",
+      "temp_c": -40.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.8,
+        "vdd_nominal_v": 3.6,
+        "vdd_window_mean_v": 3.5999999999999996,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 93,
+        "samples_per_cycle": 114.16129032258064,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 93,
+          "mean": 2.132220124424796e-08,
+          "min": 2.119798987412457e-08,
+          "max": 2.1437059490085836e-08,
+          "peak_to_peak": 2.390696159612659e-10,
+          "std_deterministic": 5.52852758278413e-11
+        },
+        "frequency_mean_hz": 46899472.927063175,
+        "pulse_high_s": {
+          "count": 93,
+          "mean": 2.4612169943250817e-09,
+          "min": 2.382377040462862e-09,
+          "max": 2.514545164845433e-09,
+          "peak_to_peak": 1.3216812438257108e-10,
+          "std_deterministic": 3.7395184917019316e-11
+        },
+        "pulse_low_s": {
+          "count": 93,
+          "mean": 1.8860984249922882e-08,
+          "min": 1.8794999817281656e-08,
+          "max": 1.892733640441164e-08,
+          "peak_to_peak": 1.3233658712998508e-10,
+          "std_deterministic": 3.2640196556562924e-11
+        },
+        "duty": {
+          "count": 93,
+          "mean": 0.11542682359546497,
+          "min": 0.11233420884903125,
+          "max": 0.1176897208749139,
+          "peak_to_peak": 0.00535551202588265,
+          "std_deterministic": 0.0015197919598348036
+        },
+        "rise_time_10_90_s": {
+          "count": 94,
+          "mean": 7.693020668006252e-10,
+          "min": 7.463679131726746e-10,
+          "max": 7.97317186439114e-10,
+          "peak_to_peak": 5.094927326643943e-11,
+          "std_deterministic": 1.1526320713967286e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 93,
+          "mean": 3.948190598836394e-10,
+          "min": 3.544582390087672e-10,
+          "max": 4.420803922349089e-10,
+          "peak_to_peak": 8.762215322614172e-11,
+          "std_deterministic": 2.140977868214271e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 92,
+          "mean": -1.4037341233474754e-12,
+          "min": -1.5005822111150216e-10,
+          "max": 2.0444365740401394e-10,
+          "peak_to_peak": 3.545018785155161e-10,
+          "std_deterministic": 6.957900818879515e-11,
+          "max_abs": 2.0444365740401394e-10
+        },
+        "tail_drift_fraction": -7.909889624959671e-05,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.6,
+      "process": "ss",
+      "temp_c": 27.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.8,
+        "vdd_nominal_v": 3.6,
+        "vdd_window_mean_v": 3.6,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 97,
+        "samples_per_cycle": 103.74226804123711,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 97,
+          "mean": 2.0529684836591722e-08,
+          "min": 2.0460659328960248e-08,
+          "max": 2.0584169231637172e-08,
+          "peak_to_peak": 1.2350990267692447e-10,
+          "std_deterministic": 3.6958731899324254e-11
+        },
+        "frequency_mean_hz": 48709953.80394827,
+        "pulse_high_s": {
+          "count": 97,
+          "mean": 2.3852647935910637e-09,
+          "min": 2.3416235015153613e-09,
+          "max": 2.4194776814867103e-09,
+          "peak_to_peak": 7.785417997134905e-11,
+          "std_deterministic": 2.7698121493435617e-11
+        },
+        "pulse_low_s": {
+          "count": 97,
+          "mean": 1.8144420043000658e-08,
+          "min": 1.8115280240803245e-08,
+          "max": 1.8170250312961274e-08,
+          "peak_to_peak": 5.497007215802857e-11,
+          "std_deterministic": 1.6757232061510072e-11
+        },
+        "duty": {
+          "count": 97,
+          "mean": 0.11618431638860317,
+          "min": 0.11429611802997096,
+          "max": 0.11776393679890883,
+          "peak_to_peak": 0.0034678187689378692,
+          "std_deterministic": 0.0011638261189848582
+        },
+        "rise_time_10_90_s": {
+          "count": 98,
+          "mean": 9.068188193097603e-10,
+          "min": 8.955275834513702e-10,
+          "max": 9.26743938086858e-10,
+          "peak_to_peak": 3.1216354635487786e-11,
+          "std_deterministic": 6.8698222871489685e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 97,
+          "mean": 4.6207172789060314e-10,
+          "min": 4.1523689930147425e-10,
+          "max": 4.770448436232019e-10,
+          "peak_to_peak": 6.180794432172768e-11,
+          "std_deterministic": 1.735890921459147e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 96,
+          "mean": 8.884986069421542e-13,
+          "min": -1.0175796623983972e-10,
+          "max": 1.0134600050718066e-10,
+          "peak_to_peak": 2.0310396674702038e-10,
+          "std_deterministic": 4.1780932426682396e-11,
+          "max_abs": 1.0175796623983972e-10
+        },
+        "tail_drift_fraction": -0.00022102146214527193,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.6,
+      "process": "ss",
+      "temp_c": 85.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.8,
+        "vdd_nominal_v": 3.6,
+        "vdd_window_mean_v": 3.6,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 99,
+        "samples_per_cycle": 102.54545454545455,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 99,
+          "mean": 2.00741042898624e-08,
+          "min": 2.0037677546802123e-08,
+          "max": 2.0095532716760464e-08,
+          "peak_to_peak": 5.7855169958341774e-11,
+          "std_deterministic": 1.2054222806146556e-11
+        },
+        "frequency_mean_hz": 49815423.1720819,
+        "pulse_high_s": {
+          "count": 99,
+          "mean": 2.3510369978123323e-09,
+          "min": 2.326999438605692e-09,
+          "max": 2.3707310164366665e-09,
+          "peak_to_peak": 4.373157783097467e-11,
+          "std_deterministic": 8.75628554070386e-12
+        },
+        "pulse_low_s": {
+          "count": 99,
+          "mean": 1.772306729205007e-08,
+          "min": 1.770455693326584e-08,
+          "max": 1.7735371110891372e-08,
+          "peak_to_peak": 3.081417762553114e-11,
+          "std_deterministic": 6.250656865931955e-12
+        },
+        "duty": {
+          "count": 99,
+          "mean": 0.11711771817513356,
+          "min": 0.11611956722710415,
+          "max": 0.11801687214266922,
+          "peak_to_peak": 0.0018973049155650706,
+          "std_deterministic": 0.00037698473726979065
+        },
+        "rise_time_10_90_s": {
+          "count": 100,
+          "mean": 1.0337033995499388e-09,
+          "min": 1.0174280685797902e-09,
+          "max": 1.0470806836192963e-09,
+          "peak_to_peak": 2.965261503950611e-11,
+          "std_deterministic": 7.407092569005284e-12
+        },
+        "fall_time_90_10_s": {
+          "count": 99,
+          "mean": 4.821180876897904e-10,
+          "min": 4.3770214038787395e-10,
+          "max": 5.156825955973188e-10,
+          "peak_to_peak": 7.798045520944485e-11,
+          "std_deterministic": 1.797840283680733e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 98,
+          "mean": 3.2111451266137596e-13,
+          "min": -3.473666441498164e-11,
+          "max": 3.078520398604417e-11,
+          "peak_to_peak": 6.552186840102581e-11,
+          "std_deterministic": 1.3017061099973424e-11,
+          "max_abs": 3.473666441498164e-11
+        },
+        "tail_drift_fraction": 0.00016746767863498808,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.6,
+      "process": "ff",
+      "temp_c": -40.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.8,
+        "vdd_nominal_v": 3.6,
+        "vdd_window_mean_v": 3.6,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 92,
+        "samples_per_cycle": 114.04347826086956,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 92,
+          "mean": 2.1611260170886344e-08,
+          "min": 2.139486711992677e-08,
+          "max": 2.1970339890098686e-08,
+          "peak_to_peak": 5.754727701719154e-10,
+          "std_deterministic": 1.1980213338595803e-10
+        },
+        "frequency_mean_hz": 46272174.4170732,
+        "pulse_high_s": {
+          "count": 92,
+          "mean": 1.583752776721694e-09,
+          "min": 1.5120078551728738e-09,
+          "max": 1.6662754462720946e-09,
+          "peak_to_peak": 1.5426759109922082e-10,
+          "std_deterministic": 3.416575832661742e-11
+        },
+        "pulse_low_s": {
+          "count": 92,
+          "mean": 2.002750739416465e-08,
+          "min": 1.9853054108143843e-08,
+          "max": 2.03102249447046e-08,
+          "peak_to_peak": 4.5717083656075796e-10,
+          "std_deterministic": 1.0172120983911378e-10
+        },
+        "duty": {
+          "count": 92,
+          "mean": 0.07328040197034669,
+          "min": 0.07060517043276753,
+          "max": 0.0766675190563902,
+          "peak_to_peak": 0.0060623486236226765,
+          "std_deterministic": 0.0013596368555731967
+        },
+        "rise_time_10_90_s": {
+          "count": 93,
+          "mean": 6.075186106796513e-10,
+          "min": 5.754023224654092e-10,
+          "max": 6.493830110856837e-10,
+          "peak_to_peak": 7.398068862027448e-11,
+          "std_deterministic": 1.794192425114358e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 92,
+          "mean": 3.723818009980133e-10,
+          "min": 2.991392946507566e-10,
+          "max": 4.154611039589994e-10,
+          "peak_to_peak": 1.1632180930824278e-10,
+          "std_deterministic": 2.7013591855615138e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 91,
+          "mean": -6.278086604998966e-13,
+          "min": -4.044521605581458e-10,
+          "max": 3.433426492064056e-10,
+          "peak_to_peak": 7.477948097645514e-10,
+          "std_deterministic": 1.682298270747954e-10,
+          "max_abs": 4.044521605581458e-10
+        },
+        "tail_drift_fraction": -0.00215507861521854,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.6,
+      "process": "ff",
+      "temp_c": 27.0,
+      "metrics": {
+        "units": {
+          "time": "s",
+          "voltage": "V",
+          "duty": "ratio"
+        },
+        "level_v": 1.8,
+        "vdd_nominal_v": 3.6,
+        "vdd_window_mean_v": 3.6000000000000005,
+        "window_s": 2.0000000000000003e-06,
+        "window_start_s": 1.8e-05,
+        "tstop_s": 2e-05,
+        "n_complete_cycles": 96,
+        "samples_per_cycle": 105.90625,
+        "omitted_boundary": {
+          "leading_falling_edges": 0,
+          "trailing_falling_edges": 1
+        },
+        "period_s": {
+          "count": 96,
+          "mean": 2.0626106598168036e-08,
+          "min": 2.0502675750165962e-08,
+          "max": 2.079365802669207e-08,
+          "peak_to_peak": 2.909822765261082e-10,
+          "std_deterministic": 5.705820649176924e-11
+        },
+        "frequency_mean_hz": 48482247.25498208,
+        "pulse_high_s": {
+          "count": 96,
+          "mean": 1.5764576461838103e-09,
+          "min": 1.530926149773701e-09,
+          "max": 1.6495154189495424e-09,
+          "peak_to_peak": 1.1858926917584145e-10,
+          "std_deterministic": 2.453786460661924e-11
+        },
+        "pulse_low_s": {
+          "count": 96,
+          "mean": 1.9049648951984226e-08,
+          "min": 1.8933218861859357e-08,
+          "max": 1.9176905435048126e-08,
+          "peak_to_peak": 2.4368657318876827e-10,
+          "std_deterministic": 5.464532503835401e-11
+        },
+        "duty": {
+          "count": 96,
+          "mean": 0.07642977079270011,
+          "min": 0.0744723530385314,
+          "max": 0.07996227436618895,
+          "peak_to_peak": 0.005489921327657549,
+          "std_deterministic": 0.0011418949545396375
+        },
+        "rise_time_10_90_s": {
+          "count": 97,
+          "mean": 7.183145037855366e-10,
+          "min": 6.766789229170904e-10,
+          "max": 7.630188158955437e-10,
+          "peak_to_peak": 8.633989297845328e-11,
+          "std_deterministic": 1.8988285478908383e-11
+        },
+        "fall_time_90_10_s": {
+          "count": 96,
+          "mean": 3.866450670221594e-10,
+          "min": 3.3758899597627996e-10,
+          "max": 4.3824297280510897e-10,
+          "peak_to_peak": 1.00653976828829e-10,
+          "std_deterministic": 2.4836391496161277e-11
+        },
+        "cycle_to_cycle_s": {
+          "count": 95,
+          "mean": -5.952813811258919e-14,
+          "min": -1.8396352367808818e-10,
+          "max": 2.2619178315506547e-10,
+          "peak_to_peak": 4.1015530683315366e-10,
+          "std_deterministic": 6.659138058124553e-11,
+          "max_abs": 2.2619178315506547e-10
+        },
+        "tail_drift_fraction": 0.0015370753187621683,
+        "spread_kind": "deterministic (noiseless transient): includes settling and solver/sample artifacts; NOT stochastic RMS jitter"
+      },
+      "status": "OK"
+    },
+    {
+      "report": "report.json",
+      "vdd_v": 3.6,
+      "process": "ff",
+      "temp_c": 85.0,
+      "status": "FAIL: transition end (90/10 % level) not in waveform"
+    }
+  ]
+}
