@@ -1,0 +1,1192 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/cmph-fix/startup/tb_v36.spice",
+    "scope": "repo"
+  },
+  "status": "pass",
+  "corner_count": 21,
+  "passed": 21,
+  "failed": 0,
+  "errored": 0,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {},
+    "by_severity": {},
+    "corners_with_diagnostics": 0
+  },
+  "metrics": {
+    "sim__corner__count": 21,
+    "sim__corner__passed_count": 21,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 0,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "46",
+    "ngspice_binary": "/usr/local/bin/ngspice",
+    "engine_build": {
+      "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******",
+      "binary_sha256": "dc859418bedd0478ff439a2d3e2e09f4386a7f4d5e3f17671953e101a000cc60",
+      "probe": "ok",
+      "reason": null
+    },
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+    "models_lib_sha256_scope": "client",
+    "netlist_sha256": "75a76ea456b72a5df97c7fce68ec8dd2fea870e1ce7e23ea201902155a365945",
+    "corner_coverage": {
+      "pdk": "gf180mcuC",
+      "sections": [
+        {
+          "process": "ff",
+          "unmoved_devices": [
+            "06v0",
+            "06v0_nvt",
+            "fets_mm",
+            "noise_corner"
+          ]
+        },
+        {
+          "process": "ss",
+          "unmoved_devices": [
+            "06v0",
+            "06v0_nvt",
+            "fets_mm",
+            "noise_corner"
+          ]
+        },
+        {
+          "process": "fs",
+          "unmoved_devices": [
+            "06v0",
+            "06v0_nvt",
+            "fets_mm",
+            "noise_corner"
+          ]
+        },
+        {
+          "process": "sf",
+          "unmoved_devices": [
+            "06v0",
+            "06v0_nvt",
+            "fets_mm",
+            "noise_corner"
+          ]
+        }
+      ]
+    },
+    "netlist_closure": [
+      {
+        "path": "sim/cmph-fix/startup/tb_v36.spice",
+        "scope": "repo",
+        "sha256": "75a76ea456b72a5df97c7fce68ec8dd2fea870e1ce7e23ea201902155a365945"
+      },
+      {
+        "path": "sim/cmph-fix/startup/rcosc_top_p3.spice",
+        "scope": "repo",
+        "sha256": "7afa433a227b9e8fc94f0bfa17e9ae8e10a244092769885a25719b0a9d72aeb3"
+      }
+    ],
+    "netlist_identity": "sha256:0f1a4299674d98d9dfb5d27dd012e9edbe27d9d6dfbbd9535052dd3ab43784b0",
+    "netlist_source": "extracted",
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-4e366a98ed46",
+      "region": "us-east-1",
+      "instance_id": "i-07fc9e3d7b179eae4",
+      "instance_type": "m7i.4xlarge",
+      "availability_zone": "us-east-1c",
+      "ami_id": "ami-095c25ae241a4d360",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "done",
+      "exit_code": "0",
+      "concurrency": "1",
+      "physical_cores": "8",
+      "elapsed_seconds": 154,
+      "client_submitted_at": "2026-11-06T06:29:54.100074Z",
+      "client_launched_at": "2026-11-06T06:30:11.701171Z",
+      "client_status_terminal_at": "2026-11-06T06:33:16.350481Z",
+      "client_collected_at": "2026-11-06T06:33:18.009268Z",
+      "runner_klt_version": "0.9.0",
+      "client_klt_version": "0.9.2.dev33+g684a7569e857",
+      "runner_compatibility": "match",
+      "runner_request_features": {
+        "required": [
+          "options.ngspice_init"
+        ],
+        "missing": [],
+        "status": "supported"
+      },
+      "worker_environment": {
+        "capture": "ok",
+        "simulator": {
+          "requested_binary": "ngspice",
+          "binary_source": "PATH",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-46 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2025, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Thu Oct  1 23:51:59 UTC 2026\n******\n",
+          "version_probe": "ok"
+        },
+        "pdk": {
+          "variant": "gf180mcuC",
+          "root": "/opt/pdk",
+          "stamp_scheme": "sources-sha256",
+          "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+          "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+          "models_staged": false,
+          "stamp_scope": "executed"
+        },
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+        "omp_num_threads": null,
+        "image_manifest": null,
+        "model_inputs": null,
+        "diagnostics": [],
+        "pdk_stamp_comparison": {
+          "status": "not_comparable",
+          "reason": "client_stamp_unavailable"
+        },
+        "engine_build_comparison": {
+          "status": "match"
+        }
+      },
+      "runner_model_inputs": null,
+      "job_ceiling": {
+        "basis": "conservative_serial_bound",
+        "unit_count": 21,
+        "per_unit_timeout_s": 1800,
+        "overhead_s": 120.0,
+        "job_bound_s": 37920.0,
+        "max_job_seconds": 3600.0,
+        "max_job_seconds_source": "fleet_config",
+        "exceeds_ceiling": true,
+        "check": "warn",
+        "max_units_per_job": 1,
+        "recommended_hosts": 21,
+        "warning": "batch job bound 37920s (options.timeout_s 1800s x 21 units + 120s; a conservative fully-serial upper bound, not a runtime estimate) exceeds the fleet's whole-job ceiling of 3600s (max_job_seconds from fleet_config); a job still running at the ceiling is killed and every unit is reported batch_job_timeout. Set request.remote.hosts to at least 21 to run one job per shard of at most 1 units, each within the ceiling"
+      }
+    },
+    "engine_host": "worker",
+    "client_ngspice_binary": "/home/ubuntu/.local/bin/ngspice",
+    "backend": {
+      "resolved": "batch",
+      "source": "env",
+      "requested": "batch"
+    },
+    "timeout_preflight_warning": "options.timeout_s (1800s) looks implausible for a tran analysis with ~1e+05 timepoints (200p step, 20000n window) -- even 50 timepoints/s (a generous floor, not a real engine-rate estimate) would need 2e+03s per corner. This is only a coarse, advisory pre-grid heuristic -- it does not block the sweep, and a plausible-looking budget can still turn out to be too short in practice."
+  },
+  "coverage": {
+    "corners_simulated": 21,
+    "measurements_declared": 2,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "measurement:[0,\"tt/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[0,\"tt/novdd/-40C\",\"t_first_edge\"]/observation",
+      "measurement:[1,\"tt/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[1,\"tt/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[10,\"fs/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[10,\"fs/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[11,\"fs/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[11,\"fs/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[12,\"sf/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[12,\"sf/novdd/-40C\",\"t_first_edge\"]/observation",
+      "measurement:[13,\"sf/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[13,\"sf/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[14,\"sf/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[14,\"sf/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[15,\"rc_f/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[15,\"rc_f/novdd/-40C\",\"t_first_edge\"]/observation",
+      "measurement:[16,\"rc_f/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[16,\"rc_f/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[17,\"rc_f/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[17,\"rc_f/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[18,\"rc_s/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[18,\"rc_s/novdd/-40C\",\"t_first_edge\"]/observation",
+      "measurement:[19,\"rc_s/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[19,\"rc_s/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[2,\"tt/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[2,\"tt/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[20,\"rc_s/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[20,\"rc_s/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[3,\"ff/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[3,\"ff/novdd/-40C\",\"t_first_edge\"]/observation",
+      "measurement:[4,\"ff/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[4,\"ff/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[5,\"ff/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[5,\"ff/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[6,\"ss/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[6,\"ss/novdd/-40C\",\"t_first_edge\"]/observation",
+      "measurement:[7,\"ss/novdd/27C\",\"t_edge_50\"]/observation",
+      "measurement:[7,\"ss/novdd/27C\",\"t_first_edge\"]/observation",
+      "measurement:[8,\"ss/novdd/85C\",\"t_edge_50\"]/observation",
+      "measurement:[8,\"ss/novdd/85C\",\"t_first_edge\"]/observation",
+      "measurement:[9,\"fs/novdd/-40C\",\"t_edge_50\"]/observation",
+      "measurement:[9,\"fs/novdd/-40C\",\"t_first_edge\"]/observation"
+    ],
+    "skipped": [],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"tt/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"tt/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[1,\"tt/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[10,\"fs/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[10,\"fs/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[11,\"fs/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[11,\"fs/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[12,\"sf/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[12,\"sf/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[13,\"sf/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[13,\"sf/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[14,\"sf/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[14,\"sf/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[15,\"rc_f/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[15,\"rc_f/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[16,\"rc_f/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[16,\"rc_f/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[17,\"rc_f/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[17,\"rc_f/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[18,\"rc_s/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[18,\"rc_s/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[19,\"rc_s/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[19,\"rc_s/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[2,\"tt/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[20,\"rc_s/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[20,\"rc_s/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"ff/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[3,\"ff/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"ff/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[4,\"ff/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"ff/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[5,\"ff/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[6,\"ss/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[6,\"ss/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[7,\"ss/novdd/27C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[7,\"ss/novdd/27C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[8,\"ss/novdd/85C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[8,\"ss/novdd/85C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[9,\"fs/novdd/-40C\",\"t_edge_50\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[9,\"fs/novdd/-40C\",\"t_first_edge\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
+  },
+  "provenance": {
+    "klt_version": "0.9.2.dev33+g684a7569e857",
+    "klt_git_commit": "684a7569e8570b41f451f12aadcc00dbdf909a58",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@684a7569e8570b41f451f12aadcc00dbdf909a58",
+    "klayout_version": "0.30.13",
+    "pdk": {
+      "name": "gf180mcuC",
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
+    },
+    "deck": {
+      "name": "sm141064.ngspice",
+      "content_hash": "sha256:f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:75a76ea456b72a5df97c7fce68ec8dd2fea870e1ce7e23ea201902155a365945",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "t_first_edge",
+      "unit": "s",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/novdd/-40C",
+        "value": 5.43891113e-07,
+        "margin": null
+      }
+    },
+    {
+      "name": "t_edge_50",
+      "unit": "s",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "tt/novdd/-40C",
+        "value": 1.57077439e-06,
+        "margin": null
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "tt/novdd/-40C",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 52.051,
+      "peak_rss_bytes": 49786880,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.43891113e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.57077439e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/tt_novdd_n40C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/tt_novdd_n40C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/tt_novdd_n40C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/tt_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/novdd/27C",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 48.931,
+      "peak_rss_bytes": 49786880,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.57248696e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.55222836e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/tt_novdd_27C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/tt_novdd_27C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/tt_novdd_27C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/tt_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "tt/novdd/85C",
+      "process": "tt",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 46.292,
+      "peak_rss_bytes": 49786880,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.50757419e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.50540452e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/tt_novdd_85C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/tt_novdd_85C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/tt_novdd_85C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/tt_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/novdd/-40C",
+      "process": "ff",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 56.008,
+      "peak_rss_bytes": 49786880,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.56292433e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.35677727e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ff_novdd_n40C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ff_novdd_n40C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ff_novdd_n40C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ff_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/novdd/27C",
+      "process": "ff",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 53.434,
+      "peak_rss_bytes": 49786880,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.61361748e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.32197397e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ff_novdd_27C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ff_novdd_27C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ff_novdd_27C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ff_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ff/novdd/85C",
+      "process": "ff",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 50.164,
+      "peak_rss_bytes": 49786880,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.63099189e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.26353686e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ff_novdd_85C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ff_novdd_85C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ff_novdd_85C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ff_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ss/novdd/-40C",
+      "process": "ss",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 49.079,
+      "peak_rss_bytes": 49786880,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.67244794e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.8430262e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ss_novdd_n40C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ss_novdd_n40C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ss_novdd_n40C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ss_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ss/novdd/27C",
+      "process": "ss",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 44.434,
+      "peak_rss_bytes": 49786880,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.50046369e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.79823789e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ss_novdd_27C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ss_novdd_27C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ss_novdd_27C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ss_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "ss/novdd/85C",
+      "process": "ss",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 43.216,
+      "peak_rss_bytes": 49917952,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.52376463e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.76831158e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ss_novdd_85C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ss_novdd_85C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ss_novdd_85C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/ss_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "fs/novdd/-40C",
+      "process": "fs",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 50.19,
+      "peak_rss_bytes": 49917952,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.84256868e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.59488457e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/fs_novdd_n40C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/fs_novdd_n40C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/fs_novdd_n40C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/fs_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "fs/novdd/27C",
+      "process": "fs",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 45.381,
+      "peak_rss_bytes": 49917952,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.91051202e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.55034259e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/fs_novdd_27C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/fs_novdd_27C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/fs_novdd_27C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/fs_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "fs/novdd/85C",
+      "process": "fs",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 45.803,
+      "peak_rss_bytes": 49917952,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.93913435e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.48781976e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/fs_novdd_85C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/fs_novdd_85C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/fs_novdd_85C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/fs_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "sf/novdd/-40C",
+      "process": "sf",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 51.724,
+      "peak_rss_bytes": 50049024,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.34105258e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.57921718e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/sf_novdd_n40C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/sf_novdd_n40C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/sf_novdd_n40C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/sf_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "sf/novdd/27C",
+      "process": "sf",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 47.638,
+      "peak_rss_bytes": 50049024,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.38649433e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.56014982e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/sf_novdd_27C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/sf_novdd_27C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/sf_novdd_27C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/sf_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "sf/novdd/85C",
+      "process": "sf",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 44.137,
+      "peak_rss_bytes": 50049024,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.35252327e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.53418281e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/sf_novdd_85C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/sf_novdd_85C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/sf_novdd_85C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/sf_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "rc_f/novdd/-40C",
+      "process": "rc_f",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 54.38,
+      "peak_rss_bytes": 50049024,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.57205961e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.38735901e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_f_novdd_n40C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_f_novdd_n40C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_f_novdd_n40C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_f_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "rc_f/novdd/27C",
+      "process": "rc_f",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 50.818,
+      "peak_rss_bytes": 50180096,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.63322649e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.34809358e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_f_novdd_27C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_f_novdd_27C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_f_novdd_27C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_f_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "rc_f/novdd/85C",
+      "process": "rc_f",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 49.337,
+      "peak_rss_bytes": 50180096,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.61935678e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.28051884e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_f_novdd_85C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_f_novdd_85C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_f_novdd_85C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_f_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "rc_s/novdd/-40C",
+      "process": "rc_s",
+      "supply_v": {},
+      "temperature_c": -40.0,
+      "status": "pass",
+      "runtime_s": 46.161,
+      "peak_rss_bytes": 50180096,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.59662657e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.78844651e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_s_novdd_n40C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_s_novdd_n40C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_s_novdd_n40C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_s_novdd_n40C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "rc_s/novdd/27C",
+      "process": "rc_s",
+      "supply_v": {},
+      "temperature_c": 27.0,
+      "status": "pass",
+      "runtime_s": 44.516,
+      "peak_rss_bytes": 50180096,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.58140567e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.75856139e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_s_novdd_27C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_s_novdd_27C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_s_novdd_27C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_s_novdd_27C/corner.cir"
+      },
+      "monte_carlo": null
+    },
+    {
+      "corner_id": "rc_s/novdd/85C",
+      "process": "rc_s",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 45.325,
+      "peak_rss_bytes": 50180096,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "t_first_edge",
+          "value": 5.47800791e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "t_edge_50",
+          "value": 1.72154317e-06,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_s_novdd_85C/ngspice.log",
+        "raw": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_s_novdd_85C/waveform.raw",
+        "waveform": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_s_novdd_85C/waveform.raw.json",
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/cmph-fix/results/20261106T071000Z/out_v36/rc_s_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    }
+  ]
+}

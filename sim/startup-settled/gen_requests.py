@@ -73,9 +73,14 @@ def request(vdd):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, default=HERE)
-    out = ap.parse_args().out
+    ap.add_argument("--dut", type=Path, default=None,
+                    help="netlist to copy in as rcosc_top_p3.spice instead of the settled P3 netlist "
+                         "(e.g. sim/cmph-fix/rcosc_top_p3_cmphfix.spice, issue #229)")
+    a = ap.parse_args()
+    out = a.out
+    src = a.dut if a.dut is not None else SRC
     out.mkdir(parents=True, exist_ok=True)
-    (out / DUT).write_text(SRC.read_text())
+    (out / DUT).write_text(src.read_text())
     for v in VDDS_V:
         (out / f"tb_{tag(v)}.spice").write_text(testbench(v))
         (out / f"request_{tag(v)}.json").write_text(json.dumps(request(v), indent=2) + "\n")

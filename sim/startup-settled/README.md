@@ -26,3 +26,11 @@ Batch fleet jobs `klt-sim-8bfc88ec9089` (3.0 V), `klt-sim-077f87f7e2da` (3.3 V),
 #227; root cause in `sim/startup-fs-m40c/results/20261106T061000Z/summary.md`). Those two are recorded as
 failures; the bench and bands are unchanged (design fix: #229). Worst settle time of the started points: 2.56 us (fs / 27 C / 3.0 V). The 63-point pre-re-centre campaign and DR-0020 status stay with
 issue #82.
+
+## Revised comparator-H stage (issue #229, DR-0028)
+
+Same requests, DUT replaced by `sim/cmph-fix/rcosc_top_p3_cmphfix.spice` (`gen_requests.py --dut`, requests in
+`sim/cmph-fix/startup/`), batch jobs `klt-sim-829a270ff52b` (3.0 V), `klt-sim-58ef1d67a0ce` (3.3 V),
+`klt-sim-4e366a98ed46` (3.6 V); receipts in `sim/cmph-fix/results/20261106T071000Z/`, analysis in
+`results/20261106T0735Z/`: **63/63 points start and settle, 0 NON-START**, worst settle 1.54 us (limit 10 us).
+The earlier `results/20261106T061500Z/` stays as the pre-fix evidence.

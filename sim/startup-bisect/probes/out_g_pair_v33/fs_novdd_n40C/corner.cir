@@ -1,0 +1,19 @@
+* klt sim -- generated corner deck, do not edit
+.lib /home/ubuntu/.ciel/gf180mcuC/libs.tech/ngspice/sm141064.ngspice fs
+.lib /home/ubuntu/.ciel/gf180mcuC/libs.tech/ngspice/sm141064.ngspice res_typical
+.lib /home/ubuntu/.ciel/gf180mcuC/libs.tech/ngspice/sm141064.ngspice mimcap_typical
+.lib /home/ubuntu/.ciel/gf180mcuC/libs.tech/ngspice/sm141064.ngspice cap_mim
+.include /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-229/sim/startup-bisect/probes/tb_g_pair_fs_m40_v33.spice
+.temp -40.0
+.meas tran ta WHEN v(clk)=1.6500 RISE=5
+.meas tran tb WHEN v(clk)=1.6500 RISE=25
+.meas tran fosc PARAM='20/(tb-ta)'
+.meas tran clk_max MAX v(clk) FROM=200n
+.meas tran clk_min MIN v(clk) FROM=200n
+.meas tran iq_run_ua AVG v(iq_ua) FROM=200n TO=1200n
+.control
+save all
+tran 200p 1200n
+quit
+.endc
+.end

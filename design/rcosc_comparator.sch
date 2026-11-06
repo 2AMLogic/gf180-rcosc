@@ -101,7 +101,7 @@ N 1020 -30 1020 -50 {}
 C {lab_pin.sym} 1020 -50 0 0 {name=l23 lab=vdd}
 N 1020 0 1040 0 {}
 C {lab_pin.sym} 1040 0 0 0 {name=l24 lab=vdd}
-C {symbols/nfet_03v3.sym} 1200 0 0 0 {name=MBUFN model=nfet_03v3 W=2u L=0.5u nf=1 m=1}
+C {symbols/nfet_03v3.sym} 1200 0 0 0 {name=MBUFN model=nfet_03v3 W=1u L=0.5u nf=1 m=1}
 N 1220 -30 1220 -50 {}
 C {lab_pin.sym} 1220 -50 0 0 {name=l25 lab=out}
 N 1180 0 1160 0 {}
