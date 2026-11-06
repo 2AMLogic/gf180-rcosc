@@ -216,7 +216,7 @@ def test_generation_records_hashes_solver_and_manifest_template(tmp_path):
 
 def test_generation_rejects_bad_inputs(tmp_path):
     bad = tmp_path / "bad.spice"
-    bad.write_text(".subckt rcosc_top vdd vss clk t0 t1 t2 t3 t4 t5 t6 t7\n.ends\n")
+    bad.write_text(".subckt rcosc_top vdd vss clk t0 t1 t2 t3 t4 t5 t6\n.ends\n")
     with pytest.raises(prepare.PrepareError, match="pins"):
         prepare.generate(tmp_path / "a", bad, None, CORNER)
     bad.write_text("* nothing\n")
@@ -404,3 +404,12 @@ def test_cli_prepare_end_to_end(tmp_path):
 
 def test_no_measured_artifacts_in_tree():
     assert not (HERE / "results").exists()
+
+
+def test_permuted_pin_order_is_followed(tmp_path):
+    p3 = tmp_path / "p3.spice"
+    p3.write_text(".SUBCKT rcosc_top vdd vss clk t0 t1 t2 t3 t4 t5 t6 t7\n.ends\n")
+    out = tmp_path / "o"
+    prepare.generate(out, p3, None, CORNER)
+    tb = next(out.rglob("tb_c00.spice")).read_text()
+    assert "XXDUT vdd 0 clk t0 t1 t2 t3 t4 t5 t6 t7 rcosc_top" in tb
