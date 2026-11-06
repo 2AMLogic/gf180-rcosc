@@ -426,3 +426,54 @@ def test_permuted_pin_order_is_followed(tmp_path):
     prepare.generate(out, p3, None, CORNER)
     tb = next(out.rglob("tb_c00.spice")).read_text()
     assert "XXDUT vdd 0 clk t0 t1 t2 t3 t4 t5 t6 t7 rcosc_top" in tb
+
+
+# ------------------------------------------------------------ run_batch ----
+
+FAKE_KLT = '''#!/usr/bin/env python3
+import json, sys
+from pathlib import Path
+a = sys.argv[1:]
+assert a[0] == "sim" and "--backend" in a and a[a.index("--backend") + 1] == "batch", a
+out = Path(a[a.index("-o") + 1]); out.mkdir(parents=True, exist_ok=True)
+tag = Path(a[1]).stem
+fail = "c03" in tag
+Path(sys.argv[0] + ".log").open("a").write(tag + "\\n")
+(out / "batch-receipt.json").write_text(json.dumps({"job_id": "fake-" + tag, "state": "failed" if fail else "done"}))
+print(json.dumps({"status": "fail" if fail else "pass", "environment": {"remote": {"job_id": "fake-" + tag}}}))
+sys.exit(1 if fail else 0)
+'''
+
+
+def test_run_batch_resumes_without_resubmitting_done_jobs(tmp_path):
+    """FIXTURE: a fake klt stands in for the fleet; nothing real is submitted."""
+    import run_batch
+    bench = tmp_path / "bench"
+    for c in range(5):
+        d = bench / "sch" / "tt_27C_3p3V"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / f"request_c{c:02x}.json").write_text("{}")
+    fake = tmp_path / "fake_klt.py"
+    fake.write_text(FAKE_KLT)
+    fake.chmod(0o755)
+    klt = [sys.executable, str(fake)]
+    out = tmp_path / "res"
+    rows = run_batch.drive(bench, out, klt, limit=2)
+    assert [r["tag"] for r in rows] == ["sch_tt_27C_3p3V_c00", "sch_tt_27C_3p3V_c01"]
+    rows = run_batch.drive(bench, out, klt)  # resume: c00/c01 are not resubmitted
+    assert [r["tag"] for r in rows] == ["sch_tt_27C_3p3V_c02", "sch_tt_27C_3p3V_c03", "sch_tt_27C_3p3V_c04"]
+    log = Path(str(fake) + ".log").read_text().split()
+    assert len(log) == 5 and len(set(log)) == 5
+    failed = [r for r in rows if r["state"] != "done"]
+    assert [r["tag"] for r in failed] == ["sch_tt_27C_3p3V_c03"]  # reported, not dropped
+    assert run_batch.drive(bench, out, klt) == []  # failed one is not silently retried
+    assert [r["tag"] for r in run_batch.drive(bench, out, klt, retry_failed=True)] == ["sch_tt_27C_3p3V_c03"]
+    ledger = [json.loads(l) for l in (out / "ledger.jsonl").read_text().splitlines()]
+    assert len(ledger) == 6 and all(r["job_id"].startswith("fake-") for r in ledger)
+    assert (out / "reports" / "report_sch_tt_27C_3p3V_c00.json").is_file()
+
+
+def test_run_batch_refuses_concurrency_above_two(tmp_path):
+    import run_batch
+    with pytest.raises(SystemExit):
+        run_batch.drive(tmp_path, tmp_path / "o", ["klt"], workers=3)
