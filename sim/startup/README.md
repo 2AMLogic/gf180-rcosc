@@ -29,28 +29,39 @@ ngspice grids; single-corner probes use `--backend local`.
 
 ## Status of the evidence
 
-**The 63-point factorial has not been run.** All four batch submissions failed
-before simulating anything (`batch-attempts/`):
+**The 63-point factorial has run** on the batch fleet (runner `eda-batch-runner`
+v11, `ami-095c25ae241a4d360`, runner klt 0.9.0, client klt
+`0.9.2.dev47+g581de87616d8`, `runner_compatibility: match`, PDK `gf180mcuC`,
+open_pdks `f6eeac7`). Jobs `klt-sim-971dfc731fe7` (v30), `klt-sim-b591e450d02c`
+(v33), `klt-sim-fbe71ced6e21` (v36); every unit passed at the simulator level.
+Evidence: `results/20261106T052948Z/` (append-only).
 
-- `klt 0.7.0` client: job `klt-sim-dc36ead70420` (v30), `klt-sim-8cfbc84880ad`
-  (v33), `klt-sim-6ee7fb2db163` (v36): exit 87,
-  `batch_runner_version_mismatch` -- the fleet runner image runs klt 0.5.0.
-- `klt 0.6.0` client: job `klt-sim-69b745c69c5d` (v33): exit 1, "failed
-  without a usable report".
-- `klt 0.5.0` has no `batch` backend (`supported: local, local-parallel, remote`).
+**Measured verdict under the ratified DR-0020 definition: 61/63 PASS, 2 FAIL.**
+Primary band +/-1.1% of the corner's final mean period (8-cycle windows),
+<= 10 us from ramp start, trim `0xA3`. Worst settle time of the passing points
+is 1.174 us (`ss`/-40 C/3.0 V). The two failures are `ff`/-40 C at 3.3 V and
+3.6 V: they started (first edge 0.59 / 0.54 us) but the settled-tail check
+(last 2 us steady to +/-0.5%) is not met -- measured tail period deviation
+0.78% / 0.61% -- so no settle time is defined and the points are recorded as
+FAIL, not as passes. The bench and the +/-0.5% tail tolerance were not
+changed to make them pass. The same two points also fail the looser
+diagnostic bands because the verdict path stops at the tail check.
 
-- Runner image `eda-batch-runner` v10 (`ami-04591566329422a44`, runner klt
-  0.9.0, `runner_compatibility: match`; client klt `0.9.1.dev18+gc663b4c`,
-  2026-11-05): jobs `klt-sim-1410c9044c01` (v30), `klt-sim-2b23c329351d`
-  (v33), `klt-sim-34c8f65a8ba2` (v36) all failed in ~5 s, every unit
-  `batch_job_failed` (job command exit 1): "no supported-layout PDK install
-  providing variant 'gf180mcuC' was found" (searched `PDK_ROOT=/opt/pdk`,
-  `~/.ciel`, `~/.volare`, ...). The version mismatch is fixed; the worker image
-  carries no gf180mcuC PDK. Reports: `batch-attempts/klt0.9.1dev_runner0.9.0_*`.
+A relative-settling pass does **not** imply a target-accurate or USB-ready
+clock: settled frequencies span 35.6-66.7 MHz at fixed trim `0xA3` and are
+graded against 48 MHz by the separate frequency / PVT-accuracy rows.
 
-Per host policy the grid was not run locally as a fallback. What exists is two
-single-corner local probes (`results/20261008T235538Z/`):
-`ss`/-40 C/3.0 V (the expected slowest corner) and `tt`/27 C/3.3 V, both
-started and settled well inside 10 us at every band. That is not a factorial
-verdict. To complete the evidence, re-run the three requests once the fleet
-runner image matches the client klt.
+Earlier failed submissions are kept as evidence in `batch-attempts/`:
+
+- `klt 0.7.0` client: jobs `klt-sim-dc36ead70420` (v30), `klt-sim-8cfbc84880ad`
+  (v33), `klt-sim-6ee7fb2db163` (v36): exit 87, `batch_runner_version_mismatch`
+  (runner image klt 0.5.0).
+- `klt 0.6.0` client: job `klt-sim-69b745c69c5d` (v33): exit 1, no usable report.
+- `klt 0.5.0` has no `batch` backend.
+- Runner v10 (`ami-04591566329422a44`, runner klt 0.9.0): jobs
+  `klt-sim-1410c9044c01`, `klt-sim-2b23c329351d`, `klt-sim-34c8f65a8ba2` failed
+  in ~5 s, no `gf180mcuC` PDK on the image (fixed in v11).
+
+Two local single-corner probes (`results/20261008T235538Z/`, `ss`/-40 C/3.0 V
+and `tt`/27 C/3.3 V) pre-date the factorial and agree with it (1.174 us and
+0.891 us at +/-1.1%).

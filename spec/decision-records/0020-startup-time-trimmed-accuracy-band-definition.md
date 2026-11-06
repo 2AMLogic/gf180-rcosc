@@ -1,8 +1,8 @@
 # 0020: Startup-time row — "within trimmed accuracy" band definition left ambiguous, bench reports all readings
 
-- **Status**: proposed (surfaced for ratification; the ratified bound is **not** changed)
+- **Status**: ratified 2026-10-16 (operator ruling, batch 8 Q3 option 1: relative startup settling); the ratified 10 µs bound is **not** changed
 - **Date**: 2026-10-08
-- **Decided by**: Builder agent, issue #78 (needs human ratification of the primary band)
+- **Decided by**: Builder agent, issue #78 (proposal); ratified by the operator 2026-10-16 (issue #82)
 
 ## Context
 
@@ -53,9 +53,12 @@ the lenient reading:
 - **Non-start**: fewer than 20 clk edges in the run, or fewer than 20 in the
   last 2 µs, is reported as `NON-START` and counts as a failure.
 
-A human should ratify (or replace) the primary band and the time origin; this
-record then becomes the definition. Until then the characterization report
-states the verdict together with the band it holds at.
+The operator ratified this definition on 2026-10-16 (issue #82): relative
+settling to each corner's final mean period, +/-1.1% primary band over
+8-cycle windows, <= 10 µs from the start of the 1 µs ramp, fixed trim
+`0xA3`, with all diagnostic bands and the steady-tail / non-start checks
+retained. A relative-settling pass can hold while the clock is stably
+off-target; it is not a claim of target-accurate or USB-ready availability.
 
 ## Alternatives considered
 
@@ -71,10 +74,10 @@ states the verdict together with the band it holds at.
 ## Consequences
 
 - Row 10 of the characterization report states its band and origin.
-- The 63-point factorial was **not** obtainable on the Spot fleet at the time
-  of this record (runner/client klt version mismatch, see
-  `sim/startup/README.md`); only two single-corner local probes exist.
-  Row 10 therefore reports partial evidence, not a factorial verdict.
+- The 63-point factorial ran on the batch fleet (runner v11, 2026-11-06,
+  `sim/startup/results/20261106T052948Z/`): **61/63 PASS, 2 FAIL**
+  (`ff`/-40 °C at 3.3 V and 3.6 V fail the settled-tail steadiness check).
+  Row 10 is therefore recorded as measured and not passed.
 - Not tested: slower supply ramps, per-corner calibrated trim codes, post-layout
   (PEX) startup, and mismatch-induced failure to start (a separate robustness
   check per DR-0019).
