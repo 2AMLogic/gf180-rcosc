@@ -14,7 +14,7 @@ netlist, ladder R x0.70, PDK MiM) and were run on the batch fleet; envelopes and
 writes `rows.md`). Result: all 3.0 V envelopes pass; the 3.3 V and 3.6 V envelopes error at fs / -40 C (no
 oscillation, see the summary); rows 2, 4, 5, 7, 8, 10 fail, rows 1 and 3 pass. Item 5 stays `unmet`
 (`check_failed`). No ratified row or DR-0019 is edited. Row 9 is now measured on the settled netlist (`../startup-settled/`, issue #227): 61/63 start, fs / -40 C at 3.3 and 3.6 V do not. The fs / -40 C no-oscillation is a real failure of the settled netlist, not a simulator artifact (`../startup-fs-m40c/`). The Monte Carlo remainders are declared gaps.
-**Revised comparator-H output stage (issue #229, DR-0028).** The same 15 requests, regenerated on the settled
+**Revised comparator-H output stage (issue #229, DR-0028), calibration code 0xA9.** The same 15 requests, regenerated on the settled
 P3 sizing applied to a fresh extraction of the revised layout (`python3 -I sim/item5/gen_requests.py --dut
 ../cmph-fix/rcosc_top_p3_cmphfix.spice`), were run on the batch fleet; envelopes, receipts and per-row verdicts are in
 [`../cmph-fix/results/20261106T071000Z/item5/`](../cmph-fix/results/20261106T071000Z/item5/rows.md). All 15 envelopes return a
@@ -26,6 +26,12 @@ frequency up; single-corner probes find 0xA4 (-0.24 %) and 0xA5 (+0.30 %) back i
 (`../cmph-fix/calib/`), but re-centring the calibration code is a DR-0023 decision left to the operator. The older
 `results/20261106T051832Z/` stays as the pre-fix evidence.
 
+**Re-centred calibration code (issue #235, DR-0029).** `requests/` is now regenerated on the DR-0028 netlist at calibration code
+0xA4 (nearest 48.000 MHz among the probed codes; LSB neighbour 0xA5). The 15 requests were run on the batch fleet; envelopes, receipts and
+per-row verdicts are in [`results/20261106T071555Z/`](results/20261106T071555Z/summary.md). Row 1 passes (47.886 MHz, -0.24 %); rows 7 and 10 pass;
+rows 4 and 5 are re-derived at 0xA4 and still FAIL (7/21 and 26/63 points inside the ratified windows), as do rows 2 and 8. No ratified row or DR is edited.
+The 0xA9 results above (`results/20261106T051832Z/`, `../cmph-fix/results/`) remain the append-only evidence for that code.
+
 Every request spans 7 process x 3 temperature corners (21 points); the file name encodes trim code and
 supply (`request_c<code, lowercase hex>_v<VDD*10>.json`). Each reports `fosc` and `iq_run_ua`, with
 `fosc >= 1 MHz` (a clock is produced) on all and `iq_run_ua < 500 uA` on the calibration-code requests as the only
@@ -36,13 +42,13 @@ supplies.
 
 | Row | Spec row | Covered by | Corner-checkable part | Declared gap |
 |---|---|---|---|---|
-| 1 | Output frequency, 48.000 MHz | `requests/request_ca9_v33.json` | fosc at tt / 27 C / 3.3 V on the calibration code 0xA9 | none |
-| 2 | Trim interface: 8-bit, +/-40 % range, 0.314 %/code | `requests/request_c00_v*.json`, `request_cff_v*.json`, `request_ca9_v*.json`, `request_caa_v*.json` | nominal range from the 0x00 / 0xFF endpoint frequencies, nominal LSB from the 0xA9 -> 0xAA step | Monte Carlo remainder (claim S1: coverage, per-die step size, monotonicity, rail headroom) -- DR-0019 section 2, not covered by a corner request |
+| 1 | Output frequency, 48.000 MHz | `requests/request_ca4_v33.json` | fosc at tt / 27 C / 3.3 V on the calibration code 0xA4 (DR-0029) | none |
+| 2 | Trim interface: 8-bit, +/-40 % range, 0.314 %/code | `requests/request_c00_v*.json`, `request_cff_v*.json`, `request_ca4_v*.json`, `request_ca5_v*.json` | nominal range from the 0x00 / 0xFF endpoint frequencies, nominal LSB from the 0xA9 -> 0xAA step | Monte Carlo remainder (claim S1: coverage, per-die step size, monotonicity, rail headroom) -- DR-0019 section 2, not covered by a corner request |
 | 3 | Free-running untrimmed spread, +/-35 % | `requests/request_c80_v*.json` | fosc spread of the mid-scale code across all 7 process corners (rc_f / rc_s isolate the passives) | none |
-| 4 | Post-trim accuracy at calibration point | `requests/request_ca9_v*.json` | frequency of the calibration code at 27 C across process and 3.0 / 3.3 / 3.6 V (corner mean; no per-die recalibration) | Monte Carlo remainder (claim S2: trim-DAC mismatch and comparator offset) -- DR-0019 section 2 |
-| 5 | Post-trim accuracy over -40..+85 C | `requests/request_ca9_v*.json` | frequency of the held calibration code over the 3 temperatures x 3 supplies x 7 process corners | Monte Carlo remainder (claim S3) -- DR-0019 section 2 |
+| 4 | Post-trim accuracy at calibration point | `requests/request_ca4_v*.json` | frequency of the calibration code at 27 C across process and 3.0 / 3.3 / 3.6 V (corner mean; no per-die recalibration) | Monte Carlo remainder (claim S2: trim-DAC mismatch and comparator offset) -- DR-0019 section 2 |
+| 5 | Post-trim accuracy over -40..+85 C | `requests/request_ca4_v*.json` | frequency of the held calibration code over the 3 temperatures x 3 supplies x 7 process corners | Monte Carlo remainder (claim S3) -- DR-0019 section 2 |
 | 6 | Runtime-disciplined, <= +/-0.25 % | none | none | declared gap: reserved, not designed (DR-0004); no discipline loop exists to simulate; re-classify when one is designed |
-| 7 | Supply, 3.0-3.6 V | `requests/request_ca9_v30.json`, `requests/request_ca9_v33.json`, `requests/request_ca9_v36.json` | the supply is the per-request axis | none |
-| 8 | Quiescent current, < 500 uA (running) | `requests/request_ca9_v*.json` | `iq_run_ua` at every corner of the calibration-code requests; worst case is the max over the grid (window is a fixed 200-1200 ns, not whole periods) | none |
+| 7 | Supply, 3.0-3.6 V | `requests/request_ca4_v30.json`, `requests/request_ca4_v33.json`, `requests/request_ca4_v36.json` | the supply is the per-request axis | none |
+| 8 | Quiescent current, < 500 uA (running) | `requests/request_ca4_v*.json` | `iq_run_ua` at every corner of the calibration-code requests; worst case is the max over the grid (window is a fixed 200-1200 ns, not whole periods) | none |
 | 9 | Startup time, <= 10 us | `../startup-settled/request_v30.json`, `../startup-settled/request_v33.json`, `../startup-settled/request_v36.json` | 1 us VDD ramp (trim bits ramp with it) on the settled netlist at calibration code 0xA9, 7 process x 3 T per supply, DR-0020 analysis: [`../startup-settled/results/20261106T061500Z/`](../startup-settled/results/20261106T061500Z/summary.md) (batch fleet): 61/63 points start and settle within 10 us (worst 2.56 us); fs / -40 C at 3.3 V and 3.6 V are NON-START; on the revised comparator-H stage (#229, DR-0028): [`../startup-settled/results/20261106T0735Z/`](../startup-settled/results/20261106T0735Z/summary.md) 63/63 start, worst settle 1.54 us, 0 NON-START | measured fail, not a gap: the two NON-START points are the real design failure traced in [`../startup-fs-m40c/results/20261106T061000Z/`](../startup-fs-m40c/results/20261106T061000Z/summary.md) (#227); the 63-point pre-re-centre campaign and DR-0020 stay with #82; design fix tracked in #229 |
 | 10 | Temperature range, -40..+85 C | every request in `requests/` | the temperature is a corner axis of each request | none |

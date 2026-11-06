@@ -9,11 +9,11 @@ multi-corner submit goes to the batch fleet (KLT_SIM_BACKEND=batch) -- never a
 hand-launched local grid.  See sim/item5/ROWS.md for the row-to-request map and
 the declared gaps.
 
-DUT (issue #201): the settled sizing of #66 / DR-0023, "P3" -- the committed
-extracted netlist with the nine trim-ladder poly resistors at 0.70x length and
-the PDK cap_mim_1f0fF timing MiM -- copied byte-for-byte from
-sim/recentre/p3/rcosc_top_p3.spice (the netlist the 27-point batch run
-sim/recentre/results/20261106T044714Z measured).  The requests are therefore
+DUT (issues #201, #229, #235): the settled sizing of #66 / DR-0023, "P3" -- the extracted
+netlist with the nine trim-ladder poly resistors at 0.70x length and the PDK cap_mim_1f0fF
+timing MiM -- of the revised comparator-H layout (DR-0028), copied byte-for-byte from
+sim/cmph-fix/rcosc_top_p3_cmphfix.spice.  (The pre-fix netlist is sim/recentre/p3/rcosc_top_p3.spice,
+which the earlier results/20261106T051832Z campaign measured.)  The requests are therefore
 `netlist_source: "extracted"` and the lumped layout parasitics are back-annotated.
 
 One request per (trim code, VDD): the frequency `.meas` needs the VDD/2 edge
@@ -29,8 +29,8 @@ accuracy rows are post-trim percentages against a per-die calibrated reference,
 not absolute per-corner limits, so their grading is report_rows.py post-processing.
 
 Codes: 0x00 and 0xFF (range endpoints, rows 2/3), 0x80 (mid-scale untrimmed
-code, row 3), 0xA9 (the tt 27 C / 3.3 V calibration code of DR-0023 on the P3
-netlist, rows 1/4/5/7/8/10) and 0xAA (its neighbour, for the LSB step, row 2).
+code, row 3), 0xA4 (the tt 27 C / 3.3 V calibration code of DR-0029, which amends DR-0023's
+0xA9 for the comparator-H-fixed P3 netlist, rows 1/4/5/7/8/10) and 0xA5 (its neighbour, for the LSB step, row 2).
 One code is held across all 7 process corners: these requests do not
 recalibrate per die (the per-process-code picture is sim/recentre's grid).
 
@@ -47,8 +47,10 @@ REPO = HERE.parent.parent
 sys.path.insert(0, str(REPO / "sim" / "pvt"))
 from pvt_sweep import PROCESS_CORNERS, TEMPS_C, VDDS_V  # noqa: E402
 
-CODES = [0x00, 0x80, 0xA9, 0xAA, 0xFF]
-CAL_CODE = 0xA9
+# Calibration code: DR-0029 (amends DR-0023) re-centres it to 0xA4 on the comparator-H-fixed netlist;
+# the neighbour for the LSB step is CAL_CODE + 1.  `--cal-code` regenerates for another code.
+CAL_CODE = 0xA4
+CODES = [0x00, 0x80, CAL_CODE, CAL_CODE + 1, 0xFF]
 IQ_MAX_UA = 500.0
 # `klt signoff` grades item 5 only from envelopes with at least one checked
 # limit.  The only corner-wide limits that state a ratified row faithfully are
@@ -58,7 +60,7 @@ IQ_MAX_UA = 500.0
 # are nominal-point, per-die-calibrated or relative quantities): they are
 # graded by report_rows.py, which quotes the ratified number and the binding corner.
 OSC_PRESENT_HZ = 1.0e6
-SRC = REPO / "sim" / "recentre" / "p3" / "rcosc_top_p3.spice"
+SRC = REPO / "sim" / "cmph-fix" / "rcosc_top_p3_cmphfix.spice"   # DR-0028 netlist (pre-fix: sim/recentre/p3/)
 DUT = "rcosc_top_p3.spice"
 
 
@@ -135,11 +137,15 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, default=HERE / "requests")
     ap.add_argument("--dut", type=Path, default=None,
-                    help="netlist to copy in as rcosc_top_p3.spice instead of the settled P3 netlist "
-                         "(e.g. sim/cmph-fix/rcosc_top_p3_cmphfix.spice, issue #229)")
+                    help="netlist to copy in as rcosc_top_p3.spice instead of the default "
+                         "(sim/cmph-fix/rcosc_top_p3_cmphfix.spice, DR-0028)")
+    ap.add_argument("--cal-code", type=lambda x: int(x, 0), default=CAL_CODE,
+                    help="calibration trim code (default 0xA4, DR-0029); the LSB-step neighbour is code+1")
     a = ap.parse_args()
     if a.dut is not None:
         globals()["SRC"] = a.dut.resolve()
+    globals()["CAL_CODE"] = a.cal_code
+    globals()["CODES"] = [0x00, 0x80, a.cal_code, a.cal_code + 1, 0xFF]
     generate(a.out)
 
 
