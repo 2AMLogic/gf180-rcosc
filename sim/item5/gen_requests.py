@@ -134,7 +134,13 @@ def generate(out: Path) -> list[Path]:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", type=Path, default=HERE / "requests")
-    generate(ap.parse_args().out)
+    ap.add_argument("--dut", type=Path, default=None,
+                    help="netlist to copy in as rcosc_top_p3.spice instead of the settled P3 netlist "
+                         "(e.g. sim/cmph-fix/rcosc_top_p3_cmphfix.spice, issue #229)")
+    a = ap.parse_args()
+    if a.dut is not None:
+        globals()["SRC"] = a.dut.resolve()
+    generate(a.out)
 
 
 if __name__ == "__main__":
