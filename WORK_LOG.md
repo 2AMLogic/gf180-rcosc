@@ -4,6 +4,16 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-06
 
+- **PR #242**: sim(trim-dense): freeze campaign manifest, validate batch driver on live fleet slice
+- **PR #241**: sim(trim-dense): resumable batch driver for the dense trim campaign
+- **PR #240**: docs(item5): cite the 0xA4 -> 0xA5 step in ROWS row 2
+- **PR #238**: sim(item5): re-centre calibration code to 0xA4 after the comparator-H fix (DR-0029)
+- **PR #234**: fix(comparator): narrow the comparator-H output pull-down so a logic high is produced at fs / -40 C
+- **PR #232**: sim(trim-transition): converge lsb_first bench and record nine-corner campaign
+- **Issue #239** (closed): docs(item5): ROWS.md row 2 still says nominal LSB comes from the 0xA9 -> 0xAA step
+- **Issue #235** (closed): Re-centre the calibration code after the comparator-H output-stage fix (row 1 fails at 0xA9)
+- **Issue #229** (closed): Comparator-H output stage stalls oscillator at fs / -40 C, VDD >= 3.3 V (settled netlist)
+- **Issue #103** (closed): Live trim-code transition bench: runt pulses and period excursions when code changes on a running oscillator
 - **PR #230**: sim(startup): fs/-40 C no-oscillation is a real settled-netlist failure; settled startup bench run
 - **PR #228**: sim(item5): run the 15-envelope corner campaign on the settled netlist; item 5 graded, still unmet
 - **PR #224**: feat(sim): measured 27-point clk waveform campaign, convergence check and DR-0025
