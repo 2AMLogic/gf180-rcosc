@@ -216,7 +216,7 @@ def test_generation_records_hashes_solver_and_manifest_template(tmp_path):
 
 def test_generation_rejects_bad_inputs(tmp_path):
     bad = tmp_path / "bad.spice"
-    bad.write_text(".subckt rcosc_top vdd vss clk t0 t1 t2 t3 t4 t5 t6 t7\n.ends\n")
+    bad.write_text(".subckt rcosc_top vdd vss clk t0 t1 t2 t3 t4 t5 t6\n.ends\n")
     with pytest.raises(prepare.PrepareError, match="pins"):
         prepare.generate(tmp_path / "a", bad, None, CORNER)
     bad.write_text("* nothing\n")
@@ -403,4 +403,26 @@ def test_cli_prepare_end_to_end(tmp_path):
 
 
 def test_no_measured_artifacts_in_tree():
-    assert not (HERE / "results").exists()
+    # A results/ tree may hold a Step 0 fleet-gate record (issue #87 acceptance 1: one
+    # single-corner batch request, no trim-step verdict). It must never hold campaign
+    # evidence: a filled manifest, analyzer outputs, or per-code reports.
+    res = HERE / "results"
+    if not res.exists():
+        return
+    campaign = {"manifest.json", "results.json", "steps.csv"}
+    bad = [str(p.relative_to(HERE)) for p in res.rglob("*") if p.is_file() and p.name in campaign]
+    assert not bad, f"campaign artifacts present: {bad}"
+    for run in (d for d in res.iterdir() if d.is_dir()):
+        readme = (run / "README.md").read_text()
+        assert "Step 0 fleet gate only" in readme and "NOT run" in readme, run
+        extra = [d.name for d in run.iterdir() if d.is_dir() and d.name != "step0"]
+        assert not extra, f"non-gate directories in {run.name}: {extra}"
+
+
+def test_permuted_pin_order_is_followed(tmp_path):
+    p3 = tmp_path / "p3.spice"
+    p3.write_text(".SUBCKT rcosc_top vdd vss clk t0 t1 t2 t3 t4 t5 t6 t7\n.ends\n")
+    out = tmp_path / "o"
+    prepare.generate(out, p3, None, CORNER)
+    tb = next(out.rglob("tb_c00.spice")).read_text()
+    assert "XXDUT vdd 0 clk t0 t1 t2 t3 t4 t5 t6 t7 rcosc_top" in tb
