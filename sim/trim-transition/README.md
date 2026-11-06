@@ -15,7 +15,7 @@ PARTIAL: six of nine benches (`none`, `msb_first` at 3.0/3.3/3.6 V x tt/ss/ff,
 ngspice (`timestep_too_small`, all 9 corners), so the lsb_first skew has no batch
 evidence.** No runt pulse and no missing/extra edge in any simulated event; 22
 events fail the "never settles" screen (see "Verdict").  Decision record:
-`spec/decision-records/0025-live-trim-code-transition-bench-batch-result.md`.
+`spec/decision-records/0026-live-trim-code-transition-bench-batch-result.md`.
 Nothing here changes a ratified spec row.
 
 ```
@@ -182,6 +182,13 @@ open_pdks `f6eeac7`, ngspice 46, 3 corners per job. Analysis:
 Partial. No glitch-class failure (runt / missing edge) on the six simulated
 benches, but 22 "never settles" violations and 9 aborted lsb_first corners mean
 the discipline model's no-glitch-on-update assumption is **not confirmed**
-across all nine corners. Recorded in DR-0025 and cross-referenced from DR-0021;
+across all nine corners. Recorded in DR-0026 and cross-referenced from DR-0021;
 no ratified row is relaxed. Follow-up needed: lsb_first convergence and the
 ff/3.6 V settle behaviour.
+
+## Limitations
+
+Schematic only (post-layout PEX only if a violation appears); ideal digital
+sources (no driver impedance, no coupling through routing); no mismatch; edge 1 ns
+fixed; skew modes are two orderings, not a Monte Carlo of arrival times; 27 C only;
+the phase of each change is measured, not controlled.

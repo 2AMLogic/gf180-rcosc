@@ -1,4 +1,4 @@
-# 0025: Live trim-code transition bench - batch result is partial; no runt/missing edge, but settle violations and an unsimulated lsb_first skew
+# 0026: Live trim-code transition bench - batch result is partial; no runt/missing edge, but settle violations and an unsimulated lsb_first skew
 
 - **Status**: proposed (evidence record; the ratified spec is **not** changed)
 - **Date**: 2026-11-06
