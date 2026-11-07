@@ -4,6 +4,11 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-07
 
+- **PR #263**: refactor(sim): share sha256, evidence banner and new-run guard across drivers
+- **PR #262**: sim(trim-dense): run campaign slice 11 on batch fleet (jobs 290-305 of 1536)
+- **PR #261**: sim(trim-dense): run campaign slice 10 on batch fleet (jobs 262-289 of 1536)
+- **PR #259**: sim(trim-dense): run campaign slice 9 on batch fleet (jobs 222-261 of 1536)
+- **Issue #260** (closed): Consolidate duplicated sim helpers (sha256, synthetic-evidence banner, new-run guard) into one shared module
 - **PR #257**: sim(trim-dense): run campaign slice 8 on batch fleet (jobs 204-221 of 1536)
 
 ### 2026-11-06
