@@ -4,6 +4,8 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-07
 
+- **PR #266**: sim(trim-dense): run campaign slice 13 on batch fleet (jobs 322-337 of 1536)
+- **PR #265**: sim(trim-dense): run campaign slice 12 on batch fleet (321 of 1536 jobs)
 - **PR #263**: refactor(sim): share sha256, evidence banner and new-run guard across drivers
 - **PR #262**: sim(trim-dense): run campaign slice 11 on batch fleet (jobs 290-305 of 1536)
 - **PR #261**: sim(trim-dense): run campaign slice 10 on batch fleet (jobs 262-289 of 1536)
