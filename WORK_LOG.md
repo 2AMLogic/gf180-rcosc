@@ -2,6 +2,10 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-07
+
+- **PR #257**: sim(trim-dense): run campaign slice 8 on batch fleet (jobs 204-221 of 1536)
+
 ### 2026-11-06
 
 - **PR #255**: sim(trim-dense): run campaign slice 7 on batch fleet (jobs 164-203 of 1536)
