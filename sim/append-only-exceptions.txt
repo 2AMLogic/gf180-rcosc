@@ -5,3 +5,5 @@
 # prefix (use a run directory, not a blanket glob). Entries are reviewed in
 # the PR that adds them. Default: no exceptions.
 sim/trim-dense/results/20261106T1115Z-campaign/ledger.jsonl | run_batch.py appends one JSONL line per finished job across sessions; the diff must be pure line additions (checked in the PR)
+sim/trim-dense/results/20261106T1115Z-campaign/jobs/ext_ss_m40C_3p0V_c21/batch-receipt.json | slice 11 completed the job left in flight at the slice-10 stop: driver rewrote the receipt from state null to done (one resubmission per tag, disclosed in SLICE-11.md)
+sim/trim-dense/results/20261106T1115Z-campaign/jobs/ext_ss_m40C_3p0V_c22/batch-receipt.json | slice 11 completed the job left in flight at the slice-10 stop: driver rewrote the receipt from state null to done (one resubmission per tag, disclosed in SLICE-11.md)
