@@ -44,6 +44,11 @@ import sys
 from dataclasses import dataclass, asdict
 from pathlib import Path
 
+_SIM_DIR = Path(__file__).resolve().parent.parent
+if str(_SIM_DIR) not in sys.path:
+    sys.path.insert(0, str(_SIM_DIR))
+import evidence_common  # noqa: E402  shared sha256/banner/new-run guard (#260)
+
 HERE = Path(__file__).resolve().parent
 
 
@@ -321,13 +326,9 @@ def flat(r):
 
 
 def write_run(out: Path, rows, metas, p: Params, synthetic: bool, note: str = ""):
-    out = Path(out)
-    if out.exists():
-        raise SystemExit(f"refusing to overwrite existing run {out}")
-    out.mkdir(parents=True)
-    synthetic = synthetic or any(m.get("synthetic") for m in metas)
-    banner = ("SYNTHETIC FIXTURE - NOT MEASURED EVIDENCE" if synthetic else
-              "Analysis of simulator output; evidence status is set by the originating campaign record")
+    out = evidence_common.new_run_dir(out)
+    synthetic = evidence_common.is_synthetic(synthetic, metas)
+    banner = evidence_common.banner(synthetic)
     nfail = sum(1 for r in rows if r["status"] != "OK")
     doc = {"label": banner, "synthetic": synthetic, "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
            "params": asdict(p), "note": note, "reports": metas, "n_corners": len(rows),

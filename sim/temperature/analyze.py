@@ -331,10 +331,8 @@ CSV_FIELDS = ["evidence_label", "process", "temp_c", "status", "f_hz", "norm_ppm
 
 def write_run(out: Path, result: dict, manifest: dict, metas, synthetic: bool, note: str = "",
               params=None) -> dict:
-    out = Path(out)
-    if out.exists():
-        raise SystemExit(f"refusing to overwrite existing run {out}")
-    synthetic = bool(synthetic or any(m.get("synthetic") for m in metas))
+    out = tp.evidence_common.require_absent(out)
+    synthetic = tp.evidence_common.is_synthetic(synthetic, metas)
     label = SYNTHETIC_LABEL if synthetic else MEASURED_LABEL
     doc = {"label": label, "synthetic": synthetic, "issue": tp.ISSUE,
            "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(), "note": note,
