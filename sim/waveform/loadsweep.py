@@ -37,6 +37,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import analyze  # noqa: E402
+import evidence_common  # noqa: E402  (sim/ is on sys.path via analyze)
 import prepare  # noqa: E402
 
 LOADS_F = (0.0, 1e-12, 2e-12, 5e-12, 10e-12)
@@ -45,7 +46,7 @@ VDDS_V = (3.0, 3.3, 3.6)
 TEMP_C = 27.0
 TARGET_HZ = 48e6
 BUDGET_PCT = (-2.9, 2.0)  # DR-0017 at-calibration budget
-SYNTH = "SYNTHETIC FIXTURE - NOT MEASURED EVIDENCE"
+SYNTH = evidence_common.SYNTHETIC_BANNER
 MANIFEST = "sweep_manifest.json"
 
 
@@ -242,10 +243,8 @@ CSV_FIELDS = ["label", "id", "process", "vdd_v", "load_pf", "trim_code", "status
 
 
 def write_results(out: Path, man: dict, res: dict, metas: list, synthetic: bool, p: analyze.Params) -> dict:
-    out = Path(out)
-    if out.exists():
-        raise SweepError(f"refusing to overwrite existing run {out}")
-    synthetic = synthetic or any(m.get("synthetic") for m in metas)
+    out = evidence_common.require_absent(out, SweepError)
+    synthetic = evidence_common.is_synthetic(synthetic, metas)
     banner = SYNTH if synthetic else ("Load-sensitivity analysis of simulator output; evidence status is set "
                                       "by the originating campaign record")
     nfail = sum(1 for e in res["points"] if e["comparison"] != "OK")

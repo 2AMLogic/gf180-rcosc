@@ -37,7 +37,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import re
 import sys
@@ -47,6 +46,7 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
 sys.path.insert(0, str(HERE.parent))
 from _module_loader import load_module  # noqa: E402
+import evidence_common  # noqa: E402  shared sha256/banner/new-run guard (#260)
 
 N_CODES = 256
 TRIM_BITS = 8
@@ -79,12 +79,8 @@ class PrepareError(Exception):
     pass
 
 
-def sha256_bytes(b: bytes) -> str:
-    return hashlib.sha256(b).hexdigest()
-
-
-def sha256_file(p: Path) -> str:
-    return sha256_bytes(Path(p).read_bytes())
+sha256_bytes = evidence_common.sha256_bytes
+sha256_file = evidence_common.sha256_file
 
 
 def _pvt():

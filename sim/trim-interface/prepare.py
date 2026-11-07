@@ -23,7 +23,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import re
 import sys
@@ -36,6 +35,7 @@ if str(_SIM) not in sys.path:
     sys.path.insert(0, str(_SIM))
 from _module_loader import load_module  # noqa: E402
 import git_provenance  # noqa: E402  shared git HEAD/dirty helper (#216)
+import evidence_common  # noqa: E402  shared sha256/banner/new-run guard (#260)
 sys.path.insert(0, str(REPO / "sim" / "pvt"))
 from pvt_sweep import PROCESS_CORNERS, TEMPS_C, VDDS_V  # noqa: E402
 
@@ -75,12 +75,8 @@ class PrepareError(Exception):
     pass
 
 
-def sha256(path: Path) -> str:
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
-
-
-def sha256_text(text: str) -> str:
-    return hashlib.sha256(text.encode()).hexdigest()
+sha256 = evidence_common.sha256_file
+sha256_text = evidence_common.sha256_text
 
 
 # ------------------------------------------------------------- extraction --

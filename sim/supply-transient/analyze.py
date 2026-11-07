@@ -56,11 +56,13 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
-SYN_BANNER = "SYNTHETIC FIXTURE - NOT MEASURED EVIDENCE"
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from _module_loader import load_module  # noqa: E402
+import evidence_common  # noqa: E402  shared sha256/banner/new-run guard (#260)
+
+SYN_BANNER = evidence_common.SYNTHETIC_BANNER   # public alias (tests, docs)
 
 
 def _load(name, rel):
@@ -378,13 +380,9 @@ def flat(r):
 
 
 def write_run(out: Path, rows, metas, p: Params, synthetic: bool, series=None, note: str = ""):
-    out = Path(out)
-    if out.exists():
-        raise SystemExit(f"refusing to overwrite existing run {out}")
-    out.mkdir(parents=True)
-    synthetic = synthetic or any(m.get("synthetic") for m in metas)
-    banner = (SYN_BANNER if synthetic else
-              "Analysis of simulator output; evidence status is set by the originating campaign record")
+    out = evidence_common.new_run_dir(out)
+    synthetic = evidence_common.is_synthetic(synthetic, metas)
+    banner = evidence_common.banner(synthetic)
     nfail = sum(1 for r in rows if r["status"] != "OK")
     doc = {"label": banner, "synthetic": synthetic, "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
            "params": asdict(p), "note": note, "reports": metas, "n_cases": len(rows),
