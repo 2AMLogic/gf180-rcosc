@@ -25,6 +25,10 @@ Run: engine ngspice 42 (this host), `klt 0.7.0+g4cbdfa769875`, `gf180mcuC`,
 open_pdks `c6d73a35f524070e85faff4a6a9eef49553ebc2b`,
 `sm141064.ngspice` sha256 `6edba54d…1b77b1aa`, MC seed `20261008` (DR-0019).
 
+**Superseded by the campaign.** The injected pipeline now runs on the batch fleet
+(`results/20261106T045937Z/`, a 5-sample schematic smoke) and the item-6 campaign
+itself is [`../mc/`](../mc/README.md) (issue #202), on the P3 netlist.
+
 **Injector status (issue #135).** `mismatch_inject.py` implements the DR-0022
 section 4 netlist-body injector (`m='1/(1+d_<inst>)'` resistors,
 `m='(1+d_<inst>)'` capacitor, `d_<inst>` gated by `sw_stat_mismatch`, loud

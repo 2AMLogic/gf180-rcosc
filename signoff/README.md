@@ -139,7 +139,7 @@ Today the machine grades this block (`klt signoff --manifest`, committed
   clean), item 4 (LVS clean), item 8 (Characterization report), item 9
   (Testbenches shipped), item 10 (Repo hygiene), item 11 (Power delivery,
   structural)**
-- **unmet, reason `no_evidence`: items 5, 6, 7**
+- **unmet: item 5 (`check_failed`), item 6 (`negative_control_not_detected`), item 7 (`no_evidence`)**
 
 The block therefore still grades **below T1** (`tier: null`, exit `3`).
 
@@ -361,44 +361,30 @@ requests (`fosc` >= 1 MHz, and `iq_run_ua` < 500 uA on the calibration-code
 requests) because the grader requires a checked limit and the other rows are
 not corner-wide limits. Nothing in the ratified spec was relaxed.
 
-### unmet — item 6 (Statistical claims carry Monte Carlo evidence): nothing to back, nothing cited
+### unmet — item 6 (Statistical claims carry Monte Carlo evidence): campaign run, `negative_control_not_detected`
 
-There is no Monte Carlo or `klt yield` run anywhere under `sim/`, so the
-machine row is `no_evidence`. The repo **does** have statistical claims to
-back: [DR-0019](../spec/decision-records/0019-statistical-vs-deterministic-spec-rows-and-monte-carlo-evidence-plan.md)
-(status `proposed`) classifies every ratified spec row and finds the trim
-coverage/resolution row and both post-trim accuracy rows statistical (their
-budgets contain per-die trim-DAC mismatch and comparator offset), while the
-remaining rows are corner-bounded or reserved. Until now the README treated
-every accuracy figure as a worst-case-corner figure and the item as vacuous;
-that reading is withdrawn -- a corner matrix cannot validate an accuracy row.
-The record states each claim (ratified limit, 99 % yield, 95 % confidence),
-the Monte Carlo design (500 samples per corner, recorded seed, deterministic
-negative controls, run on top of the corner matrix rather than replacing it),
-the evidence verb (`klt yield`, `klayout-tools[yield]` extra, fed by a `klt
-sim` `monte_carlo` request submitted to the batch fleet), and the sequencing:
-the campaign runs after #66 settles the sizing. The item stays `unmet` until
-that campaign lands a `yield` envelope; both the MC run and this row change
-together.
+The Monte Carlo campaign now exists (issue #202, [`sim/mc/`](../sim/mc/README.md),
+[DR-0029](../spec/decision-records/0029-item-6-monte-carlo-campaign-results-s2-ss-and-s3-ff-fail-controls-incomplete.md)):
+500 samples per process corner on the P3 netlist, seed `20261008`, the
+DR-0022 matching model, one `klt yield` report per (process, row set) in
+`sim/mc/results/20261106T072000Z/`. The manifest cites all nine under
+`evidence."6"` with `rows`, and declares `spec_rows."6"` = rows 2, 4, 5 with
+`ratified: false` (DR-0019 is `proposed`, so even a clean pass would grade
+`unratified_rows`, not `met`). The grader reports, per citation:
 
-**What exists toward it (issue #186, pipeline groundwork, not a yield claim).**
-`sim/mc-groundwork/gen_bench.py --inject-mismatch` wires the DR-0022 §4
-mismatch injector into the Monte Carlo benches (default off; committed benches
-unchanged), with offline tests. The smoke attempt is committed as a diagnostic
-under `sim/mc-groundwork/results/20261017T200500Z/` (retried once in `20261017T202900Z/`, same failure): every batch submit failed
-because the fleet runner has no `gf180mcuC` PDK, so there are no simulation
-results and the negative controls were not run. `klayout-tools[yield]==0.7.0`
-also does not resolve (`klt-yield-native` is not in the registry), so no `klt
-yield` report exists either.
+* `check_failed`: `ss` row 4 (0 % yield) and `ff` row 5 (60.4 % yield);
+* `negative_control_not_detected`: every other cell except `ff` row 4 (the 3x
+  inflated control did not degrade the claim, so the harness cannot show it would
+  have failed it);
+* `met`: `ff` row 4 only.
 
-**Still owed.** (1) A fleet runner with the PDK, then the mismatch-on smoke and
-the negative controls; (2) an installable `klt yield` at the pin; (3) a
-block-manifest item-6 entry. `klt 0.7.0 --describe-grader` lists no way to
-declare which spec rows are statistical, so the manifest is deliberately left
-unchanged and item 6 stays `unmet` / `no_evidence` rather than gaining an
-entry the pinned grader would ignore or reject. `testbench-inventory.md` is
-also unchanged (it is a hashed artifact, and the diagnostic is not a claimed
-measurement); a row for the final campaign lands with its re-grade.
+The item therefore reads `unmet` / `negative_control_not_detected` with
+`failed_rows` 2 and 5. The controls and the passing cells' lack of a verdict
+are in `sim/mc/README.md`; the ratified rows and the controls are unchanged.
+Anything that makes rows 2/4/5 pass (a design fix for the `ss` supply span and
+the `ff` temperature spread, a stronger or differently defined negative control,
+DR-0019/0022 ratification) lands as a new run and a re-grade, never an edit of
+these results. `testbench-inventory.md` carries the campaign (item 9 re-pinned).
 
 ### unmet — item 7 (Post-layout verification): campaign committed, not a `klt pex` report
 

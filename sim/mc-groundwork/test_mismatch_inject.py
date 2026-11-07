@@ -175,3 +175,36 @@ def test_committed_netlist_not_modified_by_injection():
     diff = subprocess.run(["git", "-C", str(ROOT), "diff", "--quiet", "--",
                            "design"], check=False)
     assert diff.returncode == 0
+
+
+def test_card_without_m_gets_multiplier_appended():
+    # extracted netlists (klt extract) write no m= at all: SPICE default is 1
+    dut = "XR1 a b vss ppolyf_u_1k r_length=12.0386U r_width=2U\nXC1 vss vc cap_mim_1f0fF c_width=20u c_length=10u"
+    text, man = mi.inject(dut)
+    assert "XR1 a b vss ppolyf_u_1k r_length=12.0386U r_width=2U m='1/(1+d_r1)'" in text
+    assert "XC1 vss vc cap_mim_1f0fF c_width=20u c_length=10u m='(1+d_c1)'" in text
+    assert [m["instance"] for m in man] == ["XR1", "XC1"]
+    # literal zero scale keeps the baseline card verbatim (no m appended)
+    t0, _ = mi.inject(dut, mm_scale=0)
+    assert "XR1 a b vss ppolyf_u_1k r_length=12.0386U r_width=2U\n" in t0 + "\n"
+    assert "m=" not in t0.split("XR1", 1)[1].split("\n")[0]
+
+
+def test_explicit_non_unit_m_still_refused_when_m_otherwise_absent_form_allowed():
+    with pytest.raises(mi.UnmappedCardError):
+        mi.inject("XR1 a b vss ppolyf_u_1k r_length=1u r_width=2u m=4")
+
+
+def test_dollar_instance_names_get_safe_param_names():
+    dut = "X$87 a b vsubs ppolyf_u_1k r_length=100U r_width=2U\nX_87 a c vsubs ppolyf_u_1k r_length=100U r_width=2U"
+    # X$87 -> d__87 and X_87 -> d__87 would collide: refuse rather than alias
+    with pytest.raises(mi.UnmappedCardError):
+        mi.inject(dut)
+    text, man = mi.inject(dut.split("\n")[0])
+    assert "m='1/(1+d__87)'" in text and ".param d__87=" in text and "$" not in text.replace("X$87", "")
+
+
+def test_gate_param_replaces_sw_stat_mismatch_in_draws():
+    text, _ = mi.inject("XR1 a b vss ppolyf_u_1k r_length=100u r_width=2u m=1", gate="sw_inj")
+    assert ".param d_r1='sw_inj*agauss(0," in text
+    assert "sw_stat_mismatch" not in text.split("\n", 1)[1]

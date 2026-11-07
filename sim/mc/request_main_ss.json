@@ -1,0 +1,133 @@
+{
+  "netlist": "tb_main_ss.spice",
+  "engine": "ngspice",
+  "netlist_source": "extracted",
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "ss",
+        "sections": [
+          "ss",
+          "res_ss",
+          "mimcap_ss",
+          "cap_mim"
+        ]
+      }
+    ],
+    "temperature_c": [
+      27
+    ]
+  },
+  "analysis": {
+    "kind": "op",
+    "args": ""
+  },
+  "measurements": [
+    {
+      "name": "code_sel",
+      "expr": "$v_code",
+      "unit": ""
+    },
+    {
+      "name": "f_hold_hz",
+      "expr": "$v_fhold",
+      "unit": "Hz"
+    },
+    {
+      "name": "hold_gap_hz",
+      "expr": "$v_gap",
+      "unit": "Hz"
+    },
+    {
+      "name": "step_up_hz",
+      "expr": "$v_up",
+      "unit": "Hz"
+    },
+    {
+      "name": "step_dn_hz",
+      "expr": "$v_dn",
+      "unit": "Hz"
+    },
+    {
+      "name": "s1_resid_abs_pct",
+      "expr": "$v_s1r",
+      "unit": "%"
+    },
+    {
+      "name": "s1_headroom",
+      "expr": "$v_s1h",
+      "unit": "codes"
+    },
+    {
+      "name": "s2_margin_pct",
+      "expr": "$v_s2",
+      "unit": "%"
+    },
+    {
+      "name": "s3_margin_pct",
+      "expr": "$v_s3",
+      "unit": "%"
+    },
+    {
+      "name": "e_n40_30_pct",
+      "expr": "$v_e_n40_30",
+      "unit": "%"
+    },
+    {
+      "name": "e_n40_33_pct",
+      "expr": "$v_e_n40_33",
+      "unit": "%"
+    },
+    {
+      "name": "e_n40_36_pct",
+      "expr": "$v_e_n40_36",
+      "unit": "%"
+    },
+    {
+      "name": "e_27_30_pct",
+      "expr": "$v_e_27_30",
+      "unit": "%"
+    },
+    {
+      "name": "e_27_33_pct",
+      "expr": "$v_e_27_33",
+      "unit": "%"
+    },
+    {
+      "name": "e_27_36_pct",
+      "expr": "$v_e_27_36",
+      "unit": "%"
+    },
+    {
+      "name": "e_85_30_pct",
+      "expr": "$v_e_85_30",
+      "unit": "%"
+    },
+    {
+      "name": "e_85_33_pct",
+      "expr": "$v_e_85_33",
+      "unit": "%"
+    },
+    {
+      "name": "e_85_36_pct",
+      "expr": "$v_e_85_36",
+      "unit": "%"
+    }
+  ],
+  "batch": {
+    "capacity_wait_s": 1200
+  },
+  "options": {
+    "timeout_s": 120,
+    "keep_artifacts": false
+  },
+  "monte_carlo": {
+    "n": 500,
+    "seed": 20261008,
+    "vary": "mismatch"
+  }
+}
