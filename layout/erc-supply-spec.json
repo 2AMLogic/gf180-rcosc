@@ -163,7 +163,16 @@
       "and nothing else. Validated against both the pre-#57 and post-#57",
       "top GDS: identical supply-island verdicts (one island each, zero",
       "missing_tie) and zero supply shorts, with only the disclosed",
-      "floating-gate artifact remaining."
+      "floating-gate artifact remaining.",
+      "",
+      "TIE RESPELLED (klayout-tools 0.8.0 pin): tap_requires is honoured",
+      "by the pinned grader (klayout-tools#2358 fixed), so the 0.4.0",
+      "workaround above is retired: tap_layer is Comp (22/0) again and",
+      "tap_requires [32/0] (Nplus) narrows it to the tap sites. The",
+      "workaround spelling (tap_layer 32/0 = tap_requires 32/0) narrows",
+      "nothing and 0.8.0 skips it as degenerate_tap_declaration, which",
+      "renders item 11 supply_spec_incomplete. Same physical tap",
+      "definition; zero erc.missing_tie, one island per supply."
   ],
   "stackup": [
     { "name": "poly2", "layer": "30/0", "role": "gate", "active_layer": "22/0" },
@@ -185,7 +194,7 @@
     {
       "name": "nwell_vdd_tap",
       "well_layer": "21/0",
-      "tap_layer": "32/0",
+      "tap_layer": "22/0",
       "tap_requires": ["32/0"],
       "connect_to": "Metal1",
       "net": "vdd"

@@ -1,0 +1,19 @@
+* klt sim -- generated corner deck, do not edit
+.lib /home/ubuntu/.ciel/gf180mcuC/libs.tech/ngspice/sm141064.ngspice fs
+.lib /home/ubuntu/.ciel/gf180mcuC/libs.tech/ngspice/sm141064.ngspice res_typical
+.lib /home/ubuntu/.ciel/gf180mcuC/libs.tech/ngspice/sm141064.ngspice mimcap_typical
+.lib /home/ubuntu/.ciel/gf180mcuC/libs.tech/ngspice/sm141064.ngspice cap_mim
+.include /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-227/sim/startup-fs-m40c/probes/tb_ramp_ctl_fs_m40_v30.spice
+.temp -40.0
+.meas tran ta WHEN v(clk)=1.5000 RISE=5
+.meas tran tb WHEN v(clk)=1.5000 RISE=25
+.meas tran fosc PARAM='20/(tb-ta)'
+.meas tran clk_max MAX v(clk) FROM=200n
+.meas tran clk_min MIN v(clk) FROM=200n
+.control
+set filetype=ascii
+tran 200p 3u
+write /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-227/sim/startup-fs-m40c/results/20261106T061000Z/out_ramp_ctl_fs_m40_v30/fs_novdd_n40C/waveform.raw
+quit
+.endc
+.end

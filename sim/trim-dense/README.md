@@ -1,8 +1,9 @@
 # sim/trim-dense - dense trim-step request generator and analyzer (offline)
 
-Issue #98, the offline-preparation subset of #87. **No simulation was run and
-no measured result exists here.** This directory holds only tooling and tests;
-there is no `results/` directory and nothing in it is evidence. Every curve in
+Issue #98, the offline-preparation subset of #87. **The dense campaign was not
+run and no trim-step result exists here.** This directory holds tooling and tests;
+the only `results/` content permitted is a Step 0 single-corner fleet-gate record
+(see `test_no_measured_artifacts_in_tree`), which is not campaign evidence. Every curve in
 `test_harness.py` is a labeled synthetic fixture. The campaign, its evidence
 and its decision record stay in #87; no ratified row, existing result, design
 file or DR-0021 is changed by this directory.
@@ -134,3 +135,19 @@ report as `report_<tag>.json`, fill the manifest, then run `analyze.py
 --manifest`. Hand-launched local `ngspice` grids are forbidden on the dispatch
 hosts; a refused or failed submission is reported, never replaced by a local
 fallback. The evidence directory, decision record and any verdict are #87's.
+
+## Resumable batch driver (`run_batch.py`, #87)
+
+```
+python3 -I sim/trim-dense/run_batch.py --bench-dir <prepare.py out> \
+    --out-dir sim/trim-dense/results/<UTC-stamp> [--limit N] [--only TAG] [--retry-failed]
+```
+
+Submits each `request_cXX.json` with `klt sim --backend batch -o <out>/jobs/<tag> --format json`
+(never local), saves `reports/report_<tag>.json`, and appends one line per
+submission (job id, receipt state, report status) to `ledger.jsonl`. Concurrency
+is hard-capped at 2 (host rule). Re-running skips requests whose
+`batch-receipt.json` is `done`; failed/errored ones are reported and only
+re-submitted with `--retry-failed`. `--limit` lets a session run a bounded
+slice. Tested with a fake `klt` (`test_harness.py`); no fleet job was run for the
+driver itself. The 1536-job campaign (~32 s per job, 2 at a time) is still to run.

@@ -41,15 +41,19 @@ from __future__ import annotations
 
 import argparse
 import csv
-import hashlib
 import json
 import math
 import re
 import sys
 from pathlib import Path
 
+_SIM_DIR = Path(__file__).resolve().parent.parent
+if str(_SIM_DIR) not in sys.path:
+    sys.path.insert(0, str(_SIM_DIR))
+import evidence_common  # noqa: E402  shared sha256/banner/new-run guard (#260)
+
 N_CODES = 256
-SYN_BANNER = "SYNTHETIC FIXTURE - NOT MEASURED EVIDENCE"
+SYN_BANNER = evidence_common.SYNTHETIC_BANNER
 NOPROV_BANNER = "PROVENANCE INCOMPLETE - NOT USABLE AS EVIDENCE"
 NOMINAL_STEP_PCT = 80.0 / 255.0        # DR-0003 Row 2: 0.313725 %/code
 HALF_LSB_PCT = 40.0 / 255.0            # 0.156863 %
@@ -238,7 +242,7 @@ def check_manifest(path, prov_path: Path, prov: dict) -> list[str]:
         errs.append("pdk_revision 'unknown' requires pdk_revision_reason")
     if m.get("backend") not in (None, "batch"):
         errs.append(f"backend {m.get('backend')!r} is not 'batch'")
-    want = hashlib.sha256(Path(prov_path).read_bytes()).hexdigest()
+    want = evidence_common.sha256_file(prov_path)
     if m.get("provenance_sha256") not in (None, "", want):
         errs.append("provenance_sha256 does not match the bench provenance.json")
     solver = m.get("solver")
@@ -316,7 +320,7 @@ def analyse_campaign(bench_dir: Path, reports_dir: Path, manifest=None, syntheti
         "banner": SYN_BANNER if is_syn else (NOPROV_BANNER if run_errors else "MEASURED CAMPAIGN DATA (analysis only; verdict belongs to #87)"),
         "synthetic": is_syn, "all_curves_valid": all_ok, "run_errors": run_errors,
         "engine_versions_in_reports": engines,
-        "bench_provenance_sha256": hashlib.sha256(prov_path.read_bytes()).hexdigest(),
+        "bench_provenance_sha256": evidence_common.sha256_file(prov_path),
         "bench_inputs": prov.get("inputs"), "settings": prov.get("settings"),
         "curves": curves,
     }

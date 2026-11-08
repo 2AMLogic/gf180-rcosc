@@ -1,0 +1,42 @@
+{
+ "1": {
+  "ok": false,
+  "binding": "tt/27C/3.3V",
+  "text": "f(0xA9) = 49.142 MHz (+2.38 %) vs 48.000 MHz; ratified calibration tolerance +/-1.1 % (DR-0023 re-derives it at the calibration point)"
+ },
+ "2": {
+  "ok": false,
+  "binding": "tt/27C/3.3V",
+  "text": "f(0x00) = 28.650 MHz (needs <= 28.800), f(0xFF) = 76.393 MHz (needs >= 67.200), LSB 0xA9->0xAA = 0.513 %/code (ratified 0.314 %/code); Monte Carlo remainder (claim S1) is a declared gap"
+ },
+ "3": {
+  "ok": true,
+  "binding": "ff/27C/3.3V",
+  "text": "0x80 at 27 C / 3.3 V vs tt: tt +0.0 %, ff +29.5 %, ss -20.2 %, fs +1.4 %, sf -1.7 %, rc_f +26.3 %, rc_s -17.9 % (ratified +/-35 %)"
+ },
+ "4": {
+  "ok": false,
+  "binding": "ff/27C/3.6V",
+  "text": "one code (0xA9) held across 7 process corners: 4/21 points inside -2.9 %/+2.0 %; largest |error| +33.46 % at ff/27 C/3.6 V; per-die recalibration is NOT modelled here (see sim/recentre per-process-code grid); Monte Carlo remainder (claim S2/S3) is a declared gap"
+ },
+ "5": {
+  "ok": false,
+  "binding": "ff/85C/3V",
+  "text": "one code (0xA9) held across 7 process corners: 25/63 points inside -10.8 %/+8.8 %; largest |error| +40.42 % at ff/85 C/3 V; per-die recalibration is NOT modelled here (see sim/recentre per-process-code grid); Monte Carlo remainder (claim S2/S3) is a declared gap"
+ },
+ "7": {
+  "ok": true,
+  "binding": "n/a",
+  "text": "0 (code, VDD, process, T) points returned no frequency, in 0 of 15 envelopes"
+ },
+ "10": {
+  "ok": true,
+  "binding": "n/a",
+  "text": "temperature axis -40/27/85 C present in every request; 0 (code, VDD, process, T) points returned no frequency, in 0 of 15 envelopes"
+ },
+ "8": {
+  "ok": false,
+  "binding": "ff/85C/3.6V (code 0xA9)",
+  "text": "max iq_run_ua = 564.5 uA over 63 measured calibration-code (0xA9) points (limit < 500 uA); window is the fixed 200-1200 ns, not whole periods"
+ }
+}

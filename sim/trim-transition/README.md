@@ -8,22 +8,21 @@ runtime-discipline claim (DR-0004, DR-0021) assumes a code rewrite does not
 corrupt the clock. This bench tests that assumption. Schematic level only, no
 design change.
 
-**Status (2026-11-06): the batch campaign RAN on the v11 runner (runner klt
-0.9.0, gf180mcuC present) into `results/20261106T050454Z/` (below). It is
-PARTIAL: six of nine benches (`none`, `msb_first` at 3.0/3.3/3.6 V x tt/ss/ff,
-576 events) were simulated and analysed; the three `lsb_first` benches aborted in
-ngspice (`timestep_too_small`, all 9 corners), so the lsb_first skew has no batch
-evidence.** No runt pulse and no missing/extra edge in any simulated event; 22
-events fail the "never settles" screen (see "Verdict").  Decision record:
-`spec/decision-records/0026-live-trim-code-transition-bench-batch-result.md`.
-Nothing here changes a ratified spec row.
+**Status (2026-11-06): COMPLETE. The nine-corner batch campaign ran on the v11
+runner (runner klt 0.9.0) into `results/20261106T055733Z/`: all nine jobs `pass`,
+864 events (3 skews x 9 corners x 32). No runt pulse and no missing/extra edge in
+any event. 30 events fail the "never settles" screen, which is noise-limited at the
+fast corners (see "Verdict").** Decision records:
+`spec/decision-records/0027-live-trim-code-transition-bench-nine-corner-result.md`
+(this run) and `0026-...-batch-result.md` (the earlier partial run
+`results/20261106T050454Z/`, kept as is). Nothing here changes a ratified spec row.
 
 ```
 sim/trim-transition/
   prepare.py            offline bench + `klt sim` request generator (no simulator, no cloud)
   analyze.py            klt sim report analyzer -> results.json / results.csv / summary.md
   run-transition.sh     regenerate + `klt sim` each request into a NEW results/<runid>/
-  test_harness.py       synthetic-fixture + request tests (23 tests, run in CI)
+  test_harness.py       synthetic-fixture + request tests (24 tests, run in CI)
   provenance.json       GENERATED: positions, skew modes, settings, DUT hash (not evidence)
   rcosc_top_schematic.spice   GENERATED: DUT extracted from design/netlist/pvt_tb.spice
   tb_/request_/schedule_v{30,33,36}_{none,lsb_first,msb_first}.*   GENERATED: nine benches
@@ -80,6 +79,9 @@ free-running oscillator:
 - Same bench settings as `sim/waveform` except `tstep/tmax = 100p` (a 200p max
   step leaves ~0.2 % solver edge-time noise on single periods, larger than the
   settle tolerance; 40p aborted with "timestep too small" at a PWL edge).
+- Each select PWL source drives its trim pin through `drv_ohm` = 50 ohm. With ideal
+  0-ohm sources the `lsb_first` benches aborted `timestep_too_small` at 30.7167 us at
+  every corner, whatever `itl4` / `method=gear` / `tmax` was used (DR-0027).
 - No extra `clk` load, ideal rails, schematic netlist, no mismatch. The trim
   code is *not* the per-process calibrated code: the carry codes are fixed by the
   bit pattern, the same for every process (periods differ, see results).
@@ -177,18 +179,40 @@ open_pdks `f6eeac7`, ngspice 46, 3 corners per job. Analysis:
   interaction, not a corner effect. Not debugged in this run (out of scope:
   no generator change); not retried locally per the batch-only host rule.
 
+## Campaign `results/20261106T055733Z/` (2026-11-06, series-R bench)
+
+`run-transition.sh --backend batch`; nine `klt sim` jobs (all `pass`, runner klt 0.9.0).
+Analysis: `results/20261106T055733Z/analysis/{summary.md,results.csv,results.json}`
+(864 event rows). Raw waveforms (~1.1 GB) are not committed.
+
+| skew | corners | events | PASS | FLAG | VIOLATION | FAIL | worst excursion |
+|---|---|---|---|---|---|---|---|
+| none | 9/9 | 288 | 182 | 92 | 14 | 0 | 14 % |
+| lsb_first | 9/9 | 288 | 202 | 78 | 8 | 0 | 24 % |
+| msb_first | 9/9 | 288 | 134 | 146 | 8 | 0 | 41 % |
+| **all** | 27/27 | 864 | 518 | 316 | 30 | 0 | |
+
+- Runt pulses: none. Missing/extra edges: none.
+- The 30 VIOLATIONs are all "never settles" (21 at ff/3.6 V). Their pre-change steady
+  period spread is 0.02-0.15 % (median 0.075 %) against the 0.1 % settle tolerance,
+  and 834 non-violating events have steady spread up to 0.17 %: the screen is
+  noise-limited, not evidence of a slow settle. Tolerance not loosened.
+- Worst excursions are single-cycle and at the 0x7F<->0x80 carry (ff), the
+  non-monotone carry of DR-0021 plus skew-order transient codes.
+- `analyze.py` collapses exact-duplicate timestamps (ngspice emits two at the
+  30.7167 us instant); out-of-order time still fails.
+
 ## Verdict (current)
 
-Partial. No glitch-class failure (runt / missing edge) on the six simulated
-benches, but 22 "never settles" violations and 9 aborted lsb_first corners mean
-the discipline model's no-glitch-on-update assumption is **not confirmed**
-across all nine corners. Recorded in DR-0026 and cross-referenced from DR-0021;
-no ratified row is relaxed. Follow-up needed: lsb_first convergence and the
-ff/3.6 V settle behaviour.
+No glitch-class failure (runt / missing edge) in any of 27 corner x skew benches at
+schematic level: DR-0021's no-glitch-on-update assumption holds for that class. The
+settle claim is not resolvable with the 0.1 % screen at fast corners; a
+spread-relative criterion is the follow-up. Recorded in DR-0027, cross-referenced
+from DR-0021; no ratified row is relaxed.
 
 ## Limitations
 
 Schematic only (post-layout PEX only if a violation appears); ideal digital
-sources (no driver impedance, no coupling through routing); no mismatch; edge 1 ns
+sources behind a fixed 50 ohm driver (no real driver model, no coupling through routing); no mismatch; edge 1 ns
 fixed; skew modes are two orderings, not a Monte Carlo of arrival times; 27 C only;
 the phase of each change is measured, not controlled.

@@ -370,3 +370,15 @@ def test_cli_exit_codes(tmp_path):
     rep2.write_text(json.dumps({"corner_count": 1, "corners": [corner("tt", bad)]}))
     r = subprocess.run(base + [f"v33_none={rep2}", "--outdir", str(tmp_path / "o2")], capture_output=True, text=True)
     assert r.returncode == 1
+
+
+def test_duplicate_timestamps_are_collapsed_not_reordered(tmp_path):
+    base = {"variables": [{"name": "time"}, {"name": "v(clk)"}, {"name": "v(vdd)"}]}
+    good = tmp_path / "dup.json"
+    good.write_text(json.dumps(dict(base, points=[[0, 0, 1], [1e-9, 1, 1], [1e-9, 1, 1], [2e-9, 0, 1]])))
+    t, _, _ = analyze.load_waveform_dedup(good)
+    assert t == [0.0, 1e-9, 2e-9]
+    bad = tmp_path / "ooo.json"
+    bad.write_text(json.dumps(dict(base, points=[[0, 0, 1], [2e-9, 1, 1], [1e-9, 1, 1]])))
+    with pytest.raises(analyze.AnalysisError, match="strictly increasing"):
+        analyze.load_waveform_dedup(bad)

@@ -1,0 +1,27 @@
+* klt sim -- generated corner deck, do not edit
+.lib /home/ubuntu/.ciel/gf180mcuC/libs.tech/ngspice/sm141064.ngspice fs
+.lib /home/ubuntu/.ciel/gf180mcuC/libs.tech/ngspice/sm141064.ngspice res_typical
+.lib /home/ubuntu/.ciel/gf180mcuC/libs.tech/ngspice/sm141064.ngspice mimcap_typical
+.lib /home/ubuntu/.ciel/gf180mcuC/libs.tech/ngspice/sm141064.ngspice cap_mim
+.include /home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-227/sim/startup-fs-m40c/probes/tb_schem_fs_m40_v33.spice
+.temp -40.0
+.meas tran n_vc AVG v(xxdut.vc) FROM=700n TO=1200n
+.meas tran n_vh AVG v(xxdut.vh) FROM=700n TO=1200n
+.meas tran n_vl AVG v(xxdut.vl) FROM=700n TO=1200n
+.meas tran n_ibias AVG v(xxdut.ibias) FROM=700n TO=1200n
+.meas tran n_pb AVG v(xxdut.pb) FROM=700n TO=1200n
+.meas tran n_cmph_out AVG v(xxdut.cmph_out) FROM=700n TO=1200n
+.meas tran n_cmpl_out AVG v(xxdut.cmpl_out) FROM=700n TO=1200n
+.meas tran n_qbar AVG v(xxdut.qbar) FROM=700n TO=1200n
+.meas tran ta WHEN v(clk)=1.6500 RISE=5
+.meas tran tb WHEN v(clk)=1.6500 RISE=25
+.meas tran fosc PARAM='20/(tb-ta)'
+.meas tran clk_max MAX v(clk) FROM=200n
+.meas tran clk_min MIN v(clk) FROM=200n
+.meas tran iq_run_ua AVG v(iq_ua) FROM=200n TO=1200n
+.control
+save all
+tran 200p 1200n
+quit
+.endc
+.end

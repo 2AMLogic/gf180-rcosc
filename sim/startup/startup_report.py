@@ -37,6 +37,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 import git_provenance  # noqa: E402  shared git HEAD/dirty helper (#216)
+import evidence_common  # noqa: E402  shared sha256/banner/new-run guard (#260)
 RAMP_NS = 1000
 TAIL_NS = 2000
 TAIL_TOL = 0.005
@@ -109,8 +110,7 @@ def main():
     ap.add_argument("--note", default="")
     a = ap.parse_args()
     out = HERE / "results" / a.runid
-    if out.exists():
-        sys.exit(f"refusing to overwrite existing run {out}")
+    evidence_common.require_absent(out)
     rows, edges, remotes = [], {}, []
     for k, rep in enumerate(a.reports):
         d = json.load(open(rep))

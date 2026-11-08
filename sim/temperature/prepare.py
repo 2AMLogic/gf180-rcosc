@@ -43,6 +43,7 @@ if str(_SIM) not in sys.path:
     sys.path.insert(0, str(_SIM))
 from _module_loader import load_module  # noqa: E402
 import git_provenance  # noqa: E402  shared git HEAD/dirty helper (#216)
+import evidence_common  # noqa: E402  shared sha256/banner/new-run guard (#260)
 WAVEFORM = REPO / "sim" / "waveform"
 
 
@@ -70,7 +71,7 @@ CAL_RUNID = "20260923T030125Z"
 CAL_GIT_SHA = "ed26786191202a85a71b6938563c45a1eaaa5582"
 EXPECTED_CODES = {"tt": 0xA3, "ss": 0xCD, "ff": 0x59}
 KIND = "interior-temperature-requests"
-SYNTHETIC_LABEL = "SYNTHETIC FIXTURE - NOT MEASURED EVIDENCE"
+SYNTHETIC_LABEL = evidence_common.SYNTHETIC_BANNER
 
 
 class PrepareError(Exception):

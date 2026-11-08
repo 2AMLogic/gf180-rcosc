@@ -68,7 +68,7 @@ def test_requests_parse_and_reference_existing_netlists():
         assert {m["name"] for m in req["measurements"]} >= {"fosc", "iq_run_ua"}
         lim = {m["name"]: m.get("limits") for m in req["measurements"]}
         assert lim["fosc"] == {"min": 1.0e6}
-        assert lim["iq_run_ua"] == ({"max": 500.0} if f.name.startswith("request_ca9_") else None)
+        assert lim["iq_run_ua"] == ({"max": 500.0} if f.name.startswith("request_ca4_") else None)
 
 
 def test_regeneration_is_byte_identical(tmp_path):

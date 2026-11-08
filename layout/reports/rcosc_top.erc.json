@@ -1,13 +1,76 @@
 {
-  "schema_version": 1,
-  "file": "layout/cells/rcosc_top.gds",
+  "schema_version": 2,
+  "file": {
+    "path": "layout/cells/rcosc_top.gds",
+    "scope": "repo"
+  },
   "spec": "layout/erc-supply-spec.json",
   "pdk": null,
+  "findings_only": false,
   "gate_role": "poly2",
   "gate_count": 62,
+  "antenna_tables_omitted": false,
   "gates": [
     {
       "gate_id": "gate0",
+      "net": null,
+      "gate_area_um2": 0.5,
+      "antenna_verdict": "unchecked",
+      "levels": [
+        {
+          "layer": "poly2",
+          "step_area_um2": 0.8444,
+          "cumulative_area_um2": 0.8444,
+          "antenna_ratio": 1.6888,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal1",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 0.8444,
+          "antenna_ratio": 1.6888,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal2",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 0.8444,
+          "antenna_ratio": 1.6888,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal3",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 0.8444,
+          "antenna_ratio": 1.6888,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal4",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 0.8444,
+          "antenna_ratio": 1.6888,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        }
+      ]
+    },
+    {
+      "gate_id": "gate1",
       "net": null,
       "gate_area_um2": 0.25,
       "antenna_verdict": "unchecked",
@@ -65,7 +128,7 @@
       ]
     },
     {
-      "gate_id": "gate1",
+      "gate_id": "gate2",
       "net": null,
       "gate_area_um2": 2.0,
       "antenna_verdict": "unchecked",
@@ -123,7 +186,7 @@
       ]
     },
     {
-      "gate_id": "gate2",
+      "gate_id": "gate3",
       "net": null,
       "gate_area_um2": 16.0,
       "antenna_verdict": "unchecked",
@@ -181,7 +244,7 @@
       ]
     },
     {
-      "gate_id": "gate3",
+      "gate_id": "gate4",
       "net": null,
       "gate_area_um2": 40.0,
       "antenna_verdict": "unchecked",
@@ -231,64 +294,6 @@
           "step_area_um2": 0.0,
           "cumulative_area_um2": 40.3444,
           "antenna_ratio": 1.00861,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        }
-      ]
-    },
-    {
-      "gate_id": "gate4",
-      "net": null,
-      "gate_area_um2": 4.0,
-      "antenna_verdict": "unchecked",
-      "levels": [
-        {
-          "layer": "poly2",
-          "step_area_um2": 4.3444,
-          "cumulative_area_um2": 4.3444,
-          "antenna_ratio": 1.0861,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        },
-        {
-          "layer": "Metal1",
-          "step_area_um2": 0.0,
-          "cumulative_area_um2": 4.3444,
-          "antenna_ratio": 1.0861,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        },
-        {
-          "layer": "Metal2",
-          "step_area_um2": 0.0,
-          "cumulative_area_um2": 4.3444,
-          "antenna_ratio": 1.0861,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        },
-        {
-          "layer": "Metal3",
-          "step_area_um2": 0.0,
-          "cumulative_area_um2": 4.3444,
-          "antenna_ratio": 1.0861,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        },
-        {
-          "layer": "Metal4",
-          "step_area_um2": 0.0,
-          "cumulative_area_um2": 4.3444,
-          "antenna_ratio": 1.0861,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -357,14 +362,14 @@
     {
       "gate_id": "gate6",
       "net": null,
-      "gate_area_um2": 1.0,
+      "gate_area_um2": 4.0,
       "antenna_verdict": "unchecked",
       "levels": [
         {
           "layer": "poly2",
-          "step_area_um2": 1.3444,
-          "cumulative_area_um2": 1.3444,
-          "antenna_ratio": 1.3444,
+          "step_area_um2": 4.3444,
+          "cumulative_area_um2": 4.3444,
+          "antenna_ratio": 1.0861,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -373,8 +378,8 @@
         {
           "layer": "Metal1",
           "step_area_um2": 0.0,
-          "cumulative_area_um2": 1.3444,
-          "antenna_ratio": 1.3444,
+          "cumulative_area_um2": 4.3444,
+          "antenna_ratio": 1.0861,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -383,8 +388,8 @@
         {
           "layer": "Metal2",
           "step_area_um2": 0.0,
-          "cumulative_area_um2": 1.3444,
-          "antenna_ratio": 1.3444,
+          "cumulative_area_um2": 4.3444,
+          "antenna_ratio": 1.0861,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -393,8 +398,8 @@
         {
           "layer": "Metal3",
           "step_area_um2": 0.0,
-          "cumulative_area_um2": 1.3444,
-          "antenna_ratio": 1.3444,
+          "cumulative_area_um2": 4.3444,
+          "antenna_ratio": 1.0861,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -403,8 +408,8 @@
         {
           "layer": "Metal4",
           "step_area_um2": 0.0,
-          "cumulative_area_um2": 1.3444,
-          "antenna_ratio": 1.3444,
+          "cumulative_area_um2": 4.3444,
+          "antenna_ratio": 1.0861,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -647,14 +652,14 @@
     {
       "gate_id": "gate11",
       "net": null,
-      "gate_area_um2": 1.4,
+      "gate_area_um2": 1.0,
       "antenna_verdict": "unchecked",
       "levels": [
         {
           "layer": "poly2",
-          "step_area_um2": 1.7444,
-          "cumulative_area_um2": 1.7444,
-          "antenna_ratio": 1.246,
+          "step_area_um2": 1.3444,
+          "cumulative_area_um2": 1.3444,
+          "antenna_ratio": 1.3444,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -663,8 +668,8 @@
         {
           "layer": "Metal1",
           "step_area_um2": 0.0,
-          "cumulative_area_um2": 1.7444,
-          "antenna_ratio": 1.246,
+          "cumulative_area_um2": 1.3444,
+          "antenna_ratio": 1.3444,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -673,8 +678,8 @@
         {
           "layer": "Metal2",
           "step_area_um2": 0.0,
-          "cumulative_area_um2": 1.7444,
-          "antenna_ratio": 1.246,
+          "cumulative_area_um2": 1.3444,
+          "antenna_ratio": 1.3444,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -683,8 +688,8 @@
         {
           "layer": "Metal3",
           "step_area_um2": 0.0,
-          "cumulative_area_um2": 1.7444,
-          "antenna_ratio": 1.246,
+          "cumulative_area_um2": 1.3444,
+          "antenna_ratio": 1.3444,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -693,8 +698,8 @@
         {
           "layer": "Metal4",
           "step_area_um2": 0.0,
-          "cumulative_area_um2": 1.7444,
-          "antenna_ratio": 1.246,
+          "cumulative_area_um2": 1.3444,
+          "antenna_ratio": 1.3444,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -705,6 +710,64 @@
     {
       "gate_id": "gate12",
       "net": null,
+      "gate_area_um2": 1.4,
+      "antenna_verdict": "unchecked",
+      "levels": [
+        {
+          "layer": "poly2",
+          "step_area_um2": 1.7444,
+          "cumulative_area_um2": 1.7444,
+          "antenna_ratio": 1.246,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal1",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 1.7444,
+          "antenna_ratio": 1.246,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal2",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 1.7444,
+          "antenna_ratio": 1.246,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal3",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 1.7444,
+          "antenna_ratio": 1.246,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal4",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 1.7444,
+          "antenna_ratio": 1.246,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        }
+      ]
+    },
+    {
+      "gate_id": "gate13",
+      "net": null,
       "gate_area_um2": 1.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -761,7 +824,7 @@
       ]
     },
     {
-      "gate_id": "gate13",
+      "gate_id": "gate14",
       "net": null,
       "gate_area_um2": 1.12,
       "antenna_verdict": "unchecked",
@@ -819,7 +882,7 @@
       ]
     },
     {
-      "gate_id": "gate14",
+      "gate_id": "gate15",
       "net": null,
       "gate_area_um2": 1.0,
       "antenna_verdict": "unchecked",
@@ -877,7 +940,7 @@
       ]
     },
     {
-      "gate_id": "gate15",
+      "gate_id": "gate16",
       "net": null,
       "gate_area_um2": 0.84,
       "antenna_verdict": "unchecked",
@@ -935,7 +998,7 @@
       ]
     },
     {
-      "gate_id": "gate16",
+      "gate_id": "gate17",
       "net": null,
       "gate_area_um2": 1.0,
       "antenna_verdict": "unchecked",
@@ -993,7 +1056,7 @@
       ]
     },
     {
-      "gate_id": "gate17",
+      "gate_id": "gate18",
       "net": null,
       "gate_area_um2": 1.4,
       "antenna_verdict": "unchecked",
@@ -1051,7 +1114,7 @@
       ]
     },
     {
-      "gate_id": "gate18",
+      "gate_id": "gate19",
       "net": null,
       "gate_area_um2": 1.12,
       "antenna_verdict": "unchecked",
@@ -1109,7 +1172,7 @@
       ]
     },
     {
-      "gate_id": "gate19",
+      "gate_id": "gate20",
       "net": null,
       "gate_area_um2": 0.84,
       "antenna_verdict": "unchecked",
@@ -1159,64 +1222,6 @@
           "step_area_um2": 0.0,
           "cumulative_area_um2": 1.1844,
           "antenna_ratio": 1.41,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        }
-      ]
-    },
-    {
-      "gate_id": "gate20",
-      "net": null,
-      "gate_area_um2": 2.0,
-      "antenna_verdict": "unchecked",
-      "levels": [
-        {
-          "layer": "poly2",
-          "step_area_um2": 2.3444,
-          "cumulative_area_um2": 2.3444,
-          "antenna_ratio": 1.1722,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        },
-        {
-          "layer": "Metal1",
-          "step_area_um2": 0.0,
-          "cumulative_area_um2": 2.3444,
-          "antenna_ratio": 1.1722,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        },
-        {
-          "layer": "Metal2",
-          "step_area_um2": 0.0,
-          "cumulative_area_um2": 2.3444,
-          "antenna_ratio": 1.1722,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        },
-        {
-          "layer": "Metal3",
-          "step_area_um2": 0.0,
-          "cumulative_area_um2": 2.3444,
-          "antenna_ratio": 1.1722,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        },
-        {
-          "layer": "Metal4",
-          "step_area_um2": 0.0,
-          "cumulative_area_um2": 2.3444,
-          "antenna_ratio": 1.1722,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -1633,64 +1638,6 @@
     {
       "gate_id": "gate28",
       "net": null,
-      "gate_area_um2": 16.0,
-      "antenna_verdict": "unchecked",
-      "levels": [
-        {
-          "layer": "poly2",
-          "step_area_um2": 30.3548,
-          "cumulative_area_um2": 30.3548,
-          "antenna_ratio": 1.897175,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        },
-        {
-          "layer": "Metal1",
-          "step_area_um2": 0.0,
-          "cumulative_area_um2": 30.3548,
-          "antenna_ratio": 1.897175,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        },
-        {
-          "layer": "Metal2",
-          "step_area_um2": 0.0,
-          "cumulative_area_um2": 30.3548,
-          "antenna_ratio": 1.897175,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        },
-        {
-          "layer": "Metal3",
-          "step_area_um2": 0.0,
-          "cumulative_area_um2": 30.3548,
-          "antenna_ratio": 1.897175,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        },
-        {
-          "layer": "Metal4",
-          "step_area_um2": 0.0,
-          "cumulative_area_um2": 30.3548,
-          "antenna_ratio": 1.897175,
-          "antenna_ratio_max": null,
-          "antenna_ratio_source": null,
-          "verdict": "unchecked",
-          "remedy": null
-        }
-      ]
-    },
-    {
-      "gate_id": "gate29",
-      "net": null,
       "gate_area_um2": 2.0,
       "antenna_verdict": "unchecked",
       "levels": [
@@ -1739,6 +1686,64 @@
           "step_area_um2": 0.0,
           "cumulative_area_um2": 2.3444,
           "antenna_ratio": 1.1722,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        }
+      ]
+    },
+    {
+      "gate_id": "gate29",
+      "net": null,
+      "gate_area_um2": 16.0,
+      "antenna_verdict": "unchecked",
+      "levels": [
+        {
+          "layer": "poly2",
+          "step_area_um2": 30.3548,
+          "cumulative_area_um2": 30.3548,
+          "antenna_ratio": 1.897175,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal1",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 30.3548,
+          "antenna_ratio": 1.897175,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal2",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 30.3548,
+          "antenna_ratio": 1.897175,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal3",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 30.3548,
+          "antenna_ratio": 1.897175,
+          "antenna_ratio_max": null,
+          "antenna_ratio_source": null,
+          "verdict": "unchecked",
+          "remedy": null
+        },
+        {
+          "layer": "Metal4",
+          "step_area_um2": 0.0,
+          "cumulative_area_um2": 30.3548,
+          "antenna_ratio": 1.897175,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -1807,14 +1812,14 @@
     {
       "gate_id": "gate31",
       "net": null,
-      "gate_area_um2": 1.0,
+      "gate_area_um2": 2.0,
       "antenna_verdict": "unchecked",
       "levels": [
         {
           "layer": "poly2",
-          "step_area_um2": 1.3444,
-          "cumulative_area_um2": 1.3444,
-          "antenna_ratio": 1.3444,
+          "step_area_um2": 2.3444,
+          "cumulative_area_um2": 2.3444,
+          "antenna_ratio": 1.1722,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -1823,8 +1828,8 @@
         {
           "layer": "Metal1",
           "step_area_um2": 0.0,
-          "cumulative_area_um2": 1.3444,
-          "antenna_ratio": 1.3444,
+          "cumulative_area_um2": 2.3444,
+          "antenna_ratio": 1.1722,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -1833,8 +1838,8 @@
         {
           "layer": "Metal2",
           "step_area_um2": 0.0,
-          "cumulative_area_um2": 1.3444,
-          "antenna_ratio": 1.3444,
+          "cumulative_area_um2": 2.3444,
+          "antenna_ratio": 1.1722,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -1843,8 +1848,8 @@
         {
           "layer": "Metal3",
           "step_area_um2": 0.0,
-          "cumulative_area_um2": 1.3444,
-          "antenna_ratio": 1.3444,
+          "cumulative_area_um2": 2.3444,
+          "antenna_ratio": 1.1722,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -1853,8 +1858,8 @@
         {
           "layer": "Metal4",
           "step_area_um2": 0.0,
-          "cumulative_area_um2": 1.3444,
-          "antenna_ratio": 1.3444,
+          "cumulative_area_um2": 2.3444,
+          "antenna_ratio": 1.1722,
           "antenna_ratio_max": null,
           "antenna_ratio_source": null,
           "verdict": "unchecked",
@@ -3603,6 +3608,28 @@
       ]
     }
   ],
+  "nets": [
+    {
+      "name": "vdd",
+      "matched_islands": 1,
+      "expected_islands": 1,
+      "roles": [],
+      "unlabelled_islands": null,
+      "unlabelled_area_um2": null,
+      "unlabelled_bbox": null,
+      "unlabelled_allowed_islands": null
+    },
+    {
+      "name": "vss",
+      "matched_islands": 1,
+      "expected_islands": 1,
+      "roles": [],
+      "unlabelled_islands": null,
+      "unlabelled_area_um2": null,
+      "unlabelled_bbox": null,
+      "unlabelled_allowed_islands": null
+    }
+  ],
   "erc_findings": [
     {
       "rule": "erc.floating_gate",
@@ -3612,11 +3639,12 @@
       "gate_id": "gate0",
       "layer": "poly2",
       "bbox": {
-        "left": 922001,
+        "left": 878811,
         "bottom": 0,
-        "right": 922501,
-        "top": 1320
-      }
+        "right": 879311,
+        "top": 1820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3626,11 +3654,12 @@
       "gate_id": "gate1",
       "layer": "poly2",
       "bbox": {
-        "left": 316550,
+        "left": 922001,
         "bottom": 0,
-        "right": 317550,
-        "top": 2820
-      }
+        "right": 922501,
+        "top": 1320
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3640,11 +3669,12 @@
       "gate_id": "gate10",
       "layer": "poly2",
       "bbox": {
-        "left": 536774,
+        "left": 509502,
         "bottom": 0,
-        "right": 537274,
+        "right": 510002,
         "top": 2820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3654,11 +3684,12 @@
       "gate_id": "gate11",
       "layer": "poly2",
       "bbox": {
-        "left": 570828,
+        "left": 536774,
         "bottom": 0,
-        "right": 571248,
-        "top": 5820
-      }
+        "right": 537274,
+        "top": 2820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3668,11 +3699,12 @@
       "gate_id": "gate12",
       "layer": "poly2",
       "bbox": {
-        "left": 576018,
+        "left": 570828,
         "bottom": 0,
-        "right": 576518,
-        "top": 2820
-      }
+        "right": 571248,
+        "top": 5820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3682,11 +3714,12 @@
       "gate_id": "gate13",
       "layer": "poly2",
       "bbox": {
-        "left": 634016,
+        "left": 576018,
         "bottom": 0,
-        "right": 634436,
-        "top": 4820
-      }
+        "right": 576518,
+        "top": 2820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3696,11 +3729,12 @@
       "gate_id": "gate14",
       "layer": "poly2",
       "bbox": {
-        "left": 639206,
+        "left": 634016,
         "bottom": 0,
-        "right": 639706,
-        "top": 2820
-      }
+        "right": 634436,
+        "top": 4820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3710,11 +3744,12 @@
       "gate_id": "gate15",
       "layer": "poly2",
       "bbox": {
-        "left": 745091,
+        "left": 639206,
         "bottom": 0,
-        "right": 745511,
-        "top": 3820
-      }
+        "right": 639706,
+        "top": 2820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3724,11 +3759,12 @@
       "gate_id": "gate16",
       "layer": "poly2",
       "bbox": {
-        "left": 750281,
+        "left": 745091,
         "bottom": 0,
-        "right": 750781,
-        "top": 2820
-      }
+        "right": 745511,
+        "top": 3820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3738,11 +3774,12 @@
       "gate_id": "gate17",
       "layer": "poly2",
       "bbox": {
-        "left": 782801,
+        "left": 750281,
         "bottom": 0,
-        "right": 783221,
-        "top": 5820
-      }
+        "right": 750781,
+        "top": 2820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3752,11 +3789,12 @@
       "gate_id": "gate18",
       "layer": "poly2",
       "bbox": {
-        "left": 788221,
+        "left": 782801,
         "bottom": 0,
-        "right": 788641,
-        "top": 4820
-      }
+        "right": 783221,
+        "top": 5820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3766,11 +3804,12 @@
       "gate_id": "gate19",
       "layer": "poly2",
       "bbox": {
-        "left": 793641,
+        "left": 788221,
         "bottom": 0,
-        "right": 794061,
-        "top": 3820
-      }
+        "right": 788641,
+        "top": 4820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3780,11 +3819,12 @@
       "gate_id": "gate2",
       "layer": "poly2",
       "bbox": {
-        "left": 322390,
-        "bottom": 820,
-        "right": 333330,
-        "top": 4460
-      }
+        "left": 316550,
+        "bottom": 0,
+        "right": 317550,
+        "top": 2820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3794,11 +3834,12 @@
       "gate_id": "gate20",
       "layer": "poly2",
       "bbox": {
-        "left": 799131,
+        "left": 793641,
         "bottom": 0,
-        "right": 799631,
-        "top": 4820
-      }
+        "right": 794061,
+        "top": 3820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3808,11 +3849,12 @@
       "gate_id": "gate21",
       "layer": "poly2",
       "bbox": {
-        "left": 804771,
+        "left": 799131,
         "bottom": 0,
-        "right": 805271,
+        "right": 799631,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3822,11 +3864,12 @@
       "gate_id": "gate22",
       "layer": "poly2",
       "bbox": {
-        "left": 810411,
+        "left": 804771,
         "bottom": 0,
-        "right": 810911,
+        "right": 805271,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3836,11 +3879,12 @@
       "gate_id": "gate23",
       "layer": "poly2",
       "bbox": {
-        "left": 816051,
+        "left": 810411,
         "bottom": 0,
-        "right": 816551,
+        "right": 810911,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3850,11 +3894,12 @@
       "gate_id": "gate24",
       "layer": "poly2",
       "bbox": {
-        "left": 821691,
+        "left": 816051,
         "bottom": 0,
-        "right": 822191,
+        "right": 816551,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3864,11 +3909,12 @@
       "gate_id": "gate25",
       "layer": "poly2",
       "bbox": {
-        "left": 827331,
+        "left": 821691,
         "bottom": 0,
-        "right": 827831,
+        "right": 822191,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3878,11 +3924,12 @@
       "gate_id": "gate26",
       "layer": "poly2",
       "bbox": {
-        "left": 832971,
+        "left": 827331,
         "bottom": 0,
-        "right": 833471,
+        "right": 827831,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3892,11 +3939,12 @@
       "gate_id": "gate27",
       "layer": "poly2",
       "bbox": {
-        "left": 838611,
+        "left": 832971,
         "bottom": 0,
-        "right": 839111,
+        "right": 833471,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3906,11 +3954,12 @@
       "gate_id": "gate28",
       "layer": "poly2",
       "bbox": {
-        "left": 852351,
-        "bottom": 820,
-        "right": 863291,
-        "top": 4460
-      }
+        "left": 838611,
+        "bottom": 0,
+        "right": 839111,
+        "top": 4820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3920,11 +3969,12 @@
       "gate_id": "gate29",
       "layer": "poly2",
       "bbox": {
-        "left": 868131,
-        "bottom": 0,
-        "right": 868631,
-        "top": 4820
-      }
+        "left": 852351,
+        "bottom": 820,
+        "right": 863291,
+        "top": 4460
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3934,11 +3984,12 @@
       "gate_id": "gate3",
       "layer": "poly2",
       "bbox": {
-        "left": 375010,
-        "bottom": 0,
-        "right": 395010,
-        "top": 2820
-      }
+        "left": 322390,
+        "bottom": 820,
+        "right": 333330,
+        "top": 4460
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3948,11 +3999,12 @@
       "gate_id": "gate30",
       "layer": "poly2",
       "bbox": {
-        "left": 873471,
+        "left": 868131,
         "bottom": 0,
-        "right": 873971,
+        "right": 868631,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3962,11 +4014,12 @@
       "gate_id": "gate31",
       "layer": "poly2",
       "bbox": {
-        "left": 878811,
+        "left": 873471,
         "bottom": 0,
-        "right": 879311,
-        "top": 2820
-      }
+        "right": 873971,
+        "top": 4820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3980,7 +4033,8 @@
         "bottom": 0,
         "right": 885301,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -3994,7 +4048,8 @@
         "bottom": 0,
         "right": 891441,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4008,7 +4063,8 @@
         "bottom": 0,
         "right": 897081,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4022,7 +4078,8 @@
         "bottom": 0,
         "right": 911321,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4036,7 +4093,8 @@
         "bottom": 0,
         "right": 917161,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4050,7 +4108,8 @@
         "bottom": 0,
         "right": 927841,
         "top": 2820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4064,7 +4123,8 @@
         "bottom": 820,
         "right": 946491,
         "top": 4460
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4078,7 +4138,8 @@
         "bottom": 820,
         "right": 954891,
         "top": 4460
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4088,11 +4149,12 @@
       "gate_id": "gate4",
       "layer": "poly2",
       "bbox": {
-        "left": 400000,
+        "left": 375010,
         "bottom": 0,
-        "right": 401000,
-        "top": 4820
-      }
+        "right": 395010,
+        "top": 2820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4106,7 +4168,8 @@
         "bottom": 0,
         "right": 960531,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4120,7 +4183,8 @@
         "bottom": 0,
         "right": 966171,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4134,7 +4198,8 @@
         "bottom": 0,
         "right": 983641,
         "top": 2820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4148,7 +4213,8 @@
         "bottom": 0,
         "right": 988981,
         "top": 2820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4162,7 +4228,8 @@
         "bottom": 0,
         "right": 994321,
         "top": 2820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4176,7 +4243,8 @@
         "bottom": 0,
         "right": 999661,
         "top": 2820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4190,7 +4258,8 @@
         "bottom": 0,
         "right": 1005151,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4204,7 +4273,8 @@
         "bottom": 0,
         "right": 1010791,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4218,7 +4288,8 @@
         "bottom": 0,
         "right": 1016431,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4232,7 +4303,8 @@
         "bottom": 0,
         "right": 1022071,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4242,11 +4314,12 @@
       "gate_id": "gate5",
       "layer": "poly2",
       "bbox": {
-        "left": 406140,
+        "left": 400000,
         "bottom": 0,
-        "right": 407140,
+        "right": 401000,
         "top": 4820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4260,7 +4333,8 @@
         "bottom": 0,
         "right": 465153,
         "top": 16820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4274,7 +4348,8 @@
         "bottom": 0,
         "right": 483446,
         "top": 12820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4288,7 +4363,8 @@
         "bottom": 0,
         "right": 504732,
         "top": 8820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4302,7 +4378,8 @@
         "bottom": 0,
         "right": 532004,
         "top": 6820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4316,7 +4393,8 @@
         "bottom": 0,
         "right": 761541,
         "top": 16820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4330,7 +4408,8 @@
         "bottom": 0,
         "right": 766961,
         "top": 12820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4344,7 +4423,8 @@
         "bottom": 0,
         "right": 772381,
         "top": 8820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4358,7 +4438,8 @@
         "bottom": 0,
         "right": 777801,
         "top": 6820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4372,7 +4453,8 @@
         "bottom": 820,
         "right": 938091,
         "top": 6460
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4386,7 +4468,8 @@
         "bottom": 0,
         "right": 978301,
         "top": 20820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4396,11 +4479,12 @@
       "gate_id": "gate6",
       "layer": "poly2",
       "bbox": {
-        "left": 453126,
+        "left": 406140,
         "bottom": 0,
-        "right": 453626,
-        "top": 2820
-      }
+        "right": 407140,
+        "top": 4820
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4414,7 +4498,8 @@
         "bottom": 0,
         "right": 448356,
         "top": 24820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4428,7 +4513,8 @@
         "bottom": 0,
         "right": 756121,
         "top": 24820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4438,11 +4524,12 @@
       "gate_id": "gate7",
       "layer": "poly2",
       "bbox": {
-        "left": 469923,
+        "left": 453126,
         "bottom": 0,
-        "right": 470423,
+        "right": 453626,
         "top": 2820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4452,11 +4539,12 @@
       "gate_id": "gate8",
       "layer": "poly2",
       "bbox": {
-        "left": 488216,
+        "left": 469923,
         "bottom": 0,
-        "right": 488716,
+        "right": 470423,
         "top": 2820
-      }
+      },
+      "islands": null
     },
     {
       "rule": "erc.floating_gate",
@@ -4466,11 +4554,12 @@
       "gate_id": "gate9",
       "layer": "poly2",
       "bbox": {
-        "left": 509502,
+        "left": 488216,
         "bottom": 0,
-        "right": 510002,
+        "right": 488716,
         "top": 2820
-      }
+      },
+      "islands": null
     }
   ],
   "erc_finding_count": 62,
@@ -5807,19 +5896,44 @@
     "inapplicable": [],
     "unknown": [],
     "nothing_checked": false,
-    "nothing_checked_reasons": []
+    "nothing_checked_reasons": [],
+    "checked_by_assertion": [],
+    "checked_by_well_assertion": [],
+    "layers_in_stream_without_declaration": [
+      "31/0",
+      "33/0",
+      "41/0",
+      "49/0",
+      "62/0",
+      "75/0",
+      "81/0",
+      "110/5",
+      "117/5",
+      "117/10"
+    ],
+    "well_assertion_coverage": []
   },
+  "ties_disclosure": null,
   "provenance": {
-    "klt_version": "0.5.0+g2b1e55e51bb8.dirty",
-    "klayout_version": "0.30.12",
+    "klt_version": "0.8.0",
+    "klayout_version": "0.30.13",
     "pdk": null,
     "deck": null,
     "input": {
-      "content_hash": "sha256:8cd7c47a3c174c0bc049e7741dcc67c9a69603dda5da33891a2ef954015071fe",
+      "content_hash": "sha256:f602a08ca2223e9ff02ab2b6b491f7109315dfc0ff4121079b093c6d122a77c7",
       "role": "layout"
     },
     "spec": {
-      "content_hash": "sha256:25e84c3c14970558344719847b809e0f02bea8ba5303b7c57f80150d0f6f27cd"
-    }
+      "content_hash": "sha256:d63b591c031b3340914e089a2c51bee3a490ba5eb113050cf58bb2a0751bcbf8"
+    },
+    "devices": [],
+    "net_exclusions": [],
+    "label_layers": [
+      {
+        "name": "Metal2",
+        "label_layer": "36/10",
+        "label_text_count": 11
+      }
+    ]
   }
 }

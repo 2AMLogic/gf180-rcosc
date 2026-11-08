@@ -216,7 +216,7 @@ def test_generation_records_hashes_solver_and_manifest_template(tmp_path):
 
 def test_generation_rejects_bad_inputs(tmp_path):
     bad = tmp_path / "bad.spice"
-    bad.write_text(".subckt rcosc_top vdd vss clk t0 t1 t2 t3 t4 t5 t6 t7\n.ends\n")
+    bad.write_text(".subckt rcosc_top vdd vss clk t0 t1 t2 t3 t4 t5 t6\n.ends\n")
     with pytest.raises(prepare.PrepareError, match="pins"):
         prepare.generate(tmp_path / "a", bad, None, CORNER)
     bad.write_text("* nothing\n")
@@ -403,4 +403,83 @@ def test_cli_prepare_end_to_end(tmp_path):
 
 
 def test_no_measured_artifacts_in_tree():
-    assert not (HERE / "results").exists()
+    # A results/ tree may hold a Step 0 fleet-gate record (issue #87 acceptance 1: one
+    # single-corner batch request, no trim-step verdict). It must never hold campaign
+    # evidence: a filled manifest, analyzer outputs, or per-code reports.
+    res = HERE / "results"
+    if not res.exists():
+        return
+    # Analyzer outputs are never allowed until the verdict PR adds them deliberately; a
+    # run directory with a frozen manifest.json is a campaign dir (#87), whose README
+    # must say it is partial and whose analyzer outputs must be absent here.
+    analysis = {"results.json", "steps.csv", "summary.md"}
+    bad = [str(p.relative_to(HERE)) for p in res.rglob("*") if p.is_file() and p.name in analysis]
+    assert not bad, f"analyzer outputs present: {bad}"
+    for run in (d for d in res.iterdir() if d.is_dir()):
+        if (run / "manifest.json").is_file():
+            assert "PARTIAL" in (run / "README.md").read_text(), run
+            continue
+        readme = (run / "README.md").read_text()
+        assert "Step 0 fleet gate only" in readme and "NOT run" in readme, run
+        extra = [d.name for d in run.iterdir() if d.is_dir() and d.name != "step0"]
+        assert not extra, f"non-gate directories in {run.name}: {extra}"
+
+
+def test_permuted_pin_order_is_followed(tmp_path):
+    p3 = tmp_path / "p3.spice"
+    p3.write_text(".SUBCKT rcosc_top vdd vss clk t0 t1 t2 t3 t4 t5 t6 t7\n.ends\n")
+    out = tmp_path / "o"
+    prepare.generate(out, p3, None, CORNER)
+    tb = next(out.rglob("tb_c00.spice")).read_text()
+    assert "XXDUT vdd 0 clk t0 t1 t2 t3 t4 t5 t6 t7 rcosc_top" in tb
+
+
+# ------------------------------------------------------------ run_batch ----
+
+FAKE_KLT = '''#!/usr/bin/env python3
+import json, sys
+from pathlib import Path
+a = sys.argv[1:]
+assert a[0] == "sim" and "--backend" in a and a[a.index("--backend") + 1] == "batch", a
+out = Path(a[a.index("-o") + 1]); out.mkdir(parents=True, exist_ok=True)
+tag = Path(a[1]).stem
+fail = "c03" in tag
+Path(sys.argv[0] + ".log").open("a").write(tag + "\\n")
+(out / "batch-receipt.json").write_text(json.dumps({"job_id": "fake-" + tag, "state": "failed" if fail else "done"}))
+print(json.dumps({"status": "fail" if fail else "pass", "environment": {"remote": {"job_id": "fake-" + tag}}}))
+sys.exit(1 if fail else 0)
+'''
+
+
+def test_run_batch_resumes_without_resubmitting_done_jobs(tmp_path):
+    """FIXTURE: a fake klt stands in for the fleet; nothing real is submitted."""
+    import run_batch
+    bench = tmp_path / "bench"
+    for c in range(5):
+        d = bench / "sch" / "tt_27C_3p3V"
+        d.mkdir(parents=True, exist_ok=True)
+        (d / f"request_c{c:02x}.json").write_text("{}")
+    fake = tmp_path / "fake_klt.py"
+    fake.write_text(FAKE_KLT)
+    fake.chmod(0o755)
+    klt = [sys.executable, str(fake)]
+    out = tmp_path / "res"
+    rows = run_batch.drive(bench, out, klt, limit=2)
+    assert [r["tag"] for r in rows] == ["sch_tt_27C_3p3V_c00", "sch_tt_27C_3p3V_c01"]
+    rows = run_batch.drive(bench, out, klt)  # resume: c00/c01 are not resubmitted
+    assert [r["tag"] for r in rows] == ["sch_tt_27C_3p3V_c02", "sch_tt_27C_3p3V_c03", "sch_tt_27C_3p3V_c04"]
+    log = Path(str(fake) + ".log").read_text().split()
+    assert len(log) == 5 and len(set(log)) == 5
+    failed = [r for r in rows if r["state"] != "done"]
+    assert [r["tag"] for r in failed] == ["sch_tt_27C_3p3V_c03"]  # reported, not dropped
+    assert run_batch.drive(bench, out, klt) == []  # failed one is not silently retried
+    assert [r["tag"] for r in run_batch.drive(bench, out, klt, retry_failed=True)] == ["sch_tt_27C_3p3V_c03"]
+    ledger = [json.loads(l) for l in (out / "ledger.jsonl").read_text().splitlines()]
+    assert len(ledger) == 6 and all(r["job_id"].startswith("fake-") for r in ledger)
+    assert (out / "reports" / "report_sch_tt_27C_3p3V_c00.json").is_file()
+
+
+def test_run_batch_refuses_concurrency_above_two(tmp_path):
+    import run_batch
+    with pytest.raises(SystemExit):
+        run_batch.drive(tmp_path, tmp_path / "o", ["klt"], workers=3)
