@@ -12,8 +12,8 @@ at campaign execution).  Nothing written here is measured evidence.
 Variants (explicit input netlists, hashed):
     sch  schematic DUT netlist   (--schematic-netlist)
     ext  extracted DUT netlist   (--extracted-netlist, a `klt extract` output)
-Either input must define `.subckt rcosc_top clk t0 .. t7 vdd vss` (the
-alphabetical pin order `klt extract` writes; see
+Either input must define `.subckt rcosc_top` with pins clk t0 .. t7 vdd vss in
+any order (the instance line follows the netlist's order; `klt extract` writes alphabetical; see
 sim/pvt-postlayout/klt-pex/gen_requests.py, from which the request shape and
 the 20-period frequency measurement are taken).
 
@@ -37,7 +37,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import re
 import sys
@@ -47,6 +46,7 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
 sys.path.insert(0, str(HERE.parent))
 from _module_loader import load_module  # noqa: E402
+import evidence_common  # noqa: E402  shared sha256/banner/new-run guard (#260)
 
 N_CODES = 256
 TRIM_BITS = 8
@@ -79,12 +79,8 @@ class PrepareError(Exception):
     pass
 
 
-def sha256_bytes(b: bytes) -> str:
-    return hashlib.sha256(b).hexdigest()
-
-
-def sha256_file(p: Path) -> str:
-    return sha256_bytes(Path(p).read_bytes())
+sha256_bytes = evidence_common.sha256_bytes
+sha256_file = evidence_common.sha256_file
 
 
 def _pvt():
@@ -130,18 +126,21 @@ def code_tag(code: int) -> str:
     return f"c{code:02X}"
 
 
-def check_dut(text: str, label: str) -> None:
-    """The testbench instance line is positional, so the header must match."""
+def check_dut(text: str, label: str) -> list[str]:
+    """Return the DUT pin order. The pin set must be exactly PINS; the order may
+    differ (e.g. the P3 netlist is `vdd vss clk t0..t7`) because the testbench
+    instance line is built positionally from the returned order."""
     for line in text.splitlines():
         tok = line.split()
         if len(tok) >= 2 and tok[0].lower() == ".subckt" and tok[1].lower() == "rcosc_top":
-            if [t.lower() for t in tok[2:]] != PINS:
-                raise PrepareError(f"{label}: `.subckt rcosc_top` pins {tok[2:]} != required {PINS}")
-            return
+            pins = [t.lower() for t in tok[2:]]
+            if sorted(pins) != sorted(PINS):
+                raise PrepareError(f"{label}: `.subckt rcosc_top` pins {tok[2:]} != required set {PINS}")
+            return pins
     raise PrepareError(f"{label}: no `.subckt rcosc_top` definition found")
 
 
-def tb_text(variant: str, code: int, vdd: float, dut_name: str, cfg: dict) -> str:
+def tb_text(variant: str, code: int, vdd: float, dut_name: str, cfg: dict, pins: list[str] = PINS) -> str:
     if not 0 <= code < N_CODES:
         raise PrepareError(f"code out of range: {code}")
     lines = [
@@ -150,7 +149,7 @@ def tb_text(variant: str, code: int, vdd: float, dut_name: str, cfg: dict) -> st
         ".param sw_stat_global=0 sw_stat_mismatch=0 mc_skew=3 res_mc_skew=3 cap_mc_skew=3 fnoicor=0",
         f".options reltol={cfg['reltol']:g} abstol={cfg['abstol']:g} vntol={cfg['vntol']:g}",
         f'.include "{dut_name}"',
-        "XXDUT clk " + " ".join(f"t{i}" for i in range(TRIM_BITS)) + " vdd 0 rcosc_top",
+        "XXDUT " + " ".join("0" if q == "vss" else q for q in pins) + " rcosc_top",
         f"VDD vdd 0 DC {vdd:g}",
     ]
     for i in range(TRIM_BITS):   # static sources (not B-source decode): see mc-groundwork README
@@ -220,12 +219,13 @@ def generate(out: Path, schematic: Path | None, extracted: Path | None,
     if not inputs:
         raise PrepareError("at least one of --schematic-netlist / --extracted-netlist is required")
     texts = {}
+    pin_order = {}
     for v, p in inputs.items():
         try:
             texts[v] = Path(p).read_text()
         except OSError as e:
             raise PrepareError(f"{v} netlist unreadable: {e}")
-        check_dut(texts[v], f"{v} netlist {p}")
+        pin_order[v] = check_dut(texts[v], f"{v} netlist {p}")
     grid = grid_definition()
     corners = validate_corners(corners, grid)
     out = Path(out)
@@ -245,7 +245,7 @@ def generate(out: Path, schematic: Path | None, extracted: Path | None,
             for code in range(N_CODES):
                 ct = code_tag(code)
                 tb_name, req_name = f"tb_{ct}.spice", f"request_{ct}.json"
-                tb = tb_text(v, code, vdd, dut_name, cfg)
+                tb = tb_text(v, code, vdd, dut_name, cfg, pin_order[v])
                 req = json.dumps(request(v, tb_name, proc, temp, vdd, grid, cfg), indent=2) + "\n"
                 (d / tb_name).write_text(tb)
                 (d / req_name).write_text(req)

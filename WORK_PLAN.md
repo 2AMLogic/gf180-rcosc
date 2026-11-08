@@ -7,7 +7,8 @@ This roadmap is generated from the current GitHub label state by the Loom Guide 
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-_None._
+- **#225**: feat(sim): measured 63-point startup factorial (61/63 pass) and DR-0020 ratified
+- **#237**: sim(mc): item-6 Monte Carlo campaign on the P3 netlist, graded with klt yield (rows 4 and 5 fail, controls incomplete)
 
 ## Very Important
 
@@ -19,20 +20,21 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
-- **#66**: design: re-centre the oscillator for extracted parasitics and size a trim range that covers them (T1 item 5; operator ruling 2026-10-08)
 - **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
 
 ## Ready
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
+_None._
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#82**: Run startup-time PVT factorial on batch fleet and close row 10 (follow-up to #78/PR #80)
+- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b)
+- **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5
 
 ## PRs Awaiting Review
 
@@ -44,19 +46,21 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#225**: feat(sim): measured 63-point startup factorial (61/63 pass) and DR-0020 ratified
+- **#237**: sim(mc): item-6 Monte Carlo campaign on the P3 netlist, graded with klt yield (rows 4 and 5 fail, controls incomplete)
 
 ## Proposed
 
 Issues carrying `loom:curated`.
 
-- **#66**: design: re-centre the oscillator for extracted parasitics and size a trim range that covers them (T1 item 5; operator ruling 2026-10-08) *(curated)*
+- **#82**: Run startup-time PVT factorial on batch fleet and close row 10 (follow-up to #78/PR #80) *(curated)*
+- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b) *(curated)*
+- **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5 *(curated)*
 - **#204**: Move layout geometry pin klt 0.4.0 → 0.8.0 and regenerate committed cells/reports *(curated)*
-- **#213**: Physical clock pulse-width and jitter campaign (deferred from #91) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
-- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b) *(architect)*
+_None._
 
 ## Epics
 
@@ -66,14 +70,14 @@ Issues carrying `loom:curated`.
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 0 |
+| Operator merge-risk holds | 2 |
 | Very important | 0 |
-| Important | 2 |
-| Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 0 |
+| Important | 1 |
+| Ready (`loom:issue`) | 0 |
+| In Progress (`loom:building`) | 3 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 0 |
-| Curated | 3 |
-| Architect / Hermit proposals | 1 |
+| Approved PRs awaiting merge | 2 |
+| Curated | 4 |
+| Architect / Hermit proposals | 0 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->

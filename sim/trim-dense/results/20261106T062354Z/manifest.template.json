@@ -1,0 +1,26 @@
+{
+  "git_sha": null,
+  "git_dirty": null,
+  "klt_version": null,
+  "engine": "ngspice",
+  "engine_version": null,
+  "pdk": null,
+  "pdk_revision": null,
+  "backend": "batch",
+  "executed_utc": null,
+  "provenance_sha256": null,
+  "_template": true,
+  "_instructions": "Copy, fill every null at campaign execution, drop the leading-underscore keys. analyze.py fails a non-synthetic run whose manifest has a missing/null field. pdk_revision is a 40-hex open_pdks commit or exactly 'unknown' with pdk_revision_reason (sim/pdk_provenance.py, issue #65 convention).",
+  "issue": 87,
+  "pdk_revision_source": null,
+  "pdk_revision_reason": null,
+  "model_dir": null,
+  "solver": {
+    "reltol": 0.001,
+    "abstol": 1e-12,
+    "vntol": 1e-06,
+    "tstep": "200p",
+    "tstop": "2000n"
+  },
+  "engine_version_expected": "unspecified"
+}

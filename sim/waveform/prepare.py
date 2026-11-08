@@ -26,7 +26,6 @@ from __future__ import annotations
 
 import argparse
 import csv
-import hashlib
 import json
 import subprocess
 import sys
@@ -35,6 +34,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
 sys.path.insert(0, str(REPO / "sim" / "pvt"))
+sys.path.insert(0, str(REPO / "sim"))
+import evidence_common  # noqa: E402  shared sha256/banner/new-run guard (#260)
 from pvt_sweep import (  # noqa: E402
     PROCESS_CORNERS, REF_TEMP_C, REF_VDD_V, TEMPS_C, VDDS_V,
 )
@@ -72,8 +73,7 @@ class PrepareError(Exception):
     pass
 
 
-def sha256(path: Path) -> str:
-    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+sha256 = evidence_common.sha256_file
 
 
 def grid() -> list[tuple[str, float, float]]:

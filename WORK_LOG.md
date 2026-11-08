@@ -2,8 +2,36 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-07
+
+- **PR #266**: sim(trim-dense): run campaign slice 13 on batch fleet (jobs 322-337 of 1536)
+- **PR #265**: sim(trim-dense): run campaign slice 12 on batch fleet (321 of 1536 jobs)
+- **PR #263**: refactor(sim): share sha256, evidence banner and new-run guard across drivers
+- **PR #262**: sim(trim-dense): run campaign slice 11 on batch fleet (jobs 290-305 of 1536)
+- **PR #261**: sim(trim-dense): run campaign slice 10 on batch fleet (jobs 262-289 of 1536)
+- **PR #259**: sim(trim-dense): run campaign slice 9 on batch fleet (jobs 222-261 of 1536)
+- **Issue #260** (closed): Consolidate duplicated sim helpers (sha256, synthetic-evidence banner, new-run guard) into one shared module
+- **PR #257**: sim(trim-dense): run campaign slice 8 on batch fleet (jobs 204-221 of 1536)
+
 ### 2026-11-06
 
+- **PR #255**: sim(trim-dense): run campaign slice 7 on batch fleet (jobs 164-203 of 1536)
+- **PR #253**: sim(trim-dense): run campaign slice 6 on batch fleet (jobs 118-163 of 1536)
+- **PR #252**: sim(trim-dense): run campaign slice 5 on batch fleet (jobs 77-116 of 1536)
+- **PR #250**: sim(trim-dense): run campaign slice 4 on batch fleet (jobs 62-76 of 1536)
+- **PR #249**: docs: guard write-confinement investigation report and repro harness
+- **PR #248**: sim(trim-dense): run campaign slice 3 on batch fleet (jobs 42-61 of 1536)
+- **PR #245**: sim(trim-dense): campaign slice 2, 40 more batch jobs (42/1536)
+- **PR #242**: sim(trim-dense): freeze campaign manifest, validate batch driver on live fleet slice
+- **PR #241**: sim(trim-dense): resumable batch driver for the dense trim campaign
+- **PR #240**: docs(item5): cite the 0xA4 -> 0xA5 step in ROWS row 2
+- **PR #238**: sim(item5): re-centre calibration code to 0xA4 after the comparator-H fix (DR-0029)
+- **PR #234**: fix(comparator): narrow the comparator-H output pull-down so a logic high is produced at fs / -40 C
+- **PR #232**: sim(trim-transition): converge lsb_first bench and record nine-corner campaign
+- **Issue #239** (closed): docs(item5): ROWS.md row 2 still says nominal LSB comes from the 0xA9 -> 0xAA step
+- **Issue #235** (closed): Re-centre the calibration code after the comparator-H output-stage fix (row 1 fails at 0xA9)
+- **Issue #229** (closed): Comparator-H output stage stalls oscillator at fs / -40 C, VDD >= 3.3 V (settled netlist)
+- **Issue #103** (closed): Live trim-code transition bench: runt pulses and period excursions when code changes on a running oscillator
 - **PR #230**: sim(startup): fs/-40 C no-oscillation is a real settled-netlist failure; settled startup bench run
 - **PR #228**: sim(item5): run the 15-envelope corner campaign on the settled netlist; item 5 graded, still unmet
 - **PR #224**: feat(sim): measured 27-point clk waveform campaign, convergence check and DR-0025

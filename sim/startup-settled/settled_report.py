@@ -19,6 +19,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent))
 from _module_loader import load_module  # noqa: E402
+import evidence_common  # noqa: E402  shared sha256/banner/new-run guard (#260)
 
 sr = load_module("startup_report", HERE.parent / "startup" / "startup_report.py", reuse=True)
 
@@ -41,8 +42,7 @@ def main():
     ap.add_argument("--note", default="")
     a = ap.parse_args()
     out = HERE / "results" / a.runid
-    if out.exists():
-        sys.exit(f"refusing to overwrite existing run {out}")
+    evidence_common.require_absent(out)
     rows, remotes = [], []
     for k, rep in enumerate(a.reports):
         d = json.load(open(rep))
