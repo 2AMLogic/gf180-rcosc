@@ -364,7 +364,7 @@ not corner-wide limits. Nothing in the ratified spec was relaxed.
 ### unmet — item 6 (Statistical claims carry Monte Carlo evidence): campaign run, `negative_control_not_detected`
 
 The Monte Carlo campaign now exists (issue #202, [`sim/mc/`](../sim/mc/README.md),
-[DR-0029](../spec/decision-records/0029-item-6-monte-carlo-campaign-results-s2-ss-and-s3-ff-fail-controls-incomplete.md)):
+[DR-0030](../spec/decision-records/0030-item-6-monte-carlo-campaign-results-s2-ss-and-s3-ff-fail-controls-incomplete.md)):
 500 samples per process corner on the P3 netlist, seed `20261008`, the
 DR-0022 matching model, one `klt yield` report per (process, row set) in
 `sim/mc/results/20261106T072000Z/`. The manifest cites all nine under

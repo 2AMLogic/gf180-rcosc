@@ -1,4 +1,4 @@
-# 0029: Item-6 Monte Carlo campaign — row 4 fails at `ss`, row 5 fails at `ff`, negative controls incomplete; ratified spec unchanged
+# 0030: Item-6 Monte Carlo campaign — row 4 fails at `ss`, row 5 fails at `ff`, negative controls incomplete; ratified spec unchanged
 
 - **Status**: proposed — records simulation evidence. Changes no ratified
   value and relaxes no row. It executes the plan of

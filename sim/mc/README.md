@@ -6,7 +6,7 @@ with `klt yield`. Result and its limits: **row 4 fails at `ss`, row 5 fails at
 `ff`, and the negative controls are incomplete, so the passing cells carry no
 verdict.** Item 6 grades `unmet` (`negative_control_not_detected`). The
 ratified spec is untouched; the record is
-[DR-0029](../../spec/decision-records/0029-item-6-monte-carlo-campaign-results-s2-ss-and-s3-ff-fail-controls-incomplete.md).
+[DR-0030](../../spec/decision-records/0030-item-6-monte-carlo-campaign-results-s2-ss-and-s3-ff-fail-controls-incomplete.md).
 `results/` is append-only.
 
 ```
