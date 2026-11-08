@@ -31,8 +31,10 @@ sim/mc/
   (ladder x0.70) on the committed extracted netlist, `sim/recentre/p3/rcosc_top_p3.spice`:
   the sizing #66 settled. The schematic in `design/` carries the pre-recentre
   sizing and is not used (DR-0019 section 4). **The DUT predates DR-0028**
-  (proposed, comparator-H output stage, #229): a campaign on a netlist with
-  that change is not covered by these numbers.
+  (comparator-H output stage, #229/#234), whose change is already in
+  `design/netlist/rcosc_top.spice` on `main`: every number here measures a
+  superseded netlist and must be re-run on the post-DR-0028 netlist (after
+  re-centring) before it describes the current design.
 * **Mismatch.** PDK MOS mismatch (`sw_stat_mismatch`) plus the DR-0022 injected
   area-scaled ladder-resistor and MIM-capacitor mismatch, `A_R = A_C = 1.0 %.um`
   (flagged assumption, no public source), through `sim/mc-groundwork/mismatch_inject.py`
@@ -68,8 +70,9 @@ Yield, 95 % Clopper-Pearson lower bound, target 99 %, all `sample_size` verdicts
 | `ss` | 100 % (>= 99.26 %) | **0 %, fail** | 100 % (>= 99.26 %) |
 
 Why the two failures are not noise: `ss` row 4's supply span at the held code
-(27 C, 3.0-3.6 V) is 5.44 points median (smallest 4.89) against a 4.9-point
-ratified window, so no code can fit it; `ff` row 5 fails on both sides (26 %
+(27 C, 3.0-3.6 V) is 5.44 points median (range 4.89-6.09) against a 4.9-point
+ratified window: 498 of 500 dies cannot fit it (the two narrowest, 4.891, fit
+by under 0.01 point, below one trim step); `ff` row 5 fails on both sides (26 %
 of dies above +8.8 %, 17 % below -10.8 %). Code spread: tt 165-172, ff 82-95,
 ss 212-217 (every code at least 38 from a rail).
 
