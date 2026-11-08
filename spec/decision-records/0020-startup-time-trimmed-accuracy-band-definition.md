@@ -23,6 +23,10 @@ independent ways, and the ratified record does not resolve either:
    reachable at most corners (DR-0005/DR-0006: trim-range shortfall), so an
    absolute-48 MHz reading would make the row fail for a reason that has
    nothing to do with startup, and would double-count rows 2, 5 and 6.
+   *(Annotation, 2026-11-08: the trim-range-shortfall rationale is stale,
+   since later records calibrate inner-range, per the operator triage of
+   2026-10-16 on #82. The double-counting argument still carries the decision
+   on its own.)*
 
 Two further bench assumptions are not in the ratified spec at all: the
 supply-ramp rate and the trim code held during startup.
@@ -77,7 +81,37 @@ off-target; it is not a claim of target-accurate or USB-ready availability.
 - The 63-point factorial ran on the batch fleet (runner v11, 2026-11-06,
   `sim/startup/results/20261106T052948Z/`): **61/63 PASS, 2 FAIL**
   (`ff`/-40 °C at 3.3 V and 3.6 V fail the settled-tail steadiness check).
-  Row 10 is therefore recorded as measured and not passed.
+  This is a **simulated** result (ngspice-46 transient on a pre-layout
+  schematic netlist, gf180mcuC, open_pdks `f6eeac7`); nothing in this record
+  is a silicon measurement.
+- **Which design that run grades.** `20261106T052948Z` grades the
+  **pre-re-centre schematic at trim `0xA3`**, i.e. before DR-0023 (settled P3
+  netlist, calibration code `0xA9`) and DR-0028 (comparator-H output-stage
+  fix). It is kept as append-only history of that design. It is not the
+  startup status of the current design.
+- **Current-design startup evidence** (`main`, EE/market-key reconciliation):
+  `sim/startup-settled/results/20261106T061500Z/` (settled P3 netlist, `0xA9`,
+  DR-0020 analysis): 61/63 start, `fs`/-40 °C at 3.3 V and 3.6 V NON-START
+  (a real design failure, #227); and
+  `sim/startup-settled/results/20261106T0735Z/` (same netlist with the DR-0028
+  comparator-H fix): 63/63 pass the primary band, worst settle 1.54 µs, 0
+  NON-START. The two `ff`/-40 °C tail failures above do not reproduce on the
+  current design (tail deviation 0.04-0.05% there). Row 10 of the
+  characterization report records both, labelled by design revision.
+- **Cause of the two `ff`/-40 °C FAILs (not root-caused).** The EE key found a
+  slow µs-scale period drift on the pre-re-centre netlist (not edge jitter),
+  absent on the DR-0028 stage. That is consistent with the old comparator-H
+  output stage; this record does not claim a diagnosis.
+- **Open question for the operator: the fixed trim code.** The 2026-10-16
+  ruling names `0xA3`, which was the calibration code of the pre-re-centre
+  schematic. The current design's tt/27 °C/3.3 V calibration code is `0xA9`
+  (DR-0023); DR-0029 (Proposed) would move it to `0xA4`. The settled-netlist
+  startup runs above use `0xA9`, so they do not literally conform to "`0xA3`".
+  Candidate wording for a ruling: "the design's tt/27 °C/3.3 V calibration
+  code, held fixed (not recalibrated per corner); `0xA3` for the run cited
+  for the pre-re-centre design". This record deliberately **states both
+  codes and picks neither**; the ruling is requested separately and the
+  definition's trim-code clause is unchanged until it is given.
 - Not tested: slower supply ramps, per-corner calibrated trim codes, post-layout
   (PEX) startup, and mismatch-induced failure to start (a separate robustness
   check per DR-0019).

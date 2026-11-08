@@ -36,12 +36,13 @@ open_pdks `f6eeac7`). Jobs `klt-sim-971dfc731fe7` (v30), `klt-sim-b591e450d02c`
 (v33), `klt-sim-fbe71ced6e21` (v36); every unit passed at the simulator level.
 Evidence: `results/20261106T052948Z/` (append-only).
 
-**Measured verdict under the ratified DR-0020 definition: 61/63 PASS, 2 FAIL.**
+**Simulated verdict (ngspice-46, pre-layout schematic netlist, not silicon) under the ratified DR-0020 definition: 61/63 PASS, 2 FAIL.**
+This run grades the **pre-re-centre schematic at trim `0xA3`** (before DR-0023/DR-0028); it is append-only history of that design, not the current design's status. The current design's startup evidence is `sim/startup-settled/` (`results/20261106T061500Z/`: 61/63, `fs`/-40 C NON-START; `results/20261106T0735Z/` on the DR-0028 stage: 63/63 pass, worst 1.54 us, trim `0xA9`).
 Primary band +/-1.1% of the corner's final mean period (8-cycle windows),
 <= 10 us from ramp start, trim `0xA3`. Worst settle time of the passing points
 is 1.174 us (`ss`/-40 C/3.0 V). The two failures are `ff`/-40 C at 3.3 V and
 3.6 V: they started (first edge 0.59 / 0.54 us) but the settled-tail check
-(last 2 us steady to +/-0.5%) is not met -- measured tail period deviation
+(last 2 us steady to +/-0.5%) is not met -- simulated tail period deviation
 0.78% / 0.61% -- so no settle time is defined and the points are recorded as
 FAIL, not as passes. The bench and the +/-0.5% tail tolerance were not
 changed to make them pass. The same two points also fail the looser
