@@ -4,6 +4,7 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-10
 
+- **PR #298**: sim(trim-dense): run campaign slice 36 on batch fleet (jobs 721-756 of 1536)
 - **PR #296**: sim(trim-dense): run campaign slice 35 on batch fleet (jobs 685-720 of 1536)
 - **PR #295**: refactor(design): use klt netlist in regen-netlist.sh
 - **PR #294**: sim(trim-dense): run campaign slice 34 on batch fleet (jobs 649-684 of 1536)
