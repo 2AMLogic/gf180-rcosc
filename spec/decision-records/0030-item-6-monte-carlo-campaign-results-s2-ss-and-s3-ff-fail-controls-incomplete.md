@@ -12,7 +12,9 @@
   (`sim/recentre/p3/rcosc_top_p3.spice`). That netlist is **no longer the
   design on `main`**: the DR-0028 change (MBUFN W 2u -> 1u, #229/#234) is
   already in `design/netlist/rcosc_top.spice` and in the layout and extraction.
-  See "DUT status" below.
+  See "DUT status" below. On that DR-0028 netlist,
+  [0029](0029-calibration-code-after-comparator-h-fix.md) (`proposed`) moves the
+  calibration code to `0xA4` and finds rows 4 and 5 still failing.
 - **Date**: 2026-11-06
 - **Decided by**: Loom Builder (issue #202), pending operator ratification
 
@@ -74,7 +76,8 @@ netlist only.
   498 of 500 dies the span exceeds the whole 4.9-point ratified window
   (-2.9 % / +2.0 %); the two narrowest (4.891) would fit by less than 0.01
   point, far below one trim step (0.41-0.47 %). At the calibrated code the
-  3.6 V error alone (median +2.38 %) exceeds +2.0 % on every die. Re-centring cannot fix this; the span has to
+  3.6 V error alone (median +2.38 %) exceeds +2.0 % on 477 of 500 dies (minimum
+  +1.82 %); every die still violates the window on one side or the other. Re-centring cannot fix this; the span has to
   shrink (design) or the row has to be re-decided by the owner. The limit is
   not relaxed here.
 - **Row 5 at `ff`** fails on both sides: 26 % of dies exceed +8.8 % (worst
