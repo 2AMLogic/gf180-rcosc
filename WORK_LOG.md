@@ -4,6 +4,14 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-10
 
+- **PR #291**: sim(trim-dense): run campaign slice 33 on batch fleet (jobs 625-648 of 1536)
+- **PR #290**: sim(trim-dense): run campaign slice 32 on batch fleet (jobs 601-624 of 1536)
+- **PR #289**: sim(trim-dense): run campaign slice 31 on batch fleet (jobs 589-600 of 1536)
+- **PR #288**: sim(trim-dense): run campaign slice 30 on batch fleet (jobs 577-588 of 1536)
+- **PR #286**: sim(trim-dense): run campaign slice 29 on batch fleet (jobs 565-576 of 1536)
+- **PR #285**: sim(trim-dense): run campaign slice 28 on batch fleet (jobs 553-564 of 1536)
+- **PR #284**: sim(trim-dense): run campaign slice 27 on batch fleet (jobs 542-552 of 1536)
+- **PR #283**: sim(trim-dense): run campaign slice 26 on batch fleet (jobs 528-541 of 1536)
 - **PR #281**: sim(trim-dense): run campaign slice 25 on batch fleet (jobs 512-527 of 1536)
 
 ### 2026-11-09
