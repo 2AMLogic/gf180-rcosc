@@ -8,7 +8,8 @@ name: Offline suites
 #     the SOF-loss/reacquisition model tests, added by #134).
 #   - legacy-analysis-offline: pure analysis cores of sim/pvt, sim/startup and
 #     sim/iq (issue #121).
-#   - mc-groundwork-offline: DR-0022 section 4 mismatch injector (issue #135).
+#   - mc-groundwork-offline: DR-0022 section 4 mismatch injector (issue #135)
+#     and the item-6 campaign generator sim/mc/gen_campaign.py (issue #202).
 #   - module-loader-offline: sim/_module_loader.py (issue #130), the shared
 #     importlib helper used by the supply-transient, temperature, trim-interface
 #     and trim-transition generators, and the sim/ PDK-provenance guards.
@@ -61,7 +62,7 @@ jobs:
           - name: legacy-analysis-offline
             tests: sim/legacy-analysis/test_analysis_cores.py sim/legacy-analysis/test_jobs_defaults.py
           - name: mc-groundwork-offline
-            tests: sim/mc-groundwork/test_mismatch_inject.py sim/mc-groundwork/test_gen_bench.py
+            tests: sim/mc-groundwork/test_mismatch_inject.py sim/mc-groundwork/test_gen_bench.py sim/mc/test_gen_campaign.py
           - name: module-loader-offline
             tests: sim/test_module_loader.py sim/test_pdk_provenance.py sim/test_git_provenance.py sim/test_evidence_common.py
           - name: temperature-offline

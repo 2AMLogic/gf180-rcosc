@@ -83,18 +83,24 @@ def _parse_card(line: str):
 _M1 = re.compile(r"\bm=1\b", re.I)
 
 
-def inject(dut_text: str, mm_scale=None, exclude=DEFAULT_EXCLUDE):
+def inject(dut_text: str, mm_scale=None, exclude=DEFAULT_EXCLUDE, gate="sw_stat_mismatch"):
     """Return (text, manifest).
 
     mm_scale: None -> symbolic (netlist ``.param mm_scale`` supplied by the
     bench, default line added as 1); a number -> literal baked into sigmas;
     a literal 0 -> baseline cards kept verbatim.
+
+    gate: the .param that multiplies every draw.  Default ``sw_stat_mismatch``
+    (the PDK's own MOS switch, DR-0022 s3); the DR-0022 injected-term
+    sensitivity control passes a separate switch so the MOS terms can be off
+    while the injected ones are live.
     """
     literal_zero = mm_scale is not None and float(mm_scale) == 0.0
     scale_expr = "mm_scale" if mm_scale is None else repr(float(mm_scale))
     exclude = {e.lower() for e in exclude}
     out, params, manifest = [], [], []
     seen = set()
+    seen_params = set()
     last_x = None  # lower-case instance of the most recent X card
     for line in dut_text.splitlines():
         stripped = line.lstrip()
@@ -121,16 +127,27 @@ def inject(dut_text: str, mm_scale=None, exclude=DEFAULT_EXCLUDE):
         kind, coeff, wk, lk = MODELS[model]
         if wk not in p or lk not in p:
             raise UnmappedCardError(f"{name}: cannot read {wk}/{lk}")
-        if p.get("m") != "1":
-            raise UnmappedCardError(f"{name}: expected m=1, found m={p.get('m')}")
+        # An extracted (klt extract) netlist writes no multiplier at all: that is
+        # m=1 by SPICE default, so the injector appends one.  Any other explicit
+        # value is still refused.
+        if p.get("m") not in (None, "1"):
+            raise UnmappedCardError(f"{name}: expected m=1 or no m, found m={p.get('m')}")
         if inst in seen:
             raise UnmappedCardError(f"{name}: duplicate instance")
         seen.add(inst)
         w, l = _spice_um(p[wk]), _spice_um(p[lk])
         sigma = coeff / math.sqrt(w * l) / 100.0  # relative, at mm_scale=1
-        d = f"d_{inst}"
+        # extracted instances are named X$87: `$` is a comment/special char in
+        # ngspice expressions, so the param name keeps only [a-z0-9_]
+        d = "d_" + re.sub(r"[^a-z0-9_]", "_", inst)
+        if d in seen_params:
+            raise UnmappedCardError(f"{name}: param name {d} collides")
+        seen_params.add(d)
         expr = f"1/(1+{d})" if kind == "res" else f"(1+{d})"
-        rewritten, n = _M1.subn(f"m='{expr}'", line)
+        if "m" in p:
+            rewritten, n = _M1.subn(f"m='{expr}'", line)
+        else:
+            rewritten, n = f"{line.rstrip()} m='{expr}'", 1
         if n != 1:
             # The manifest is cited as proof the injection is live: never list
             # an instance whose card was not actually rewritten.
@@ -141,7 +158,7 @@ def inject(dut_text: str, mm_scale=None, exclude=DEFAULT_EXCLUDE):
         else:
             out.append(rewritten)
             sigma_expr = f"{scale_expr}*{sigma!r}"
-        params.append(f".param {d}='sw_stat_mismatch*agauss(0,{sigma_expr},1)'"
+        params.append(f".param {d}='{gate}*agauss(0,{sigma_expr},1)'"
                       if not literal_zero else f".param {d}=0")
         manifest.append({"instance": name, "param": d, "model": model,
                          "kind": kind, "w_um": w, "l_um": l,
