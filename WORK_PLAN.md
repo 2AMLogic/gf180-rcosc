@@ -8,7 +8,6 @@ This roadmap is generated from the current GitHub label state by the Loom Guide 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
 - **#225**: feat(sim): simulated 63-point startup factorial (61/63 pass, pre-re-centre design) and DR-0020 ratified
-- **#237**: sim(mc): item-6 Monte Carlo campaign on the P3 netlist, graded with klt yield (rows 4 and 5 fail, controls incomplete)
 
 ## Very Important
 
@@ -21,20 +20,19 @@ _None._
 `loom:important`; taken before unlabelled work.
 
 - **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
+- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b)
 
 ## Ready
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b)
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
 - **#82**: Run startup-time PVT factorial on batch fleet and close row 10 (follow-up to #78/PR #80)
-- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b)
-- **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5
 
 ## PRs Awaiting Review
 
@@ -47,7 +45,6 @@ _None._
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
 - **#225**: feat(sim): simulated 63-point startup factorial (61/63 pass, pre-re-centre design) and DR-0020 ratified
-- **#237**: sim(mc): item-6 Monte Carlo campaign on the P3 netlist, graded with klt yield (rows 4 and 5 fail, controls incomplete)
 
 ## Proposed
 
@@ -55,7 +52,6 @@ Issues carrying `loom:curated`.
 
 - **#82**: Run startup-time PVT factorial on batch fleet and close row 10 (follow-up to #78/PR #80) *(curated)*
 - **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b) *(curated)*
-- **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5 *(curated)*
 - **#204**: Move layout geometry pin klt 0.4.0 → 0.8.0 and regenerate committed cells/reports *(curated)*
 
 ## Proposed (Architect / Hermit)
@@ -70,14 +66,14 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 2 |
+| Operator merge-risk holds | 1 |
 | Very important | 0 |
-| Important | 1 |
-| Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 3 |
+| Important | 2 |
+| Ready (`loom:issue`) | 1 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 2 |
-| Curated | 4 |
+| Approved PRs awaiting merge | 1 |
+| Curated | 3 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
