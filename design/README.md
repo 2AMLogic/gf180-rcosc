@@ -56,7 +56,7 @@ design/regen-netlist.sh
 
 This netlists every entry-point schematic (`rcosc_top.sch`, the block
 itself, and `smoke_test.sch`, the bring-up testbench) with
-`xschem -n -x -q -r --rcfile design/xschemrc`, and writes the model-library
+`klt netlist --rcfile design/xschemrc` (timeout-bounded, never raw `xschem`), and writes the model-library
 include shim `design/netlist/pdk_include.spice` for the smoke test to
 `.include`. Confirmed to run with **zero xschem warnings/errors** (no
 unresolved symbols, no shorted/overlapped-instance ERC flags) as of this

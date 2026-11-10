@@ -10,9 +10,9 @@
 #
 # Usage: design/regen-netlist.sh
 #
-# Resolves the gf180mcu PDK the same way design/xschemrc does: PDK_ROOT (if
-# already set) first, then `klt pdk find` (see docs in design/README.md),
-# then the usual volare/ciel/system install locations.
+# Netlisting goes through `klt netlist` (bounded by a timeout, real exit
+# status), never raw xschem. PDK_ROOT (if already set) is used first, else
+# `klt pdk find` (see docs in design/README.md).
 
 set -euo pipefail
 
@@ -21,16 +21,15 @@ DESIGN_DIR="$REPO_ROOT/design"
 RCFILE="$DESIGN_DIR/xschemrc"
 NETLIST_DIR="$DESIGN_DIR/netlist"
 
+export PDK="${PDK:-gf180mcuC}"
+
+# PDK_ROOT is only needed for MODEL_DIR (pdk_include.spice below); netlisting
+# itself resolves the PDK through `klt netlist --pdk/--pdk-root`.
 if [[ -z "${PDK_ROOT:-}" ]]; then
-  if command -v klt >/dev/null 2>&1; then
-    RESOLVED_ROOT="$(klt pdk find --pdk gf180mcuC --format json 2>/dev/null | python3 -c 'import json,sys; print(json.load(sys.stdin).get("root",""))' 2>/dev/null || true)"
-    if [[ -n "$RESOLVED_ROOT" ]]; then
-      export PDK_ROOT="$RESOLVED_ROOT"
-    fi
-  fi
+  RESOLVED_ROOT="$(klt pdk find --pdk "$PDK" --format json 2>/dev/null | python3 -c 'import json,sys; print(json.load(sys.stdin).get("root",""))' 2>/dev/null || true)"
+  [[ -n "$RESOLVED_ROOT" ]] && export PDK_ROOT="$RESOLVED_ROOT"
 fi
 : "${PDK_ROOT:?PDK_ROOT not set and could not be resolved via 'klt pdk find --pdk gf180mcuC'. Set PDK_ROOT to the volare/ciel install root (parent of gf180mcuC/) and re-run.}"
-export PDK="${PDK:-gf180mcuC}"
 
 MODEL_DIR="$PDK_ROOT/$PDK/libs.tech/ngspice"
 if [[ ! -f "$MODEL_DIR/design.ngspice" || ! -f "$MODEL_DIR/sm141064.ngspice" ]]; then
@@ -43,7 +42,7 @@ mkdir -p "$NETLIST_DIR"
 
 echo "== gf180-rcosc netlist regen: $(date -u +%Y-%m-%dT%H:%M:%SZ) =="
 echo "PDK_ROOT=$PDK_ROOT PDK=$PDK"
-echo "xschem: $(xschem --version 2>&1 | head -1)"
+echo "klt: $(klt --version 2>&1 | head -1)"
 
 # Every schematic that is netlisted directly (a real entry point, not a
 # hierarchical building block only ever reached via another symbol).
@@ -60,11 +59,8 @@ for name in "${ENTRY_POINTS[@]}"; do
     exit 1
   fi
   echo "-- netlisting $name.sch --"
-  xschem -n -x -q -r --rcfile "$RCFILE" -o "$NETLIST_DIR" "$sch"
-  if [[ ! -f "$NETLIST_DIR/$name.spice" ]]; then
-    echo "ERROR: netlist not produced at $NETLIST_DIR/$name.spice" >&2
-    exit 1
-  fi
+  klt netlist "$sch" -o "$NETLIST_DIR/$name.spice" \
+    --pdk "$PDK" --pdk-root "$PDK_ROOT" --rcfile "$RCFILE"
 done
 
 # pdk_include.spice: the model-library recipe smoke_test.spice's
