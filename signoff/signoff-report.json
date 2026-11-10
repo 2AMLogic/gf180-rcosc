@@ -381,9 +381,119 @@
       "text": "any accuracy, offset, or matching spec row is statistical; a corner matrix (or STA corner sweep) cannot validate it. This applies to whichever spec rows are actually statistical, regardless of block kind \u2014 most digital spec rows (functional correctness, Fmax, timing closure) are not, and a block whose spec has no statistical row must say so explicitly rather than omit the item. Where it does apply, MC runs need a recorded seed, sample count, a deterministic negative control, and results combined with (not instead of) process corners (#344). A `klt yield` JSON report \u2014 a yield estimate with its confidence interval, sample-size verdict, and Cpk/sigma-to-spec against the row's own limits \u2014 is the machine-checkable evidence for this item (`klt signoff`'s tier-verdict mode grades it the same way it grades the deterministic items above). **The campaign's own self-report is a grading input, not just a footnote** (issue #2467): a cited report whose `sample_size.verdict` is `insufficient` on any measurement renders `unmet` with `reason: \"undersized_sample\"`, and one whose declared negative control did not show the seeded degradation renders `unmet` with `reason: \"negative_control_not_detected\"` \u2014 the report's passing `status` answers only \"did every declared `target_yield` hold\", which a campaign declaring none can never fail. A campaign that declared **no** negative control at all is still `met`, but says so: `citation.yield_campaign.negative_control` reads `\"not_declared\"`, since `klt yield` itself treats that as a warning rather than a failure and whether it is acceptable for a given spec row is the claimant's call. See [`cli/signoff.md`](cli/signoff.md)'s \"Campaign discipline on item 6\". **This item's evidence verb needs the `yield` extra.** Unlike every other T1 item's evidence verb (`drc`, `lvs`, `extract`, `sim`, `pex`, `sta`, `functional-verification`, `erc`, `place-and-route`), `klt yield` requires the `klt_yield_native` Rust extension. It is published as the prebuilt `klt-yield-native` wheel (Linux x86_64, macOS arm64), reached by `pip install 'klayout-tools[yield]'`; a bare `pip install klayout-tools` and the git-pinned form do not include it. A consumer pinning a release that predates the first `klt-yield-native` publication, or on another platform, still needs a repo checkout with a Rust toolchain; see `docs/cli/yield.md`'s \"What the extra does and does not reach\" callout and `docs/releasing-native.md`. **When \"not applicable\" is legitimate** (issue #2865): a block whose ratified spec has *no* statistical row passes this item by a recorded \"not applicable\", not by a waiver at grant time and not by inventing a statistical claim. That holds only when the spec is ratified, a committed statement accounts for every spec row with the reason its row class is not statistical (for example \"timing rows are corner-bounded by STA at the PDK's characterised corners\"), and both are bound by content hash so editing either invalidates the claim. Any accuracy, offset, matching or yield row is statistical by definition: a spec carrying one \u2014 or a sigma, yield, Cpk or `3\u03c3`-style bound \u2014 cannot use the outcome and needs `klt yield` evidence for that row. The outcome is available to a digital partition only; an analog partition (including the analog half of a mixed-signal block) always requires Monte Carlo evidence. `klt signoff` reports it as `not_applicable`, never as `met`. **Several statistical rows, only some evidenced** (issue #2908): item 6 is a claim about *every* statistical row, so a manifest may declare the row set under `spec_rows.\"6\"` and cite one `klt yield` report per row set (`rows` on each citation). Item 6 grades `met` only when every declared row is covered by a passing citation against a ratified target. A row with no citation (`uncovered_rows`), a row declared a `gap` because no evidence can exist yet (`declared_gaps`), or a row declared `ratified: false` (`unratified_rows`, evidence against a proposed limit is provisional) grades `unmet` / `partial_coverage`, never `met`. Without a declaration the item grades as before; a `not_applicable` entry contradicts a declared row set and is `invalid_evidence`.",
       "notes": [],
       "status": "unmet",
-      "reason": "no_evidence",
+      "reason": "negative_control_not_detected",
       "graded_by_build": true,
-      "citation": null
+      "citation": null,
+      "citations_graded": [
+        {
+          "citation": "sim/mc/results/20261106T072000Z/yield_tt_row2.json",
+          "rows": [
+            "2"
+          ],
+          "status": "unmet",
+          "reason": "negative_control_not_detected"
+        },
+        {
+          "citation": "sim/mc/results/20261106T072000Z/yield_tt_row4.json",
+          "rows": [
+            "4"
+          ],
+          "status": "unmet",
+          "reason": "negative_control_not_detected"
+        },
+        {
+          "citation": "sim/mc/results/20261106T072000Z/yield_tt_row5.json",
+          "rows": [
+            "5"
+          ],
+          "status": "unmet",
+          "reason": "negative_control_not_detected"
+        },
+        {
+          "citation": "sim/mc/results/20261106T072000Z/yield_ff_row2.json",
+          "rows": [
+            "2"
+          ],
+          "status": "unmet",
+          "reason": "negative_control_not_detected"
+        },
+        {
+          "citation": "sim/mc/results/20261106T072000Z/yield_ff_row4.json",
+          "rows": [
+            "4"
+          ],
+          "status": "met",
+          "reason": null
+        },
+        {
+          "citation": "sim/mc/results/20261106T072000Z/yield_ff_row5.json",
+          "rows": [
+            "5"
+          ],
+          "status": "unmet",
+          "reason": "check_failed"
+        },
+        {
+          "citation": "sim/mc/results/20261106T072000Z/yield_ss_row2.json",
+          "rows": [
+            "2"
+          ],
+          "status": "unmet",
+          "reason": "negative_control_not_detected"
+        },
+        {
+          "citation": "sim/mc/results/20261106T072000Z/yield_ss_row4.json",
+          "rows": [
+            "4"
+          ],
+          "status": "unmet",
+          "reason": "check_failed"
+        },
+        {
+          "citation": "sim/mc/results/20261106T072000Z/yield_ss_row5.json",
+          "rows": [
+            "5"
+          ],
+          "status": "unmet",
+          "reason": "negative_control_not_detected"
+        }
+      ],
+      "detail": {
+        "yield_campaign": {
+          "sample_size": "sufficient",
+          "undersized_measurements": [],
+          "negative_control": "not_detected",
+          "measurements_without_negative_control": [],
+          "undetected_negative_controls": [
+            "s1_resid_abs_pct",
+            "s1_headroom"
+          ]
+        },
+        "failed_citations": [
+          "sim/mc/results/20261106T072000Z/yield_tt_row2.json",
+          "sim/mc/results/20261106T072000Z/yield_tt_row4.json",
+          "sim/mc/results/20261106T072000Z/yield_tt_row5.json",
+          "sim/mc/results/20261106T072000Z/yield_ff_row2.json",
+          "sim/mc/results/20261106T072000Z/yield_ff_row5.json",
+          "sim/mc/results/20261106T072000Z/yield_ss_row2.json",
+          "sim/mc/results/20261106T072000Z/yield_ss_row4.json",
+          "sim/mc/results/20261106T072000Z/yield_ss_row5.json"
+        ],
+        "failed_rows": [
+          "2",
+          "5"
+        ],
+        "uncovered_rows": [],
+        "declared_gaps": [],
+        "unratified_rows": [
+          "2",
+          "4",
+          "5"
+        ],
+        "row_sources": {
+          "4": "asserted"
+        }
+      }
     },
     {
       "tier": "T1",
@@ -434,7 +544,7 @@
         "command": null,
         "kind": "generic",
         "check_status": "pass",
-        "content_hash": "sha256:bb725099382a815b300d52c4f61dcd6f0792c4d10d4a2b60f3a7926d01d04736",
+        "content_hash": "sha256:7b1c7a843044cd63be47af18b8fbac905ead344e2e5093ecd8e3c12226d5ec18",
         "input_verified": true,
         "exit_status": 0,
         "artifact_binding": {
@@ -443,7 +553,7 @@
             "path": "signoff/testbench-inventory.md",
             "scope": "repo"
           },
-          "content_hash": "sha256:bb725099382a815b300d52c4f61dcd6f0792c4d10d4a2b60f3a7926d01d04736",
+          "content_hash": "sha256:7b1c7a843044cd63be47af18b8fbac905ead344e2e5093ecd8e3c12226d5ec18",
           "input_verified": true,
           "summary": "T1 item 9 (testbenches shipped): signoff/testbench-inventory.md lists every measured figure README.md and the characterization report currently quote, against the committed run it comes from, the bench that produced it, its cold-start command (sim/pvt/run-pvt-sweep.sh, sim/pvt/delay_probe.py, sim/iq/run-iq-sweep.sh, sim/startup/gen_requests.py, sim/pvt-postlayout/run-pex-pvt-sweep.sh, design/run-smoke-test.sh) and the PDK identity the run recorded. 'pass' asserts every claimed measurement has a committed, runnable bench. It discloses, and does not paper over, that most runs record only the PDK family gf180mcuC (no revision), the Iq run records only the install path in its manifest, and the smoke-test log records no PDK identity at all.",
           "source": "signoff/testbench-inventory.md"

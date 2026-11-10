@@ -70,6 +70,12 @@ sim/
     results/<runid>/       requests, benches, reports, model-mismatch evidence,
                            failed batch attempts; see mc-groundwork/README.md
                            for the feasibility verdict. No yield claim
+  mc/
+    gen_campaign.py        item-6 Monte Carlo campaign generator (issue #202): P3 DUT with
+                           the DR-0022 injection, per-die calibrate-then-hold bench
+    run-campaign.sh        submits each case as a sharded `klt sim` batch request into a
+                           new results/<runid>/; grade.sh grades with `klt yield`
+    results/<runid>/       raw reports, graded yield reports; see mc/README.md
   temperature/
     prepare.py, analyze.py interior-temperature curvature harness (issue #125): 12-point
                            temperature axis x tt/ss/ff at the held ratified codes, 3.3 V;
@@ -351,4 +357,5 @@ status. Run ids are append-only like the tables above.
 |---|---|
 | [`startup/results/20261008T235538Z`](startup/results/20261008T235538Z/summary.md) | Startup-time bench (issue #78; see [`startup/README.md`](startup/README.md)). **Two single-corner local probes only** (`ss`/-40 °C/3.0 V and `tt`/27 °C/3.3 V), **not the 63-point factorial**, which could not run on the fleet (`startup/batch-attempts/`). Both start; worst settle time 1.174 µs for the ±1.1% primary band (spec ≤ 10 µs). Band definition: [DR-0020](../spec/decision-records/0020-startup-time-trimmed-accuracy-band-definition.md) (Proposed). |
 | [`mc-groundwork/results/20261008T235620Z`](mc-groundwork/README.md) | Monte Carlo groundwork smoke run (issue #77; see [`mc-groundwork/README.md`](mc-groundwork/README.md); no `summary.md`, results are in the per-request `report_*.json`). Feasibility verdict: mismatch-capable **partially** (MOS yes; resistor and MIM capacitor no). Per-sample trim-selection bench smoke only; **no yield is run or claimed**, the campaign waits for #66. Plan: [DR-0019](../spec/decision-records/0019-statistical-vs-deterministic-spec-rows-and-monte-carlo-evidence-plan.md). |
+| [`mc/results/20261106T072000Z`](mc/results/20261106T072000Z/summary.md) | Item-6 Monte Carlo campaign graded with `klt yield` (issue #202; raw reports in `mc/results/20261106T051700Z`, `20261106T061800Z`, `20261106T070700Z`; see [`mc/README.md`](mc/README.md), DR-0030). 500 samples per process corner on the P3 netlist: row 4 fails at `ss`, row 5 fails at `ff`; negative controls incomplete, so the passing cells carry no verdict |
 | [`discipline/results/20261009T010000Z`](discipline/results/20261009T010000Z/summary.md) | Runtime-discipline SOF-loop model and static trim math on the committed frequency-vs-code data (issue #79; see [`discipline/README.md`](discipline/README.md)); no ngspice. Static mean step 0.409–0.470 %/code across plants, four negative steps per plant; post-layout `ss` saturates at -40 °C/3.0 V. Interpretation: [DR-0021](../spec/decision-records/0021-runtime-discipline-trim-resolution-sof-loop-model.md) (Proposed). |
