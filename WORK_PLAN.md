@@ -7,7 +7,7 @@ This roadmap is generated from the current GitHub label state by the Loom Guide 
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-- **#225**: feat(sim): measured 63-point startup factorial (61/63 pass) and DR-0020 ratified
+- **#225**: feat(sim): simulated 63-point startup factorial (61/63 pass, pre-re-centre design) and DR-0020 ratified
 - **#237**: sim(mc): item-6 Monte Carlo campaign on the P3 netlist, graded with klt yield (rows 4 and 5 fail, controls incomplete)
 
 ## Very Important
@@ -46,7 +46,7 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#225**: feat(sim): measured 63-point startup factorial (61/63 pass) and DR-0020 ratified
+- **#225**: feat(sim): simulated 63-point startup factorial (61/63 pass, pre-re-centre design) and DR-0020 ratified
 - **#237**: sim(mc): item-6 Monte Carlo campaign on the P3 netlist, graded with klt yield (rows 4 and 5 fail, controls incomplete)
 
 ## Proposed
