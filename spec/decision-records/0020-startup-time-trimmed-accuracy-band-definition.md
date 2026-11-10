@@ -49,8 +49,10 @@ the lenient reading:
   against the 10 µs budget (conservative; ST's `tsu(HSI48)` is measured from
   enable). First-edge time and VDD-90% time are recorded too.
 - **Supply ramp**: linear 0 → VDD in 1 µs, trim pins following VDD, trim code
-  0xA3 (post-#60 calibration code) held. A slower ramp, or a per-corner
-  calibrated code, are untested assumptions (see Consequences).
+  held fixed at the design's tt / 27 °C / 3.3 V calibration code (not
+  recalibrated per corner), per the operator ruling of 2026-11-10 (see
+  Consequences). A slower ramp, or a per-corner calibrated code, are
+  untested assumptions.
 - **Period sampling**: 8-cycle mean period, because single-edge times from
   the transient solver carry ~0.2 ns numerical noise (~0.7% of a cycle),
   comparable to the ±1.1% band.
@@ -102,16 +104,16 @@ off-target; it is not a claim of target-accurate or USB-ready availability.
   slow µs-scale period drift on the pre-re-centre netlist (not edge jitter),
   absent on the DR-0028 stage. That is consistent with the old comparator-H
   output stage; this record does not claim a diagnosis.
-- **Open question for the operator: the fixed trim code.** The 2026-10-16
-  ruling names `0xA3`, which was the calibration code of the pre-re-centre
-  schematic. The current design's tt/27 °C/3.3 V calibration code is `0xA9`
-  (DR-0023); DR-0029 (Proposed) would move it to `0xA4`. The settled-netlist
-  startup runs above use `0xA9`, so they do not literally conform to "`0xA3`".
-  Candidate wording for a ruling: "the design's tt/27 °C/3.3 V calibration
-  code, held fixed (not recalibrated per corner); `0xA3` for the run cited
-  for the pre-re-centre design". This record deliberately **states both
-  codes and picks neither**; the ruling is requested separately and the
-  definition's trim-code clause is unchanged until it is given.
+- **Fixed trim code: ruled.** Operator ruling 2026-11-10 (rjwalters,
+  `/fleet:decide` round 20261110-r12 q16, PR #225 comment): the fixed trim
+  code during startup is **the design's tt / 27 °C / 3.3 V calibration code,
+  held fixed (not recalibrated per corner)**. This replaces the literal
+  `0xA3` from the 2026-10-16 ruling, so the definition follows DR-0023,
+  DR-0029 and any later re-centre. Per-run codes stay as recorded: `0xA3` is
+  the code of the cited pre-re-centre run
+  (`sim/startup/results/20261106T052948Z/`), and `0xA9` is the calibration
+  code of the settled P3 netlist used by the `sim/startup-settled/` runs
+  (DR-0023; DR-0029, Proposed, would move it to `0xA4`).
 - Not tested: slower supply ramps, per-corner calibrated trim codes, post-layout
   (PEX) startup, and mismatch-induced failure to start (a separate robustness
   check per DR-0019).
