@@ -278,8 +278,8 @@ gate bus is not planar in metal1), and `rcosc_trim_bank` at issue #50's
 re-spin (the `tb<i>` inverter buses and the two rails cross the c-node and
 `t<i>` terminal runs). Issue #13's two-row planar trim bank — a resistor
 chain with a row of shunt switches above it, wired with
-`wire_segment`/`wire_l`/`wire_z` so each cross-row jog stayed inside its
-own resistor's private x-window — survives only in history: it was
+`wire_segment` and since-removed dogleg helpers so each cross-row jog stayed
+inside its own resistor's private x-window — survives only in history: it was
 planar precisely because pre-#43 every shunt was one nfet, which the
 transmission-gate restructure ended. The bias cell's own re-spin (#44)
 forced the same move for its own reason ("the PMOS gate bus `pb` must
