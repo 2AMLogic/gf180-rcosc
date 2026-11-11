@@ -26,20 +26,19 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b)
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
 - **#82**: Run startup-time PVT factorial on batch fleet and close row 10 (follow-up to #78/PR #80)
-- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b)
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-- **#302**: sim(trim-dense): run campaign slice 38 on batch fleet (jobs 793-822 of 1536)
+_None._
 
 ## Approved (Awaiting Merge)
 
@@ -71,9 +70,9 @@ _None._
 | Operator merge-risk holds | 1 |
 | Very important | 0 |
 | Important | 2 |
-| Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
-| PRs awaiting review | 1 |
+| Ready (`loom:issue`) | 1 |
+| In Progress (`loom:building`) | 1 |
+| PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 1 |
 | Curated | 4 |
 | Architect / Hermit proposals | 0 |

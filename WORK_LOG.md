@@ -4,6 +4,9 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-11
 
+- **PR #305**: refactor(layout): remove unused wire_l and wire_z helpers
+- **Issue #304** (closed): Remove dead Composer.wire_l/wire_z from layout/gen_lib.py
+- **PR #302**: sim(trim-dense): run campaign slice 38 on batch fleet (jobs 793-822 of 1536)
 - **PR #301**: docs(spec): attribute rows 4/5 fixed-code failure to process offset (DR-0031)
 
 ### 2026-11-10
