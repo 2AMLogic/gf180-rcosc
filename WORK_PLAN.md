@@ -26,19 +26,20 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b)
+_None._
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
 - **#82**: Run startup-time PVT factorial on batch fleet and close row 10 (follow-up to #78/PR #80)
+- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b)
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-_None._
+- **#302**: sim(trim-dense): run campaign slice 38 on batch fleet (jobs 793-822 of 1536)
 
 ## Approved (Awaiting Merge)
 
@@ -53,6 +54,7 @@ Issues carrying `loom:curated`.
 - **#82**: Run startup-time PVT factorial on batch fleet and close row 10 (follow-up to #78/PR #80) *(curated)*
 - **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b) *(curated)*
 - **#204**: Move layout geometry pin klt 0.4.0 → 0.8.0 and regenerate committed cells/reports *(curated)*
+- **#236**: Item 6 Monte Carlo: ss row 4 supply span exceeds the ratified window, ff row 5 spread, and controls that do not discriminate *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -69,11 +71,11 @@ _None._
 | Operator merge-risk holds | 1 |
 | Very important | 0 |
 | Important | 2 |
-| Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 1 |
-| PRs awaiting review | 0 |
+| Ready (`loom:issue`) | 0 |
+| In Progress (`loom:building`) | 2 |
+| PRs awaiting review | 1 |
 | Approved PRs awaiting merge | 1 |
-| Curated | 3 |
+| Curated | 4 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->

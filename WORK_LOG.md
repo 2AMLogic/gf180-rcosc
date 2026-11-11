@@ -2,8 +2,13 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-11
+
+- **PR #301**: docs(spec): attribute rows 4/5 fixed-code failure to process offset (DR-0031)
+
 ### 2026-11-10
 
+- **PR #300**: sim(trim-dense): run campaign slice 37 on batch fleet (jobs 757-792 of 1536)
 - **PR #298**: sim(trim-dense): run campaign slice 36 on batch fleet (jobs 721-756 of 1536)
 - **PR #296**: sim(trim-dense): run campaign slice 35 on batch fleet (jobs 685-720 of 1536)
 - **PR #295**: refactor(design): use klt netlist in regen-netlist.sh
