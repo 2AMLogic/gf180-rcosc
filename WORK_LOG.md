@@ -4,6 +4,11 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-11
 
+- **PR #309**: sim(trim-dense): campaign slice 40, 42 more sch jobs on batch fleet (906/1536)
+- **PR #308**: docs(signoff): cite DR-0020 fixed-trim ruling in row 10
+- **Issue #287** (closed): signoff: drop stale 'awaits an operator ruling' on DR-0020 trim-code clause
+- **PR #307**: sim(trim-dense): run campaign slice 39 on batch fleet (jobs 823-864 of 1536)
+- **PR #225**: feat(sim): simulated 63-point startup factorial (61/63 pass, pre-re-centre design) and DR-0020 ratified
 - **PR #305**: refactor(layout): remove unused wire_l and wire_z helpers
 - **Issue #304** (closed): Remove dead Composer.wire_l/wire_z from layout/gen_lib.py
 - **PR #302**: sim(trim-dense): run campaign slice 38 on batch fleet (jobs 793-822 of 1536)
