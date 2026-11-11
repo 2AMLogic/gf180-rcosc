@@ -270,7 +270,7 @@ envelope's `status: "pass"` asserts **the record is present and current** — it
 is **not** a claim that every spec row passes. In the record's own §4 verdict
 vocabulary: **Met** (rows 1, 3, 8, 11), **Within** the ratified bound (row 4),
 **Not met** (row 2 — trim range), **Exceeds** (rows 5–6 — post-trim accuracy,
-both methodologies — and row 9 — Iq off-reference), **Not evaluated** (row 7), **Simulated, not measured** (row 10 — startup; current design 63/63 on the DR-0028 stage, pre-re-centre design 61/63 as history; trim-code clause of DR-0020 awaiting an operator ruling) — every miss undisguised, with causes traced in §4 and DR-0009/DR-0011. The
+both methodologies — and row 9 — Iq off-reference), **Not evaluated** (row 7), **Simulated, not measured** (row 10 — startup; current design 63/63 on the DR-0028 stage, pre-re-centre design 61/63 as history; fixed trim = the design's tt/27 °C/3.3 V calibration code, held fixed per DR-0020 and the operator ruling of 2026-11-10 on #225) — every miss undisguised, with causes traced in §4 and DR-0009/DR-0011. The
 envelope pins the document's content hash (`provenance.input.content_hash`),
 mirrored in the manifest pin, so a citation against a stale characterization
 record rots in CI the same way the layout pins do.
