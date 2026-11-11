@@ -76,6 +76,9 @@ claims, so they are not listed one by one.
 | `sim/pvt/results/20260923T030905Z/summary.md` | README spec table: delay share of the supply span after the issue #57 re-reference (7.6-33%) | `sim/pvt/delay_probe.py` (`--cal-from` `20260923T030125Z`) | `ed26786` (dirty) | family `gf180mcuC` + install root path only. **No revision** |
 | `sim/iq/results/20260921T091042Z/README.md` | char. report row 9: running Iq at the reference corner (worst 330.38 µA at `0xFF`) and over the full 63-point grid (541.85 µA at `0xC0`, `ff`/85 °C/3.6 V) | `sim/iq/run-iq-sweep.sh` | `1ac4434` (dirty) | `manifest.json` records the install root path only. The family name `gf180mcuC` appears only in the generated `README.md`. **No revision** |
 | `sim/pvt-postlayout/results/20260923T152954Z/summary.md` | char. report post-layout divergence note and README maturity ladder: extracted runs −18.78% to −36.86% slower than the schematic at `0xA3` (mean −25.65%); DR-0017 guardrails held extracted-side; `ss` calibrates at `0xF7` | `sim/pvt-postlayout/run-pex-pvt-sweep.sh` (`--guardrails --baseline-runid 20260923T030125Z`) | `89399c6` (dirty) | `manifest.json`: family `gf180mcuC` + install root path. The committed `rcosc_top.pex.extract.json` (the `klt extract` half) records `open_pdks c6d73a35f524070e85faff4a6a9eef49553ebc2b` for the install it resolved under the same root. The simulation half does not record a revision of its own |
+| `sim/startup/results/20261106T052948Z/summary.md` | char. report row 10, **simulated** (ngspice-46, pre-layout schematic netlist) on the **pre-re-centre schematic at `0xA3`** (before DR-0023/DR-0028; history, not the current design): 61/63 PASS, 2 FAIL, under the DR-0020 definition (+/-1.1% of final mean period, 8-cycle windows, <= 10 µs from ramp start, trim `0xA3`): worst passing settle 1.174 µs (`ss`/-40 °C/3.0 V); `ff`/-40 °C at 3.3 V and 3.6 V FAIL the settled-tail steadiness check (0.78% / 0.61% vs 0.5%). Relative settling only: not a target-accurate / USB-ready clock claim | `sim/startup/gen_requests.py` + `klt sim` on the batch backend (jobs `klt-sim-971dfc731fe7`, `klt-sim-b591e450d02c`, `klt-sim-fbe71ced6e21`) + `startup_report.py` | `d157152e` (base; tree dirty with the result dir only) | `klt sim` reports record the models-lib sha256; runner `eda-batch-runner` v11, family `gf180mcuC`, open_pdks `f6eeac7`; no revision |
+| `sim/startup-settled/results/20261106T061500Z/summary.md` | char. report row 10, **simulated**, current design before DR-0028 (settled P3 netlist, trim `0xA9`, DR-0020 analysis): 61/63 start; `fs`/-40 °C at 3.3 V and 3.6 V NON-START (#227) | `sim/startup-settled/` requests + `klt sim` on the batch backend + `settled_report.py` | per the run's `manifest.json` | batch-fleet `klt sim` reports; PDK revision not independently re-checked in this PR |
+| `sim/startup-settled/results/20261106T0735Z/summary.md` | char. report row 10, **simulated**, current design on the DR-0028 comparator-H stage (trim `0xA9`): 63/63 pass the primary band, worst settle 1.54 µs, 0 NON-START | same, with `sim/cmph-fix/` netlist (#229) | per the run's `manifest.json` | batch-fleet `klt sim` reports (jobs `klt-sim-829a270ff52b`, `klt-sim-58ef1d67a0ce`, `klt-sim-4e366a98ed46`); PDK revision not independently re-checked in this PR |
 | `sim/startup/results/20261008T235538Z/summary.md` | char. report row 10 (**partial**): two single-corner local probes only (`ss`/-40 °C/3.0 V settles 1.174 µs, `tt`/27 °C/3.3 V 0.891 µs, at ±1.1%); the 63-point factorial did not run (fleet runner klt 0.5.0 vs client 0.7.0; failed submissions in `sim/startup/batch-attempts/`) | `sim/startup/gen_requests.py` + `klt sim` (`--backend local` for the probes) | `b5d4f5c` (base; the bench files were uncommitted when run) | `klt sim` report records the models-lib sha256; family `gf180mcuC`; no revision |
 | `design/netlist/smoke_test.log` | bring-up only: the block oscillates at `0x80`, `.op` sanity values. **No spec-row claim** | `design/run-smoke-test.sh` | not recorded | **None**: the log records the ngspice version and run time, not the PDK family or revision |
 
@@ -108,12 +111,20 @@ stays as disclosed here.
 - Ratified row "Runtime-disciplined accuracy" (characterization report
   row 7): reserved, not designed (DR-0004). No measurement is claimed and
   no bench exists.
-- Ratified row "Startup time" (characterization report row 10): **partially
-  evaluated** (issue #78). The bench `sim/startup/` exists; only two
-  single-corner probes have run. The 63-point factorial is not evaluated:
-  every batch submission failed on a runner/client klt version mismatch,
-  and the grid was not run locally. No pass is claimed for the row (see
-  DR-0020 for the unresolved "trimmed accuracy" band definition).
+- Ratified row "Startup time" (characterization report row 10): **simulated
+  (not measured; no silicon exists)** (issue #82) under the operator-ratified
+  DR-0020 definition (relative settling, +/-1.1% of final mean period,
+  <= 10 µs from ramp start). Two designs are graded: the pre-re-centre
+  schematic at fixed trim `0xA3` (`sim/startup/results/20261106T052948Z/`,
+  history) is 61/63 PASS, 2 FAIL (`ff`/-40 °C at 3.3 V and 3.6 V fail the
+  settled-tail steadiness check); the current design is in
+  `sim/startup-settled/results/` at trim `0xA9`: 61/63 on the DR-0023 settled
+  netlist (`fs`/-40 °C NON-START, #227) and 63/63 on the DR-0028 stage (worst
+  settle 1.54 µs). The trim-code clause of DR-0020 (`0xA3` vs the design's
+  `0xA9`) awaits an operator ruling, so the row is not claimed as passed
+  under a conforming code. Relative
+  settling does not imply target-accurate or USB-ready clock availability;
+  that is graded by the separate frequency and PVT-accuracy rows.
 - Monte Carlo / statistical (item 6): **run, and not a pass.** The campaign
   (issue #202, `sim/mc/`) ran 500 samples per process corner on the P3 netlist
   under the DR-0022 flagged matching model. Row 4 fails at `ss` (0 % yield) and
