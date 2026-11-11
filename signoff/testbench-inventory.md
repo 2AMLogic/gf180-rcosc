@@ -120,9 +120,10 @@ stays as disclosed here.
   settled-tail steadiness check); the current design is in
   `sim/startup-settled/results/` at trim `0xA9`: 61/63 on the DR-0023 settled
   netlist (`fs`/-40 °C NON-START, #227) and 63/63 on the DR-0028 stage (worst
-  settle 1.54 µs). The trim-code clause of DR-0020 (`0xA3` vs the design's
-  `0xA9`) awaits an operator ruling, so the row is not claimed as passed
-  under a conforming code. Relative
+  settle 1.54 µs). The trim-code clause of DR-0020 is ruled (operator ruling
+  2026-11-10, #225 comment): the fixed trim is the design's tt / 27 °C /
+  3.3 V calibration code (`0xA9`), held fixed and not recalibrated per
+  corner. The row stays simulated, not measured. Relative
   settling does not imply target-accurate or USB-ready clock availability;
   that is graded by the separate frequency and PVT-accuracy rows.
 - Monte Carlo / statistical (item 6): **run, and not a pass.** The campaign
