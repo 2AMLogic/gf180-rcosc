@@ -239,44 +239,6 @@ class Composer:
             )
         self.top.shapes(self.layout.layer(*layer)).insert(box)
 
-    def wire_l(
-        self,
-        p_from: tuple[float, float],
-        p_to: tuple[float, float],
-        width_um: float,
-        via_x: float | None = None,
-    ) -> None:
-        """Connect two points with a two-segment Manhattan (L-shaped) wire,
-        jogging at `via_x` (defaults to `p_from`'s own x -- a vertical-then-
-        horizontal dogleg) if the points do not already share an axis."""
-        x0, y0 = p_from
-        x1, y1 = p_to
-        if abs(x0 - x1) < 1e-9 or abs(y0 - y1) < 1e-9:
-            self.wire_segment(x0, y0, x1, y1, width_um)
-            return
-        jog_x = via_x if via_x is not None else x0
-        self.wire_segment(x0, y0, jog_x, y0, width_um)
-        self.wire_segment(jog_x, y0, jog_x, y1, width_um)
-        self.wire_segment(jog_x, y1, x1, y1, width_um)
-
-    def wire_z(
-        self,
-        p_from: tuple[float, float],
-        p_to: tuple[float, float],
-        width_um: float,
-        y_mid: float,
-    ) -> None:
-        """Connect two points with a three-segment Manhattan (Z-shaped)
-        wire: vertical from `p_from` to `y_mid`, horizontal at `y_mid`, then
-        vertical up to `p_to` -- for jogging through an empty channel
-        between two rows without the two-segment `wire_l` dogleg's risk of
-        clipping a row's own device geometry near the jog."""
-        x0, y0 = p_from
-        x1, y1 = p_to
-        self.wire_segment(x0, y0, x0, y_mid, width_um)
-        self.wire_segment(x0, y_mid, x1, y_mid, width_um)
-        self.wire_segment(x1, y_mid, x1, y1, width_um)
-
     def add_pin_label(
         self, x_um: float, y_um: float, text: str, layer: tuple[int, int] = METAL1_LABEL
     ) -> None:
