@@ -7,7 +7,7 @@ This roadmap is generated from the current GitHub label state by the Loom Guide 
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-- **#225**: feat(sim): simulated 63-point startup factorial (61/63 pass, pre-re-centre design) and DR-0020 ratified
+_None._
 
 ## Very Important
 
@@ -32,7 +32,7 @@ Human-approved issues ready for implementation (`loom:issue`).
 
 Issues currently being built (`loom:building`).
 
-- **#82**: Run startup-time PVT factorial on batch fleet and close row 10 (follow-up to #78/PR #80)
+_None._
 
 ## PRs Awaiting Review
 
@@ -44,13 +44,12 @@ _None._
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-- **#225**: feat(sim): simulated 63-point startup factorial (61/63 pass, pre-re-centre design) and DR-0020 ratified
+_None._
 
 ## Proposed
 
 Issues carrying `loom:curated`.
 
-- **#82**: Run startup-time PVT factorial on batch fleet and close row 10 (follow-up to #78/PR #80) *(curated)*
 - **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b) *(curated)*
 - **#204**: Move layout geometry pin klt 0.4.0 → 0.8.0 and regenerate committed cells/reports *(curated)*
 - **#236**: Item 6 Monte Carlo: ss row 4 supply span exceeds the ratified window, ff row 5 spread, and controls that do not discriminate *(curated)*
@@ -67,14 +66,14 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 1 |
+| Operator merge-risk holds | 0 |
 | Very important | 0 |
 | Important | 2 |
 | Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 1 |
+| In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
-| Approved PRs awaiting merge | 1 |
-| Curated | 4 |
+| Approved PRs awaiting merge | 0 |
+| Curated | 3 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
