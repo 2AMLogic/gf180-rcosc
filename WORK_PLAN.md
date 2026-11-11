@@ -26,19 +26,19 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b)
+_None._
 
 ## In Progress
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b)
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-_None._
+- **#312**: sim(trim-dense): run slice 41, 42 more sch_ff curve jobs on batch fleet (948/1536)
 
 ## Approved (Awaiting Merge)
 
@@ -69,9 +69,9 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 0 |
 | Important | 2 |
-| Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 0 |
-| PRs awaiting review | 0 |
+| Ready (`loom:issue`) | 0 |
+| In Progress (`loom:building`) | 1 |
+| PRs awaiting review | 1 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 3 |
 | Architect / Hermit proposals | 0 |
