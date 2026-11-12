@@ -1,4 +1,4 @@
-# 0036: Row 4 `ss` supply span: the whole charge-RC supply term is the bank pass gates, not parasitic C; DR-0034's 0.69 pt was a code-shift artefact; a re-centred 3x-W bank meets 4.9 pt in simulation
+# 0037: Row 4 `ss` supply span: the whole charge-RC supply term is the bank pass gates, not parasitic C; DR-0034's 0.69 pt was a code-shift artefact; a re-centred 3x-W bank meets 4.9 pt in simulation
 
 - **Status**: proposed - measurement and a candidate only. Changes no ratified row, window or value; per-die calibration basis of
   [0032](0032-rows-4-5-per-die-calibrated-basis-and-monte-carlo-on-dr0028.md) unchanged; no per-corner trim; [0004](0004-no-active-tc-compensation-runtime-discipline.md)

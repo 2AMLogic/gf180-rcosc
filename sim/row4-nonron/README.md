@@ -22,10 +22,10 @@ python3 -I sim/row4-nonron/width_table.py <ctrl dir> sim/row4-nonron/results/<ru
 - Pass-device width at fixed code 212 (`width_table.py`): `results/20261112T120000Z-w2`, `results/20261112T120000Z-w4`,
   `results/20261112T120000Z-w8`; table in `results/20261112T120000Z-w2/width_table.md`. `w8` (W = 192 um) failed in ngspice
   (`ngspice_fatal`, outside the model's width bins) and is kept as the record of that.
-- Width + base-resistor re-centring points (see DR-0036): `results/20261112T130000Z-w2r75`, `results/20261112T130000Z-w2r85`,
+- Width + base-resistor re-centring points (see DR-0037): `results/20261112T130000Z-w2r75`, `results/20261112T130000Z-w2r85`,
   `results/20261112T140000Z-w3r70`, `results/20261112T140000Z-w4r55`, `results/20261112T140000Z-w4r65`.
 - The candidate's ss supply stage run and trim-range endpoints: `results/20261112T150000Z-w3r65`,
   `results/20261112T150000Z-range-w3r65-code0`, `results/20261112T150000Z-range-w3r65-code255`.
-  The scripts print per-run numbers; the summary tables are in DR-0036.
+  The scripts print per-run numbers; the summary tables are in DR-0037.
 
-Result and interpretation: `spec/decision-records/0036-*.md`.
+Result and interpretation: `spec/decision-records/0037-*.md`.
