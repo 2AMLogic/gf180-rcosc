@@ -20,6 +20,11 @@ SETS = {"a": {"base": (1, 4, .5, .5), "p3": (1, 3, .5, .5), "p25": (1, 2.5, .5, 
               "n07": (0.7, 4, .5, .5), "pl07": (1, 4, .5, .7), "p3n07": (0.7, 3, .5, .5)},
         "b": {"base": (1, 4, .5, .5), "p6": (1, 6, .5, .5), "p8": (1, 8, .5, .5), "n15": (1.5, 4, .5, .5),
               "n2": (2, 4, .5, .5), "p8n15": (1.5, 8, .5, .5), "nl07": (1, 4, .7, .5), "nl1": (1, 4, 1, .5)}}
+# first-stage sets (round 2): name -> (pair W um, mirror-load L um, tail W factor); None = as extracted (4, 1, 1)
+FIRST = {"c": {"base": (None, None, None), "pw3": (3, None, None), "pw6": (6, None, None), "pw8": (8, None, None),
+               "ll07": (None, 0.7, None), "ll15": (None, 1.5, None), "tk15": (None, None, 1.5), "tk07": (None, None, 0.7)},
+         "d": {"base": (None, None, None), "ll05": (None, 0.5, None), "ll06": (None, 0.6, None), "ll08": (None, 0.8, None),
+               "ll09": (None, 0.9, None), "ll11": (None, 1.1, None), "tk085": (None, None, 0.85), "tk055": (None, None, 0.55)}}
 
 
 def bench(name: str, vdd: float) -> str:
@@ -46,8 +51,11 @@ def request(name: str, vdd: float, temps) -> dict:
 if __name__ == "__main__":
     out = Path(sys.argv[1])
     out.mkdir(parents=True, exist_ok=True)
-    for name, (wn, wp, ln, lp) in SETS[sys.argv[2] if len(sys.argv) > 2 else "a"].items():
-        (out / f"dut_{name}.spice").write_text(variant.comparator_h_buffer(SRC.read_text(), wn, wp, ln, lp))
+    which = sys.argv[2] if len(sys.argv) > 2 else "a"
+    duts = ({n: variant.first_stage(SRC.read_text(), *a) for n, a in FIRST[which].items()} if which in FIRST else
+            {n: variant.comparator_h_buffer(SRC.read_text(), *a) for n, a in SETS[which].items()})
+    for name, text in duts.items():
+        (out / f"dut_{name}.spice").write_text(text)
         for vdd, temps in ((3.3, [27.0]), (3.0, [-40.0, 85.0])):
             t = f"{name}_v{int(round(vdd * 10)):02d}"
             (out / f"tb_{t}.spice").write_text(bench(name, vdd))
