@@ -1,0 +1,143 @@
+{
+  "samples": "sim/mc/results/20261112T060000Z/sampleset_ff.json",
+  "limits": "sim/mc/results/20261112T060000Z/limits_main.json",
+  "source": {
+    "kind": "sample-set",
+    "netlist": null,
+    "monte_carlo": null,
+    "sample_count": 500
+  },
+  "schema_version": 1,
+  "confidence": 0.95,
+  "target_ci_halfwidth": 0.01,
+  "min_samples": 500,
+  "status": "fail",
+  "measurement_count": 1,
+  "measurements": [
+    {
+      "name": "s3_margin_pct",
+      "unit": "%",
+      "n": 500,
+      "errored": 0,
+      "failed_unmeasurable": 0,
+      "censored": 0,
+      "inconclusive": 0,
+      "limits": {
+        "min": 0.0,
+        "target_yield": 0.99
+      },
+      "source_corners": [
+        "ff/novdd/27C"
+      ],
+      "distribution": {
+        "model": "normal",
+        "mean": 1.8408115939399985,
+        "stddev": 1.2484899442951325,
+        "min": -2.24104,
+        "max": 4.89,
+        "median": 1.90104,
+        "skewness": -0.2806655960861833,
+        "excess_kurtosis": -0.05426624375673228,
+        "normality": {
+          "test": "anderson-darling",
+          "statistic": 0.5921181566840075,
+          "critical_value": 0.787,
+          "significance": 0.05,
+          "verdict": "consistent"
+        }
+      },
+      "yield": {
+        "empirical": {
+          "method": "clopper-pearson",
+          "estimate": 0.926,
+          "confidence": 0.95,
+          "confidence_interval": {
+            "low": 0.8994411252535297,
+            "high": 0.9473648914510038
+          },
+          "n": 500
+        },
+        "normal": {
+          "method": "normal-delta",
+          "estimate": 0.9298171349154727,
+          "confidence": 0.95,
+          "confidence_interval": {
+            "low": 0.9127812250866983,
+            "high": 0.946853044744247
+          },
+          "n": 500
+        },
+        "variance_reduced": null
+      },
+      "capability": {
+        "cp": null,
+        "cpk": 0.49147681761513284,
+        "cpk_confidence_interval": {
+          "low": 0.4492462676330636,
+          "high": 0.533707367597202
+        },
+        "sigma_to_spec": 1.4744304528453984,
+        "sigma_to_spec_confidence_interval": {
+          "low": 1.3477388028991908,
+          "high": 1.601122102791606
+        },
+        "limiting_side": "lower"
+      },
+      "sample_size": {
+        "n": 500,
+        "observed_ci_halfwidth": 0.023961883098737036,
+        "target_ci_halfwidth": 0.01,
+        "required_n": 2633,
+        "required_n_for_target": null,
+        "verdict": "insufficient",
+        "method": "normal-approximation",
+        "variance_reduced": null
+      },
+      "negative_control": {
+        "description": "same seed 20261008, sw_stat_mismatch=3: MOS and injected mismatch sigma 3x (DR-0022 s3)",
+        "n": 500,
+        "errored": 0,
+        "failed_unmeasurable": 0,
+        "censored": 0,
+        "yield": {
+          "empirical": {
+            "method": "clopper-pearson",
+            "estimate": 0.686,
+            "confidence": 0.95,
+            "confidence_interval": {
+              "low": 0.6433067215811263,
+              "high": 0.726477101307742
+            },
+            "n": 500
+          },
+          "normal": {
+            "method": "normal-delta",
+            "estimate": 0.6498276171802337,
+            "confidence": 0.95,
+            "confidence_interval": {
+              "low": 0.6161745744996381,
+              "high": 0.6834806598608294
+            },
+            "n": 500
+          },
+          "variance_reduced": null
+        },
+        "nominal_empirical_estimate": 0.926,
+        "degradation_detected": true,
+        "verdict": "detected"
+      },
+      "analytic_cross_check": null,
+      "sampling": {
+        "strategy": "plain_random",
+        "replicates": null,
+        "effective_sample_size": null
+      },
+      "status": "fail",
+      "warnings": [
+        "measurement 's3_margin_pct': N = 500 resolves the yield only to +/-0.0240 at 95% confidence; 2633 samples are needed for the requested +/-0.01",
+        "measurement 's3_margin_pct': the observed pass rate (0.926000) is at or below the 0.99 target, so no sample count can support the claim -- this is the design falling short, not the campaign"
+      ]
+    }
+  ],
+  "warnings": []
+}

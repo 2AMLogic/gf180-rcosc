@@ -25,6 +25,12 @@ sim/mc/
   results/20261106T052000Z/, 20261106T052500Z/, 20261106T053000Z/   pipeline validation (below)
 ```
 
+> **Later run on the DR-0028 netlist (issue #236):** `results/20261112T025135Z/` (reports) and
+> `results/20261112T060000Z/` (graded), made with `run-campaign.sh --dut sim/cmph-fix/rcosc_top_p3_cmphfix.spice`.
+> Row 4 still fails at `ss` (0 %) and row 5 at `ff` (92.6 %). Record:
+> [DR-0032](../../spec/decision-records/0032-rows-4-5-per-die-calibrated-basis-and-monte-carlo-on-dr0028.md).
+> The numbers below describe the pre-DR-0028 P3 netlist.
+
 ## What was run
 
 * **DUT.** The P3 sizing of [DR-0023](../../spec/decision-records/0023-recentre-timing-ladder-for-extracted-parasitics.md)
@@ -110,7 +116,7 @@ resolution.
 ## Reproduce
 
 ```
-sim/mc/run-campaign.sh <new runid> [case ...]     # each case is a klt sim batch request; no local ngspice loop
+sim/mc/run-campaign.sh [--dut <netlist>] <new runid> [case ...]     # each case is a klt sim batch request; no local ngspice loop
 sim/mc/grade.sh <new gradeid> <run dir> [<run dir> ...]
 uv run --no-project --with "klayout-tools==0.8.0" klt signoff --manifest signoff/block-manifest.json --format json > signoff/signoff-report.json
 ```
