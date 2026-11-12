@@ -33,3 +33,6 @@ Row 5 on the real schematic netlist (issue #321, fifth increment): `gen_row5_sch
 L=1u as a same-netlist control). Results: `20261112T170000Z-calib-schematic-coarse` (two tt jobs never returned), `T180000Z-calib-schematic-fine`,
 `T183000Z-calib-schematic-ss` (codes tt 160, ff 85, ss 203), `T190000Z-stage-schematic`, control `T200000Z-calib-schematic-control-l1`,
 `T203000Z-calib-schematic-control-l1-lower`, `T210000Z-stage-schematic-control-l1` (the stage headers still print the old constants). See `spec/decision-records/0040-*.md`.
+
+Row 5 trim range and running Iq on the schematic netlist (issue #321, sixth increment): `T193941Z-ends-schematic` and `...-control-l1` (0x00 / 0xFF ends, via `gen_row5_schematic.py calib`),
+`gen_row5_iq_schematic.py` -> `T194358Z-iq-schematic` and `...-control-l1` (108 cells each; `iq_table.py` -> `table.md`). See `spec/decision-records/0041-*.md`.
