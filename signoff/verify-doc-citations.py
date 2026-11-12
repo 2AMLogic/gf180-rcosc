@@ -38,7 +38,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SIM = REPO_ROOT / "sim"
 SIDECAR = REPO_ROOT / "signoff" / "citations.json"
 
-TS = r"\d{8}T\d{6}Z"
+# A run dir is `<ts>` or `<ts>-<suffix>` (e.g. `20261112T083000Z-w2`); the
+# suffix is part of the dir name, so the full name must exist.
+TS = r"\d{8}T\d{6}Z(?:-[A-Za-z0-9]+(?:[-._][A-Za-z0-9]+)*)?"
 TS_RE = re.compile(rf"(?<![0-9A-Za-z]){TS}(?![0-9A-Za-z])")
 # `<bench>/results|corners/<ts>`, optionally preceded by `sim/` (or ../..).
 FULL_RE = re.compile(rf"(?<![A-Za-z0-9_-])([A-Za-z0-9_-]+)/(results|corners)/({TS})(?![0-9A-Za-z])")

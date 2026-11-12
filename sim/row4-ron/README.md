@@ -11,5 +11,5 @@ python3 -I sim/row4-ron/ron_table.py sim/row4-ron/results/<runid> sim/row4-ron/r
 ```
 
 - `results/20261112T081500Z/`: committed bank (`real`) and the ladder-only reference (`ideal`), `ron_table.md`.
-- `results/20261112T083000Z-w{1.5,2,3}/`: `real` variant only, all pass-device widths scaled by WSCALE (candidate fix); the ideal
+- `row4-ron/results/20261112T083000Z-w1.5/`, `row4-ron/results/20261112T083000Z-w2/`, `row4-ron/results/20261112T083000Z-w3/`: `real` variant only, all pass-device widths scaled by WSCALE (candidate fix); the ideal
   reference is width-independent and is read from the first run.

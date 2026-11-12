@@ -21,7 +21,7 @@ supplies, three temperatures. `ron_table.md` subtracts a ladder-only reference (
 - **Ron rises as VDD falls, and the ladder R does not move.** At `ss`, 27 C, code 0xD4 (the `ss` per-die code), node at 2VDD/3:
   Ron 7.5 kohm at 3.0 V, 5.9 kohm at 3.3 V, 4.8 kohm at 3.6 V (bank total 37.9 kohm at 3.0 V, 35.0 kohm at 3.6 V), ladder-only R identical at all three supplies. Ron(3.0 V)/Ron(3.6 V) = 1.20 / 1.39 / 1.57 at the VDD/3, VDD/2,
   2VDD/3 node levels. The hypothesis in 0033 is **confirmed qualitatively**.
-- Switch width scaling (`results/20261112T083000Z-w{1.5,2,3}`): the 3.0 V -> 3.6 V swing of the bank at 2VDD/3 falls from
+- Switch width scaling (`sim/row4-ron/results/20261112T083000Z-w1.5`, `-w2`, `-w3`): the 3.0 V -> 3.6 V swing of the bank at 2VDD/3 falls from
   2905 ohm to 2039 / 1572 / 1080 ohm at 1.5x / 2x / 3x W (-30 / -46 / -63 %).
 
 ## Stage re-run of the candidate (2x W on every pass device)
