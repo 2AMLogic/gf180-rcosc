@@ -4,6 +4,9 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-12
 
+- **PR #319**: sim,spec: bank pass-gate Ron confirmed as part of the ss RC term; 2x width lever refuted (DR-0034)
+- **PR #318**: docs(spec): stage-level attribution of rows 4/5 on the DR-0028 netlist (DR-0033)
+- **Issue #314** (closed): Rows 4/5: reduce ss supply span and ff hot/low-supply skew (Monte Carlo fails per-die basis)
 - **PR #315**: feat(sim/mc): grade rows 4/5 by Monte Carlo on the DR-0028 netlist (DR-0032)
 - **Issue #236** (closed): Item 6 Monte Carlo: ss row 4 supply span exceeds the ratified window, ff row 5 spread, and controls that do not discriminate
 
