@@ -1,0 +1,31 @@
+* klt sim -- generated corner deck, do not edit
+.lib /opt/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice ss
+.lib /opt/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice res_ss
+.lib /opt/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice mimcap_ss
+.lib /opt/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice cap_mim
+.include /var/tmp/eda-job-klt-sim-f587263fc374/inputs/netlist.cir
+.temp 85.0
+.meas tran i_c0vl AVG i(VP_c0vl) FROM=10n TO=20n
+.meas tran i_c0mid AVG i(VP_c0mid) FROM=10n TO=20n
+.meas tran i_c0vh AVG i(VP_c0vh) FROM=10n TO=20n
+.meas tran i_c1vl AVG i(VP_c1vl) FROM=10n TO=20n
+.meas tran i_c1mid AVG i(VP_c1mid) FROM=10n TO=20n
+.meas tran i_c1vh AVG i(VP_c1vh) FROM=10n TO=20n
+.meas tran i_c2vl AVG i(VP_c2vl) FROM=10n TO=20n
+.meas tran i_c2mid AVG i(VP_c2mid) FROM=10n TO=20n
+.meas tran i_c2vh AVG i(VP_c2vh) FROM=10n TO=20n
+.meas tran i_c3vl AVG i(VP_c3vl) FROM=10n TO=20n
+.meas tran i_c3mid AVG i(VP_c3mid) FROM=10n TO=20n
+.meas tran i_c3vh AVG i(VP_c3vh) FROM=10n TO=20n
+.meas tran i_c4vl AVG i(VP_c4vl) FROM=10n TO=20n
+.meas tran i_c4mid AVG i(VP_c4mid) FROM=10n TO=20n
+.meas tran i_c4vh AVG i(VP_c4vh) FROM=10n TO=20n
+.meas tran i_c5vl AVG i(VP_c5vl) FROM=10n TO=20n
+.meas tran i_c5mid AVG i(VP_c5mid) FROM=10n TO=20n
+.meas tran i_c5vh AVG i(VP_c5vh) FROM=10n TO=20n
+.control
+save all
+tran 100p 20n
+quit
+.endc
+.end
