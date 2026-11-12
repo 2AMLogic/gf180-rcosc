@@ -66,3 +66,26 @@ def test_sensitivity_scale_is_baked_in_not_overridden_by_the_injector_default():
     t1, _ = gc.bench("s1", gc.HDR.format(mm=0, sc=1, extra=" sw_inj=1"), "sw_inj", True, 1.0)
     assert "agauss(0,10.0*" in t10 and "agauss(0,1.0*" in t1
     assert ".param mm_scale=1\n" not in t10
+
+
+def test_default_dut_regenerates_the_committed_inputs_byte_identically(tmp_path):
+    # issue #236: --dut/--out must not change what the default campaign writes
+    gc.main(["--out", str(tmp_path)])
+    here = Path(gc.__file__).parent
+    for f in sorted(tmp_path.iterdir()):
+        assert f.read_text() == (here / f.name).read_text(), f.name
+    assert len(list(tmp_path.iterdir())) == 12 * 2 + 2
+
+
+def test_dut_option_swaps_the_netlist_and_writes_only_to_out(tmp_path):
+    here = Path(gc.__file__).parent
+    dut = here.parent / "cmph-fix" / "rcosc_top_p3_cmphfix.spice"
+    before = {f.name: f.read_text() for f in here.glob("tb_*.spice")}
+    gc.main(["--dut", str(dut), "--out", str(tmp_path)])
+    assert {f.name: f.read_text() for f in here.glob("tb_*.spice")} == before
+    man = json.loads((tmp_path / "mismatch-manifest.json").read_text())
+    assert man["source"] == "sim/cmph-fix/rcosc_top_p3_cmphfix.spice"
+    import hashlib
+    assert man["source_sha256"] == hashlib.sha256(dut.read_bytes()).hexdigest()
+    assert "rcosc_top_p3_cmphfix.spice" in (tmp_path / "tb_main_tt.spice").read_text().splitlines()[0]
+    assert (tmp_path / "tb_main_tt.spice").read_text() != (here / "tb_main_tt.spice").read_text()
