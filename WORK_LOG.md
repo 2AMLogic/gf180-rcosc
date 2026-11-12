@@ -2,6 +2,11 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-12
+
+- **PR #315**: feat(sim/mc): grade rows 4/5 by Monte Carlo on the DR-0028 netlist (DR-0032)
+- **Issue #236** (closed): Item 6 Monte Carlo: ss row 4 supply span exceeds the ratified window, ff row 5 spread, and controls that do not discriminate
+
 ### 2026-11-11
 
 - **PR #309**: sim(trim-dense): campaign slice 40, 42 more sch jobs on batch fleet (906/1536)
