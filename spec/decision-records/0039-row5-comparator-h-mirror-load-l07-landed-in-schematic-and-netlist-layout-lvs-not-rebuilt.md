@@ -21,6 +21,9 @@ Land the edit in the design sources, following the DR-0028 precedent for the ben
 - The five tracked `sim/**/rcosc_top_schematic.spice` bench copies get the same two lines; `sim/trim-transition/provenance.json` and
   `sim/waveform/provenance.json` `source_sha256` / `extracted_sha256` are re-pinned to the new netlist. These are tracked bench inputs, not
   `sim/*/results/*`; archived results keep the netlist they were simulated on (append-only check unaffected).
+- The three generated Monte Carlo groundwork benches `sim/mc-groundwork/tb_fixedcode.spice`, `tb_trimsel_mm.spice` and `tb_trimsel_nomm.spice`
+  inline the DUT from `design/netlist/pvt_tb.spice`; they are regenerated with `python3 sim/mc-groundwork/gen_bench.py` (only the
+  `XMLOADA`/`XMLOADB` lines change, `L=1u` -> `L=0.7u`). `sim/mc-groundwork/results/*` is untouched.
 - `python3 design/check-netlist-consistency.py`: **OK** (was 22 problems with the schematic edit alone).
 
 ## Evidence and what it does not show
