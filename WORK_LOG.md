@@ -4,6 +4,7 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-12
 
+- **PR #328**: sim: row-5 comparator-H mirror-load L 0.7 um stage re-run clears ff hot/low-V (+6.93 -> +1.65 pt); DR-0038
 - **PR #326**: sim,spec: record comparator-H mirror-load L and tail current as the row-5 ff hot/low-V lever
 - **PR #325**: sim(row4-nonron): ss supply span is the bank pass gates, not parasitic C; re-centred 3x-W candidate (DR-0037)
 - **Issue #320** (closed): Row 4: isolate non-Ron ss supply dependence in trim-bank RC term and cut span >= 1.2 pt
