@@ -4,6 +4,11 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-12
 
+- **PR #334**: sim: re-confirm comparator-H L 0.7 um on the rebuilt-layout extraction, ff hot/low-V +1.66 pt (DR-0043)
+- **PR #333**: layout: rebuild comparator-H for mirror-load L 0.7 um, DRC clean and LVS match (DR-0042)
+- **PR #332**: sim: row-5 L 0.7 um trim range and running Iq unchanged on schematic netlist (DR-0041)
+- **PR #331**: sim: re-confirm comparator-H mirror-load L 0.7 um on the real schematic netlist
+- **PR #330**: feat(design): comparator-H mirror-load L 0.7 um in schematic and netlists (DR-0039)
 - **PR #328**: sim: row-5 comparator-H mirror-load L 0.7 um stage re-run clears ff hot/low-V (+6.93 -> +1.65 pt); DR-0038
 - **PR #326**: sim,spec: record comparator-H mirror-load L and tail current as the row-5 ff hot/low-V lever
 - **PR #325**: sim(row4-nonron): ss supply span is the bank pass gates, not parasitic C; re-centred 3x-W candidate (DR-0037)
