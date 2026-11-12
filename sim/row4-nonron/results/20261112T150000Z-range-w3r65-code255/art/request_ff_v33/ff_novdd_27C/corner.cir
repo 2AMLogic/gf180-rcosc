@@ -1,0 +1,30 @@
+* klt sim -- generated corner deck, do not edit
+.lib /opt/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice ff
+.lib /opt/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice res_ff
+.lib /opt/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice mimcap_ff
+.lib /opt/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice cap_mim
+.include /var/tmp/eda-job-klt-sim-0580d82b4a89/inputs/netlist.cir
+.temp 27
+.meas tran ev_a WHEN v(pvc)=v(pvh) RISE=1 TD=700n
+.meas tran ev_a2 WHEN v(pvc)=v(pvh) RISE=2 TD=700n
+.meas tran ev_a3 WHEN v(pvc)=v(pvh) RISE=3 TD=700n
+.meas tran ev_b WHEN v(pcmph)=1.6500 RISE=1 TD=700n
+.meas tran ev_c WHEN v(clk)=1.6500 RISE=1 TD=700n
+.meas tran ev_d WHEN v(pvc)=v(pvl) FALL=1 TD=700n
+.meas tran ev_e WHEN v(pcmpl)=1.6500 RISE=1 TD=700n
+.meas tran ev_f WHEN v(clk)=1.6500 FALL=1 TD=700n
+.meas tran v0 FIND v(pvc) WHEN v(clk)=1.6500 FALL=1 TD=700n
+.meas tran vh AVG v(pvh) FROM=900n TO=1200n
+.meas tran vl AVG v(pvl) FROM=900n TO=1200n
+.meas tran vib AVG v(pibias) FROM=900n TO=1200n
+.meas tran vpb AVG v(ppb) FROM=900n TO=1200n
+.meas tran vcpk MAX v(pvc) FROM=700n TO=1200n
+.meas tran f_ta WHEN v(clk)=1.6500 RISE=5
+.meas tran f_tb WHEN v(clk)=1.6500 RISE=25
+.meas tran fosc PARAM='20/(f_tb-f_ta)'
+.control
+save all
+tran 200p 1200n
+quit
+.endc
+.end
