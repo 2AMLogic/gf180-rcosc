@@ -28,3 +28,8 @@ DR-0028 netlist, row-4 bank switches NOT doubled), `gen_row5_iq.py`, `gen_row5_m
 `20261112T133000Z-calib-ll07-lower` (codes tt 164, ff 79, ss 212), `20261112T140000Z-stage-ll07` (9-request re-run; its header
 still prints the script's old constants), `20261112T143000Z-calib-ll07-ends` (trim ends), `20261112T150000Z-iq-ll07`,
 `20261112T153000Z-mismatch-ll07` (`table.md`). See `spec/decision-records/0038-*.md`.
+
+Row 5 on the real schematic netlist (issue #321, fifth increment): `gen_row5_schematic.py calib|stage OUTDIR ...` (`CONTROL_L1=1` puts MLOADA/MLOADB back to
+L=1u as a same-netlist control). Results: `20261112T170000Z-calib-schematic-coarse` (two tt jobs never returned), `T180000Z-calib-schematic-fine`,
+`T183000Z-calib-schematic-ss` (codes tt 160, ff 85, ss 203), `T190000Z-stage-schematic`, control `T200000Z-calib-schematic-control-l1`,
+`T203000Z-calib-schematic-control-l1-lower`, `T210000Z-stage-schematic-control-l1` (the stage headers still print the old constants). See `spec/decision-records/0040-*.md`.
