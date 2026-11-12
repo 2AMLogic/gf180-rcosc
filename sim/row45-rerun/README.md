@@ -22,3 +22,9 @@ Row 5 (issue #321): `variant.comparator_h_buffer` resizes the comparator-H outpu
 First stage (issue #321, second increment): `variant.first_stage` (pair W / mirror-load L / tail factor) and `gen_screen.py OUTDIR c|d`.
 `results/20261112T110000Z-screen-cmph-first` (set c) and `results/20261112T112000Z-screen-cmph-first` (set d), with `table.md`:
 mirror-load L and tail current are the lever; see `spec/decision-records/0036-*.md`.
+
+Row 5 candidate (issue #321, third increment): `gen_row5_candidate.py calib|stage OUTDIR 0.7 ...` (comparator-H mirror-load L 0.7 um on the
+DR-0028 netlist, row-4 bank switches NOT doubled), `gen_row5_iq.py`, `gen_row5_mismatch.py`. Results: `20261112T130000Z-calib-ll07` and
+`20261112T133000Z-calib-ll07-lower` (codes tt 164, ff 79, ss 212), `20261112T140000Z-stage-ll07` (9-request re-run; its header
+still prints the script's old constants), `20261112T143000Z-calib-ll07-ends` (trim ends), `20261112T150000Z-iq-ll07`,
+`20261112T153000Z-mismatch-ll07` (`table.md`). See `spec/decision-records/0038-*.md`.
