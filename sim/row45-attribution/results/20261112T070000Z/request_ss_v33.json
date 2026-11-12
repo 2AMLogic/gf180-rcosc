@@ -1,0 +1,128 @@
+{
+  "netlist": "tb_ss_v33.spice",
+  "engine": "ngspice",
+  "netlist_source": "extracted",
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "ss",
+        "sections": [
+          "ss",
+          "res_ss",
+          "mimcap_ss",
+          "cap_mim"
+        ]
+      }
+    ],
+    "temperature_c": [
+      -40.0,
+      27.0,
+      85.0
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "200p 1200n"
+  },
+  "measurements": [
+    {
+      "name": "ev_a",
+      "spice": ".meas tran ev_a WHEN v(pvc)=v(pvh) RISE=1 TD=700n",
+      "unit": "s"
+    },
+    {
+      "name": "ev_a2",
+      "spice": ".meas tran ev_a2 WHEN v(pvc)=v(pvh) RISE=2 TD=700n",
+      "unit": "s"
+    },
+    {
+      "name": "ev_a3",
+      "spice": ".meas tran ev_a3 WHEN v(pvc)=v(pvh) RISE=3 TD=700n",
+      "unit": "s"
+    },
+    {
+      "name": "ev_b",
+      "spice": ".meas tran ev_b WHEN v(pcmph)=1.6500 RISE=1 TD=700n",
+      "unit": "s"
+    },
+    {
+      "name": "ev_c",
+      "spice": ".meas tran ev_c WHEN v(clk)=1.6500 RISE=1 TD=700n",
+      "unit": "s"
+    },
+    {
+      "name": "ev_d",
+      "spice": ".meas tran ev_d WHEN v(pvc)=v(pvl) FALL=1 TD=700n",
+      "unit": "s"
+    },
+    {
+      "name": "ev_e",
+      "spice": ".meas tran ev_e WHEN v(pcmpl)=1.6500 RISE=1 TD=700n",
+      "unit": "s"
+    },
+    {
+      "name": "ev_f",
+      "spice": ".meas tran ev_f WHEN v(clk)=1.6500 FALL=1 TD=700n",
+      "unit": "s"
+    },
+    {
+      "name": "v0",
+      "spice": ".meas tran v0 FIND v(pvc) WHEN v(clk)=1.6500 FALL=1 TD=700n",
+      "unit": "V"
+    },
+    {
+      "name": "vh",
+      "spice": ".meas tran vh AVG v(pvh) FROM=900n TO=1200n",
+      "unit": "V"
+    },
+    {
+      "name": "vl",
+      "spice": ".meas tran vl AVG v(pvl) FROM=900n TO=1200n",
+      "unit": "V"
+    },
+    {
+      "name": "vib",
+      "spice": ".meas tran vib AVG v(pibias) FROM=900n TO=1200n",
+      "unit": "V"
+    },
+    {
+      "name": "vpb",
+      "spice": ".meas tran vpb AVG v(ppb) FROM=900n TO=1200n",
+      "unit": "V"
+    },
+    {
+      "name": "vcpk",
+      "spice": ".meas tran vcpk MAX v(pvc) FROM=700n TO=1200n",
+      "unit": "V"
+    },
+    {
+      "name": "f_ta",
+      "spice": ".meas tran f_ta WHEN v(clk)=1.6500 RISE=5",
+      "unit": "s"
+    },
+    {
+      "name": "f_tb",
+      "spice": ".meas tran f_tb WHEN v(clk)=1.6500 RISE=25",
+      "unit": "s"
+    },
+    {
+      "name": "fosc",
+      "spice": ".meas tran fosc PARAM='20/(f_tb-f_ta)'",
+      "unit": "Hz"
+    }
+  ],
+  "batch": {
+    "capacity_wait_s": 600
+  },
+  "options": {
+    "timeout_s": 3600,
+    "keep_artifacts": true,
+    "ngspice_init": [
+      "set measureprec=8"
+    ]
+  }
+}
