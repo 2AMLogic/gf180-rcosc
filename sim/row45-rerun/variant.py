@@ -27,6 +27,26 @@ def double_bank_switches(text: str, k: float = 2.0) -> str:
     return "\n".join(out)
 
 
+BUF_N = re.compile(r"^(X\$21 \S+ \S+ \S+ \S+ nfet_03v3 L=)([\d.]+)U W=([\d.]+)U AS=\S+ AD=\S+ PS=\S+ PD=\S+$")
+BUF_P = re.compile(r"^(X\$67 \S+ \S+ \S+ \S+ pfet_03v3 L=)([\d.]+)U W=([\d.]+)U AS=\S+ AD=\S+ PS=\S+ PD=\S+$")
+
+
+def comparator_h_buffer(text: str, wn: float = 1.0, wp: float = 4.0, ln: float = 0.5, lp: float = 0.5) -> str:
+    """Row-5 candidates: resize the comparator-H output inverter (X$21 = MBUFN, X$67 = MBUFP in the flat extraction).
+    AS/AD/PS/PD are re-derived by the extractor's rule (area = W x 0.42 um, perimeter = 2 (W + 0.42 um))."""
+    out, n = [], 0
+    for line in text.split("\n"):
+        for rx, w, l in ((BUF_N, wn, ln), (BUF_P, wp, lp)):
+            m = rx.match(line)
+            if m:
+                head = m.group(0).split(" L=")[0]
+                line = f"{head} L={fmt(l)}U W={fmt(w)}U AS={fmt(w * 0.42)}P AD={fmt(w * 0.42)}P PS={fmt(2 * (w + 0.42))}U PD={fmt(2 * (w + 0.42))}U"
+                n += 1
+        out.append(line)
+    assert n == 2, n
+    return "\n".join(out)
+
+
 def build(text: str) -> str:
     """Apply every #317 variant change to the extracted P3 netlist text."""
     return double_bank_switches(text)
