@@ -18,3 +18,7 @@ Row 5 (issue #321): `variant.comparator_h_buffer` resizes the comparator-H outpu
 `gen_screen.py OUTDIR [a|b]` writes the screening requests (ff median die, code 0x4E, 3.3 V / 27 C reference + 3.0 V at -40 / 85 C),
 `screen_table.py RESULT_DIR` tabulates them. `results/20261112T100000Z-screen-cmph` (set a) and `results/20261112T101500Z-screen-cmph`
 (set b): no variant helps; see `spec/decision-records/0035-*.md`.
+
+First stage (issue #321, second increment): `variant.first_stage` (pair W / mirror-load L / tail factor) and `gen_screen.py OUTDIR c|d`.
+`results/20261112T110000Z-screen-cmph-first` (set c) and `results/20261112T112000Z-screen-cmph-first` (set d), with `table.md`:
+mirror-load L and tail current are the lever; see `spec/decision-records/0036-*.md`.
