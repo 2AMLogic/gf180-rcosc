@@ -1,0 +1,48 @@
+{
+  "netlist": "tb_base.spice",
+  "engine": "ngspice",
+  "netlist_source": "extracted",
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "ff",
+        "sections": [
+          "ff",
+          "res_ff",
+          "mimcap_ff",
+          "cap_mim"
+        ]
+      }
+    ],
+    "temperature_c": [
+      -40.0,
+      27.0,
+      85.0
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "200p 1200n"
+  },
+  "measurements": [
+    {
+      "name": "iq",
+      "spice": ".meas tran iq AVG i(VDD) FROM=900n TO=1200n",
+      "unit": "A"
+    }
+  ],
+  "batch": {
+    "capacity_wait_s": 600
+  },
+  "options": {
+    "timeout_s": 1800,
+    "keep_artifacts": true,
+    "ngspice_init": [
+      "set measureprec=8"
+    ]
+  }
+}
