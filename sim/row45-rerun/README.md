@@ -13,3 +13,8 @@ re-derived by the extractor's own rule). Append-only.
   reference-point `code` column; the codes actually simulated are tt 171, ff 80, ss 218 (`tb_*.spice`).
 
 Result and interpretation: `spec/decision-records/0034-*.md`.
+
+Row 5 (issue #321): `variant.comparator_h_buffer` resizes the comparator-H output inverter (X$21 MBUFN, X$67 MBUFP);
+`gen_screen.py OUTDIR [a|b]` writes the screening requests (ff median die, code 0x4E, 3.3 V / 27 C reference + 3.0 V at -40 / 85 C),
+`screen_table.py RESULT_DIR` tabulates them. `results/20261112T100000Z-screen-cmph` (set a) and `results/20261112T101500Z-screen-cmph`
+(set b): no variant helps; see `spec/decision-records/0035-*.md`.
