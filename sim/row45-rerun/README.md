@@ -36,3 +36,6 @@ L=1u as a same-netlist control). Results: `20261112T170000Z-calib-schematic-coar
 
 Row 5 trim range and running Iq on the schematic netlist (issue #321, sixth increment): `T193941Z-ends-schematic` and `...-control-l1` (0x00 / 0xFF ends, via `gen_row5_schematic.py calib`),
 `gen_row5_iq_schematic.py` -> `T194358Z-iq-schematic` and `...-control-l1` (108 cells each; `iq_table.py` -> `table.md`). See `spec/decision-records/0041-*.md`.
+
+Row 5 on the extraction of the rebuilt layout (issue #321, eighth increment): `T200335Z-extract-l07` (`sim/cmph-fix/gen_dut.py --out`, klayout-tools 0.4.0 venv), `gen_row5_extracted.py calib|stage OUTDIR ...` (frequency only; the old probe nets do not apply),
+`T201500Z-calib-extracted-l07` (codes tt 164, ff 79, ss 212), `T203500Z-stage-extracted-l07` (`table.py` -> `table.md`). See `spec/decision-records/0043-*.md`.
