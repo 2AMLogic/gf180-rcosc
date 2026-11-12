@@ -1,0 +1,56 @@
+{
+  "netlist": "tb_ss_cC8.spice",
+  "engine": "ngspice",
+  "netlist_source": "extracted",
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "ss",
+        "sections": [
+          "ss",
+          "res_ss",
+          "mimcap_ss",
+          "cap_mim"
+        ]
+      }
+    ],
+    "temperature_c": [
+      27.0
+    ]
+  },
+  "analysis": {
+    "kind": "tran",
+    "args": "200p 1200n"
+  },
+  "measurements": [
+    {
+      "name": "f_ta",
+      "spice": ".meas tran f_ta WHEN v(clk)=1.6500 RISE=5",
+      "unit": "s"
+    },
+    {
+      "name": "f_tb",
+      "spice": ".meas tran f_tb WHEN v(clk)=1.6500 RISE=25",
+      "unit": "s"
+    },
+    {
+      "name": "fosc",
+      "spice": ".meas tran fosc PARAM='20/(f_tb-f_ta)'",
+      "unit": "Hz"
+    }
+  ],
+  "batch": {
+    "capacity_wait_s": 600
+  },
+  "options": {
+    "timeout_s": 1800,
+    "keep_artifacts": true,
+    "ngspice_init": [
+      "set measureprec=8"
+    ]
+  }
+}
