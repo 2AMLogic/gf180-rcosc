@@ -74,7 +74,7 @@ N 420 30 420 50 {}
 C {lab_pin.sym} 420 50 0 0 {name=l11 lab=tail}
 N 420 0 440 0 {}
 C {lab_pin.sym} 440 0 0 0 {name=l12 lab=vss}
-C {symbols/pfet_03v3.sym} 600 0 0 0 {name=MLOADA model=pfet_03v3 W=4u L=1u nf=1 m=1}
+C {symbols/pfet_03v3.sym} 600 0 0 0 {name=MLOADA model=pfet_03v3 W=4u L=0.7u nf=1 m=1}
 N 620 30 620 50 {}
 C {lab_pin.sym} 620 50 0 0 {name=l13 lab=dn}
 N 580 0 560 0 {}
@@ -83,7 +83,7 @@ N 620 -30 620 -50 {}
 C {lab_pin.sym} 620 -50 0 0 {name=l15 lab=vdd}
 N 620 0 640 0 {}
 C {lab_pin.sym} 640 0 0 0 {name=l16 lab=vdd}
-C {symbols/pfet_03v3.sym} 800 0 0 0 {name=MLOADB model=pfet_03v3 W=4u L=1u nf=1 m=1}
+C {symbols/pfet_03v3.sym} 800 0 0 0 {name=MLOADB model=pfet_03v3 W=4u L=0.7u nf=1 m=1}
 N 820 30 820 50 {}
 C {lab_pin.sym} 820 50 0 0 {name=l17 lab=dp}
 N 780 0 760 0 {}
