@@ -2,6 +2,11 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-13
+
+- **PR #336**: sim: row-5 comparator-H L 0.7 um trim range and running Iq on the rebuilt-layout extraction (DR-0044)
+- **Issue #321** (closed): Row 5: make comparator-H trip track supply to fix ff hot/low-V delay collapse
+
 ### 2026-11-12
 
 - **PR #334**: sim: re-confirm comparator-H L 0.7 um on the rebuilt-layout extraction, ff hot/low-V +1.66 pt (DR-0043)
