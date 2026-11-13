@@ -4,6 +4,7 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-13
 
+- **PR #339**: sim: w3r65 bank candidate on the rebuilt-layout extraction clears ss span 4.68 pt, 0xFF running Iq +18..28 % (DR-0045)
 - **PR #336**: sim: row-5 comparator-H L 0.7 um trim range and running Iq on the rebuilt-layout extraction (DR-0044)
 - **Issue #321** (closed): Row 5: make comparator-H trip track supply to fix ff hot/low-V delay collapse
 
