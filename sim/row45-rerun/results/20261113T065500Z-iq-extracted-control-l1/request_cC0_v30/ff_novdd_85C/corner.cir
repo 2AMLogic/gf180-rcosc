@@ -1,0 +1,18 @@
+* klt sim -- generated corner deck, do not edit
+.lib /opt/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice ff
+.lib /opt/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice res_ff
+.lib /opt/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice mimcap_ff
+.lib /opt/pdk/gf180mcuC/libs.tech/ngspice/sm141064.ngspice cap_mim
+.include /var/tmp/eda-job-klt-sim-2bd63cb6db93/inputs/netlist.cir
+.temp 85.0
+.meas tran f_ta WHEN v(clk)=1.5000 RISE=5
+.meas tran f_tb WHEN v(clk)=1.5000 RISE=25
+.meas tran q_a FIND v(qint) WHEN v(clk)=1.5000 RISE=5
+.meas tran q_b FIND v(qint) WHEN v(clk)=1.5000 RISE=25
+.meas tran iq_run PARAM='(q_b-q_a)*1n/(f_tb-f_ta)'
+.control
+save all
+tran 200p 4000n
+quit
+.endc
+.end

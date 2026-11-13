@@ -39,3 +39,6 @@ Row 5 trim range and running Iq on the schematic netlist (issue #321, sixth incr
 
 Row 5 on the extraction of the rebuilt layout (issue #321, eighth increment): `T200335Z-extract-l07` (`sim/cmph-fix/gen_dut.py --out`, klayout-tools 0.4.0 venv), `gen_row5_extracted.py calib|stage OUTDIR ...` (frequency only; the old probe nets do not apply),
 `T201500Z-calib-extracted-l07` (codes tt 164, ff 79, ss 212), `T203500Z-stage-extracted-l07` (`table.py` -> `table.md`). See `spec/decision-records/0043-*.md`.
+
+Row 5 trim range and running Iq on the extraction of the rebuilt layout (issue #321, ninth increment): `T064105Z-ends-extracted-l07` / `T065500Z-ends-extracted-control-l1` (`gen_row5_extracted.py calib`),
+`gen_row5_iq_extracted.py` -> `T064105Z-iq-extracted-l07` / `T065500Z-iq-extracted-control-l1` (`CONTROL_L1=1` = extraction of the old layout, `sim/cmph-fix/`; `iq_table.py` -> `table.md`). See `spec/decision-records/0044-*.md`.

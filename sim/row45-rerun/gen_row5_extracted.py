@@ -19,7 +19,9 @@ sys.path.insert(0, str(HERE))
 import gen_calib_requests as gc  # noqa: E402
 import gen_stage_requests as gs  # noqa: E402
 
-SRC = HERE / "results" / "20261112T200335Z-extract-l07" / "rcosc_top_p3_cmphfix.spice"
+import os  # noqa: E402
+CONTROL_L1 = os.environ.get("CONTROL_L1") == "1"  # control: extraction of the OLD layout (L=1u loads), sim/cmph-fix/
+SRC = (HERE.parent / "cmph-fix" / "rcosc_top_p3_cmphfix.spice") if CONTROL_L1 else (HERE / "results" / "20261112T200335Z-extract-l07" / "rcosc_top_p3_cmphfix.spice")
 
 if __name__ == "__main__":
     mode, out = sys.argv[1], Path(sys.argv[2])
