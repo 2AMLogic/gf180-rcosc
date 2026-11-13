@@ -33,27 +33,27 @@ _None._
 Issues currently being built (`loom:building`).
 
 - **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b)
-- **#321**: Row 5: make comparator-H trip track supply to fix ff hot/low-V delay collapse
 
 ## PRs Awaiting Review
 
 PRs waiting on Judge (`loom:review-requested`).
 
-- **#312**: sim(trim-dense): run slice 41, 42 more sch_ff curve jobs on batch fleet (948/1536)
+_None._
 
 ## Approved (Awaiting Merge)
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#312**: sim(trim-dense): run slice 41, 42 more sch_ff curve jobs on batch fleet (948/1536)
 
 ## Proposed
 
 Issues carrying `loom:curated`.
 
 - **#87**: Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b) *(curated)*
+- **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5 *(curated)*
 - **#204**: Move layout geometry pin klt 0.4.0 → 0.8.0 and regenerate committed cells/reports *(curated)*
-- **#321**: Row 5: make comparator-H trip track supply to fix ff hot/low-V delay collapse *(curated)*
+- **#337**: Row 4 ss span: adopt and verify the DR-0037 w3r65 bank candidate (needs operator ruling on one re-centred change) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -71,10 +71,10 @@ _None._
 | Very important | 0 |
 | Important | 2 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
-| PRs awaiting review | 1 |
-| Approved PRs awaiting merge | 0 |
-| Curated | 3 |
+| In Progress (`loom:building`) | 1 |
+| PRs awaiting review | 0 |
+| Approved PRs awaiting merge | 1 |
+| Curated | 4 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
