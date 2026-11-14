@@ -16,7 +16,9 @@ GEN = HERE / "gen_requests.py"
 
 # Row table lines look like "| 4 | ... |".
 ROW_RE = re.compile(r"^\|\s*(\d+)\s*\|")
-PATH_RE = re.compile(r"`((?:\.\./startup/|requests/)[A-Za-z0-9_./*<>-]+\.json)`")
+PATH_RE = re.compile(r"`((?:\.\./startup-settled/|\.\./startup/|requests/)[A-Za-z0-9_./*<>-]+\.json)`")
+# results/ run directories cited in the row cells (startup-settled only; #346)
+RESULTS_RE = re.compile(r"`\.\./startup-settled/results/([A-Za-z0-9_.-]+)/`")
 
 
 def table_rows():
@@ -43,6 +45,16 @@ def test_every_row_is_mapped_or_a_declared_gap():
     for l in table_rows():
         cells = [c.strip() for c in l.strip().strip("|").split("|")]
         assert cells[2] != "none" or "declared gap" in cells[4], l
+
+
+def test_row9_startup_results_directories_exist():
+    """Row 9's cited startup-settled result runs must exist (issue #346)."""
+    (row9,) = [l for l in table_rows() if ROW_RE.match(l).group(1) == "9"]
+    runs = RESULTS_RE.findall(row9)
+    assert runs, "row 9 must cite at least one startup-settled results run"
+    base = HERE.parent / "startup-settled" / "results"
+    for run in runs:
+        assert (base / run / "summary.md").is_file(), run
 
 
 def test_cited_requests_exist():
