@@ -163,15 +163,20 @@ load-bearing, and discovered the hard way on issue #44's re-spin):** every
 per-cell DRC/extract/LVS report in `layout/reports/` records the toolchain
 that produced the committed cells — `klt 0.4.0` with `klayout 0.30.12` —
 and byte-identical cell reproduction (and the re-spin's own bias/top
-evidence) holds under exactly that pair, while `klt erc` requires the
-newer build `layout/run_checks.sh` pins for it (`klt 0.5.0+g2b1e55e51bb8…`,
-the same version string `reports/rcosc_top.erc.json` records), and `klt
-signoff` grading uses the build `signoff/README.md` pins (currently the
-klayout-tools 0.7.0 release; `3a75c3ae…` from issue #64 until issue #72). The
-ERC and grader pins differ on purpose: the `3a75c3ae` grader build's `klt erc` refuses the committed supply spec's
+evidence) holds under exactly that pair, while `klt erc` requires a newer
+build — the one `layout/run_checks.sh` pins — and `klt signoff` grading
+uses the build `signoff/README.md` pins. For the value of either, read
+`signoff/README.md`'s "**The grader pin is load-bearing.**" statement and
+the `ERC_KLT` comment in `layout/run_checks.sh`; this file deliberately
+does not restate it. Since issue #203 the two are the **same** build: the
+newer graders' `klt erc` once refused the committed supply spec's
 `_comment` annotation
 ([klayout-tools#2822](https://github.com/2AMLogic/klayout-tools/issues/2822)),
-while its `klt signoff` accepts the committed ERC envelope unchanged. `klt gen`'s
+and now that it is closed the pinned build reads that spec unchanged, so
+the ERC and grader pins no longer differ. The committed
+`reports/rcosc_top.erc.json` is still the earlier `0.5.0+g2b1e55e51bb8`
+build's output and records that version string; it is rewritten only when
+`run_checks.sh` regenerates `layout/reports/`. `klt gen`'s
 drawn output is **not stable across `klayout-tools` versions**: the
 0.5.0-era generators render `res_array` footprints and an output grid
 that differ from the 0.4.0 era, so under a newer `klt` alone
@@ -400,7 +405,7 @@ included for completeness — one worked as documented, needing no new issue):
   (reproduced four ways in `gf180-drone-fc`'s FRICTION F-034). Hit here
   while building the T1 item-11 supply spec ("Supply ERC" above):
   originally worked around by committing the spec without `ties[]`;
-  the ERC build (`0.5.0+g2b1e55e51bb8`, the `layout/run_checks.sh` pin) ships the fix — a declared
+  the ERC build (`0.5.0+g2b1e55e51bb8`) ships the fix — a declared
   well is never a conductor, a tie contributes only its `tap_requires`
   tap sites, and `ties[]` runs in an extraction that cannot alter any
   other rule — so the spec now declares the tie (`Comp` intersected
