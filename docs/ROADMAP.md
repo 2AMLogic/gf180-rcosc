@@ -54,18 +54,18 @@ and items 5 and 6 now have campaigns behind them.
    jobs, `analyze.py` output is committed, and a decision record states each of
    the four DR-0021 carries confirmed or refuted. PR #312 (948 of 1536) is
    approved and unmerged.
-2. **Re-run the startup bench on the current netlist** (no issue yet).
+2. **Re-run the startup bench on the current netlist** ([#346](https://github.com/2AMLogic/gf180-rcosc/issues/346), filed, `loom:triage`).
    Comparator-H caused the earlier no-start and has changed since the last
    startup run. Done when a new `sim/startup-settled/results/<stamp>/` reports
    all 63 points on the L 0.7 um netlist at code `0xA4` (the last run held `0xA9`).
-3. **Attribute running Iq at the `ff` corners by stage** (no issue yet).
+3. **Attribute running Iq at the `ff` corners by stage** ([#347](https://github.com/2AMLogic/gf180-rcosc/issues/347), filed, `loom:triage`).
    Done when a new `sim/` results directory and a decision record give the
    per-stage supply current at the cells over 500 uA and name the candidate
    lever, with no design file changed.
-4. **Make `layout/run_checks.sh` runnable end to end under its pins** (no issue yet). DR-0042 records that the geometry pin (klt 0.4.0) lacks the
+4. **Make `layout/run_checks.sh` runnable end to end under its pins** ([#348](https://github.com/2AMLogic/gf180-rcosc/issues/348), filed, `loom:triage`). DR-0042 records that the geometry pin (klt 0.4.0) lacks the
    `klt netlist` command the script's first step calls. Done when one
    documented invocation completes and the preflight test covers it.
-5. **Refresh the README status block and maturity-ladder paragraph** (no issue yet). Done when both match `signoff/README.md` and this file, and no
+5. **Refresh the README status block and maturity-ladder paragraph** ([#349](https://github.com/2AMLogic/gf180-rcosc/issues/349), filed, `loom:triage`). Done when both match `signoff/README.md` and this file, and no
    closed issue is named as owning open work.
 
 ## Next
@@ -122,7 +122,8 @@ and items 5 and 6 now have campaigns behind them.
   on 2026-11-11 and still carries a blocked label.
 
 Apart from #87, in progress, nothing in the tracker is dispatchable today; Now
-items 2 to 5 become dispatchable once filed.
+items 2 to 5 are filed as `loom:triage` (#346 to #349) and become dispatchable once
+curated and promoted.
 
 ## Not planned
 
