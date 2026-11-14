@@ -155,6 +155,13 @@ layout/        GDS + DRC/LVS reports (klayout-tools driven)
 measurements/  silicon characterization (empty until tape-out)
 ```
 
+The offline test suites are enumerated as a matrix of isolated jobs in
+[`.github/workflows/offline-suites.yml`](.github/workflows/offline-suites.yml)
+— run one at a time locally (e.g. `python3 -m pytest -p no:cacheprovider
+sim/waveform/test_harness.py`); there is no repo-wide `pytest` entry point,
+because several benches share the `test_harness.py` basename, which makes a
+single rootdir-relative collection collide.
+
 ## Chipalooza
 
 [`docs/chipalooza/challenge-5-proposal.md`](docs/chipalooza/challenge-5-proposal.md)
