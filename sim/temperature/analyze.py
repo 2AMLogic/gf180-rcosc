@@ -355,8 +355,7 @@ def write_run(out: Path, result: dict, manifest: dict, metas, synthetic: bool, n
                             "status": r["status"], "f_hz": r.get("f_hz"), "norm_ppm": r.get("norm_ppm"),
                             "report": r.get("report")})
 
-    def g(x, f="%.4g"):
-        return "-" if x is None else f % x
+    g = tp.evidence_common.dash
     L = [f"# Interior-temperature analysis {out.name}", "", f"**{label}**", "",
          f"Overall status: **{result['status']}**. Tolerance {TOL_PPM:g} ppm of f27 is a diagnostic, "
          "not a spec. Schematic equivalence with the calibration revision: "
