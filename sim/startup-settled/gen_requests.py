@@ -9,7 +9,8 @@ pre-re-centre schematic at 0xA3.  Corner grid: 7 process x 3 T per request, one 
 per supply (a PWL supply cannot take a supply_v alter) = 63 points -> batch fleet.
 sim/startup/ (issue #82) is not modified.
 
-Usage: python3 gen_requests.py [--out DIR]   # default: this directory; deterministic
+Usage: python3 gen_requests.py [--out DIR] [--dut PATH] [--code HEX]
+       # default: this directory, the settled P3 netlist, code 0xA9; deterministic
 """
 import argparse
 import json
@@ -21,7 +22,7 @@ REPO = HERE.parent.parent
 sys.path.insert(0, str(REPO / "sim" / "pvt"))
 from pvt_sweep import PROCESS_CORNERS, TEMPS_C, VDDS_V  # noqa: E402
 
-CODE = 0xA9
+DEFAULT_CODE = 0xA9  # settled-netlist calibration code (issue #227); --code overrides
 RAMP_NS = 1000
 TSTOP_NS = 20000
 SRC = REPO / "sim" / "recentre" / "p3" / "rcosc_top_p3.spice"
@@ -32,17 +33,17 @@ def tag(vdd):
     return f"v{int(round(vdd * 10)):02d}"
 
 
-def testbench(vdd):
+def testbench(vdd, code=DEFAULT_CODE):
     r = RAMP_NS
     lines = [
-        f"* rcosc_top settled-netlist startup bench, VDD ramp 0->{vdd:g} V in {r} ns, trim 0x{CODE:02X} (gen_requests.py)",
+        f"* rcosc_top settled-netlist startup bench, VDD ramp 0->{vdd:g} V in {r} ns, trim 0x{code:02X} (gen_requests.py)",
         ".param sw_stat_global=0 sw_stat_mismatch=0 mc_skew=3 res_mc_skew=3 cap_mc_skew=3 fnoicor=0",
         f'.include "{DUT}"',
         "XXDUT vdd 0 clk t0 t1 t2 t3 t4 t5 t6 t7 rcosc_top",
         f"VDD vdd 0 PWL(0 0 {r}n {vdd:g})",
     ]
     for i in range(8):
-        lines.append(f"VT{i} t{i} 0 PWL(0 0 {r}n {vdd:g})" if (CODE >> i) & 1 else f"VT{i} t{i} 0 DC 0")
+        lines.append(f"VT{i} t{i} 0 PWL(0 0 {r}n {vdd:g})" if (code >> i) & 1 else f"VT{i} t{i} 0 DC 0")
     lines.append(".save v(clk) v(vdd)")
     return "\n".join(lines) + "\n"
 
@@ -76,13 +77,16 @@ def main():
     ap.add_argument("--dut", type=Path, default=None,
                     help="netlist to copy in as rcosc_top_p3.spice instead of the settled P3 netlist "
                          "(e.g. sim/cmph-fix/rcosc_top_p3_cmphfix.spice, issue #229)")
+    ap.add_argument("--code", type=lambda s: int(s, 0), default=DEFAULT_CODE,
+                    help="trim code as a hex literal, e.g. 0xA4 (default: 0xA9, the settled-netlist "
+                         "calibration code); sets which VT{i} trim sources ramp with VDD (issue #346)")
     a = ap.parse_args()
     out = a.out
     src = a.dut if a.dut is not None else SRC
     out.mkdir(parents=True, exist_ok=True)
     (out / DUT).write_text(src.read_text())
     for v in VDDS_V:
-        (out / f"tb_{tag(v)}.spice").write_text(testbench(v))
+        (out / f"tb_{tag(v)}.spice").write_text(testbench(v, a.code))
         (out / f"request_{tag(v)}.json").write_text(json.dumps(request(v), indent=2) + "\n")
 
 
