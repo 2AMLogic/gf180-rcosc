@@ -2,6 +2,17 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-14
+
+- **PR #355**: chore: drop package.json's dead scripts block, document the real test entry point
+- **PR #354**: refactor(layout): drop never-read Placed/Port members from gen_lib
+- **PR #350**: refactor(layout): collapse the trim bank's duplicate MOS reference-card writer
+- **PR #345**: docs: roadmap as of 2026-11-13
+- **PR #312**: sim(trim-dense): run slice 41, 42 more sch_ff curve jobs on batch fleet (948/1536)
+- **Issue #352** (closed): Remove package.json's dead scripts block: four exit-0 stubs and one missing-helper alias
+- **Issue #344** (closed): Remove dead Placed/Port members from layout/gen_lib.py: x1_um, y1_um, bbox_um, Placed.name, Port.direction_deg
+- **Issue #343** (closed): Remove _trim_mos_ref_card: duplicate of _mos_ref_card, verified output-neutral to merge
+
 ### 2026-11-13
 
 - **PR #339**: sim: w3r65 bank candidate on the rebuilt-layout extraction clears ss span 4.68 pt, 0xFF running Iq +18..28 % (DR-0045)
