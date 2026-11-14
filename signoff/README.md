@@ -123,10 +123,6 @@ unchanged manifest was graded under both builds:
   needed. Item 11's ERC half was written by the old build. The new grader
   re-reads the spec it names and verifies the recorded spec hash, and grades
   it `met`, so no ERC regeneration was needed either.
-- Not moved: `layout/run_checks.sh` keeps running `klt erc` on the
-  `2b1e55e5` build. The `3a75c3ae` build's `klt erc` refuses
-  `layout/erc-supply-spec.json` because of its `_comment` annotation key
-  (klayout-tools#2822). See the comment above `ERC_KLT` in that script.
 
 ## Current verdict, and the claims behind each row
 
@@ -256,10 +252,9 @@ block — neither question was *asked* by this compare, so the match says
 nothing about per-instance power pin-to-net reach or body ties. The supply
 question itself is now item 11's, graded met (see the met-item-11 section
 below) from this same envelope's `net_correspondence` rows plus an ERC
-half written by a post-0.4.0 build (`2b1e55e5`, the ERC pin in
-`layout/run_checks.sh`); the `power_connectivity`/`body_verification`
-blocks stay unasked by this pair, which is why item 11's analog branch
-does not lean on them.
+half written by a post-0.4.0 build (`2b1e55e5`); the
+`power_connectivity`/`body_verification` blocks stay unasked by this pair,
+which is why item 11's analog branch does not lean on them.
 
 ### met — item 8 (Characterization report): `signoff/characterization-envelope.json`
 
@@ -318,9 +313,9 @@ grader does not grade:
   nets as pins — the analog branch's "the reference includes the supply
   nets" clause, satisfied by a SPICE reference by construction. This
   resolves the LVS-envelope open question of issue #42 by grader output:
-  the freshly graded committed report shows the pinned grader (both the
-  previous `2b1e55e5` pin and the current `3a75c3ae` one) accepting the
-  committed klt-0.4.0-era envelope on this branch — no LVS regeneration
+  the freshly graded committed report shows the pinned grader (every
+  grader pin this repo has used) accepting the committed klt-0.4.0-era
+  envelope on this branch — no LVS regeneration
   was needed, and with no PDN citation the `power_connectivity` block the
   PDN branch would read is never consulted (`power_connectivity_status`
   is `null` in the citation, and that null is why the analog branch, not
@@ -431,8 +426,9 @@ mechanical grade stays `no_evidence`. The grid was not run locally. This item
 stays open until the fleet can run `gf180mcuC` (or the PDK variant question is
 otherwise settled) and the three requests return finite values on both legs.
 
-The grader pin (0.7.0) and the batch client/runner (0.7.0) agree, so no
-pin move is needed for this item.
+At the time of this campaign the batch client and runner agreed at 0.7.0,
+so nothing about this item's status turns on a version disagreement
+between them.
 
 One single-corner local probe (tt / 27 C / 3.3 V, `0xA3`) is committed at
 `sim/pvt-postlayout/results/20261008T220500Z/klt-pex-probe/`, produced by the
