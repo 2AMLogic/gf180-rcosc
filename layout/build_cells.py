@@ -990,26 +990,6 @@ def _write_reference_netlist_trim_bank(devices: dict, path: Path, ctx: dict) -> 
     path.write_text("\n".join(lines))
 
 
-def _trim_mos_ref_card(name: str, d: Device) -> str:
-    """One MOS subckt-call line for the trim bank's LVS reference netlist.
-
-    Same two disclosed rewrites as `_mos_ref_card` (NMOS body -> `vsubs`;
-    `nf=1` at the schematic's total width -- every post-#43 trim MOS is
-    `nf=1`, so the respell is exact), plus one trim-specific normalization:
-    `W`/`L` literals are re-emitted from the parsed micrometre value rather
-    than passed through verbatim, because the post-#43 schematic spells the
-    transmission-gate widths with xschem's double-u micrometre suffix
-    (`W=24uu`), a spelling `klt`'s reference normalizer is not documented to
-    accept -- `24u` is the same value in the canonical spelling."""
-    d_net, g_net, s_net, b_net = d.nodes
-    if not d.model.startswith("pfet"):
-        b_net = "vsubs"
-    return (
-        f"{name} {d_net} {g_net} {s_net} {b_net} {d.model} "
-        f"L={d.param_um('l'):.6g}u W={d.param_um('w'):.6g}u nf=1"
-    )
-
-
 def _trim_bank_subckt(devices: dict, vsubs_pin: bool = False) -> list[str]:
     res_order = ["XRFIX"] + [f"XR{i}" for i in range(8)]
     mos_order = (
@@ -1027,7 +1007,7 @@ def _trim_bank_subckt(devices: dict, vsubs_pin: bool = False) -> list[str]:
         d = devices[name]
         r_ohm = _res_r_ohm(d.param_um("r_length"), d.param_um("r_width"))
         lines.append(f"R${name[1:]} {nodes[i]} {nodes[i + 1]} vsubs {r_ohm:.6g} ppolyf_u_1k")
-    lines += [_trim_mos_ref_card(name, devices[name]) for name in mos_order]
+    lines += [_mos_ref_card(name, devices[name]) for name in mos_order]
     lines.append(".ENDS")
     return lines
 
@@ -1051,13 +1031,23 @@ def _mos_ref_card(name: str, d: Device) -> str:
       `klt lvs`'s `options.combine_devices`. Safe on this PDK precisely
       because gf180mcu's `W` is already the total width (`W/nf` per finger);
       it would not be on a PDK whose `W` is per-finger.
+    * `W`/`L` are re-emitted from the parsed micrometre value rather than
+      passed through verbatim. This is forced by the trim bank: the post-#43
+      schematic spells its transmission-gate widths with xschem's double-u
+      micrometre suffix (`W=24uu`), a spelling `klt`'s reference normalizer is
+      not documented to accept -- `24u` is the same value in the canonical
+      spelling. Re-emitting is a no-op everywhere else: on all 46 non-trim MOS
+      cards in this design the canonical spelling reproduces the schematic's
+      own literal byte-for-byte (the 16 that differ are exactly the trim
+      bank's `XSW0..7`/`XPW0..7` pair), which is why one card writer covers
+      every cell rather than the trim bank needing its own.
     """
     d_net, g_net, s_net, b_net = d.nodes
     if not d.model.startswith("pfet"):
         b_net = "vsubs"
     return (
         f"{name} {d_net} {g_net} {s_net} {b_net} {d.model} "
-        f"L={d.params['l']} W={d.params['w']} nf=1"
+        f"L={d.param_um('l'):.6g}u W={d.param_um('w'):.6g}u nf=1"
     )
 
 
