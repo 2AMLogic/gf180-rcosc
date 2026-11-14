@@ -47,7 +47,6 @@ from __future__ import annotations
 import argparse
 import bisect
 import csv
-import datetime
 import json
 import math
 import sys
@@ -380,13 +379,10 @@ def flat(r):
 
 
 def write_run(out: Path, rows, metas, p: Params, synthetic: bool, series=None, note: str = ""):
-    out = evidence_common.new_run_dir(out)
-    synthetic = evidence_common.is_synthetic(synthetic, metas)
-    banner = evidence_common.banner(synthetic)
+    out, synthetic, banner = evidence_common.run_prologue(out, synthetic, metas)
     nfail = sum(1 for r in rows if r["status"] != "OK")
-    doc = {"label": banner, "synthetic": synthetic, "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-           "params": asdict(p), "note": note, "reports": metas, "n_cases": len(rows),
-           "n_fail": nfail, "all_ok": nfail == 0 and bool(rows), "cases": rows}
+    doc = {**evidence_common.run_header(banner, synthetic, params=asdict(p), note=note, metas=metas),
+           "n_cases": len(rows), "n_fail": nfail, "all_ok": nfail == 0 and bool(rows), "cases": rows}
     if synthetic:
         doc["measured_evidence"] = False   # fixtures can never be claimed as measured evidence
     (out / "results.json").write_text(json.dumps(doc, indent=2) + "\n")
@@ -397,14 +393,9 @@ def write_run(out: Path, rows, metas, p: Params, synthetic: bool, series=None, n
                 w.writerow(["cycle_start_s", "period_s", "frequency_hz"])
                 for a, f in s:
                     w.writerow([f"{a:.12g}", f"{1 / f:.12g}", f"{f:.12g}"])
-    with open(out / "results.csv", "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=FIELDS)
-        w.writeheader()
-        for r in rows:
-            w.writerow({k: (f"{v:.6g}" if isinstance(v, float) else v) for k, v in flat(r).items()})
+    evidence_common.write_results_csv(out / "results.csv", rows, FIELDS, flat=flat)
 
-    def g(x, f="%.4g"):
-        return "-" if x is None else f % x
+    g = evidence_common.dash
     L = [f"# Supply-transient analysis {out.name}", "", f"**{banner}**", "",
          f"Settling band +/-{p.band * 100:g}% of the endpoint frequency is a configurable engineering metric, not the",
          "ratified trimmed-accuracy band and not an acceptance threshold.  Ripple sensitivity is",

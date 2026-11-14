@@ -36,8 +36,6 @@ imputed or defaulted to a passing number.
 from __future__ import annotations
 
 import argparse
-import csv
-import datetime
 import json
 import math
 import sys
@@ -326,19 +324,12 @@ def flat(r):
 
 
 def write_run(out: Path, rows, metas, p: Params, synthetic: bool, note: str = ""):
-    out = evidence_common.new_run_dir(out)
-    synthetic = evidence_common.is_synthetic(synthetic, metas)
-    banner = evidence_common.banner(synthetic)
+    out, synthetic, banner = evidence_common.run_prologue(out, synthetic, metas)
     nfail = sum(1 for r in rows if r["status"] != "OK")
-    doc = {"label": banner, "synthetic": synthetic, "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-           "params": asdict(p), "note": note, "reports": metas, "n_corners": len(rows),
-           "n_fail": nfail, "all_ok": nfail == 0 and bool(rows), "corners": rows}
+    doc = {**evidence_common.run_header(banner, synthetic, params=asdict(p), note=note, metas=metas),
+           "n_corners": len(rows), "n_fail": nfail, "all_ok": nfail == 0 and bool(rows), "corners": rows}
     (out / "results.json").write_text(json.dumps(doc, indent=2) + "\n")
-    with open(out / "results.csv", "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=FIELDS)
-        w.writeheader()
-        for r in rows:
-            w.writerow({k: (f"{v:.6g}" if isinstance(v, float) else v) for k, v in flat(r).items()})
+    evidence_common.write_results_csv(out / "results.csv", rows, FIELDS, flat=flat)
     L = [f"# Waveform analysis {out.name}", "", f"**{banner}**", "",
          "Spread columns are deterministic (noiseless transient); they are not stochastic",
          "RMS jitter and not the external SOF-arrival jitter assumption.", ""]
@@ -348,8 +339,7 @@ def write_run(out: Path, rows, metas, p: Params, synthetic: bool, note: str = ""
           "| process | T (C) | VDD (V) | status | cycles | period (ns) | p2p (ps) | std det (ps) | max abs c2c (ps) | high (ns) | low (ns) | duty | rise (ps) | fall (ps) |",
           "|---|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
 
-    def g(x, f="%.4g"):
-        return "-" if x is None else f % x
+    g = evidence_common.dash
     for r in rows:
         x = flat(r)
         L.append(f"| {x['process']} | {g(x['temp_c'])} | {g(x['vdd_v'])} | {x['status']} | {g(x.get('n_cycles'), '%d')} | "
