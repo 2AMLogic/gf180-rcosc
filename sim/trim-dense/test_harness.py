@@ -483,3 +483,103 @@ def test_run_batch_refuses_concurrency_above_two(tmp_path):
     import run_batch
     with pytest.raises(SystemExit):
         run_batch.drive(tmp_path, tmp_path / "o", ["klt"], workers=3)
+
+
+# ------------------------------------------- run_batch frozen-manifest gate ----
+# A netlist can move on `main` while a multi-session campaign is still running
+# (#87: sim/pvt-postlayout/klt-pex/rcosc_top_schematic.spice changed under
+# DR-0039 after this campaign's manifest froze).  The driver must refuse such a
+# bench instead of appending jobs measured on a different design to one curve.
+
+def _gated_bench(tmp_path, netlist="* sch netlist v1\n", provenance='{"fixture": true}'):
+    """FIXTURE: a 3-request bench with a DUT netlist copy and a provenance file."""
+    bench = tmp_path / "bench"
+    d = bench / "sch" / "tt_27C_3p3V"
+    d.mkdir(parents=True, exist_ok=True)
+    for c in range(3):
+        (d / f"request_c{c:02x}.json").write_text("{}")
+    (d / "rcosc_top_sch.spice").write_text(netlist)
+    (bench / "provenance.json").write_text(provenance)
+    return bench
+
+
+def _frozen_manifest(out, netlist="* sch netlist v1\n", provenance='{"fixture": true}'):
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "manifest.json").write_text(json.dumps({
+        "provenance_sha256": hashlib.sha256(provenance.encode()).hexdigest(),
+        "netlists": {"sch": {"path": "fixture/sch.spice",
+                             "sha256": hashlib.sha256(netlist.encode()).hexdigest()}},
+    }))
+
+
+def _fake_klt(tmp_path):
+    fake = tmp_path / "fake_klt.py"
+    fake.write_text(FAKE_KLT)
+    fake.chmod(0o755)
+    return [sys.executable, str(fake)], Path(str(fake) + ".log")
+
+
+def test_run_batch_submits_when_the_bench_reproduces_the_frozen_manifest(tmp_path):
+    """FIXTURE: a fake klt stands in for the fleet; nothing real is submitted."""
+    import run_batch
+    bench, out = _gated_bench(tmp_path), tmp_path / "res"
+    _frozen_manifest(out)
+    klt, log = _fake_klt(tmp_path)
+    assert not run_batch.manifest_problems(bench, out)
+    rows = run_batch.drive(bench, out, klt)
+    assert [r["tag"] for r in rows] == [f"sch_tt_27C_3p3V_c{c:02x}" for c in range(3)]
+    assert len(log.read_text().split()) == 3
+
+
+def test_run_batch_refuses_a_netlist_that_moved_after_the_freeze(tmp_path):
+    """A sizing change landing mid-campaign stops the run; nothing is submitted."""
+    import run_batch
+    out = tmp_path / "res"
+    _frozen_manifest(out)                                     # froze netlist v1
+    bench = _gated_bench(tmp_path, netlist="* sch netlist v2\n")  # main moved to v2
+    klt, log = _fake_klt(tmp_path)
+    problems = run_batch.manifest_problems(bench, out)
+    assert len(problems) == 1 and "'sch' netlist sha256" in problems[0]
+    with pytest.raises(SystemExit) as e:
+        run_batch.drive(bench, out, klt)
+    assert "nothing was submitted" in str(e.value) and "'sch'" in str(e.value)
+    assert not log.exists()                                   # no submission attempted
+    assert not (out / "ledger.jsonl").exists()
+
+
+def test_run_batch_refuses_a_bench_whose_provenance_does_not_match(tmp_path):
+    """Any other frozen setting (corners, solver) drifting shows up as the provenance hash."""
+    import run_batch
+    out = tmp_path / "res"
+    _frozen_manifest(out)
+    bench = _gated_bench(tmp_path, provenance='{"fixture": true, "reltol": 0.01}')
+    klt, log = _fake_klt(tmp_path)
+    problems = run_batch.manifest_problems(bench, out)
+    assert len(problems) == 1 and "provenance.json sha256" in problems[0]
+    with pytest.raises(SystemExit):
+        run_batch.drive(bench, out, klt)
+    assert not log.exists()
+
+
+def test_run_batch_skips_the_gate_on_a_campaign_with_no_manifest_yet(tmp_path):
+    """First slice of a fresh campaign: no manifest to check against."""
+    import run_batch
+    bench, out = _gated_bench(tmp_path), tmp_path / "res"
+    assert run_batch.manifest_problems(bench, out) == []
+    klt, log = _fake_klt(tmp_path)
+    assert len(run_batch.drive(bench, out, klt)) == 3
+    assert len(log.read_text().split()) == 3
+
+
+def test_committed_campaign_reports_carry_the_manifest_netlist_hashes():
+    """Every committed #87 campaign report was measured on a manifest netlist."""
+    camp = prepare.REPO / "sim" / "trim-dense" / "results" / "20261106T1115Z-campaign"
+    man = json.loads((camp / "manifest.json").read_text())
+    frozen = {v: d["sha256"] for v, d in man["netlists"].items()}
+    reports = sorted((camp / "reports").glob("report_*.json"))
+    assert reports, "campaign reports missing"
+    for r in reports:
+        env = json.loads(r.read_text())["environment"]
+        variant = r.name[len("report_"):].split("_")[0]
+        dut = {c["sha256"] for c in env["netlist_closure"]} - {env["netlist_sha256"]}
+        assert dut == {frozen[variant]}, f"{r.name}: DUT netlist {dut} != frozen {frozen[variant]}"

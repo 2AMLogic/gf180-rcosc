@@ -16,9 +16,20 @@ exists is skipped, so an interrupted campaign continues without resubmitting
 finished jobs.  A failed or errored request is re-submitted on the next run
 only with --retry-failed.
 
+Manifest preflight (issue #87): when the campaign directory already holds a
+frozen `manifest.json`, nothing is submitted until the bench reproduces it --
+`sha256(<bench>/provenance.json)` must equal `manifest.json:provenance_sha256`
+and every DUT netlist copy in the bench must hash to
+`manifest.json:netlists.<variant>.sha256`.  A netlist that moved on `main`
+after the freeze (e.g. a sizing change landing mid-campaign) therefore stops
+the run instead of silently appending jobs measured on a different design to
+the same curve.  A campaign directory with no manifest yet (the first slice)
+skips the check and says so.
+
     python3 -I sim/trim-dense/run_batch.py --bench-dir B --out-dir R [--limit N]
 """
 import argparse
+import hashlib
 import json
 import subprocess
 import sys
@@ -46,6 +57,45 @@ def read_json(p: Path):
         return json.loads(p.read_text())
     except (OSError, ValueError):
         return None
+
+
+def sha256_file(p: Path) -> str:
+    return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def bench_netlists(bench: Path) -> dict[str, set[str]]:
+    """variant -> the sha256(s) of the DUT netlist copies prepare.py wrote into the bench."""
+    found: dict[str, set[str]] = {}
+    for p in sorted(bench.glob("*/*/rcosc_top_*.spice")):
+        found.setdefault(p.parent.parent.name, set()).add(sha256_file(p))
+    return found
+
+
+def manifest_problems(bench: Path, out: Path) -> list[str]:
+    """Reasons this bench must not be appended to this campaign (empty == safe).
+
+    Returns [] when the campaign has no frozen manifest yet (first slice).
+    """
+    mpath = out / "manifest.json"
+    man = read_json(mpath)
+    if man is None:
+        return []
+    bad = []
+    want = man.get("provenance_sha256")
+    prov = bench / "provenance.json"
+    got = sha256_file(prov) if prov.is_file() else None
+    if want and got != want:
+        bad.append(f"provenance.json sha256 {got} != manifest provenance_sha256 {want}")
+    netlists = man.get("netlists") or {}
+    for variant, hashes in sorted(bench_netlists(bench).items()):
+        frozen = (netlists.get(variant) or {}).get("sha256")
+        if frozen is None:
+            bad.append(f"variant {variant!r} is in the bench but not in manifest netlists")
+        elif hashes != {frozen}:
+            bad.append(
+                f"variant {variant!r} netlist sha256 {sorted(hashes)} != manifest "
+                f"{frozen} (path {(netlists.get(variant) or {}).get('path')})")
+    return bad
 
 
 def is_done(out: Path, tag: str) -> bool:
@@ -82,6 +132,19 @@ def drive(bench: Path, out: Path, klt: list[str], limit: int | None = None,
           retry_failed: bool = False, workers: int = MAX_CONCURRENT, only: str | None = None) -> list[dict]:
     if workers < 1 or workers > MAX_CONCURRENT:
         raise SystemExit(f"run_batch.py: --workers must be 1..{MAX_CONCURRENT} (host rule)")
+    problems = manifest_problems(bench, out)
+    if problems:
+        raise SystemExit(
+            "run_batch.py: this bench does not reproduce the campaign's frozen manifest; "
+            "nothing was submitted.\n  - " + "\n  - ".join(problems)
+            + "\nRegenerate the bench from the manifest's netlists (recover a moved netlist from "
+              "git history by its recorded sha256), or start a new campaign directory.")
+    man = read_json(out / "manifest.json")
+    if man is None:
+        print("manifest preflight: no manifest.json in the campaign dir yet (first slice); not checked")
+    else:
+        print(f"manifest preflight: OK (provenance_sha256 {man.get('provenance_sha256')}, "
+              f"netlists {{{', '.join(f'{v}={h}' for v, hs in sorted(bench_netlists(bench).items()) for h in sorted(hs))}}})")
     (out / "reports").mkdir(parents=True, exist_ok=True)
     reqs = [(t, p) for t, p in find_requests(bench) if only is None or only in t]
     attempted = {r["tag"] for r in map(json.loads, (out / "ledger.jsonl").read_text().splitlines())} \
