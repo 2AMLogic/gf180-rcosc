@@ -45,8 +45,6 @@ Failures are explicit; nothing is imputed.
 from __future__ import annotations
 
 import argparse
-import csv
-import datetime
 import json
 import sys
 from bisect import bisect_right
@@ -331,26 +329,18 @@ def flat(r):
 
 
 def write_run(out: Path, rows, metas, p: Params, synthetic: bool, note: str = ""):
-    out = evidence_common.new_run_dir(out)
-    synthetic = evidence_common.is_synthetic(synthetic, metas)
-    banner = evidence_common.banner(synthetic)
+    out, synthetic, banner = evidence_common.run_prologue(out, synthetic, metas)
     agg = aggregate(rows)
     counts = {v: sum(1 for r in rows if r.get("verdict") == v) for v in ("PASS", "FLAG", "VIOLATION", "FAIL")}
-    doc = {"label": banner, "synthetic": synthetic,
-           "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-           "params": asdict(p), "note": note, "reports": metas, "n_events": len(rows),
-           "verdict_counts": counts, "all_pass": counts["PASS"] == len(rows) and bool(rows),
+    doc = {**evidence_common.run_header(banner, synthetic, params=asdict(p), note=note, metas=metas),
+           "n_events": len(rows), "verdict_counts": counts,
+           "all_pass": counts["PASS"] == len(rows) and bool(rows),
            "no_violation": counts["VIOLATION"] == 0 and counts["FAIL"] == 0 and bool(rows),
            "aggregate": agg, "events": rows}
     (out / "results.json").write_text(json.dumps(doc, indent=1) + "\n")
-    with open(out / "results.csv", "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=CSV_FIELDS, extrasaction="ignore")
-        w.writeheader()
-        for r in rows:
-            w.writerow({k: (f"{v:.6g}" if isinstance(v, float) else v) for k, v in flat(r).items()})
+    evidence_common.write_results_csv(out / "results.csv", rows, CSV_FIELDS, flat=flat, extrasaction="ignore")
 
-    def g(x, f="%.4g"):
-        return "-" if x is None else f % x
+    g = evidence_common.dash
     L = [f"# Trim-transition analysis {out.name}", "", f"**{banner}**", ""]
     if note:
         L += [f"Note: {note}", ""]
