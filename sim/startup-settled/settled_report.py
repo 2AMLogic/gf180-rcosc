@@ -9,7 +9,6 @@ Usage: python3 -I settled_report.py report_v30.json report_v33.json report_v36.j
 Output: results/<runid>/{results.csv,summary.md,manifest.json}; refuses to overwrite.
 """
 import argparse
-import csv
 import datetime
 import json
 import subprocess
@@ -71,11 +70,7 @@ def main():
     out.mkdir(parents=True)
     fields = ["process", "temp_c", "vdd_v", "status", "klt_status", "n_edges", "f_settled_mhz", "tail_dev_pct",
               "t_first_edge_ns"] + [f"t_settle_{l}_ns" for l, _ in sr.BANDS] + ["clk_min_v", "clk_max_v", "diag"]
-    with open(out / "results.csv", "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=fields, extrasaction="ignore")
-        w.writeheader()
-        for r in rows:
-            w.writerow({k: (f"{v:.4g}" if isinstance(v, float) else v) for k, v in r.items()})
+    evidence_common.write_results_csv(out / "results.csv", rows, fields, fmt=".4g", extrasaction="ignore")
     n = len(rows)
     npass = sum(verdict(r) == "pass" for r in rows)
     nostart = [r for r in rows if r["status"] == "NON-START"]
