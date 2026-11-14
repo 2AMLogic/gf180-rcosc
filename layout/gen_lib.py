@@ -93,17 +93,14 @@ class Port:
     x_um: float
     y_um: float
     width_um: float
-    direction_deg: float
 
 
 @dataclass
 class Placed:
     """A `klt gen` cell instantiated into a composing layout at (x0, y0)."""
 
-    name: str
     x0_um: float
     y0_um: float
-    bbox_um: tuple[float, float, float, float]
     ports: dict[str, Port] = field(default_factory=dict)
 
     def port_abs(self, port_name: str) -> tuple[float, float, float]:
@@ -111,14 +108,6 @@ class Placed:
         coordinate frame."""
         p = self.ports[port_name]
         return (self.x0_um + p.x_um, self.y0_um + p.y_um, p.width_um)
-
-    @property
-    def x1_um(self) -> float:
-        return self.x0_um + self.bbox_um[2]
-
-    @property
-    def y1_um(self) -> float:
-        return self.y0_um + self.bbox_um[3]
 
 
 class Composer:
@@ -166,18 +155,11 @@ class Composer:
         )
         self.top.insert(inst)
 
-        bbox = placed_cell.bbox()
-        bbox_um = (
-            bbox.left * DBU_UM,
-            bbox.bottom * DBU_UM,
-            bbox.right * DBU_UM,
-            bbox.top * DBU_UM,
-        )
         ports = {
-            p["name"]: Port(p["x_um"], p["y_um"], p["width_um"], p["direction_deg"])
+            p["name"]: Port(p["x_um"], p["y_um"], p["width_um"])
             for p in resp["ports"]
         }
-        return Placed(cell_name, x0_um, y0_um, bbox_um, ports)
+        return Placed(x0_um, y0_um, ports)
 
     def peek_bbox(self, generator: str, params: dict) -> tuple[float, float, float, float]:
         """Run `klt gen <generator>` with `params` and return its bbox
