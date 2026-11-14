@@ -184,12 +184,6 @@ class Base(unittest.TestCase):
         for n in needles:
             self.assertIn(n, problems[0])
 
-    def assertSomeProblem(self, problems, *needles):
-        self.assertTrue(problems, "expected at least one problem")
-        joined = "\n".join(problems)
-        for n in needles:
-            self.assertIn(n, joined)
-
 
 class PinTests(Base):
     def pins(self):
