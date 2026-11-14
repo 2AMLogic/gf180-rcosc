@@ -13,6 +13,13 @@ __pycache__/
 sim/*/corners/
 sim/build/
 
+# sim/ harness: klt writes a .spiceinit into every per-corner working
+# directory, materializing the run's own request_*.json
+# options.ngspice_init. 2324 tracked copies hold 3 distinct contents and
+# nothing reads them. Already-committed copies stay tracked (ignore rules
+# do not untrack); NEW runs commit the request JSON only (issue #351).
+sim/**/.spiceinit
+
 # design/netlist/: derived from design/*.sch by design/regen-netlist.sh
 # (issue #6). pdk_include.spice embeds this machine's absolute PDK_ROOT
 # path, so it is regenerated per-machine, not committed. smoke_test.log is
