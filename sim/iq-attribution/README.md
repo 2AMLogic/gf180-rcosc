@@ -4,7 +4,7 @@ Where does the running supply current go, stage by stage, on DR-0044's DUT (the 
 rebuilt layout, `sim/row45-rerun/results/20261112T200335Z-extract-l07/rcosc_top_p3_cmphfix.spice`),
 at the cells over 500 uA in DR-0044's 108-cell table, at the calibration code `0xA4` cells row 8 is
 actually graded on (`sim/item5/ROWS.md` row 8), at tt / 27 C / 3.3 V for reference, and on the
-L=1U control extraction at one cell. Append-only: new run ids only; DR-0044's results directory is
+L=1U control extraction at three cells. Append-only: new run ids only; DR-0044's results directory is
 read, never edited.
 
 ## Method
@@ -28,11 +28,16 @@ so the device-to-stage map cannot be read off the netlist text:
   `stage_map.check_conservation` and is re-run by `iq_report.py` on every report.
 - **`gen_stage_iq_requests.py`** writes a **probed copy** of the DUT (no device edited beyond
   net renaming): each current-bearing stage's vdd-side terminals are re-terminated onto an internal
-  `vdd_<stage>` node, 0 V sources tie that node back to the original nets (an ideal short; every
-  parasitic star resistor stays in circuit, so the operating point and transient are unchanged --
-  exact, unlike a 1 mOhm probe), and each stage's feed is integrated on 1 nF INSIDE the subckt
-  (a source inside a subckt cannot be referenced from a bench-level B source, and an external
-  ammeter would leave the internal vdd network as a parallel feed path). Only the per-stage
+  `vdd_<stage>` node, 0 V sources tie that node back to the original nets (ideal shorts; every
+  parasitic star resistor stays in circuit), and each stage's feed is integrated on 1 nF INSIDE the
+  subckt (a source inside a subckt cannot be referenced from a bench-level B source, and an external
+  ammeter would leave the internal vdd network as a parallel feed path). Commoning a stage's
+  terminals parallels that stage's star resistors, so the transformation is a second-order
+  perturbation of the VDD parasitic network, not operating-point-preserving exactly -- it is bounded
+  by the back-to-back gate: the probed total reproduces DR-0044's committed figure within
+  +0.00..+0.27 % at every corner (exactness is recoverable at no measurement cost by giving each
+  original net its own `vdd_<stage>_<k>` node and 0 V source and summing the per-source currents,
+  which the `Bint_<stage>` expression already does). Only the per-stage
   integrator nodes are exposed, as pins `pq_<stage>`. The bench is DR-0044's integrator bench
   unchanged for the total (`iq_run`, clk rising edges 5 -> 25 = 20 whole periods, the DR-0009
   basis). The timing MiM and the discharge device have no vdd terminal: no source, no integrator --
@@ -66,7 +71,8 @@ python3 -I sim/iq-attribution/iq_report.py sim/iq-attribution/results/<runid>/ar
   ff/85/3.6/0xFF. They validated deck convergence and the measurement set; the committed
   back-to-back evidence is the wave-1 batch run.
 - `results/20261115T030058-iq-attribution-control-l1/`: the L=1U control (DR-0044's control
-  extraction `sim/cmph-fix/rcosc_top_p3_cmphfix.spice`) at one cell (ff / 85 C / 3.6 V / 0xFF).
+  extraction `sim/cmph-fix/rcosc_top_p3_cmphfix.spice`) at three cells (ff / 3.6 V / `0xFF` at
+  -40, 27 and 85 C).
   Its own stage map (`stage_map_control_l1.json`, built with the pre-rebuild comparator roster
   extracted from git `affc8a64` -- see `rosters/`) registers 99/99 devices the same way; its total
   is compared against DR-0044's committed control figure (779.4 uA) via `iq_report.py --control`.
@@ -83,11 +89,11 @@ control: `results/20261115T030058-iq-attribution-control-l1/table.md`. Reading:
   at the shipping-code failing cell (211.6 of 555.8 uA at ff / 3.6 V / 85 C / `0xA4`, 38 %) and
   grows steeply with temperature (ff 3.6 V / `0xFF`: 177.0 at -40 C -> 218.7 at 85 C) -- while
   being almost code-flat (+3 % from `0xC0` to `0xFF`).
-- **The trim bank carries the code scaling**: 58.9 / 67.6 / 87.0 / 252.8 uA at ff / 3.6 V / 85 C
+- **The trim bank carries the code scaling**: 67.3 / 83.9 / 108.7 / 252.8 uA at ff / 3.6 V / 85 C
   for `0x80` / `0xA4` / `0xC0` / `0xFF` -- a 2.3x step from `0xC0` to `0xFF` that the rest of the
   oscillator does not share. This is the same direction DR-0045 priced in reverse (lowering the
   ladder series resistance raised `0xFF` Iq by 18-28 %).
-- The latch (+clk drive) and bias stages are 38-77 uA everywhere in the grid; the timing MiM and
+- The latch (+clk drive) and bias stages are 35.1-77.7 uA everywhere in the grid; the timing MiM and
   the discharge device draw exactly 0 A (no vdd terminal).
 - The L=1U control at the max cell shows the same ranking (trim 262.8, cmp-H 222.5 of 781.0), so
   the attribution is not an artifact of the L 0.7 um change.

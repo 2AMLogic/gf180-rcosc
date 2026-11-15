@@ -6,9 +6,12 @@ names (`* device instance $N r0 *1 X,Y class` carries geometry only), so stage i
 be read off the netlist text.  This builder recovers it from the committed per-block rosters
 (`layout/reports/rcosc_*.extracted.spice`): each block's devices carry their in-block placement
 coordinates, so a single translation per block registers the block's devices 1:1 onto the flat
-extraction's devices by (class, L, W) signature and coordinates (resistors and caps match by
-class and coordinates only -- roster resistor values are reported Ohms, the flat deck's are
-r_length/r_width, so their lengths are not comparable).  The 10-device remainder is assigned
+extraction's devices by (class, L, W) signature and coordinates (resistors and caps carry a
+class-only signature, so at a candidate offset any two single-element-signature devices within
+`tol` are interchangeable -- a MiM cap could register against a poly resistor sitting within
+0.05 um; the candidate must be unique and the conservation count re-checks the total, and roster
+resistor values are reported Ohms while the flat deck's are r_length/r_width, so their lengths
+are not comparable).  The 10-device remainder is assigned
 from `design/netlist/rcosc_top.spice`'s top-level devices: the timing MiM (only cap_mim device),
 the discharge nfet (only W=20U nfet) and the eight latch devices as one group (XMG1A-D /
 XMG2A-D are not individually distinguishable, but they are one stage, so the group assignment

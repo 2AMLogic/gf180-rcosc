@@ -7,8 +7,10 @@ Generates (launches nothing):
     i.e. the terminals on the VDD parasitic network's star) is re-terminated onto `vdd_<stage>`,
     and one 0 V source per distinct original net ties it back (`V<stage>_<k> vdd_<stage> <orig> 0`,
     inside the .SUBCKT).  A 0 V source is an ideal short and every parasitic star resistor stays
-    in circuit, so the operating point and transient are unchanged -- exact, unlike a 1 mOhm probe.
-    No device line is otherwise edited.
+    in circuit; commoning a stage's terminals parallels that stage's star resistors, so the
+    transformation is a second-order perturbation of the VDD parasitic network -- bounded by the
+    back-to-back gate, the probed total reproducing DR-0044's committed totals within
+    +0.00..+0.27 %.  No device line is otherwise edited.
   - benches: the DR-0044 integrator bench (total `iq_run`, clk rising edges 5 -> 25) plus one
     integrator per stage (`Bint_<stage> 0 qint_<stage> I=-i(V<stage>_0)-...`), so per-stage charge
     and the total come from ONE transient.  The timing MiM and the discharge device have no vdd
@@ -65,8 +67,9 @@ def probed_dut(text, stages_devices):
     referenced from a bench-level B source -- ngspice 'unknown controlling source'; and an
     external ammeter would leave the internal vdd network as a parallel feed path).  Only the
     per-stage integrator nodes are exposed, as pins `pq_<stage>`, and measured as voltages.
-    The 0 V sources are ideal shorts and every parasitic star resistor stays in circuit, so the
-    operating point and transient are unchanged -- exact, unlike a 1 mOhm probe."""
+    The 0 V sources are ideal shorts and every parasitic star resistor stays in circuit; commoning
+    a stage's terminals parallels that stage's star resistors (a second-order perturbation of the
+    VDD parasitic network, bounded by the back-to-back gate at +0.00..+0.27 %)."""
     rewrite, sources, pins = {}, {}, []
     for stage in CURRENT_STAGES:
         devs = stages_devices.get(stage, [])

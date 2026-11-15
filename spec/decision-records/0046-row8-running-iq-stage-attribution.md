@@ -46,13 +46,13 @@ bias, comparator-H, comparator-L, latch (+clk drive), trim bank; timing and disc
   ff / 3.6 V / 85 C). Comparator-L and bias behave the same way at roughly 2/3 and 1/3 of
   comparator-H's level. This is why even low-code ff-hot cells fail: at `0x80` / ff / 3.6 V / 85 C
   the comparator pair + bias already sum to 421 uA and the cell reads 527 uA.
-- **The trim bank carries the code scaling.** At ff / 3.6 V / 85 C: 58.9 (`0x80`) / 83.9 (`0xA4`) /
+- **The trim bank carries the code scaling.** At ff / 3.6 V / 85 C: 67.3 (`0x80`) / 83.9 (`0xA4`) /
   108.7 (`0xC0`) / 252.8 uA (`0xFF`) -- a 2.3x step from `0xC0` to `0xFF` with the rest of the
   oscillator flat. Mechanically: at high codes the ladder's series resistance is lowest, so the
   RC node swings deeper and the oscillator runs faster (the window is 20 *periods*, so current
   scales with charge-per-cycle x frequency); the same direction DR-0045 priced in reverse
   (lowering series resistance further raised `0xFF` Iq 18-28 %). The latch (+clk drive) carries a
-  smaller frequency-scaled term (38-74 uA).
+  smaller frequency-scaled term (37.2-73.5 uA).
 - **Process scaling** at 3.6 V / 85 C / `0xFF`: total 760.7 (`ff`) vs 431.7 (`ss`) -- the trim bank
   252.8 vs 168.3 and comparator-H 218.7 vs 109.2 are the two biggest movers; at `ss` no cell of
   the grid exceeds 500 uA.
@@ -80,10 +80,11 @@ DR-0003's row numbering, where "Row 4" is this Iq row itself: DR-0036/DR-0038 me
 comparator sizing move re-centres the calibration code, moving rows 4 and 5 together. A current
 reduction sized only at `0xFF` would overstate its benefit at the shipping code: comparator-H
 carries 211.6 uA at `0xA4` but the trim-bank lever's price is code-dependent in DR-0045's measured
-direction (+18.4..+28.1 % Iq at `0xFF`, within +3 % at codes <= `0xC0`) -- so the `w3r65` question
-(DR-0045 open question 2) is answered "not acceptable as priced": the candidate widens the
-code-driven excess the oscillator already fails with, for a row-4 gain the attribution now shows
-does not touch the dominant ff-hot term at all.
+direction (+18.4..+28.1 % Iq at `0xFF`, within +3 % at codes <= `0xC0`) -- so the attribution is
+the input to the `w3r65` question (DR-0045 open question 2): the candidate widens the code-driven
+excess the oscillator already fails with, for a row-4 gain the attribution now shows does not
+touch the dominant ff-hot term at all. The acceptability verdict itself is #337's ruling to make,
+not this record's.
 
 No row, window, basis or design file is changed by this record. Adoption of any lever is a
 separate, ratification-bearing decision with its own measurement campaign.

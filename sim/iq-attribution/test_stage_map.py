@@ -1,5 +1,6 @@
 """Offline tests for the device-to-stage map builder (issue #347). Synthetic fixtures; no PDK, no simulator."""
 import json
+import pytest
 import sys
 from pathlib import Path
 
@@ -108,11 +109,8 @@ def test_zero_by_construction_stages_assert_on_vdd_terms(tmp_path):
     r.write_text(roster([F1, F2]))
     rt = tmp_path / "trim.spice"
     rt.write_text(roster([RD]))
-    try:
+    with pytest.raises(AssertionError, match="disch"):
         sm.build_map(p, {"bias": str(r), "trim": str(rt)})
-        raise AssertionError("disch stage with vdd terms must assert")
-    except AssertionError as e:
-        assert "disch" in str(e)
 
 
 def test_unresolved_device_is_reported_not_guessed(tmp_path):

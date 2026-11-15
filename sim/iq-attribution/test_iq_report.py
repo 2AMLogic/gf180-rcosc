@@ -1,6 +1,7 @@
 """Offline tests for the per-stage Iq attribution report (issue #347). Synthetic fixtures; no simulator."""
 import json
 import math
+import pytest
 import sys
 from pathlib import Path
 
@@ -90,8 +91,5 @@ def test_map_conservation_assert(tmp_path):
     assert stage_map.check_conservation(m) == 7
     m["stage_device_counts"]["bias"] = 2                        # break the count
     mp2 = tmp_path / "broken.json"; mp2.write_text(json.dumps(m))
-    try:
+    with pytest.raises(AssertionError, match="conservation"):
         stage_map.check_conservation(json.loads(mp2.read_text()))
-        raise AssertionError("broken map must assert")
-    except AssertionError:
-        pass

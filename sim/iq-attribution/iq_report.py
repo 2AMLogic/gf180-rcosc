@@ -47,7 +47,7 @@ OVER_LIMIT = 500.0
 
 def load_envelopes(results: Path) -> dict:
     """{(code, vdd, proc, T): measurements dict} from request_*/report.json."""
-    out = {}
+    out, skipped = {}, []
     for rep in sorted(results.glob("request_*/report.json")):
         tag = rep.parent.name.split("_", 1)[1]           # cFF_v36
         code, vtag = tag.split("_")
@@ -56,8 +56,12 @@ def load_envelopes(results: Path) -> dict:
         for c in json.loads(rep.read_text())["corners"]:
             m = {x["name"]: x["value"] for x in c["measurements"]}
             if any(v is None for v in m.values()):
-                continue                                  # a failed corner must not enter silently
+                skipped.append(f"{tag} {c['process']} {c['temperature_c']}C")   # reported, never silent
+                continue
             out[(code, v, c["process"], float(c["temperature_c"]))] = m
+    if skipped:
+        print(f"load_envelopes: {len(skipped)} corner(s) with failed measurements skipped, so the "
+              f"sum check covers only the {len(out)} loaded cells: {skipped}")
     return out
 
 
@@ -111,7 +115,7 @@ def report(env: dict, map_path: Path, src: str, control: bool = False) -> tuple[
         r = cell_rows(env[cell])
         if abs(r["residue_pct"]) > SUM_TOL_FRAC * 100:
             fails.append((cell, r["residue_pct"]))
-        dr = DR0044_IQ_UA.get(cell)
+        dr = ref_table.get(cell)
         L.append("| " + " | ".join([cell[0], f"{cell[1]:g}", cell[2], f"{cell[3]:g}"]
                                    + [f"{r[s]:.1f}" for s in STAGES]
                                    + [f"{r['sum']:.1f}", f"**{r['total']:.1f}**", f"{r['residue']:.3f}",
