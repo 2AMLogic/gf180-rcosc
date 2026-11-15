@@ -2,13 +2,23 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-15
+
+- **PR #370**: sim: re-run row-9 startup bench on the L 0.7 um extraction at 0xA4 (63/63 pass)
+- **PR #368**: sim: trim-dense slice 42 completes sch_ff curve; run_batch frozen-manifest gate
+- **PR #362**: refactor: delete four zero-reference definitions from the cell generator and signoff suite
+- **Issue #356** (closed): Remove dead device-partition constants in layout/build_cells.py: zero references, misleading in a well-grouping file
+- **Issue #346** (closed): Re-run the startup bench (row 9) on the current netlist after the comparator-H L 0.7 um change
+
 ### 2026-11-14
 
+- **PR #357**: chore: git-ignore per-corner .spiceinit under sim/
 - **PR #355**: chore: drop package.json's dead scripts block, document the real test entry point
 - **PR #354**: refactor(layout): drop never-read Placed/Port members from gen_lib
 - **PR #350**: refactor(layout): collapse the trim bank's duplicate MOS reference-card writer
 - **PR #345**: docs: roadmap as of 2026-11-13
 - **PR #312**: sim(trim-dense): run slice 41, 42 more sch_ff curve jobs on batch fleet (948/1536)
+- **Issue #351** (closed): Stop committing per-corner .spiceinit: 2324 tracked copies of 3 distinct 2-line configs
 - **Issue #352** (closed): Remove package.json's dead scripts block: four exit-0 stubs and one missing-helper alias
 - **Issue #344** (closed): Remove dead Placed/Port members from layout/gen_lib.py: x1_um, y1_um, bbox_um, Placed.name, Port.direction_deg
 - **Issue #343** (closed): Remove _trim_mos_ref_card: duplicate of _mos_ref_card, verified output-neutral to merge
