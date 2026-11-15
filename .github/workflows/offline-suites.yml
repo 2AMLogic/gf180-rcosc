@@ -50,7 +50,7 @@ jobs:
           - name: trim-transition-offline
             tests: sim/trim-transition/test_harness.py
           - name: trim-dense-offline
-            tests: sim/trim-dense/test_harness.py
+            tests: sim/trim-dense/test_harness.py sim/trim-dense/test_compare_engine.py
           - name: layout-preflight-offline
             tests: layout/test_run_checks_preflight.py
           - name: signoff-drift-offline
