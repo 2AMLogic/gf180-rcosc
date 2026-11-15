@@ -26,7 +26,6 @@ Definitions (see sim/startup/README.md and DR-0020):
   NOT-SETTLED    the tail is not steady, or the last cycle is outside band B.
 """
 import argparse
-import csv
 import datetime
 import gzip
 import json
@@ -139,11 +138,7 @@ def main():
     out.mkdir(parents=True)
     fields = ["process", "temp_c", "vdd_v", "status", "klt_status", "n_edges", "f_settled_mhz",
               "tail_dev_pct", "t_first_edge_ns"] + [f"t_settle_{l}_ns" for l, _ in BANDS] + ["t_vdd90_ns", "diag"]
-    with open(out / "results.csv", "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=fields, extrasaction="ignore")
-        w.writeheader()
-        for r in rows:
-            w.writerow({k: (f"{v:.4g}" if isinstance(v, float) else v) for k, v in r.items()})
+    evidence_common.write_results_csv(out / "results.csv", rows, fields, fmt=".4g", extrasaction="ignore")
     with gzip.open(out / "edges.json.gz", "wt") as fh:
         json.dump({"unit": "ns", "edges_rising_vdd_half": edges}, fh)
 

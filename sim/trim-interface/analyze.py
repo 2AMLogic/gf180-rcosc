@@ -39,8 +39,6 @@ ratification), not guaranteed VIL/VIH.
 from __future__ import annotations
 
 import argparse
-import csv
-import datetime
 import json
 import math
 import sys
@@ -324,28 +322,18 @@ def csv_fields(p: Params) -> list[str]:
 
 
 def write_run(out: Path, rows, metas, expected, p: Params, synthetic: bool, note: str = ""):
-    out = evidence_common.new_run_dir(out)
-    synthetic = evidence_common.is_synthetic(synthetic, metas)
-    banner = evidence_common.banner(synthetic)
+    out, synthetic, banner = evidence_common.run_prologue(out, synthetic, metas)
     agg = aggregate(rows, expected)
     complete = bool(agg) and all(a["complete"] for a in agg)
-    doc = {"label": banner, "synthetic": synthetic,
-           "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-           "params": asdict(p), "note": note,
+    doc = {**evidence_common.run_header(banner, synthetic, params=asdict(p), note=note),
            "conventions": {"input_current": "I_in = -I(VTIN), amperes, positive into the DUT; abs reported too",
                            "bank_current": "I_into_p = -I(VP)", "conductance": "S", "voltage": "V",
                            "names": "characterized low/high bounds (screens), not guaranteed VIL/VIH"},
            "reports": metas, "n_rows": len(rows), "n_expected": len(expected),
            "complete": complete, "aggregate": agg, "cases": rows}
     (out / "results.json").write_text(json.dumps(doc, indent=1) + "\n")
-    with open(out / "results.csv", "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=csv_fields(p), extrasaction="ignore")
-        w.writeheader()
-        for r in rows:
-            w.writerow({k: (f"{v:.6g}" if isinstance(v, float) else v) for k, v in r.items()})
+    evidence_common.write_results_csv(out / "results.csv", rows, csv_fields(p), fmt=".6g", extrasaction="ignore")
 
-    def g(a, k, f="%.4g"):
-        return "-" if a.get(k) is None else f % a[k]
     L = [f"# Trim-interface DC analysis {out.name}", "", f"**{banner}**", ""]
     if note:
         L += [f"Note: {note}", ""]
@@ -358,9 +346,12 @@ def write_run(out: Path, rows, metas, expected, p: Params, synthetic: bool, note
           "|---|---|---|---|---|---|---|---|---|"]
     for a in agg:
         L.append(f"| {a['vdd_v']:g} | {a['verdict'].split(' ')[0]} | {a['n_ok']}/{a['n_expected']} | "
-                 f"{g(a, 'min_low_bound_v')}, {g(a, 'min_low_bound_frac', '%.3f')} | {a.get('min_low_bound_case', '-')} | "
-                 f"{g(a, 'max_high_bound_v')}, {g(a, 'max_high_bound_frac', '%.3f')} | {a.get('max_high_bound_case', '-')} | "
-                 f"{g(a, 'max_abs_input_current_a', '%.3e')} | {a.get('max_abs_input_current_case', '-')} |")
+                 f"{evidence_common.dash(a.get('min_low_bound_v'))}, "
+                 f"{evidence_common.dash(a.get('min_low_bound_frac'), '%.3f')} | {a.get('min_low_bound_case', '-')} | "
+                 f"{evidence_common.dash(a.get('max_high_bound_v'))}, "
+                 f"{evidence_common.dash(a.get('max_high_bound_frac'), '%.3f')} | {a.get('max_high_bound_case', '-')} | "
+                 f"{evidence_common.dash(a.get('max_abs_input_current_a'), '%.3e')} | "
+                 f"{a.get('max_abs_input_current_case', '-')} |")
     for a in agg:
         if not a["complete"]:
             L += ["", f"## Incomplete: VDD {a['vdd_v']:g} V",
