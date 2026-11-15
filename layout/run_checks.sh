@@ -258,9 +258,9 @@ echo "== rcosc_top: ERC (T1 item 11 supply spec) =="
 # layout/erc-supply-spec.json outright over its `_comment` annotation key
 # (klayout-tools#2822, now closed). 0.8.0 reads the committed spec unchanged:
 # same input and spec content hashes as the committed envelope, and no supply
-# findings. The committed envelope itself is still the 2b1e55e5 build's
-# output; it is rewritten only when this script regenerates layout/reports/
-# (signoff/README.md's refresh contract).
+# findings. The committed envelope records the build that last wrote it in
+# its own provenance.klt_version field; it is rewritten only when this
+# script regenerates layout/reports/ (signoff/README.md's refresh contract).
 ERC_KLT=(uv run --quiet --with "klayout-tools==0.8.0" klt)
 
 set +e
@@ -279,9 +279,8 @@ supply_rules = ('erc.unconnected_net', 'erc.supply_short',
                 'erc.multiply_driven_net', 'erc.missing_tie')
 bad = [f for f in d['erc_findings'] if f['rule'] in supply_rules]
 assert not bad, 'rcosc_top ERC supply findings: ' + json.dumps(bad)
-# klt erc 0.4.0 emits no provenance block (the committed report at every
-# prior merge lacks it too), so the content-hash pin can only be checked
-# when present -- noted loudly rather than skipped silently.
+# klt erc 0.4.0 emits no provenance block, so the content-hash pin can only
+# be checked when present -- noted loudly rather than skipped silently.
 prov = d.get('provenance')
 if prov is None:
     print('note: klt erc 0.4.0 writes no provenance block -- ERC report '
