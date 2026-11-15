@@ -16,7 +16,9 @@ the netlist the other rows use. `sim/startup/` is not modified.
 ```
 python3 -I sim/startup-settled/gen_requests.py
 for v in 30 33 36; do KLT_SIM_BACKEND=batch klt sim sim/startup-settled/request_v$v.json -o OUT/v$v --format json > OUT/report_v$v.json; done
-python3 -I sim/startup-settled/settled_report.py OUT/report_v30.json OUT/report_v33.json OUT/report_v36.json --vdd 3.0 3.3 3.6 --artifacts-root OUT/v30 OUT/v33 OUT/v36
+python3 -I sim/startup-settled/settled_report.py OUT/report_v30.json OUT/report_v33.json OUT/report_v36.json \
+    --vdd 3.0 3.3 3.6 --artifacts-root OUT/v30 OUT/v33 OUT/v36 \
+    --dut sim/startup-settled/rcosc_top_p3.spice --code 0xA9
 ```
 
 ## Result (`results/20261106T061500Z/`)
