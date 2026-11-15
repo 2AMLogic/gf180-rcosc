@@ -12,9 +12,12 @@ simulator:
            frequency delta `100 * (f_B / f_A - 1)` [%] -- median, mean, min,
            max and the count whose |delta| exceeds the ratified half-LSB
            (40/255 = 0.156863 %, DR-0003 Row 2) -- alongside the per-code
-           pairs.  A tag present in only one set is REPORTED, never dropped;
-           unpaired tags and non-passing reports fail the run (exit 1).
-           Diagnostic-code tallies per curve are informational only.
+           pairs.  A candidate-set (B) tag with no baseline counterpart is a
+           paired-design violation: it is reported and fails the run (exit 1).
+           Baseline (A) codes the candidate set never re-ran are expected in a
+           sparse paired sample; they are counted and listed in the JSON
+           output, never treated as problems.  Diagnostic-code tallies per
+           curve are informational only.
 
 `attest`   Confirm that an A/B bench reproduces a frozen campaign's requests
            byte-for-byte once the engine-version pin key is removed (which is
@@ -176,10 +179,10 @@ def cmd_compare(a: argparse.Namespace) -> int:
         codes_a = {code for c, code in set_a if c == curve}
         codes_b = {code for c, code in set_b if c == curve}
         pairs = sorted(codes_a & codes_b)
-        only_a = sorted(codes_a - codes_b)
-        only_b = sorted(codes_b - codes_a)
-        problems += [f"{curve}: code 0x{c:02X} has no counterpart in --reports-b" for c in only_a]
-        problems += [f"{curve}: code 0x{c:02X} has no counterpart in --reports-a" for c in only_b]
+        only_a = sorted(codes_a - codes_b)   # baseline codes not re-sampled: expected, not a problem
+        only_b = sorted(codes_b - codes_a)   # candidate codes with no baseline: design violation
+        problems += [f"{curve}: code 0x{c:02X} in --reports-b has no counterpart in --reports-a"
+                     for c in only_b]
         rows = []
         deltas = []
         for code in pairs:
@@ -198,17 +201,19 @@ def cmd_compare(a: argparse.Namespace) -> int:
             if recs:
                 _, probs = _uniform(recs, "engine_version")
                 problems += [f"{curve}: set {label}: {p}" for p in probs]
-        diag: dict[str, int] = {}
-        for recs in ([set_a[(curve, c)] for c in pairs], [set_b[(curve, c)] for c in pairs]):
-            for r in recs:
-                for k, v in r["diagnostics"].items():
-                    diag[k] = diag.get(k, 0) + int(v)
+        diag_a: dict[str, int] = {}
+        diag_b: dict[str, int] = {}
+        for code in pairs:
+            for k, v in set_a[(curve, code)]["diagnostics"].items():
+                diag_a[k] = diag_a.get(k, 0) + int(v)
+            for k, v in set_b[(curve, code)]["diagnostics"].items():
+                diag_b[k] = diag_b.get(k, 0) + int(v)
         out = {
             "curve": curve,
             "label_a": a.label_a, "label_b": a.label_b,
             "n_pairs": len(rows),
-            "unpaired_in_a": [f"0x{c:02X}" for c in only_b],
-            "unpaired_in_b": [f"0x{c:02X}" for c in only_a],
+            "unsampled_a_codes": [f"0x{c:02X}" for c in only_a],
+            "unpaired_b_codes": [f"0x{c:02X}" for c in only_b],
             "delta_pct": {
                 "median": statistics.median(deltas) if deltas else None,
                 "mean": statistics.fmean(deltas) if deltas else None,
@@ -217,30 +222,32 @@ def cmd_compare(a: argparse.Namespace) -> int:
                 "abs_over_half_lsb_count": sum(1 for d in deltas if abs(d) > half_lsb),
                 "half_lsb_pct": half_lsb,
             },
-            "diagnostic_codes": diag,
+            "diagnostic_codes_a": diag_a,
+            "diagnostic_codes_b": diag_b,
             "pairs": rows,
         }
         curves_out.append(out)
         if not rows:
             print(f"{curve}: n=0 paired codes"
-                  + (f"  unpaired: a-only={out['unpaired_in_b']} b-only={out['unpaired_in_a']}"
-                     if only_a or only_b else ""))
+                  + (f"  b-only codes={out['unpaired_b_codes']}" if only_b else "")
+                  + (f"  a-codes not sampled: {len(only_a)}" if only_a else ""))
             continue
         d = out["delta_pct"]
         print(f"{curve}: n={out['n_pairs']} "
               f"median={d['median']:+.4f}% mean={d['mean']:+.4f}% "
               f"min={d['min']:+.4f}% max={d['max']:+.4f}% "
               f"|delta|>half-LSB({half_lsb:.6f}%): {d['abs_over_half_lsb_count']}/{out['n_pairs']}"
-              + (f"  unpaired: a-only={out['unpaired_in_b']} b-only={out['unpaired_in_a']}"
-                 if only_a or only_b else ""))
+              + (f"  a-codes not sampled: {len(only_a)}" if only_a else "")
+              + (f"  b-only codes={out['unpaired_b_codes']}" if only_b else ""))
         for label, recs in ((a.label_a, [set_a[(curve, c)] for c in pairs]),
                             (a.label_b, [set_b[(curve, c)] for c in pairs])):
             if recs:
                 ev, _ = _uniform(recs, "engine_version")
                 bs, _ = _uniform(recs, "binary_sha256")
                 print(f"  set {label}: engine_version={ev} binary_sha256={bs}")
-        if diag:
-            print(f"  diagnostics (informational): {diag}")
+        if diag_a or diag_b:
+            print(f"  diagnostics (informational, per set): "
+                  f"{a.label_a}={diag_a} {a.label_b}={diag_b}")
     overall = None
     if pooled:
         overall = {

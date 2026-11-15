@@ -95,7 +95,8 @@ def test_negative_deltas_and_diagnostic_tally(tmp_path):
     res = json.loads(out.read_text())
     row = res["curves"][0]["pairs"][0]
     assert row["delta_pct"] == pytest.approx(100.0 * (49.95 / 50.0 - 1.0))
-    assert res["curves"][0]["diagnostic_codes"] == {"nonconvergence": 1, "singular_matrix": 2}
+    assert res["curves"][0]["diagnostic_codes_a"] == {"nonconvergence": 1}
+    assert res["curves"][0]["diagnostic_codes_b"] == {"singular_matrix": 2}
     assert res["curves"][0]["delta_pct"]["abs_over_half_lsb_count"] == 0
 
 
@@ -113,11 +114,31 @@ def test_unpaired_and_unusable_reports_are_reported_not_dropped(tmp_path, capsys
     assert rc == 1
     captured = capsys.readouterr()
     err, out = captured.err, captured.out
-    assert "0x04 has no counterpart in --reports-a" in err
+    assert "0x04 in --reports-b has no counterpart in --reports-a" in err
     assert "c02.json: report status 'error' != pass" in err
     assert "c03.json: fosc status 'fail' != pass" in err
     # The good pair is still compared.
     assert "n=2" in out
+
+
+def test_baseline_codes_not_resampled_are_expected_not_problems(tmp_path, capsys):
+    """The A/B design re-runs a sparse sample of a complete baseline set: A
+    codes without a B counterpart are the normal state, reported in the JSON
+    but never failing the run."""
+    a, b = tmp_path / "a", tmp_path / "b"
+    a.mkdir(), b.mkdir()
+    for c in range(0, 8):
+        write_report(a, CURVE, c, 100.0 + c)
+    for c in (0x00, 0x04):
+        write_report(b, CURVE, c, 100.0 + c, engine="47")
+    out = tmp_path / "cmp.json"
+    assert run_compare(a, b, tmp_path, out_json=out) == 0
+    res = json.loads(out.read_text())
+    cv = res["curves"][0]
+    assert cv["n_pairs"] == 2
+    assert cv["unsampled_a_codes"] == ["0x01", "0x02", "0x03", "0x05", "0x06", "0x07"]
+    assert cv["unpaired_b_codes"] == []
+    assert "a-codes not sampled: 6" in capsys.readouterr().out
 
 
 def test_compare_detects_mixed_versions_within_a_set(tmp_path, capsys):

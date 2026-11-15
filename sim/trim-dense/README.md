@@ -10,9 +10,11 @@ file or DR-0021 is changed by this directory.
 
 | file | role |
 |---|---|
-| `prepare.py` | writes `klt sim` batch requests + testbenches for codes 0x00..0xFF, `provenance.json`, `manifest.template.json` |
+| `prepare.py` | writes `klt sim` batch requests + testbenches for codes 0x00..0xFF, `provenance.json`, `manifest.template.json`; `--engine-version-expected` with a real version also pins `engine_version` per request |
 | `analyze.py` | validates `klt sim` reports and produces ordered frequency/step tables, extrema, carry transitions and the ratified-resolution comparison |
+| `compare_engine.py` | paired engine-version A/B (issue #378): per-code `fosc` deltas between two report sets + bench attestation (requests identical to a frozen campaign once the pin key is removed) |
 | `test_harness.py` | synthetic-fixture tests (no simulator, no process launched) |
+| `test_compare_engine.py` | offline tests for `compare_engine.py` (synthetic reports only) |
 
 ## Grid
 
@@ -53,11 +55,24 @@ tb_cXX.spice, request_cXX.json}`; request tag `<variant>_<corner>_cXX`.
 they are written into every testbench (`.options`), `provenance.json` and the
 manifest template. Defaults are ngspice's own (`reltol=1e-3`, matching the
 committed `sim/pvt` campaigns). `sim/mc-groundwork/README.md` shows `reltol`
-moves frequency by about 0.2 % and ngspice versions differ by ~0.4 %, which is
-the size of the half-LSB being judged. #87 must freeze `reltol` and the
+moves frequency by about 0.2 %; on simulator versions, that bench measured the
+ngspice **42→46** move at ~0.4 % on one trim code (~2.5× the half-LSB), while
+the paired **46→47** A/B (`results/20261115T160955Z-engine-ab/`, issue #378)
+measured median +0.0000 %, max |delta| 0.1328 %, 0/47 pairs over the half-LSB
+— verdict recorded there: immaterial, per-curve version treatment defensible.
+#87 must freeze `reltol` and the
 simulator version before the run; `analyze.py` rejects a manifest whose
 solver settings differ from the generated ones, and a run whose reports mix
 simulator versions or differ from the manifest.
+
+Setting `--engine-version-expected` to a version (`"MAJOR"` or
+`"MAJOR.MINOR"`) additionally emits a request-level `engine_version` pin in
+every request (klayout-tools#3041): `klt sim` fails the run with code
+`engine_version_unmet` when the runner's reported version disagrees — checked
+after the run, since the batch backend has no pre-submit probe. The default
+`unspecified` emits no pin and leaves every request byte unchanged, which is
+what keeps a frozen campaign (`run_batch.py`'s `provenance_sha256` preflight)
+submittable across prepare.py changes.
 
 ## Step and resolution formulas
 

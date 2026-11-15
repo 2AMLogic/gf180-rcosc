@@ -477,14 +477,16 @@ def test_no_measured_artifacts_in_tree():
     if not res.exists():
         return
     # Analyzer outputs are never allowed until the verdict PR adds them deliberately; a
-    # run directory with a frozen manifest.json is a campaign dir (#87), whose README
-    # must say it is partial and whose analyzer outputs must be absent here.
+    # run directory with a frozen manifest.json is a campaign dir (#87) or a completed
+    # A/B run (#378), whose README must state its state explicitly: PARTIAL while the
+    # campaign is still landing slices, COMPLETE once the run's verdict is recorded.
     analysis = {"results.json", "steps.csv", "summary.md"}
     bad = [str(p.relative_to(HERE)) for p in res.rglob("*") if p.is_file() and p.name in analysis]
     assert not bad, f"analyzer outputs present: {bad}"
     for run in (d for d in res.iterdir() if d.is_dir()):
         if (run / "manifest.json").is_file():
-            assert "PARTIAL" in (run / "README.md").read_text(), run
+            readme = (run / "README.md").read_text()
+            assert "PARTIAL" in readme or "COMPLETE" in readme, run
             continue
         readme = (run / "README.md").read_text()
         assert "Step 0 fleet gate only" in readme and "NOT run" in readme, run
