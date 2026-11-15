@@ -34,3 +34,16 @@ Same requests, DUT replaced by `sim/cmph-fix/rcosc_top_p3_cmphfix.spice` (`gen_r
 `klt-sim-4e366a98ed46` (3.6 V); receipts in `sim/cmph-fix/results/20261106T071000Z/`, analysis in
 `results/20261106T0735Z/`: **63/63 points start and settle, 0 NON-START**, worst settle 1.54 us (limit 10 us).
 The earlier `results/20261106T061500Z/` stays as the pre-fix evidence.
+
+## Comparator-H mirror-load L 0.7 um rebuild (issue #346, DR-0039/DR-0042)
+
+Same bench, DUT replaced by the rebuilt-layout extraction
+`sim/row45-rerun/results/20261112T200335Z-extract-l07/rcosc_top_p3_cmphfix.spice`
+(sha256 `01e06daeb8cf341189207770f982c32a4b288b3bca504614262353ef324d16a1`) at the DR-0029 calibration code 0xA4
+(trim bits 2, 5, 7 ramp; `gen_requests.py --out sim/startup-settled/l07/ --code 0xA4 --dut ...`, requests in
+`sim/startup-settled/l07/`), batch jobs `klt-sim-4d3ab740fc79` (3.0 V), `klt-sim-a4d9b66d2086` (3.3 V),
+`klt-sim-948c39ec8591` (3.6 V); receipts and reports in `results/20261114T221218Z/batch/`, analysis in
+`results/20261114T221218Z/`: **63/63 points start and settle within the 10 us DR-0020 bound, 0 NON-START**,
+worst primary-band settle 0.947 us (fs / -40 C / 3.0 V). The two `0xA9` runs above stay as the evidence for that
+code; the run's `manifest.json` records the actual DUT path, its sha256 and the trim code (`settled_report.py
+--dut --code`, fixing the hardcoded-provenance defect that misstated the 0735Z manifest's DUT).
