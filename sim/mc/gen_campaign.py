@@ -56,6 +56,8 @@ from pathlib import Path
 here = Path(__file__).parent
 sys.path.insert(0, str(here.parent / "mc-groundwork"))  # also works under python -I
 from mismatch_inject import inject  # noqa: E402
+sys.path.insert(0, str(here.parent / "pvt"))
+from pvt_sweep import PROCESS_CORNERS  # noqa: E402
 
 SRC = here.parent / "recentre" / "p3" / "rcosc_top_p3.spice"  # default DUT; --dut overrides (issue #236)
 SEED = 20261008  # DR-0019: one recorded seed, appended to only, never re-drawn
@@ -65,11 +67,7 @@ N_SENS = 100
 N_ZERO = 3
 TARGET_HZ = 48.0e6
 VCAL = 3.3
-PROC = {
-    "tt": ["typical", "res_typical", "mimcap_typical", "cap_mim"],
-    "ff": ["ff", "res_ff", "mimcap_ff", "cap_mim"],
-    "ss": ["ss", "res_ss", "mimcap_ss", "cap_mim"],
-}
+PROC = {n: [*PROCESS_CORNERS[n], "cap_mim"] for n in ("tt", "ff", "ss")}
 # Ratified limits (README target-specification table; DR-0003 Row 3, DR-0017).
 ROW4 = (-2.9, 2.0)
 ROW5 = (-10.8, 8.8)
