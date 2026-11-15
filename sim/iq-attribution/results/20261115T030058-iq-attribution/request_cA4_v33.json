@@ -1,0 +1,148 @@
+{
+  "netlist": "tb_cA4_v33.spice",
+  "engine": "ngspice",
+  "netlist_source": "extracted",
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "ff",
+        "sections": [
+          "ff",
+          "res_ff",
+          "mimcap_ff",
+          "cap_mim"
+        ]
+      }
+    ],
+    "temperature_c": [
+      -40.0,
+      27.0,
+      85.0
+    ]
+  },
+  "batch": {
+    "capacity_wait_s": 600
+  },
+  "options": {
+    "timeout_s": 1800,
+    "keep_artifacts": true,
+    "ngspice_init": [
+      "set measureprec=8"
+    ]
+  },
+  "measurements": [
+    {
+      "name": "f_ta",
+      "spice": ".meas tran f_ta WHEN v(clk)=1.6500 RISE=5",
+      "unit": "s"
+    },
+    {
+      "name": "f_tb",
+      "spice": ".meas tran f_tb WHEN v(clk)=1.6500 RISE=25",
+      "unit": "s"
+    },
+    {
+      "name": "fosc",
+      "spice": ".meas tran fosc PARAM='20/(f_tb-f_ta)'",
+      "unit": "Hz"
+    },
+    {
+      "name": "q_a",
+      "spice": ".meas tran q_a FIND v(qint) WHEN v(clk)=1.6500 RISE=5",
+      "unit": "V"
+    },
+    {
+      "name": "q_b",
+      "spice": ".meas tran q_b FIND v(qint) WHEN v(clk)=1.6500 RISE=25",
+      "unit": "V"
+    },
+    {
+      "name": "iq_run",
+      "spice": ".meas tran iq_run PARAM='(q_b-q_a)*1n/(f_tb-f_ta)'",
+      "unit": "A"
+    },
+    {
+      "name": "q_bias_a",
+      "spice": ".meas tran q_bias_a FIND v(pq_bias) WHEN v(clk)=1.6500 RISE=5",
+      "unit": "V"
+    },
+    {
+      "name": "q_bias_b",
+      "spice": ".meas tran q_bias_b FIND v(pq_bias) WHEN v(clk)=1.6500 RISE=25",
+      "unit": "V"
+    },
+    {
+      "name": "iq_bias",
+      "spice": ".meas tran iq_bias PARAM='(q_bias_b-q_bias_a)*1n/(f_tb-f_ta)'",
+      "unit": "A"
+    },
+    {
+      "name": "q_cmp_h_a",
+      "spice": ".meas tran q_cmp_h_a FIND v(pq_cmp_h) WHEN v(clk)=1.6500 RISE=5",
+      "unit": "V"
+    },
+    {
+      "name": "q_cmp_h_b",
+      "spice": ".meas tran q_cmp_h_b FIND v(pq_cmp_h) WHEN v(clk)=1.6500 RISE=25",
+      "unit": "V"
+    },
+    {
+      "name": "iq_cmp_h",
+      "spice": ".meas tran iq_cmp_h PARAM='(q_cmp_h_b-q_cmp_h_a)*1n/(f_tb-f_ta)'",
+      "unit": "A"
+    },
+    {
+      "name": "q_cmp_l_a",
+      "spice": ".meas tran q_cmp_l_a FIND v(pq_cmp_l) WHEN v(clk)=1.6500 RISE=5",
+      "unit": "V"
+    },
+    {
+      "name": "q_cmp_l_b",
+      "spice": ".meas tran q_cmp_l_b FIND v(pq_cmp_l) WHEN v(clk)=1.6500 RISE=25",
+      "unit": "V"
+    },
+    {
+      "name": "iq_cmp_l",
+      "spice": ".meas tran iq_cmp_l PARAM='(q_cmp_l_b-q_cmp_l_a)*1n/(f_tb-f_ta)'",
+      "unit": "A"
+    },
+    {
+      "name": "q_latch_a",
+      "spice": ".meas tran q_latch_a FIND v(pq_latch) WHEN v(clk)=1.6500 RISE=5",
+      "unit": "V"
+    },
+    {
+      "name": "q_latch_b",
+      "spice": ".meas tran q_latch_b FIND v(pq_latch) WHEN v(clk)=1.6500 RISE=25",
+      "unit": "V"
+    },
+    {
+      "name": "iq_latch",
+      "spice": ".meas tran iq_latch PARAM='(q_latch_b-q_latch_a)*1n/(f_tb-f_ta)'",
+      "unit": "A"
+    },
+    {
+      "name": "q_trim_a",
+      "spice": ".meas tran q_trim_a FIND v(pq_trim) WHEN v(clk)=1.6500 RISE=5",
+      "unit": "V"
+    },
+    {
+      "name": "q_trim_b",
+      "spice": ".meas tran q_trim_b FIND v(pq_trim) WHEN v(clk)=1.6500 RISE=25",
+      "unit": "V"
+    },
+    {
+      "name": "iq_trim",
+      "spice": ".meas tran iq_trim PARAM='(q_trim_b-q_trim_a)*1n/(f_tb-f_ta)'",
+      "unit": "A"
+    }
+  ],
+  "analysis": {
+    "kind": "tran",
+    "args": "200p 4000n"
+  }
+}
