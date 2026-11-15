@@ -489,146 +489,11 @@ def run_guardrail_passes(
     }
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--jobs", type=int, default=base.DEFAULT_JOBS,
-                    help="parallel ngspice processes (default %(default)s)")
-    ap.add_argument("--keep-build", action="store_true")
-    ap.add_argument(
-        "--baseline-runid",
-        default=None,
-        help="sim/pvt/results/<runid> to compare against (default: most recent)",
-    )
-    ap.add_argument("--runid", default=None)
-    ap.add_argument(
-        "--guardrails",
-        action="store_true",
-        help="additionally re-verify DR-0017's two issue-#57 guardrails "
-        "(Row-4 cell 0x80/ff/85C/3.6V + per-process trim calibration vs the "
-        "ratified 48 MHz target) on both sides, inside this same run "
-        "(issue #61)",
-    )
-    args = ap.parse_args()
-
-    runid = args.runid or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    # Raw output is staged in git-ignored scratch and stored through the
-    # artifact store at the end (issue #196); fail closed before simulating.
-    try:
-        stage = evidence_stage.open_stage("pvt-postlayout", runid)
-    except evidence_stage.StoreError as exc:
-        sys.exit(f"ERROR: evidence cannot be stored, not starting (fail closed): {exc}")
-    corner_dir = stage.corners / runid
-    res_dir = stage.results / runid
-    build_dir = BUILD_ROOT / runid
-    for d in (corner_dir, res_dir, build_dir):
-        if d.exists() and any(d.iterdir()):
-            sys.exit(f"ERROR: {d} already exists and is non-empty (runid collision?)")
-        d.mkdir(parents=True, exist_ok=True)
-
-    started = time.time()
-
-    if args.baseline_runid:
-        baseline_id = args.baseline_runid
-        baseline_dir = PVT_RESULTS_DIR / baseline_id
-        if not (baseline_dir / "manifest.json").is_file():
-            sys.exit(f"ERROR: {baseline_dir}/manifest.json not found")
-    else:
-        baseline_id, baseline_dir = find_latest_schematic_baseline()
-    baseline_manifest = json.loads((baseline_dir / "manifest.json").read_text())
-    code = baseline_manifest["calibration_spec_target"]["tt"]["code"]
-    print(
-        f"== baseline: sim/pvt/results/{baseline_id} "
-        f"(fixed post-trim code 0x{code:02X}, from its tt/27C/3.3V "
-        "ratified-target calibration) ==",
-        flush=True,
-    )
-
-    pdk_root, pdk, model_dir = base.resolve_pdk()
-
-    print("== regenerating design/netlist from schematics ==", flush=True)
-    subprocess.run(
-        [str(REPO_ROOT / "design" / "regen-netlist.sh")], check=True, cwd=REPO_ROOT
-    )
-
-    schematic_text = PVT_TB.read_text()
-    pins, top_block_lines, _all_lines = extract_rcosc_top_block(schematic_text)
-    print(f"== schematic rcosc_top pin order: {pins} ==", flush=True)
-
-    extracted_spice, extract_report = run_extract(runid, res_dir)
-    raw_extracted_text = extracted_spice.read_text()
-    stripped_text, n_stripped = strip_capacitor_model_annotations(raw_extracted_text)
-    if n_stripped:
-        print(
-            f"== stripped {n_stripped} non-simulatable capacitor model-flavour "
-            "annotation(s) from the extracted netlist (see pex_pvt_sweep.py's "
-            "CAP_MODEL_TAG_RE docstring) ==",
-            flush=True,
-        )
-        extracted_spice.write_text(stripped_text)
-    extracted_text = reorder_extracted_header(stripped_text, pins)
-
-    # Build the extracted-side harness: byte-identical pvt_tb.spice except
-    # the embedded '.subckt rcosc_top ... .ends' region is replaced by the
-    # PEX netlist's own subckt (header reordered to match). Any sibling
-    # '.subckt rcosc_bias/...' blocks that originally followed are left in
-    # place, unreferenced -- an unused .subckt declaration is inert in
-    # ngspice, and leaving them keeps this a single contiguous-region
-    # substitution rather than a line-by-line rewrite.
-    top_block_text = "\n".join(top_block_lines)
-    if top_block_text not in schematic_text:
-        sys.exit("ERROR: could not locate the exact rcosc_top block to substitute")
-    extracted_side_text = schematic_text.replace(
-        top_block_text, extracted_text.rstrip("\n"), 1
-    )
-
-    points = [
-        base.Point(p, t, v, code)
-        for p in PEX_PROCESSES
-        for t in base.TEMPS_C
-        for v in base.VDDS_V
-    ]
-    print(f"== {len(points)} corner-endpoint points x 2 sides ==", flush=True)
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as pool:
-        futures = {}
-        for side, text in (
-            ("schematic", schematic_text),
-            ("extracted", extracted_side_text),
-        ):
-            for pt in points:
-                fut = pool.submit(
-                    run_point, side, text, pt, model_dir, build_dir, corner_dir, runid
-                )
-                futures[fut] = (side, pt)
-        done = 0
-        results: dict[tuple[str, base.Point], Result] = {}
-        for fut in concurrent.futures.as_completed(futures):
-            res = fut.result()
-            results[(res.side, res.point)] = res
-            done += 1
-            fmt = f"{res.f_hz / 1e6:8.4f} MHz" if res.f_hz else f"{res.status:>12}"
-            print(
-                f"  [{done:3d}/{len(futures):3d}] {res.side:>10} {res.point.key:<28} {fmt}",
-                flush=True,
-            )
-
-    guard = None
-    if args.guardrails:
-        guard = run_guardrail_passes(
-            sides=[("schematic", schematic_text), ("extracted", extracted_side_text)],
-            model_dir=model_dir,
-            build_dir=build_dir,
-            corner_dir=corner_dir,
-            runid=runid,
-            jobs=args.jobs,
-            seed=results,
-            baseline_dir=baseline_dir,
-            baseline_manifest=baseline_manifest,
-        )
-
-    elapsed = time.time() - started
-
-    # -- results.csv ----------------------------------------------------
+def result_rows(
+    results: dict[tuple[str, base.Point], Result],
+    points: list[base.Point],
+) -> list[dict]:
+    """Build the `results.csv` row dicts from the per-(side, point) results."""
     rows = []
     for pt in points:
         sres = results[("schematic", pt)]
@@ -652,156 +517,91 @@ def main() -> None:
                 "extracted_log": eres.log_path,
             }
         )
+    return rows
 
+
+def write_results(rows: list[dict], res_dir: Path) -> Path:
+    """Write `results.csv` from `result_rows()`'s rows."""
     csv_path = res_dir / "results.csv"
     fields = list(rows[0].keys())
     with csv_path.open("w", newline="") as fh:
         writer = csv.DictWriter(fh, fieldnames=fields)
         writer.writeheader()
         writer.writerows(rows)
+    return csv_path
 
-    if guard is not None:
-        grows = []
-        c = guard["cell"]
+
+def write_guardrails_csv(guard: dict | None, res_dir: Path) -> Path | None:
+    """Write `guardrails.csv` (issue #61); a no-op without `--guardrails`."""
+    if guard is None:
+        return None
+    grows = []
+    c = guard["cell"]
+    for side in ("schematic", "extracted"):
+        grows.append(
+            {
+                "kind": "row4_cell",
+                "side": side,
+                "process": c["process"],
+                "temp_c": f"{c['temp_c']:g}",
+                "vdd_v": f"{c['vdd_v']:g}",
+                "code": c["code"],
+                "trim_hex": f"0x{c['code']:02X}",
+                "f_hz": f"{c[side + '_f_hz']:.6e}" if c[side + "_f_hz"] else "",
+                "saturated": "",
+                "f_code0x00_hz": "",
+                "f_code0xff_hz": "",
+                "target_hz": "",
+                "dr0017_campaign_f_hz": (
+                    f"{c['dr0017_campaign_f_hz']:.6e}"
+                    if c["dr0017_campaign_f_hz"]
+                    else ""
+                ),
+            }
+        )
+    for p in PEX_PROCESSES:
         for side in ("schematic", "extracted"):
+            e = guard["calibration"][p][side]
             grows.append(
                 {
-                    "kind": "row4_cell",
+                    "kind": "calibration",
                     "side": side,
-                    "process": c["process"],
-                    "temp_c": f"{c['temp_c']:g}",
-                    "vdd_v": f"{c['vdd_v']:g}",
-                    "code": c["code"],
-                    "trim_hex": f"0x{c['code']:02X}",
-                    "f_hz": f"{c[side + '_f_hz']:.6e}" if c[side + "_f_hz"] else "",
-                    "saturated": "",
-                    "f_code0x00_hz": "",
-                    "f_code0xff_hz": "",
-                    "target_hz": "",
-                    "dr0017_campaign_f_hz": (
-                        f"{c['dr0017_campaign_f_hz']:.6e}"
-                        if c["dr0017_campaign_f_hz"]
-                        else ""
-                    ),
+                    "process": p,
+                    "temp_c": f"{guard['calibration_temp_c']:g}",
+                    "vdd_v": f"{guard['calibration_vdd_v']:g}",
+                    "code": e["code"],
+                    "trim_hex": f"0x{e['code']:02X}",
+                    "f_hz": f"{e['f_hz']:.6e}",
+                    "saturated": e["saturated"],
+                    "f_code0x00_hz": f"{e['f_code0x00_hz']:.6e}",
+                    "f_code0xff_hz": f"{e['f_code0xff_hz']:.6e}",
+                    "target_hz": f"{guard['calibration_target_hz']:.6e}",
+                    "dr0017_campaign_f_hz": "",
                 }
             )
-        for p in PEX_PROCESSES:
-            for side in ("schematic", "extracted"):
-                e = guard["calibration"][p][side]
-                grows.append(
-                    {
-                        "kind": "calibration",
-                        "side": side,
-                        "process": p,
-                        "temp_c": f"{guard['calibration_temp_c']:g}",
-                        "vdd_v": f"{guard['calibration_vdd_v']:g}",
-                        "code": e["code"],
-                        "trim_hex": f"0x{e['code']:02X}",
-                        "f_hz": f"{e['f_hz']:.6e}",
-                        "saturated": e["saturated"],
-                        "f_code0x00_hz": f"{e['f_code0x00_hz']:.6e}",
-                        "f_code0xff_hz": f"{e['f_code0xff_hz']:.6e}",
-                        "target_hz": f"{guard['calibration_target_hz']:.6e}",
-                        "dr0017_campaign_f_hz": "",
-                    }
-                )
-        gcsv_path = res_dir / "guardrails.csv"
-        gfields = list(grows[0].keys())
-        with gcsv_path.open("w", newline="") as fh:
-            writer = csv.DictWriter(fh, fieldnames=gfields)
-            writer.writeheader()
-            writer.writerows(grows)
+    gcsv_path = res_dir / "guardrails.csv"
+    gfields = list(grows[0].keys())
+    with gcsv_path.open("w", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=gfields)
+        writer.writeheader()
+        writer.writerows(grows)
+    return gcsv_path
 
-    failures = [r for r in results.values() if r.status != "ok"]
-    deltas = [float(r["delta_pct"]) for r in rows if r["delta_pct"]]
 
-    # -- Cross-check: my own freshly re-run schematic side vs. the already-
-    # committed sim/pvt/ campaign's own posttrim_spec pass at this same code
-    # -- a same-methodology, different-host/run comparison that isolates
-    # run-to-run/cross-host ngspice numerical noise from the (much larger)
-    # schematic-vs-extracted delta this run's own verdict is about. Not a
-    # correctness check of this script (both sides of *that* run's own delta
-    # share one host/run already); purely a sanity bound on how much of the
-    # reported schematic-vs-extracted delta could, in principle, be
-    # environment noise rather than layout parasitics.
-    host_variance_pct = None
-    baseline_csv = baseline_dir / "results.csv"
-    if baseline_csv.is_file():
-        baseline_lookup: dict[tuple[str, float, float], float] = {}
-        with baseline_csv.open() as fh:
-            for brow in csv.DictReader(fh):
-                if brow["pass"] != "posttrim_spec" or not brow["f_hz"]:
-                    continue
-                bkey = (brow["process"], float(brow["temp_c"]), float(brow["vdd_v"]))
-                baseline_lookup[bkey] = float(brow["f_hz"])
-        host_deltas = []
-        for pt in points:
-            sres = results[("schematic", pt)]
-            bkey = (pt.process, pt.temp_c, pt.vdd_v)
-            if sres.f_hz and bkey in baseline_lookup and baseline_lookup[bkey] > 0:
-                host_deltas.append(
-                    abs(sres.f_hz - baseline_lookup[bkey])
-                    / baseline_lookup[bkey]
-                    * 100.0
-                )
-        if host_deltas:
-            host_variance_pct = max(host_deltas)
-
-    manifest = {
-        "runid": runid,
-        "utc": datetime.now(timezone.utc).isoformat(),
-        "git_sha": base.git_sha(),
-        "git_dirty": base.git_dirty(),
-        "ngspice": base.tool_version(["ngspice", "-v"], line=1),
-        "xschem": base.tool_version(["xschem", "--version"], line=0),
-        "klt_version": base.tool_version(["klt", "version"], line=0),
-        **pdk_provenance.manifest_fields(pdk_root, pdk, model_dir),
-        "layout_gds": str(GDS_PATH.relative_to(REPO_ROOT)),
-        "extract_command": [
-            "klt",
-            "extract",
-            "layout/cells/rcosc_top.gds",
-            "--deck",
-            "gf180mcu",
-            "--top",
-            "rcosc_top",
-            "--pdk",
-            "gf180mcuC",
-            *[a for opt in DECK_OPTIONS for a in ("--deck-option", opt)],
-            "--pins",
-            EXTRACT_PINS,
-            "--parasitics",
-        ],
-        "extract_parasitic_model": extract_report.get("parasitics", {}).get("model"),
-        "schematic_baseline_runid": baseline_id,
-        "process_corners": {k: list(base.PROCESS_CORNERS[k]) for k in PEX_PROCESSES},
-        "temps_c": base.TEMPS_C,
-        "vdds_v": base.VDDS_V,
-        "trim_code": code,
-        "trim_hex": f"0x{code:02X}",
-        "measurement": {
-            "tstep": base.TSTEP,
-            "tstop_ns": base.TSTOP_NS_DEFAULT,
-            "tstop_ns_retry": base.TSTOP_NS_RETRY,
-            "first_edge": base.MEAS_FIRST_EDGE,
-            "last_edge": base.MEAS_LAST_EDGE,
-            "cycles_averaged": base.MEAS_LAST_EDGE - base.MEAS_FIRST_EDGE,
-        },
-        "points": len(points),
-        "sides": ["schematic", "extracted"],
-        "failed_runs": [f"{r.side}_{r.point.key}" for r in failures],
-        "max_abs_delta_pct": max((abs(d) for d in deltas), default=None),
-        "mean_delta_pct": (sum(deltas) / len(deltas)) if deltas else None,
-        "calibration_point_budget_pct": base.SPEC["posttrim_calpoint_pct"],
-        "schematic_rerun_vs_published_baseline_max_delta_pct": host_variance_pct,
-        "wall_clock_s": round(elapsed, 1),
-        "jobs": args.jobs,
-    }
-    if guard is not None:
-        manifest["guardrails"] = guard
-    (res_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
-
-    # -- summary.md -------------------------------------------------------
+def build_summary(
+    runid: str,
+    manifest: dict,
+    rows: list[dict],
+    points: list[base.Point],
+    guard: dict | None,
+    failures: list[Result],
+    host_variance_pct: float | None,
+    baseline_id: str,
+    code: int,
+    elapsed: float,
+    jobs: int,
+) -> str:
+    """Render the run's `summary.md` body (main() writes it)."""
     lines = []
     lines.append(f"# Post-layout (PEX-extracted) PVT re-verification {runid}")
     lines.append("")
@@ -845,7 +645,7 @@ def main() -> None:
             "guardrail verification section below |"
         )
     lines.append(f"| failed runs | {len(failures)} |")
-    lines.append(f"| wall clock | {elapsed:.1f} s at {args.jobs} jobs |")
+    lines.append(f"| wall clock | {elapsed:.1f} s at {jobs} jobs |")
     lines.append("")
     lines.append("## Corner-endpoint subset")
     lines.append("")
@@ -1061,7 +861,257 @@ def main() -> None:
         for r in failures:
             lines.append(f"- `{r.side}_{r.point.key}`: {r.status}")
 
-    (res_dir / "summary.md").write_text("\n".join(lines) + "\n")
+    return "\n".join(lines)
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__)
+    ap.add_argument("--jobs", type=int, default=base.DEFAULT_JOBS,
+                    help="parallel ngspice processes (default %(default)s)")
+    ap.add_argument("--keep-build", action="store_true")
+    ap.add_argument(
+        "--baseline-runid",
+        default=None,
+        help="sim/pvt/results/<runid> to compare against (default: most recent)",
+    )
+    ap.add_argument("--runid", default=None)
+    ap.add_argument(
+        "--guardrails",
+        action="store_true",
+        help="additionally re-verify DR-0017's two issue-#57 guardrails "
+        "(Row-4 cell 0x80/ff/85C/3.6V + per-process trim calibration vs the "
+        "ratified 48 MHz target) on both sides, inside this same run "
+        "(issue #61)",
+    )
+    args = ap.parse_args()
+
+    runid = args.runid or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    # Raw output is staged in git-ignored scratch and stored through the
+    # artifact store at the end (issue #196); fail closed before simulating.
+    try:
+        stage = evidence_stage.open_stage("pvt-postlayout", runid)
+    except evidence_stage.StoreError as exc:
+        sys.exit(f"ERROR: evidence cannot be stored, not starting (fail closed): {exc}")
+    corner_dir = stage.corners / runid
+    res_dir = stage.results / runid
+    build_dir = BUILD_ROOT / runid
+    for d in (corner_dir, res_dir, build_dir):
+        if d.exists() and any(d.iterdir()):
+            sys.exit(f"ERROR: {d} already exists and is non-empty (runid collision?)")
+        d.mkdir(parents=True, exist_ok=True)
+
+    started = time.time()
+
+    if args.baseline_runid:
+        baseline_id = args.baseline_runid
+        baseline_dir = PVT_RESULTS_DIR / baseline_id
+        if not (baseline_dir / "manifest.json").is_file():
+            sys.exit(f"ERROR: {baseline_dir}/manifest.json not found")
+    else:
+        baseline_id, baseline_dir = find_latest_schematic_baseline()
+    baseline_manifest = json.loads((baseline_dir / "manifest.json").read_text())
+    code = baseline_manifest["calibration_spec_target"]["tt"]["code"]
+    print(
+        f"== baseline: sim/pvt/results/{baseline_id} "
+        f"(fixed post-trim code 0x{code:02X}, from its tt/27C/3.3V "
+        "ratified-target calibration) ==",
+        flush=True,
+    )
+
+    pdk_root, pdk, model_dir = base.resolve_pdk()
+
+    print("== regenerating design/netlist from schematics ==", flush=True)
+    subprocess.run(
+        [str(REPO_ROOT / "design" / "regen-netlist.sh")], check=True, cwd=REPO_ROOT
+    )
+
+    schematic_text = PVT_TB.read_text()
+    pins, top_block_lines, _all_lines = extract_rcosc_top_block(schematic_text)
+    print(f"== schematic rcosc_top pin order: {pins} ==", flush=True)
+
+    extracted_spice, extract_report = run_extract(runid, res_dir)
+    raw_extracted_text = extracted_spice.read_text()
+    stripped_text, n_stripped = strip_capacitor_model_annotations(raw_extracted_text)
+    if n_stripped:
+        print(
+            f"== stripped {n_stripped} non-simulatable capacitor model-flavour "
+            "annotation(s) from the extracted netlist (see pex_pvt_sweep.py's "
+            "CAP_MODEL_TAG_RE docstring) ==",
+            flush=True,
+        )
+        extracted_spice.write_text(stripped_text)
+    extracted_text = reorder_extracted_header(stripped_text, pins)
+
+    # Build the extracted-side harness: byte-identical pvt_tb.spice except
+    # the embedded '.subckt rcosc_top ... .ends' region is replaced by the
+    # PEX netlist's own subckt (header reordered to match). Any sibling
+    # '.subckt rcosc_bias/...' blocks that originally followed are left in
+    # place, unreferenced -- an unused .subckt declaration is inert in
+    # ngspice, and leaving them keeps this a single contiguous-region
+    # substitution rather than a line-by-line rewrite.
+    top_block_text = "\n".join(top_block_lines)
+    if top_block_text not in schematic_text:
+        sys.exit("ERROR: could not locate the exact rcosc_top block to substitute")
+    extracted_side_text = schematic_text.replace(
+        top_block_text, extracted_text.rstrip("\n"), 1
+    )
+
+    points = [
+        base.Point(p, t, v, code)
+        for p in PEX_PROCESSES
+        for t in base.TEMPS_C
+        for v in base.VDDS_V
+    ]
+    print(f"== {len(points)} corner-endpoint points x 2 sides ==", flush=True)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=args.jobs) as pool:
+        futures = {}
+        for side, text in (
+            ("schematic", schematic_text),
+            ("extracted", extracted_side_text),
+        ):
+            for pt in points:
+                fut = pool.submit(
+                    run_point, side, text, pt, model_dir, build_dir, corner_dir, runid
+                )
+                futures[fut] = (side, pt)
+        done = 0
+        results: dict[tuple[str, base.Point], Result] = {}
+        for fut in concurrent.futures.as_completed(futures):
+            res = fut.result()
+            results[(res.side, res.point)] = res
+            done += 1
+            fmt = f"{res.f_hz / 1e6:8.4f} MHz" if res.f_hz else f"{res.status:>12}"
+            print(
+                f"  [{done:3d}/{len(futures):3d}] {res.side:>10} {res.point.key:<28} {fmt}",
+                flush=True,
+            )
+
+    guard = None
+    if args.guardrails:
+        guard = run_guardrail_passes(
+            sides=[("schematic", schematic_text), ("extracted", extracted_side_text)],
+            model_dir=model_dir,
+            build_dir=build_dir,
+            corner_dir=corner_dir,
+            runid=runid,
+            jobs=args.jobs,
+            seed=results,
+            baseline_dir=baseline_dir,
+            baseline_manifest=baseline_manifest,
+        )
+
+    elapsed = time.time() - started
+
+    rows = result_rows(results, points)
+    write_results(rows, res_dir)
+    write_guardrails_csv(guard, res_dir)
+
+    failures = [r for r in results.values() if r.status != "ok"]
+    deltas = [float(r["delta_pct"]) for r in rows if r["delta_pct"]]
+
+    # -- Cross-check: my own freshly re-run schematic side vs. the already-
+    # committed sim/pvt/ campaign's own posttrim_spec pass at this same code
+    # -- a same-methodology, different-host/run comparison that isolates
+    # run-to-run/cross-host ngspice numerical noise from the (much larger)
+    # schematic-vs-extracted delta this run's own verdict is about. Not a
+    # correctness check of this script (both sides of *that* run's own delta
+    # share one host/run already); purely a sanity bound on how much of the
+    # reported schematic-vs-extracted delta could, in principle, be
+    # environment noise rather than layout parasitics.
+    host_variance_pct = None
+    baseline_csv = baseline_dir / "results.csv"
+    if baseline_csv.is_file():
+        baseline_lookup: dict[tuple[str, float, float], float] = {}
+        with baseline_csv.open() as fh:
+            for brow in csv.DictReader(fh):
+                if brow["pass"] != "posttrim_spec" or not brow["f_hz"]:
+                    continue
+                bkey = (brow["process"], float(brow["temp_c"]), float(brow["vdd_v"]))
+                baseline_lookup[bkey] = float(brow["f_hz"])
+        host_deltas = []
+        for pt in points:
+            sres = results[("schematic", pt)]
+            bkey = (pt.process, pt.temp_c, pt.vdd_v)
+            if sres.f_hz and bkey in baseline_lookup and baseline_lookup[bkey] > 0:
+                host_deltas.append(
+                    abs(sres.f_hz - baseline_lookup[bkey])
+                    / baseline_lookup[bkey]
+                    * 100.0
+                )
+        if host_deltas:
+            host_variance_pct = max(host_deltas)
+
+    manifest = {
+        "runid": runid,
+        "utc": datetime.now(timezone.utc).isoformat(),
+        "git_sha": base.git_sha(),
+        "git_dirty": base.git_dirty(),
+        "ngspice": base.tool_version(["ngspice", "-v"], line=1),
+        "xschem": base.tool_version(["xschem", "--version"], line=0),
+        "klt_version": base.tool_version(["klt", "version"], line=0),
+        **pdk_provenance.manifest_fields(pdk_root, pdk, model_dir),
+        "layout_gds": str(GDS_PATH.relative_to(REPO_ROOT)),
+        "extract_command": [
+            "klt",
+            "extract",
+            "layout/cells/rcosc_top.gds",
+            "--deck",
+            "gf180mcu",
+            "--top",
+            "rcosc_top",
+            "--pdk",
+            "gf180mcuC",
+            *[a for opt in DECK_OPTIONS for a in ("--deck-option", opt)],
+            "--pins",
+            EXTRACT_PINS,
+            "--parasitics",
+        ],
+        "extract_parasitic_model": extract_report.get("parasitics", {}).get("model"),
+        "schematic_baseline_runid": baseline_id,
+        "process_corners": {k: list(base.PROCESS_CORNERS[k]) for k in PEX_PROCESSES},
+        "temps_c": base.TEMPS_C,
+        "vdds_v": base.VDDS_V,
+        "trim_code": code,
+        "trim_hex": f"0x{code:02X}",
+        "measurement": {
+            "tstep": base.TSTEP,
+            "tstop_ns": base.TSTOP_NS_DEFAULT,
+            "tstop_ns_retry": base.TSTOP_NS_RETRY,
+            "first_edge": base.MEAS_FIRST_EDGE,
+            "last_edge": base.MEAS_LAST_EDGE,
+            "cycles_averaged": base.MEAS_LAST_EDGE - base.MEAS_FIRST_EDGE,
+        },
+        "points": len(points),
+        "sides": ["schematic", "extracted"],
+        "failed_runs": [f"{r.side}_{r.point.key}" for r in failures],
+        "max_abs_delta_pct": max((abs(d) for d in deltas), default=None),
+        "mean_delta_pct": (sum(deltas) / len(deltas)) if deltas else None,
+        "calibration_point_budget_pct": base.SPEC["posttrim_calpoint_pct"],
+        "schematic_rerun_vs_published_baseline_max_delta_pct": host_variance_pct,
+        "wall_clock_s": round(elapsed, 1),
+        "jobs": args.jobs,
+    }
+    if guard is not None:
+        manifest["guardrails"] = guard
+    (res_dir / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
+
+    (res_dir / "summary.md").write_text(
+        build_summary(
+            runid,
+            manifest,
+            rows,
+            points,
+            guard,
+            failures,
+            host_variance_pct,
+            baseline_id,
+            code,
+            elapsed,
+            args.jobs,
+        )
+        + "\n"
+    )
 
     print(f"\n== done: staged in {stage.root.relative_to(REPO_ROOT)} ==", flush=True)
     if not args.keep_build:
