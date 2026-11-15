@@ -322,6 +322,33 @@ def compose_deck(
     return deck
 
 
+def run_ngspice_deck(
+    rundir: Path, deck: str, *, timeout: int = 1800
+) -> tuple[str, float, int]:
+    """Shared local single-corner ngspice invocation (issue #361).
+
+    Writes ``deck`` to ``rundir/run.spice``, runs ``ngspice -b run.spice``
+    with ``rundir`` as cwd, and returns ``(out, elapsed_s, returncode)`` where
+    ``out`` is stdout + "\\n" + stderr.  The 1800 s default timeout and the
+    stdout/stderr merge are the local-run contract shared by pvt_sweep,
+    delay_probe and pex_pvt_sweep: a single corner stays on the local host
+    (multi-corner grids go through the batch backend), so the contract has
+    one home here instead of one independent copy per driver.
+    """
+    (rundir / "run.spice").write_text(deck)
+    started = time.time()
+    proc = subprocess.run(
+        ["ngspice", "-b", "run.spice"],
+        cwd=rundir,
+        capture_output=True,
+        text=True,
+        timeout=timeout,
+    )
+    elapsed = time.time() - started
+    out = (proc.stdout or "") + "\n" + (proc.stderr or "")
+    return out, elapsed, proc.returncode
+
+
 FOSC_RE = re.compile(r"^\s*fosc\s*=\s*([-+0-9.eE]+)\s*$", re.M)
 PERIOD_RE = re.compile(r"^\s*period\s*=\s*([-+0-9.eE]+)\s*$", re.M)
 
@@ -334,17 +361,7 @@ def run_point(camp: Campaign, netlist_text: str, point: Point) -> Result:
         rundir = camp.build_dir / point.key / f"t{tstop}"
         rundir.mkdir(parents=True, exist_ok=True)
         deck = compose_deck(netlist_text, camp.model_dir, point, tstop)
-        (rundir / "run.spice").write_text(deck)
-        started = time.time()
-        proc = subprocess.run(
-            ["ngspice", "-b", "run.spice"],
-            cwd=rundir,
-            capture_output=True,
-            text=True,
-            timeout=1800,
-        )
-        elapsed = time.time() - started
-        out = (proc.stdout or "") + "\n" + (proc.stderr or "")
+        out, elapsed, returncode = run_ngspice_deck(rundir, deck)
         m_f, m_p = FOSC_RE.search(out), PERIOD_RE.search(out)
         log_rel = f"sim/pvt/corners/{camp.runid}/{point.key}.log"
         header = (
@@ -362,7 +379,7 @@ def run_point(camp: Campaign, netlist_text: str, point: Point) -> Result:
             f"f = {MEAS_LAST_EDGE - MEAS_FIRST_EDGE} periods / "
             f"(t[rise={MEAS_LAST_EDGE}] - t[rise={MEAS_FIRST_EDGE}])\n"
             f"wall clock  : {elapsed:.1f} s\n"
-            f"exit status : {proc.returncode}\n"
+            f"exit status : {returncode}\n"
             "====================================================================\n"
         )
         (camp.log_dir / f"{point.key}.log").write_text(header + out)
