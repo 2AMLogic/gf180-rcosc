@@ -15,6 +15,8 @@ name: Offline suites
 #     and trim-transition generators, and the sim/ PDK-provenance guards.
 #   - temperature-offline: sim/temperature interior-temperature request
 #     generation and curvature analysis (issue #125 subset).
+#   - iq-attribution-offline: sim/iq-attribution per-stage running-Iq
+#     attribution report and stage-map tests (issue #347, added by #373).
 #   - pvt-postlayout-offline: pex_pvt_sweep.py's extracted report/record
 #     helpers (issue #353).
 # PDK-free, simulator-free,
@@ -52,7 +54,7 @@ jobs:
           - name: trim-transition-offline
             tests: sim/trim-transition/test_harness.py
           - name: trim-dense-offline
-            tests: sim/trim-dense/test_harness.py
+            tests: sim/trim-dense/test_harness.py sim/trim-dense/test_compare_engine.py
           - name: layout-preflight-offline
             tests: layout/test_run_checks_preflight.py
           - name: signoff-drift-offline
@@ -75,6 +77,8 @@ jobs:
             tests: sim/startup-settled/test_startup_settled.py
           - name: row45-attribution-offline
             tests: sim/row45-attribution/test_stage_attribution.py
+          - name: iq-attribution-offline
+            tests: sim/iq-attribution/test_iq_report.py sim/iq-attribution/test_stage_map.py
           - name: pvt-postlayout-offline
             tests: sim/pvt-postlayout/test_pex_pvt_sweep.py
     steps:

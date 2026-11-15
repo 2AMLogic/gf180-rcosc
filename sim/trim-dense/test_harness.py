@@ -402,6 +402,73 @@ def test_cli_prepare_end_to_end(tmp_path):
     assert p.returncode != 0 and "not empty" in p.stderr
 
 
+# ------------------------------------------------- engine_version pin (#378) ----
+# `engine_version_expected` set to a real version ("MAJOR" / "MAJOR.MINOR")
+# also emits a request-level `engine_version` pin (klayout-tools#3041), which
+# `klt sim` checks against the runner's report after the run.  The default
+# "unspecified" must leave every request byte unchanged: #87's frozen campaign
+# (manifest provenance_sha256 d1d24253...) is regenerated from prepare.py every
+# slice, so any pin-unset byte drift would refuse the remaining slices.
+
+CAMPAIGN_PROV = (prepare.REPO / "sim" / "trim-dense" / "results"
+                 / "20261106T1115Z-campaign" / "provenance.json")
+
+
+def _pin_strip(raw: bytes, key: str = "engine_version") -> bytes:
+    req = json.loads(raw)
+    req.pop(key, None)
+    return (json.dumps(req, indent=2) + "\n").encode()
+
+
+def test_engine_pin_unset_is_byte_stable_with_the_frozen_campaign(tmp_path, no_exec):
+    ext = ext_fixture(tmp_path)
+    out = tmp_path / "bench"
+    prov = prepare.generate(out, SCH, ext, CORNER)
+    committed = json.loads(CAMPAIGN_PROV.read_text())
+    # Every input-independent block and every request hash must equal the
+    # committed pre-#378 artifact (same tt corner, default settings).
+    for k in ("kind", "evidence", "issue", "parent", "pvt_grid_source",
+              "models", "codes", "settings", "units", "manifest_template",
+              "manifest_required_at_execution", "execution"):
+        assert prov[k] == committed[k], k
+    frozen = {e["tag"]: e["sha256"]["request"] for e in committed["requests"]}
+    for e in prov["requests"]:
+        raw = (out / e["request"]).read_bytes()
+        assert b"engine_version" not in raw, e["tag"]
+        assert hashlib.sha256(raw).hexdigest() == e["sha256"]["request"]
+        assert e["tag"] in frozen and e["sha256"]["request"] == frozen[e["tag"]], e["tag"]
+
+
+def test_engine_pin_set_emits_key_and_strip_restores_bytes(tmp_path, no_exec):
+    ext = ext_fixture(tmp_path)
+    base = tmp_path / "base"
+    prov0 = prepare.generate(base, SCH, ext, CORNER)
+    assert prov0["settings"]["engine_version_expected"] == "unspecified"
+    for pin in ("47", "47.1"):
+        out = tmp_path / f"pinned_{pin.replace('.', '_')}"
+        prov = prepare.generate(out, SCH, ext, CORNER, {"engine_version_expected": pin})
+        assert prov["settings"]["engine_version_expected"] == pin
+        for e in prov["requests"]:
+            raw = (out / e["request"]).read_bytes()
+            assert json.loads(raw)["engine_version"] == pin
+            assert e["sha256"]["request"] == hashlib.sha256(raw).hexdigest()
+            # Removing the pin key restores the pin-less request bytes exactly:
+            # the simulator pin is the ONLY difference between the two benches.
+            assert _pin_strip(raw) == (base / e["request"]).read_bytes()
+
+
+def test_engine_pin_validation(tmp_path, no_exec):
+    ext = ext_fixture(tmp_path)
+    for unset in ("unspecified", ""):
+        out = tmp_path / f"u_{unset or 'empty'}"
+        prov = prepare.generate(out, SCH, None, CORNER, {"engine_version_expected": unset})
+        assert b'"engine_version"' not in (out / prov["requests"][0]["request"]).read_bytes()
+    for bad in ("v47", "4.7.1", "ngspice-46", "forty-seven"):
+        with pytest.raises(prepare.PrepareError, match="engine_version_expected"):
+            prepare.generate(tmp_path / f"bad_{bad[:4]}", SCH, None, CORNER,
+                             {"engine_version_expected": bad})
+
+
 def test_no_measured_artifacts_in_tree():
     # A results/ tree may hold a Step 0 fleet-gate record (issue #87 acceptance 1: one
     # single-corner batch request, no trim-step verdict). It must never hold campaign
@@ -410,14 +477,16 @@ def test_no_measured_artifacts_in_tree():
     if not res.exists():
         return
     # Analyzer outputs are never allowed until the verdict PR adds them deliberately; a
-    # run directory with a frozen manifest.json is a campaign dir (#87), whose README
-    # must say it is partial and whose analyzer outputs must be absent here.
+    # run directory with a frozen manifest.json is a campaign dir (#87) or a completed
+    # A/B run (#378), whose README must state its state explicitly: PARTIAL while the
+    # campaign is still landing slices, COMPLETE once the run's verdict is recorded.
     analysis = {"results.json", "steps.csv", "summary.md"}
     bad = [str(p.relative_to(HERE)) for p in res.rglob("*") if p.is_file() and p.name in analysis]
     assert not bad, f"analyzer outputs present: {bad}"
     for run in (d for d in res.iterdir() if d.is_dir()):
         if (run / "manifest.json").is_file():
-            assert "PARTIAL" in (run / "README.md").read_text(), run
+            readme = (run / "README.md").read_text()
+            assert "PARTIAL" in readme or "COMPLETE" in readme, run
             continue
         readme = (run / "README.md").read_text()
         assert "Step 0 fleet gate only" in readme and "NOT run" in readme, run

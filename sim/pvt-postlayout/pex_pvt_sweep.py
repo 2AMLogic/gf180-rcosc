@@ -260,10 +260,6 @@ def run_extract(runid: str, out_dir: Path) -> tuple[Path, dict]:
     return out_spice, report
 
 
-FOSC_RE = re.compile(r"^\s*fosc\s*=\s*([-+0-9.eE]+)\s*$", re.M)
-PERIOD_RE = re.compile(r"^\s*period\s*=\s*([-+0-9.eE]+)\s*$", re.M)
-
-
 @dataclass
 class Result:
     side: str
@@ -291,18 +287,8 @@ def run_point(
         rundir = build_dir / f"{side}_{point.key}" / f"t{tstop}"
         rundir.mkdir(parents=True, exist_ok=True)
         deck = base.compose_deck(netlist_text, model_dir, point, tstop)
-        (rundir / "run.spice").write_text(deck)
-        started = time.time()
-        proc = subprocess.run(
-            ["ngspice", "-b", "run.spice"],
-            cwd=rundir,
-            capture_output=True,
-            text=True,
-            timeout=1800,
-        )
-        elapsed = time.time() - started
-        out = (proc.stdout or "") + "\n" + (proc.stderr or "")
-        m_f, m_p = FOSC_RE.search(out), PERIOD_RE.search(out)
+        out, elapsed, returncode = base.run_ngspice_deck(rundir, deck)
+        m_f, m_p = base.FOSC_RE.search(out), base.PERIOD_RE.search(out)
         log_rel = f"sim/pvt-postlayout/corners/{runid}/{side}_{point.key}.log"
         header = (
             "====================================================================\n"
@@ -320,7 +306,7 @@ def run_point(
             f"f = {base.MEAS_LAST_EDGE - base.MEAS_FIRST_EDGE} periods / "
             f"(t[rise={base.MEAS_LAST_EDGE}] - t[rise={base.MEAS_FIRST_EDGE}])\n"
             f"wall clock  : {elapsed:.1f} s\n"
-            f"exit status : {proc.returncode}\n"
+            f"exit status : {returncode}\n"
             "====================================================================\n"
         )
         (log_dir / f"{side}_{point.key}.log").write_text(header + out)
