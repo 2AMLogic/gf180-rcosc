@@ -17,6 +17,8 @@ name: Offline suites
 #     generation and curvature analysis (issue #125 subset).
 #   - iq-attribution-offline: sim/iq-attribution per-stage running-Iq
 #     attribution report and stage-map tests (issue #347, added by #373).
+#   - pvt-postlayout-offline: pex_pvt_sweep.py's extracted report/record
+#     helpers (issue #353).
 # PDK-free, simulator-free,
 # cloud-free: python3 + pytest only. Fixtures are SYNTHETIC and are built in
 # memory / temporary directories; this job never writes into sim/ results and
@@ -77,6 +79,8 @@ jobs:
             tests: sim/row45-attribution/test_stage_attribution.py
           - name: iq-attribution-offline
             tests: sim/iq-attribution/test_iq_report.py sim/iq-attribution/test_stage_map.py
+          - name: pvt-postlayout-offline
+            tests: sim/pvt-postlayout/test_pex_pvt_sweep.py
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
