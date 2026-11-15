@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-"""Build `layout/cells/rcosc_bias.gds` and `layout/cells/rcosc_trim_bank.gds`
-from `klt gen` primitives, deterministically, from `design/netlist/
-rcosc_top.spice` (issue #13 -- see `layout/README.md` for the full scope
-note: this build script covers `rcosc_bias` and `rcosc_trim_bank` only, not
-yet `rcosc_comparator` or the `rcosc_top` composition).
+"""Build every cell in `CELL_ORDER` (`rcosc_bias`, `rcosc_trim_bank`,
+`rcosc_comparator`, `rcosc_comparator_p`, `rcosc_top`) from `klt gen`
+primitives, deterministically, from `design/netlist/rcosc_top.spice`
+(issue #13 -- see `layout/README.md` for the full scope note).
 
     uv run --no-project --with "klayout-tools==0.4.0" --with "klayout==0.30.12" \
         python3 layout/build_cells.py
@@ -79,6 +78,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import sys
+from collections.abc import Callable
 from pathlib import Path
 
 LAYOUT_DIR = Path(__file__).resolve().parent
@@ -533,45 +533,42 @@ _CMP_TRACKS = ["tail", "dn", "dp", "out", "vdd", "vss", "ibias", "inp", "inn"]
 _CMP_PINS = ["vdd", "vss", "ibias", "inp", "inn", "out"]
 
 
-def build_rcosc_comparator(devices: dict) -> tuple[Composer, list[str]]:
-    """5T differential pair + output buffer, channel-routed (issue #27).
+def _build_channel_routed_comparator(
+    devices: dict,
+    cell_name: str,
+    order: list[str],
+    tracks: list[str],
+    pins: list[str],
+    well_anchor: str,
+    pin_column_fn: Callable[[Row, dict], dict],
+) -> tuple[Composer, list[str]]:
+    """The channel-routed cell construction both comparators share.
 
-    Structurally different from #13's two cells in three ways, each forced by
-    the circuit rather than chosen:
-
-    * **Multi-finger.** `MTAIL` is `W=16u nf=8` -- one folded 8-finger device
-      (`mos_array`'s own `finger_topology: "parallel"`), not eight devices.
-      `klt extract` reports it as 8 parallel `nfet`s of `W=2u`, which is what
-      it physically is; `klt lvs`'s `options.combine_devices` folds them back
-      into the reference's single `W=16u` card (see `run_checks.sh`).
-    * **Not planar in one layer.** `dn` has to reach both PMOS gates across
-      `dp`'s run to the output buffer, so metal1 alone cannot route it without
-      a short. Routed instead on `gen_lib.Channel`'s two-layer discipline:
-      metal1 columns, metal2 tracks.
-    * **A real well tie.** The three PMOS share one drawn n-well with a
-      `well_island` tap on `vdd`; without it every PMOS body extracts as an
-      anonymous floating net and LVS cannot match a `vdd`-bodied reference.
-
-    Two independent `mos_array` calls are used for the `MINP`/`MINN` input pair
-    rather than `klt gen diff_pair`'s common-centroid cross-quad. `diff_pair`
-    is the right primitive when *matching* is the binding constraint; here the
-    comparator's offset is a second-order contributor to this block's spec
-    (the trip points are set by the `rcosc_bias` divider, and the oscillator's
-    accuracy budget is dominated by R/C spread and trim resolution, DR-0003),
-    while `diff_pair`'s mandatory-by-default guard ring would have to be cut
-    open on both sides to route four terminals out of it. Documented here as a
-    deliberate choice, not an oversight -- if a post-layout offset sweep ever
-    makes comparator matching binding, this is the call to revisit."""
-    c = Composer("rcosc_comparator")
+    Everything the two cells (#27's NMOS-input `rcosc_comparator` and #57's
+    PMOS-input `rcosc_comparator_p`) build differently is a parameter of this
+    helper: the composer name, the placement order, the routing-channel track
+    order, the boundary-pin list, which block anchors the shared n-well, and
+    where each pin pad lands (`pin_column_fn`). The construction around them
+    -- one `Row` of `mos_array` blocks, one n-well from the `well_anchor`
+    block through a `well_island` vdd tap, one metal1 terminal column per
+    device terminal and one metal2 track per net (`Channel`), one pin pad per
+    net -- is identical and lives only here, so a change to it cannot be made
+    to one comparator and missed in the other (the drift #343 removed
+    elsewhere in this file). The per-cell *circuit* rationale stays on the
+    public wrappers' docstrings.
+    """
+    c = Composer(cell_name)
     row = Row(c)
 
     placed = {}
-    for name in _CMP_ORDER:
+    for name in order:
         placed[name] = row.place("mos_array", _mos_params(devices[name]), name.lower()[1:])
 
-    # One n-well over the whole PMOS group plus its tap island, merging the
-    # generators' own per-device wells into one equipotential well.
-    well_x0 = row.left_um["mloada"] + COL_OFFSET_UM - 0.5
+    # One n-well from the `well_anchor` block (the PMOS group's first device)
+    # through the tap island, merging the generators' own per-device wells
+    # into one equipotential well; the blocks left of the anchor (the row's
+    # NMOS prefix) stay outside it.
+    well_x0 = row.left_um[well_anchor] + COL_OFFSET_UM - 0.5
     p_well = row.place(
         "well_island",
         {
@@ -603,7 +600,7 @@ def build_rcosc_comparator(devices: dict) -> tuple[Composer, list[str]]:
 
     # `nodes` is the schematic's own [d, g, s, b] order for these MOS calls, so
     # every net below is read from the netlist, never retyped.
-    for name in _CMP_ORDER:
+    for name in order:
         key = name.lower()[1:]
         d_net, g_net, s_net, _b_net = devices[name].nodes
         terminal(name, "U0_S", s_net, row.left_um[key])
@@ -614,22 +611,65 @@ def build_rcosc_comparator(devices: dict) -> tuple[Composer, list[str]]:
     tap_x, tap_y, _ = p_well.port_abs("TAP_N")
     ch.add("vdd", tap_x, tap_y, tap_x)
 
-    ch.route(_CMP_TRACKS)
-    pad_y = ch.top_y_um(_CMP_TRACKS) + PAD_CLEARANCE_UM
-    pin_column = {
-        "vdd": row.left_um["mloada"],
-        "vss": row.left_um["mtail"],
-        "out": row.right_um["mbufn"],
-        "ibias": placed["XMTAIL"].port_abs("U0_G")[0],
-        "inp": placed["XMINP"].port_abs("U0_G")[0],
-        "inn": placed["XMINN"].port_abs("U0_G")[0],
-    }
+    ch.route(tracks)
+    pad_y = ch.top_y_um(tracks) + PAD_CLEARANCE_UM
+    pin_column = pin_column_fn(row, placed)
     pins_um = {}
-    for net in _CMP_PINS:
+    for net in pins:
         pins_um[net] = ch.pin_pad(net, pin_column[net], pad_y, gen_lib.METAL1_LABEL)
 
     c.pins_um = pins_um  # consumed by build_rcosc_top when it instantiates this cell
-    return c, _CMP_PINS
+    return c, pins
+
+
+def build_rcosc_comparator(devices: dict) -> tuple[Composer, list[str]]:
+    """5T differential pair + output buffer, channel-routed (issue #27).
+
+    Structurally different from #13's two cells in three ways, each forced by
+    the circuit rather than chosen:
+
+    * **Multi-finger.** `MTAIL` is `W=16u nf=8` -- one folded 8-finger device
+      (`mos_array`'s own `finger_topology: "parallel"`), not eight devices.
+      `klt extract` reports it as 8 parallel `nfet`s of `W=2u`, which is what
+      it physically is; `klt lvs`'s `options.combine_devices` folds them back
+      into the reference's single `W=16u` card (see `run_checks.sh`).
+    * **Not planar in one layer.** `dn` has to reach both PMOS gates across
+      `dp`'s run to the output buffer, so metal1 alone cannot route it without
+      a short. Routed instead on `gen_lib.Channel`'s two-layer discipline:
+      metal1 columns, metal2 tracks.
+    * **A real well tie.** The three PMOS share one drawn n-well with a
+      `well_island` tap on `vdd`; without it every PMOS body extracts as an
+      anonymous floating net and LVS cannot match a `vdd`-bodied reference.
+
+    Two independent `mos_array` calls are used for the `MINP`/`MINN` input pair
+    rather than `klt gen diff_pair`'s common-centroid cross-quad. `diff_pair`
+    is the right primitive when *matching* is the binding constraint; here the
+    comparator's offset is a second-order contributor to this block's spec
+    (the trip points are set by the `rcosc_bias` divider, and the oscillator's
+    accuracy budget is dominated by R/C spread and trim resolution, DR-0003),
+    while `diff_pair`'s mandatory-by-default guard ring would have to be cut
+    open on both sides to route four terminals out of it. Documented here as a
+    deliberate choice, not an oversight -- if a post-layout offset sweep ever
+    makes comparator matching binding, this is the call to revisit."""
+    def pin_column(row: Row, placed: dict) -> dict:
+        return {
+            "vdd": row.left_um["mloada"],
+            "vss": row.left_um["mtail"],
+            "out": row.right_um["mbufn"],
+            "ibias": placed["XMTAIL"].port_abs("U0_G")[0],
+            "inp": placed["XMINP"].port_abs("U0_G")[0],
+            "inn": placed["XMINN"].port_abs("U0_G")[0],
+        }
+
+    return _build_channel_routed_comparator(
+        devices,
+        cell_name="rcosc_comparator",
+        order=_CMP_ORDER,
+        tracks=_CMP_TRACKS,
+        pins=_CMP_PINS,
+        well_anchor="mloada",
+        pin_column_fn=pin_column,
+    )
 
 
 #: `rcosc_comparator_p`'s row, left to right (issue #57): the four NMOS
@@ -674,93 +714,32 @@ def build_rcosc_comparator_p(devices: dict) -> tuple[Composer, list[str]]:
     dominated by R/C spread and trim resolution, DR-0003/DR-0017), while
     `diff_pair`'s mandatory guard ring would have to be cut open to route
     four terminals out of it."""
-    c = Composer("rcosc_comparator_p")
-    # The +0.4um row-gap delta over the module default is a deliberate
-    # top-level channel-column clearance, not a DRC number: this cell's
-    # width sets where every top-level device right of XCMPL (MDISCH, the
-    # latch, CTIMING) lands, and those devices' gate columns must clear the
-    # trim bank's own right-side pad columns (fixed x's) by >= 0.72um in
-    # `build_rcosc_top`'s channel. The pre-#57 width cleared that lattice
-    # only by coincidence; this cell's different width re-rolls it, and the
-    # 8x0.4um this adds is the measured clearance that re-establishes it
-    # (verified by the build's own column-spacing check, which scans every
-    # column pair -- not just the pair that first collided).
-    row = Row(c)
+    def pin_column(row: Row, placed: dict) -> dict:
+        return {
+            # vdd over the PMOS group's first device; vss over the second load's
+            # source column and out over MBUF2N's drain column -- interior
+            # columns of nets each already reaches, deliberately NOT the row's
+            # edge-adjacent columns: a pad outside the cell's GDS bbox lands in
+            # the top-level neighbour's right margin when `Row.place_cell`
+            # reserves space by bbox (observed as a 0.21um channel-column clash
+            # during issue #57's bring-up), and interior pads cannot.
+            "vdd": row.left_um["mptail"],
+            "vss": row.left_um["mnloadb"],
+            "out": row.right_um["mbuf2n"],
+            "pb": placed["XMPTAIL"].port_abs("U0_G")[0],
+            "inp": placed["XMPINN"].port_abs("U0_G")[0],
+            "inn": placed["XMPINP"].port_abs("U0_G")[0],
+        }
 
-    placed = {}
-    for name in _CMPP_ORDER:
-        placed[name] = row.place("mos_array", _mos_params(devices[name]), name.lower()[1:])
-
-    # One n-well over the whole PMOS group (the trailing five blocks) plus
-    # its tap island, merging the generators' own per-device wells into one
-    # equipotential well tied to vdd -- the load/buffer NMOS prefix of the
-    # row stays outside it.
-    well_x0 = row.left_um["mptail"] + COL_OFFSET_UM - 0.5
-    p_well = row.place(
-        "well_island",
-        {
-            "inner_width_um": 1.0,
-            "inner_height_um": 1.0,
-            "contacts_per_side": 1,
-            # The label this generator would draw sits on the ring's own metal
-            # inside a sub-cell, where `klt extract` does not reliably promote
-            # it to a pin -- this cell names `vdd` on its own pin pad instead.
-            "net": "",
-        },
-        "pwell_tap",
+    return _build_channel_routed_comparator(
+        devices,
+        cell_name="rcosc_comparator_p",
+        order=_CMPP_ORDER,
+        tracks=_CMPP_TRACKS,
+        pins=_CMPP_PINS,
+        well_anchor="mptail",
+        pin_column_fn=pin_column,
     )
-    well_x1 = row.right_um["pwell_tap"] - COL_OFFSET_UM + 0.5
-    c.draw_nwell(well_x0, -0.65, well_x1, row.top_um + 0.5)
-
-    ch = Channel(
-        c,
-        column_layer=gen_lib.METAL1,
-        track_layer=gen_lib.METAL2,
-        track_via=gen_lib.VIA1,
-        y0_um=row.top_um + CHANNEL_CLEARANCE_UM,
-        pitch_um=TRACK_PITCH_UM,
-    )
-
-    def terminal(dev_name: str, port: str, net: str, column_x: float) -> None:
-        x, y, _ = placed[dev_name].port_abs(port)
-        ch.add(net, x, y, column_x)
-
-    # `nodes` is the schematic's own [d, g, s, b] order for these MOS calls,
-    # so every net below is read from the netlist, never retyped.
-    for name in _CMPP_ORDER:
-        key = name.lower()[1:]
-        d_net, g_net, s_net, _b_net = devices[name].nodes
-        terminal(name, "U0_S", s_net, row.left_um[key])
-        terminal(name, "U0_D", d_net, row.right_um[key])
-        gate_x, _, _ = placed[name].port_abs("U0_G")
-        terminal(name, "U0_G", g_net, gate_x)
-
-    tap_x, tap_y, _ = p_well.port_abs("TAP_N")
-    ch.add("vdd", tap_x, tap_y, tap_x)
-
-    ch.route(_CMPP_TRACKS)
-    pad_y = ch.top_y_um(_CMPP_TRACKS) + PAD_CLEARANCE_UM
-    pin_column = {
-        # vdd over the PMOS group's first device; vss over the second load's
-        # source column and out over MBUF2N's drain column -- interior
-        # columns of nets each already reaches, deliberately NOT the row's
-        # edge-adjacent columns: a pad outside the cell's GDS bbox lands in
-        # the top-level neighbour's right margin when `Row.place_cell`
-        # reserves space by bbox (observed as a 0.21um channel-column clash
-        # during issue #57's bring-up), and interior pads cannot.
-        "vdd": row.left_um["mptail"],
-        "vss": row.left_um["mnloadb"],
-        "out": row.right_um["mbuf2n"],
-        "pb": placed["XMPTAIL"].port_abs("U0_G")[0],
-        "inp": placed["XMPINN"].port_abs("U0_G")[0],
-        "inn": placed["XMPINP"].port_abs("U0_G")[0],
-    }
-    pins_um = {}
-    for net in _CMPP_PINS:
-        pins_um[net] = ch.pin_pad(net, pin_column[net], pad_y, gen_lib.METAL1_LABEL)
-
-    c.pins_um = pins_um  # consumed by build_rcosc_top when it instantiates this cell
-    return c, _CMPP_PINS
 
 
 # `rcosc_top`'s row, left to right. Sub-blocks first, then the discharge
