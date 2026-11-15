@@ -11,16 +11,25 @@ open-source xschem + ngspice flow.
 The graded T1 verdict in
 [`signoff/signoff-report.json`](signoff/signoff-report.json) is **8 of 11
 items met, tier not yet awarded** — items 5 (corner verification), 6
-(Monte Carlo) and 7 (post-layout) are unmet. Two ratified spec rows are
-missed: **post-trim accuracy** is over the ±1.1 % budget (schematic and
-post-layout) and **trim range** is "Not met". The operator ruled on
-2026-10-08 that both are design fixes, not disclosed exceptions;
-[issue #66](https://github.com/2AMLogic/gf180-rcosc/issues/66) owns the
-fix. The post-layout (PEX) pass committed so far is a diagnostic campaign
-(27-point subset, extracted frequency 19–37 % slow), not item-7 evidence;
-[issue #70](https://github.com/2AMLogic/gf180-rcosc/issues/70) owns the
-`klt pex` report. The next work items are #66 and #70; a shuttle seat is
-not the next step while ratified rows fail.
+(Monte Carlo) and 7 (post-layout) are unmet, with reasons `check_failed`,
+`negative_control_not_detected` and `no_evidence`. The grade rests on the
+2026-11-06 campaigns. Item 5, on
+[`sim/item5/results/20261106T051832Z/`](sim/item5/results/20261106T051832Z/summary.md)
+(trim code `0xA9` held across corners): **post-trim accuracy** — rows 4
+and 5 — fails with one code held across process corners (7/21 and 22/63
+points inside the ratified −2.9 %/+2.0 % and −10.8 %/+8.8 % windows);
+**trim range** (row 2) fails on its LSB step, 0.501 %/code against the
+ratified 0.314 %/code, with both range ends passing (28.202 / 73.502 MHz
+against 28.8 / 67.2 MHz); row 8 draws 576.2 uA at `ff`/85 °C/3.6 V at the
+`tt` calibration code against the < 500 uA limit. Item 6's Monte Carlo
+campaign (`sim/mc/results/20261106T072000Z/`) reports
+`negative_control_not_detected`. Item 7 has no `klt pex` report and is
+owned by [issue #70](https://github.com/2AMLogic/gf180-rcosc/issues/70).
+The design has moved since this grade — the current row-by-row position
+is in [`docs/ROADMAP.md`](docs/ROADMAP.md) (§ "Where it stands") and
+[`signoff/README.md`](signoff/README.md) (§ "Current verdict, and the
+claims behind each row"), summarised in the ladder paragraph below — and
+none of it is re-graded, so this verdict stands as the record of truth.
 <!-- current-t1-status:end -->
 The target spec (frequency, trim math, PVT accuracy budget) is ratified —
 see below and [`spec/`](spec/README.md). Schematic capture, the PVT-corner
@@ -110,13 +119,42 @@ would supersede them.
 Maturity ladder: spec ratified → schematic simulated across PVT → layout
 DRC/LVS-clean → post-layout re-verification → shuttle seat → measured
 silicon. **Current position: spec ratified, schematic simulated across
-PVT, layout DRC/LVS-clean against the post-#43 schematic; post-layout
-(PEX) work is a diagnostic campaign only, and the graded T1 verdict is
-8 of 11 items met with post-trim accuracy and trim range missed (see the
-status above and [issue #66](https://github.com/2AMLogic/gf180-rcosc/issues/66)).
-The post-layout rung is not complete (item 7 is owned by
-[issue #70](https://github.com/2AMLogic/gf180-rcosc/issues/70)), so the
-shuttle-seat rung is not yet in reach; no silicon exists.**
+PVT, layout DRC/LVS-clean — rebuilt for the comparator-H mirror-load
+change (L 1.0 → 0.7 µm,
+[DR-0039](spec/decision-records/0039-row5-comparator-h-mirror-load-l07-landed-in-schematic-and-netlist-layout-lvs-not-rebuilt.md),
+[DR-0042](spec/decision-records/0042-row5-comparator-h-mirror-load-l07-layout-rebuilt-drc-clean-lvs-match-extraction-reconfirm-and-mismatch-open.md))
+— with the graded T1 verdict still 8 of 11 items met (status block
+above). The post-grade design position, by ratified row
+([`docs/ROADMAP.md`](docs/ROADMAP.md) § "Where it stands";
+[`signoff/README.md`](signoff/README.md) § "Current verdict, and the
+claims behind each row"): row 5's `ff` accuracy miss is fixed — the
+mirror-load change reads +1.66 pt on the rebuilt-layout extraction
+against the +8.8 % full-temperature limit
+([DR-0038](spec/decision-records/0038-row5-comparator-h-mirror-load-l07-clears-ff-hot-low-v-on-three-die-stage-rerun-schematic-not-yet-changed.md)
+to
+[DR-0044](spec/decision-records/0044-row5-comparator-h-mirror-load-l07-trim-range-and-running-iq-unchanged-on-the-extraction-of-the-rebuilt-layout.md))
+— and the startup bench re-run on that netlist reads 63/63 at the
+[DR-0029](spec/decision-records/0029-calibration-code-after-comparator-h-fix.md)
+calibration code `0xA4`
+([`sim/startup-settled/results/20261114T221218Z/`](sim/startup-settled/results/20261114T221218Z/summary.md));
+row 4 is open — the `ss` supply span is 6.09 pt against the 4.9 pt
+at-calibration window
+([DR-0043](spec/decision-records/0043-row5-comparator-h-mirror-load-l07-reconfirmed-on-the-extraction-of-the-rebuilt-layout-ff-hot-low-v-clears.md)),
+the `w3r65` bank candidate clears it at 4.68 pt on the extraction but
+raises running Iq at code `0xFF` by 18–28 %
+([DR-0045](spec/decision-records/0045-row4-w3r65-bank-candidate-measured-on-the-rebuilt-layout-extraction-ss-span-clears-but-code-0xff-running-iq-rises-20-28-percent.md))
+and is therefore not adopted, with the ruling on
+[issue #337](https://github.com/2AMLogic/gf180-rcosc/issues/337) open;
+rows 2 and 8 fail on the current corner campaign
+([`sim/item5/results/20261106T071555Z/`](sim/item5/results/20261106T071555Z/summary.md)):
+row 2's nominal LSB step is 0.539 %/code against the ratified
+0.314 %/code (the range ends pass) and row 8 draws 559.4 uA at
+`ff`/85 °C/3.6 V. Every record behind this paragraph (DR-0038 through
+DR-0045) is `Status: proposed` — none is ratified and none of it is
+re-graded; the graded verdict in the status block above remains the
+verdict of record. The post-layout rung is not complete (item 7 is owned
+by [issue #70](https://github.com/2AMLogic/gf180-rcosc/issues/70)), so
+the shuttle-seat rung is not yet in reach; no silicon exists.**
 
 The comparator/bias-path PVT
 revision ([issue #39](https://github.com/2AMLogic/gf180-rcosc/issues/39),
@@ -134,13 +172,17 @@ post-layout diagnostic campaign
 and the comparator re-reference ([issue
 #61](https://github.com/2AMLogic/gf180-rcosc/issues/61),
 [DR-0018](spec/decision-records/0018-comparator-pmos-respin-postlayout-pex-reverification.md))
-re-runs that diagnostic on the post-#60 hierarchy — which supersedes
+re-ran that diagnostic on the post-#60 hierarchy, superseding
 [DR-0010](spec/decision-records/0010-postlayout-pex-pvt-frequency-shift.md)'s,
-DR-0013's and DR-0015's post-layout figures for it — the parasitic shift
-persists, always slower, −18.78 % to −36.86 % on the current pass (mean
-−25.65 %, worst at `ff`/−40 °C/3.6 V), with both DR-0017 guardrails
-holding extracted-side but the slow corner's trim headroom tightening to
-≈ +4.7 % (`ss` calibrates at `0xF7`). See
+DR-0013's and DR-0015's post-layout figures for it. Those DR-0018 figures
+are historical — its 2026-09-23 post-layout campaign
+([`sim/pvt-postlayout/results/20260923T152954Z/`](sim/pvt-postlayout/results/20260923T152954Z/summary.md))
+is a diagnostic, not a row-level verdict: the parasitic shift measured
+then was always slower, −18.78 % to −36.86 % (mean −25.65 %, worst at
+`ff`/−40 °C/3.6 V), with both DR-0017 guardrails holding extracted-side
+but the slow corner's trim headroom tightening to ≈ +4.7 % (`ss`
+calibrating at `0xF7`); the November records cited in the ladder above
+supersede them for the rows they re-measure. See
 [`design/README.md`](design/README.md), [`layout/README.md`](layout/README.md),
 and [`spec/decision-records/0018`](spec/decision-records/0018-comparator-pmos-respin-postlayout-pex-reverification.md)
 for the evidence behind each stage.
