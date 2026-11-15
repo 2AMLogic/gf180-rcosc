@@ -26,7 +26,8 @@ median **+0.0000 %**, mean **+0.0044 %**, min **−0.0889 %**, max **+0.1328 %**
   reproduce bit-identically (delta exactly 0.0000 %); the one exception is
   `ext_ss` 0xE0 at +0.0192 %.
 - `sch_ff` (schematic netlist, ff/85 C/3.6 V) shows small solver-path shifts,
-  13/15 within ±0.07 %; the extremes are +0.1328 % (0x10) and −0.0889 % (0x20).
+  12/15 within ±0.07 % (13/15 within ±0.09 %); the three outside ±0.07 % are
+  +0.1328 % (0x10), +0.1088 % (0xB2) and −0.0889 % (0x20).
   The max is 0.85× the half-LSB — below it, but this single point is why the
   verdict says "bounded below", not "zero": the campaign caveat for `sch_ff`
   should carry that number.
