@@ -174,8 +174,8 @@ newer graders' `klt erc` once refused the committed supply spec's
 ([klayout-tools#2822](https://github.com/2AMLogic/klayout-tools/issues/2822)),
 and now that it is closed the pinned build reads that spec unchanged, so
 the ERC and grader pins no longer differ. The committed
-`reports/rcosc_top.erc.json` is still the earlier `0.5.0+g2b1e55e51bb8`
-build's output and records that version string; it is rewritten only when
+`reports/rcosc_top.erc.json` records the build that last wrote it in its
+own `provenance.klt_version` field; it is rewritten only when
 `run_checks.sh` regenerates `layout/reports/`. `klt gen`'s
 drawn output is **not stable across `klayout-tools` versions**: the
 0.5.0-era generators render `res_array` footprints and an output grid

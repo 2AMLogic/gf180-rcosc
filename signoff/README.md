@@ -252,7 +252,7 @@ block — neither question was *asked* by this compare, so the match says
 nothing about per-instance power pin-to-net reach or body ties. The supply
 question itself is now item 11's, graded met (see the met-item-11 section
 below) from this same envelope's `net_correspondence` rows plus an ERC
-half written by a post-0.4.0 build (`2b1e55e5`); the
+half written by a post-0.4.0 build; the
 `power_connectivity`/`body_verification` blocks stay unasked by this pair,
 which is why item 11's analog branch does not lean on them.
 
