@@ -96,7 +96,7 @@
         "kind": "drc",
         "check_status": "clean",
         "content_hash": "sha256:4fe1cc52e1a51b343c17c39389f32048fc847f394b0a14c23bcb9913004e17e6",
-        "input_verified": true,
+        "input_verified": null,
         "exit_status": 0,
         "coverage": {
           "layers_in_stream_without_rules": [
@@ -575,7 +575,7 @@
         "command": null,
         "kind": "generic",
         "check_status": "pass",
-        "content_hash": "sha256:f547372ad95a3f338f2a045efe5b9b7b3cec78d50bcfe1d32100872227cfd20d",
+        "content_hash": "sha256:2b82f8601a3409ce7a74881936e0ad5042a4f5840421b0099ea0bc16275dc2ca",
         "input_verified": true,
         "exit_status": 0,
         "artifact_binding": {
@@ -584,7 +584,7 @@
             "path": ".github/workflows/signoff.yml",
             "scope": "repo"
           },
-          "content_hash": "sha256:f547372ad95a3f338f2a045efe5b9b7b3cec78d50bcfe1d32100872227cfd20d",
+          "content_hash": "sha256:2b82f8601a3409ce7a74881936e0ad5042a4f5840421b0099ea0bc16275dc2ca",
           "input_verified": true,
           "summary": "T1 item 10 (repo hygiene): bound to the CI workflow .github/workflows/signoff.yml, which re-grades this manifest and re-verifies every pinned evidence hash on every push and pull request (signoff/verify-report.py). Audited alongside it: README.md states what the block is, carries the ratified target-spec table with its basis citations (spec/decision-records/0002, 0003 and later records), and points to evidence reproduction; LICENSE (Apache-2.0) is committed. 'pass' asserts those three are present; only the workflow's bytes are bound, so an edit to the workflow (including a grader-pin move) requires refreshing this envelope.",
           "source": ".github/workflows/signoff.yml"
