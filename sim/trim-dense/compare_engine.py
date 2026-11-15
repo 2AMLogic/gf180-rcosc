@@ -44,9 +44,11 @@ import statistics
 import sys
 from pathlib import Path
 
-_SIM_DIR = Path(__file__).resolve().parent.parent
-if str(_SIM_DIR) not in sys.path:
-    sys.path.insert(0, str(_SIM_DIR))
+_HERE = Path(__file__).resolve().parent
+_SIM_DIR = _HERE.parent
+for _p in (str(_SIM_DIR), str(_HERE)):
+    if _p not in sys.path:
+        sys.path.insert(0, _p)
 import analyze  # noqa: E402  single source of HALF_LSB_PCT (DR-0003 Row 2)
 
 OK_STATUS = {"pass"}
