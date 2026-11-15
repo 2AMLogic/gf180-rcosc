@@ -378,7 +378,6 @@ def build_rcosc_bias(devices: dict) -> tuple[Composer, list[str]]:
 # comparator's and the re-spun bias cell's well groups). No NMOS may sit
 # inside that well rectangle (`klt extract`'s MOS split is "active inside
 # the well is PMOS, outside is NMOS").
-_TRIM_RES_ORDER = ["XRFIX"] + [f"XR{i}" for i in range(8)]
 _TRIM_ROW_ORDER = (
     ["XRFIX"]
     + [dev for i in range(8) for dev in (f"XR{i}", f"XSW{i}", f"XNINV{i}")]
@@ -527,8 +526,6 @@ def build_rcosc_trim_bank(devices: dict) -> tuple[Composer, list[str]]:
 # three floating nets. `XWELL` is the `well_island` tap that gives that shared
 # well its `vdd` identity.
 _CMP_ORDER = ["XMTAIL", "XMINP", "XMINN", "XMBUFN", "XMLOADA", "XMLOADB", "XMBUFP"]
-_CMP_NFET = ["XMTAIL", "XMINP", "XMINN", "XMBUFN"]
-_CMP_PFET = ["XMLOADA", "XMLOADB", "XMBUFP"]
 #: Track order (bottom-up) in the comparator's routing channel. Signal nets
 #: first (shortest columns for the busiest nets), then the rails, then the
 #: three single-terminal input pins.

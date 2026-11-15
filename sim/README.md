@@ -163,6 +163,17 @@ likewise collates only committed runs. A new run's `corners/<runid>/` directory
 does not exist in git, so doc citations (`signoff/verify-doc-citations.py`) of
 that run should cite `results/<runid>/`.
 
+**Per-corner `.spiceinit` is not committed either (issue #351).** `klt sim`
+writes a two-line `.spiceinit` into every per-corner working directory, and
+those are git-ignored (`.gitignore`): a new run commits its `request_*.json`
+only. The measurement-relevant line is the run's own request
+`options.ngspice_init` (`set measureprec=8`), recorded once per request in that
+campaign's `request_*.json`; the other is klt's invariant per-corner `set
+num_threads=1`, the single-thread setting `iq/run-iq-sweep.sh` and
+[DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md)
+already document in prose. Copies committed before that rule stay tracked;
+ignore rules do not untrack.
+
 ## PVT-corner campaign (issue #12)
 
 `sim/pvt/pvt_sweep.py` runs the full process x temperature x supply
