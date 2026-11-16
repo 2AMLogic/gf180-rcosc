@@ -408,8 +408,8 @@ The inputs for the grader-readable layer are committed under
 tt/ff/ss x -40/27/85 C grid, together the same 27 corner-endpoint points,
 trim code `0xA3` held), a schematic DUT wrapper, and `gen_requests.py`.
 The 27-point grid was submitted to the Spot batch fleet with the 0.7.0
-release (`klayout-tools==0.7.0`, the grader pin; command and report in
-`sim/pvt-postlayout/results/20261014T1000Z-klt-pex-batch/`). The earlier
+release (`klayout-tools==0.7.0`, the grader pin at the time; command and
+report in `sim/pvt-postlayout/results/20261014T1000Z-klt-pex-batch/`). The earlier
 version-skew blocker (klayout-tools#2851, closed) is cleared: the job report
 records `runner_klt_version: 0.7.0`, `client_klt_version: 0.7.0`,
 `runner_compatibility: match`. The campaign still produced nothing: the
