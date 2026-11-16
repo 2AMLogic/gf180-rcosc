@@ -11,6 +11,26 @@
 #
 # PDK_ROOT is resolved automatically via `klt pdk find --pdk gf180mcuC` if
 # not already set (same convention as design/regen-netlist.sh).
+#
+# Toolchain pins, one per job (issue #348):
+#   - geometry (klt CLI + the Python runtime running build_cells.py):
+#     klayout-tools 0.4.0 / klayout 0.30.12, enforced by the preflight below;
+#   - netlist currency: design/regen-netlist.sh --check, run at the END of the
+#     read-only preflight under ITS OWN pin (klayout-tools 0.9.2, declared in
+#     design/regen-netlist.sh). The 0.4.0 geometry pin has no `klt netlist`
+#     subcommand (DR-0042: this script could not run end to end because its
+#     first step netlisted), and the schematic netlists are NOT regenerated
+#     here on purpose: build_cells.py consumes the committed
+#     design/netlist/rcosc_top.spice, so the run needs that file *current*,
+#     not rewritten -- regenerating it inside a layout-evidence run would
+#     rewrite committed evidence behind the run's back. The --check gate
+#     re-netlists every entry point into a temp dir and fails the run if any
+#     committed design/netlist/*.spice has drifted from its schematic; a stale
+#     netlist stops and reports here and is regenerated deliberately
+#     (design/regen-netlist.sh without --check) and committed, never silently
+#     refreshed as a side effect.
+#   - ERC envelope: klayout-tools 0.8.0 via a separate ephemeral uv run
+#     (see the ERC step below).
 set -euo pipefail
 
 LAYOUT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -20,10 +40,12 @@ LVS_REF_DIR="$LAYOUT_DIR/lvs_ref"
 REPORTS_DIR="$LAYOUT_DIR/reports"
 
 # ---------------------------------------------------------------------------
-# Preflight: toolchain pins. Everything in this block is read-only -- no
-# netlist, GDS, LVS reference or report is touched (not even the reports/
-# directory is created) until both the `klt` CLI and the Python runtime that
-# will run build_cells.py have been validated against the geometry pins.
+# Preflight: toolchain pins + netlist currency. Everything in this block is
+# read-only -- no netlist, GDS, LVS reference or report is touched (not even
+# the reports/ directory is created; the netlist verify below writes only to a
+# temp dir) until both the `klt` CLI and the Python runtime that will run
+# build_cells.py have been validated against the geometry pins and the
+# committed schematic netlists have been proven current.
 # ---------------------------------------------------------------------------
 
 # Toolchain pin (added issue #57): every committed GDS and report under
@@ -110,11 +132,17 @@ if ! "${PYTHON[@]}" -c "$BUILDER_RUNTIME_CHECK"; then
   exit 1
 fi
 
+# Netlist currency: verify-only, under design/regen-netlist.sh's own pin
+# (see the header). This is the last step of the read-only preflight -- before
+# reports/ exists -- so both geometry pins and netlist currency are proven
+# before anything is written. It re-netlists every entry point with the pinned
+# klayout-tools 0.9.2 build; the 0.4.0 CLI on PATH never sees a `netlist`
+# subcommand.
+echo "== verifying design/netlist is current (design/regen-netlist.sh --check) =="
+"$REPO_ROOT/design/regen-netlist.sh" --check
+
 # --- preflight passed; mutation starts below ---------------------------------
 mkdir -p "$REPORTS_DIR"
-
-echo "== regenerating design/netlist (source of truth for device geometry) =="
-"$REPO_ROOT/design/regen-netlist.sh"
 
 echo "== building layout/cells/*.gds from klt gen primitives =="
 "${PYTHON[@]}" "$LAYOUT_DIR/build_cells.py"
@@ -259,7 +287,8 @@ echo "== rcosc_top: ERC (T1 item 11 supply spec) =="
 # (klayout-tools#2822, now closed). 0.8.0 reads the committed spec unchanged:
 # same input and spec content hashes as the committed envelope, and no supply
 # findings. The committed envelope records the build that last wrote it in
-# its own provenance.klt_version field; it is rewritten only when this
+# its own provenance.klt_version field -- currently "0.8.0", matching this
+# pin; it is rewritten only when this
 # script regenerates layout/reports/ (signoff/README.md's refresh contract).
 ERC_KLT=(uv run --quiet --with "klayout-tools==0.8.0" klt)
 
