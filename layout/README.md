@@ -185,7 +185,11 @@ automatically: `.github/workflows/cell-generator.yml` (added by issue #387)
 runs `build_cells.py --check` under exactly this `klayout-tools==0.4.0` +
 `klayout==0.30.12` pair on every pull request and push to `main`, so a
 builder or netlist edit that moves geometry without regenerating fails CI
-instead of waiting for the check to be hand-run.
+instead of waiting for the check to be hand-run. The check needs a real
+PDK install to draw against, so the job provisions the same open_pdks
+revision the committed evidence records (`c6d73a35…`, via a pinned
+volare, cached across runs) and exports `PDK_ROOT` explicitly — the
+workflow header carries the details.
 
 ## Supply ERC (T1 item 11)
 
