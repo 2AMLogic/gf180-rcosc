@@ -1,5 +1,36 @@
 # Chipalooza Challenge #5 proposal — gf180-rcosc
 
+> **Status of this document — dated 2026-11-16.** The opening paragraph and
+> the § 4 table below were last substantively updated in `436dbbf3`
+> (2026-11-08). The November 2026 re-centre
+> ([DR-0023](../../spec/decision-records/0023-recentre-timing-ladder-for-extracted-parasitics.md),
+> [DR-0029](../../spec/decision-records/0029-calibration-code-after-comparator-h-fix.md))
+> and the comparator-H fixes
+> ([DR-0028](../../spec/decision-records/0028-comparator-h-output-stage-fix.md),
+> [DR-0039](../../spec/decision-records/0039-row5-comparator-h-mirror-load-l07-landed-in-schematic-and-netlist-layout-lvs-not-rebuilt.md)–[DR-0045](../../spec/decision-records/0045-row4-w3r65-bank-candidate-measured-on-the-rebuilt-layout-extraction-ss-span-clears-but-code-0xff-running-iq-rises-20-28-percent.md))
+> are **not** reflected in them: § 4 still grades the September
+> schematic-level campaigns at the fixed trim codes `0xD0`/`0xA3`, while the
+> current graded record (2026-11-06) is the re-centre's extracted-netlist
+> campaign at calibration code `0xA4`
+> ([`sim/item5/results/20261106T071555Z/`](../../sim/item5/results/20261106T071555Z/rows.md);
+> the pre-re-centre `0xA9` record is kept at
+> [`sim/item5/results/20261106T051832Z/`](../../sim/item5/results/20261106T051832Z/rows.md)).
+> Read against that record, the sentence below — "Two ratified spec rows are
+> not met by the current design — trim range and both post-trim accuracy
+> rows" — undercounts, and § 4's post-trim verdicts are stale in their own
+> frame, not contradicted by new numbers at the same code. In the graded
+> record's own item-5 row numbering (the ten-row top-level
+> [`README.md`](../../README.md) target-specification table, which merges
+> trim range and trim resolution into one row; the § 4 table below splits
+> them and numbers its eleven rows differently), the current record grades
+> item-5 row 2 (trim range and step — § 4 rows 2–3), item-5 row 4 (post-trim
+> at the calibration point — § 4 row 5), item-5 row 5 (post-trim full
+> temperature — § 4 row 6) and item-5 row 8 (quiescent current,
+> off-reference — § 4 row 9) as **not met**, and item-5 rows 6 and 9 as
+> declared gaps (§ 4 rows 7 and 10). The supply and temperature-range
+> failures on the pre-re-centre `0xA9` record (fs/−40 °C no-oscillation
+> points) are cleared at `0xA4`.
+
 **Status of this repository:** the ratified spec, a full schematic, a full
 PVT-corner simulation campaign, and a DRC-clean/LVS-matched GDS for the
 entire `rcosc_top` hierarchy are all committed, plus a first post-layout
