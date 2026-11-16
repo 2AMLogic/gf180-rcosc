@@ -79,6 +79,7 @@ from pvt_sweep import (  # noqa: E402
     git_dirty,
     git_sha,
     resolve_pdk,
+    run_ngspice_deck,
     tool_version,
 )
 
@@ -343,17 +344,7 @@ def run_probe(pr: Probe, netlist_text: str, point: ProbePoint) -> ProbeResult:
             if token not in deck:
                 sys.exit(f"ERROR: '{token}' not found in {NETLIST}")
             deck = deck.replace(token, body, 1)
-        (rundir / "run.spice").write_text(deck)
-        started = time.time()
-        proc = subprocess.run(
-            ["ngspice", "-b", "run.spice"],
-            cwd=rundir,
-            capture_output=True,
-            text=True,
-            timeout=1800,
-        )
-        elapsed = time.time() - started
-        out = (proc.stdout or "") + "\n" + (proc.stderr or "")
+        out, elapsed, returncode = run_ngspice_deck(rundir, deck)
         log_rel = f"sim/pvt/corners/{pr.runid}/{point.key}.log"
         header = (
             "====================================================================\n"
@@ -370,7 +361,7 @@ def run_probe(pr: Probe, netlist_text: str, point: ProbePoint) -> ProbeResult:
             f"transient   : tran {TSTEP} {tstop}n, wrdata + Python crossing/"
             "cycle-alignment analysis (see driver docstring)\n"
             f"wall clock  : {elapsed:.1f} s\n"
-            f"exit status : {proc.returncode}\n"
+            f"exit status : {returncode}\n"
             "====================================================================\n"
         )
         wdata = rundir / "probe.txt"

@@ -32,7 +32,9 @@ design/
   rcosc_top.sch/.sym         the composed oscillator block (top of the hierarchy)
   smoke_test.sch             bring-up testbench: DC supplies + fixed trim code
   xschemrc                   project-local xschem config (PDK resolution)
-  regen-netlist.sh           regenerates design/netlist/*.spice from the .sch files
+  regen-netlist.sh           regenerates design/netlist/*.spice from the .sch files;
+                             --check verifies the committed copies are current
+                             without writing anything (see "Regenerating" below)
   run-smoke-test.sh          regenerates netlists + runs the ngspice smoke test
   netlist/                   xschem-derived SPICE netlists (see below)
 ```
@@ -61,6 +63,38 @@ include shim `design/netlist/pdk_include.spice` for the smoke test to
 `.include`. Confirmed to run with **zero xschem warnings/errors** (no
 unresolved symbols, no shorted/overlapped-instance ERC flags) as of this
 issue.
+
+**Netlist toolchain pin (issue #348).** Netlisting runs on its own pinned
+klayout-tools build (`0.9.2`, declared as `KLT_NETLIST_VERSION_EXPECTED` in
+the script), invoked ephemerally via
+`uv run --no-project --with "klayout-tools==0.9.2" klt` — the same pattern
+`layout/run_checks.sh`'s ERC step uses for its 0.8.0 build. It is
+deliberately not the geometry pin `run_checks.sh` enforces (klt 0.4.0):
+0.4.0 has no `klt netlist` subcommand at all (DR-0042), and moving that pin
+is issue #204.
+
+**Verifying without writing (`--check`, issue #348).** This is the mode
+`layout/run_checks.sh` calls, at the end of its read-only preflight:
+
+```bash
+design/regen-netlist.sh --check
+```
+
+For each entry point it netlists the schematic into a temporary directory
+and compares against the committed `design/netlist/<name>.spice`,
+normalising only the `** sch_path:` / `** sym_path:` comment lines on both
+sides — those embed the checkout-absolute path of the machine that last
+regenerated the netlist
+([klayout-tools#4091](https://github.com/2AMLogic/klayout-tools/issues/4091)),
+so a real regeneration from any other checkout can never be byte-identical.
+Any other difference — a changed device parameter, a renamed or reordered
+port — exits non-zero printing the diff; a missing committed netlist does
+the same. `--check` writes nothing under `design/netlist/` — not even the
+gitignored `pdk_include.spice`. `klt netlist --ignore-comments` is not
+used for this: it drops every `*`-prefixed line on both sides, including
+the `**.subckt` / `*.iopin` / `**.ends` declarations a port rename lives
+in, and would report `match` on a schematic whose ports no longer agree
+with the committed netlist.
 
 ## Running the smoke test
 

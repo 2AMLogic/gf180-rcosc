@@ -27,8 +27,6 @@ A failed or missing waveform row yields no numbers and never a pass.
 from __future__ import annotations
 
 import argparse
-import csv
-import datetime
 import json
 import math
 import sys
@@ -248,8 +246,7 @@ def write_results(out: Path, man: dict, res: dict, metas: list, synthetic: bool,
     banner = SYNTH if synthetic else ("Load-sensitivity analysis of simulator output; evidence status is set "
                                       "by the originating campaign record")
     nfail = sum(1 for e in res["points"] if e["comparison"] != "OK")
-    doc = {"label": banner, "synthetic": synthetic,
-           "utc": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+    doc = {**evidence_common.run_header(banner, synthetic),
            "budget_note": "DR-0017 at-calibration -2.9%/+2.0 %; contextual away from nominal 27 C / 3.3 V; ratifies no load spec",
            "params": {"window_s": p.window_s, "min_cycles": p.min_cycles},
            "calibration": man.get("calibration"), "held_codes": man.get("held_codes"),
@@ -268,12 +265,8 @@ def write_results(out: Path, man: dict, res: dict, metas: list, synthetic: bool,
                 d[{"frequency_hz": "frequency_mhz", "rise_s": "rise_ps", "fall_s": "fall_ps"}[k]] = \
                     e[k] / (1e6 if k == "frequency_hz" else 1e-12)
         return d
-    with open(out / "results.csv", "w", newline="") as fh:
-        w = csv.DictWriter(fh, fieldnames=CSV_FIELDS)
-        w.writeheader()
-        for e in res["points"]:
-            w.writerow({k: (f"{v:.6g}" if isinstance(v, float) else v) for k, v in flatrow(e).items()})
-    g = lambda x, f="%.4g": "-" if x is None else f % x  # noqa: E731
+    evidence_common.write_results_csv(out / "results.csv", res["points"], CSV_FIELDS, flat=flatrow)
+    g = evidence_common.dash
     L = [f"# Load sensitivity {out.name}", "", f"**{banner}**", "",
          "Budget columns are DR-0017 at-calibration context only; no load specification is ratified.",
          "", f"{len(res['points'])} points, {nfail} failing.", "",

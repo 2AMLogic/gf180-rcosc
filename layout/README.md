@@ -111,11 +111,16 @@ layout/
 ## Reproducing
 
 ```bash
-layout/run_checks.sh
+PATH="/tmp/venv-klt40/bin:$PATH" layout/run_checks.sh
 ```
 
-Regenerates `design/netlist/` (so layout always builds against the current
-schematic), rebuilds all four GDS from `klt gen` primitives (plus, for
+Verifies `design/netlist/` is current against the schematics
+(`design/regen-netlist.sh --check` — verify-only, its own klayout-tools
+0.9.2 pin; a stale committed netlist **stops the run and is reported**, it
+is never regenerated here: `build_cells.py` consumes the committed
+`design/netlist/rcosc_top.spice`, so the run needs it *current*, not
+rewritten — see [design/README.md](../design/README.md) for regenerating
+deliberately), rebuilds all four GDS from `klt gen` primitives (plus, for
 `rcosc_top`, sub-cell instantiation of the other three), and re-runs
 `klt drc` / `klt extract` / `klt lvs` for each cell, asserting `status ==
 "clean"` / `"match"` and failing loudly otherwise — then the block-level
@@ -125,18 +130,23 @@ reference netlists are byte-identical to a fresh rebuild, without touching
 them — the same "derived, not hand-written, and reproducible on change"
 convention `design/regen-netlist.sh` documents for the schematic netlists.
 
-**Toolchain preflight (issue #115).** Before it touches any netlist, GDS,
-LVS reference or report, `run_checks.sh` validates *both* runtimes that
-take part in geometry: the `klt` CLI (`klt --version` must report `0.4.0`)
-and the Python interpreter that runs `build_cells.py`, whose installed
-distribution metadata must read `klayout-tools==0.4.0` and
-`klayout==0.30.12` (checked via `importlib.metadata`, not module version
-attributes). A `python3` on `PATH` that imports both packages is used and
-must match — a mismatch fails the run rather than switching interpreters;
-only when `python3` cannot import them does the script fall back to an
-ephemeral `uv run --no-project --with "klayout-tools==0.4.0" --with
-"klayout==0.30.12" python3`, which is validated the same way. The simplest
-way to satisfy both is one pinned venv on `PATH`:
+**Toolchain preflight (issue #115; netlist currency since issue #348).**
+Before it touches any netlist, GDS, LVS reference or report, `run_checks.sh`
+validates *both* runtimes that take part in geometry: the `klt` CLI
+(`klt --version` must report `0.4.0`) and the Python interpreter that runs
+`build_cells.py`, whose installed distribution metadata must read
+`klayout-tools==0.4.0` and `klayout==0.30.12` (checked via
+`importlib.metadata`, not module version attributes). A `python3` on `PATH`
+that imports both packages is used and must match — a mismatch fails the
+run rather than switching interpreters; only when `python3` cannot import
+them does the script fall back to an ephemeral `uv run --no-project --with
+"klayout-tools==0.4.0" --with "klayout==0.30.12" python3`, which is
+validated the same way. As the last step of the same read-only preflight it
+then runs `design/regen-netlist.sh --check`, which netlists every entry
+point under its own pinned klayout-tools 0.9.2 build and fails the run if
+any committed `design/netlist/*.spice` has drifted from its schematic (the
+0.4.0 CLI never sees a `netlist` subcommand — it has none, DR-0042). The
+simplest way to satisfy both geometry pins is one pinned venv on `PATH`:
 
 ```bash
 uv venv /tmp/venv-klt40
@@ -155,7 +165,8 @@ uv run --no-project --with "klayout-tools==0.4.0" --with "klayout==0.30.12" \
 The separately pinned ERC build (below) is unaffected by this preflight.
 `layout/test_run_checks_preflight.py` exercises the preflight offline with
 fake `klt` / `python3` / `uv` commands (import failure, version mismatch,
-pinned pass) without regenerating any evidence:
+netlist-pin and netlist-drift refusals, pinned pass) without regenerating
+any evidence:
 `python3 -I -m pytest -p no:cacheprovider layout/test_run_checks_preflight.py`.
 
 **Which `klt` reproduces which artifact (recorded here because it is

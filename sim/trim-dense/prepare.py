@@ -33,6 +33,12 @@ Usage:
     python3 -I sim/trim-dense/prepare.py \\
         --schematic-netlist sim/pvt-postlayout/klt-pex/rcosc_top_schematic.spice \\
         --extracted-netlist <klt extract output .spice> --out /tmp/trim-dense
+
+Setting --engine-version-expected to a version ("MAJOR" / "MAJOR.MINOR", e.g.
+"47") also emits a request-level `engine_version` pin in every request, which
+`klt sim` enforces against the runner's reported version after the run (code
+"engine_version_unmet"); the default "unspecified" emits no pin and leaves the
+requests byte-identical to a pin-less run (#378).
 """
 from __future__ import annotations
 
@@ -65,7 +71,13 @@ DEFAULTS = {
     "tstep": "200p", "tstop": "2000n",
     "skip_edges": 5, "periods": 20,
     "timeout_s": 600, "capacity_wait_s": 1200,
-    # recorded only (not enforceable offline): expected simulator build
+    # Recorded in provenance and the manifest template AND, when set to a real
+    # version ("MAJOR" or "MAJOR.MINOR"), emitted as the request-level
+    # `engine_version` pin (klayout-tools#3041): `klt sim` fails the run with
+    # code "engine_version_unmet" when the runner's report disagrees.  For a
+    # batch runner there is no pre-submit probe, so the pin is checked against
+    # the version the reports carried -- after the run.  The default
+    # "unspecified" emits no pin and leaves every request byte unchanged (#378).
     "engine_version_expected": "unspecified",
 }
 
@@ -126,6 +138,23 @@ def code_tag(code: int) -> str:
     return f"c{code:02X}"
 
 
+def engine_pin(cfg: dict) -> str | None:
+    """The request-level `engine_version` pin from `engine_version_expected`.
+
+    Returns None (no pin emitted, request bytes unchanged) for the default
+    "unspecified" or an empty value; otherwise the value must be a version of
+    the form "MAJOR" or "MAJOR.MINOR", which is what `klt sim`'s
+    `_validate_engine_version_pin` accepts (klayout-tools#3041).
+    """
+    v = str(cfg.get("engine_version_expected") or "").strip()
+    if v in ("", "unspecified"):
+        return None
+    if not re.fullmatch(r"\d+(\.\d+)?", v):
+        raise PrepareError(
+            f"engine_version_expected must be 'MAJOR' or 'MAJOR.MINOR' (or 'unspecified' for no pin), got {v!r}")
+    return v
+
+
 def check_dut(text: str, label: str) -> list[str]:
     """Return the DUT pin order. The pin set must be exactly PINS; the order may
     differ (e.g. the P3 netlist is `vdd vss clk t0..t7`) because the testbench
@@ -160,7 +189,7 @@ def tb_text(variant: str, code: int, vdd: float, dut_name: str, cfg: dict, pins:
 def request(variant: str, tb_name: str, proc: str, temp: float, vdd: float, grid: dict, cfg: dict) -> dict:
     ta, tb = cfg["skip_edges"], cfg["skip_edges"] + cfg["periods"]
     vmid = vdd / 2
-    return {
+    req = {
         "netlist": tb_name,
         "engine": "ngspice",
         "netlist_source": "schematic" if variant == "sch" else "extracted",
@@ -180,6 +209,10 @@ def request(variant: str, tb_name: str, proc: str, temp: float, vdd: float, grid
         "options": {"timeout_s": cfg["timeout_s"], "keep_artifacts": True,
                     "ngspice_init": ["set measureprec=8"]},
     }
+    pin = engine_pin(cfg)
+    if pin is not None:
+        req["engine_version"] = pin
+    return req
 
 
 def _rel(p: Path) -> str:
@@ -215,6 +248,7 @@ def generate(out: Path, schematic: Path | None, extracted: Path | None,
         raise PrepareError("solver tolerances must be positive")
     if cfg["periods"] < 2 or cfg["skip_edges"] < 1:
         raise PrepareError("need periods >= 2 and skip_edges >= 1")
+    engine_pin(cfg)  # fail on a malformed pin before anything is written
     inputs = {v: p for v, p in (("sch", schematic), ("ext", extracted)) if p is not None}
     if not inputs:
         raise PrepareError("at least one of --schematic-netlist / --extracted-netlist is required")

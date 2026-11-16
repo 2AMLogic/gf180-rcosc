@@ -19,17 +19,17 @@ the schematic-vs-extracted delta and does not grade rows.
 Run from this directory:  python3 gen_requests.py
 """
 import json
+import sys
 from pathlib import Path
+
+here = Path(__file__).parent
+sys.path.insert(0, str(here.parent.parent / "pvt"))
+from pvt_sweep import PROCESS_CORNERS  # noqa: E402
 
 CODE = 0xA3
 VDDS = [3.0, 3.3, 3.6]
 TEMPS = [-40, 27, 85]
-PROC = {
-    "tt": ["typical", "res_typical", "mimcap_typical", "cap_mim"],
-    "ff": ["ff", "res_ff", "mimcap_ff", "cap_mim"],
-    "ss": ["ss", "res_ss", "mimcap_ss", "cap_mim"],
-}
-here = Path(__file__).parent
+PROC = {n: [*PROCESS_CORNERS[n], "cap_mim"] for n in ("tt", "ff", "ss")}
 SRC = here.parent.parent.parent / "design" / "netlist" / "pvt_tb.spice"
 
 # Schematic-side DUT.  The schematic DUT is the `.subckt rcosc_top ... .ends`

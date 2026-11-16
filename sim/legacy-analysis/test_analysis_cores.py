@@ -389,3 +389,54 @@ def test_grab_does_not_confuse_iq_ua_with_iq_run_ua():
 def test_grab_first_match_wins_and_is_line_anchored_search():
     out = "t_avg_start = 1e-9\nt_avg_start = 2e-9\n"
     assert iq._grab(r"t_avg_start\s*=\s*" + iq.NUM, out) == pytest.approx(1e-9)
+
+
+# --------------------------------------------------- pvt: run_ngspice_deck
+
+def test_run_ngspice_deck_writes_deck_runs_in_rundir_and_merges_output(
+    tmp_path, monkeypatch
+):
+    """Issue #361: the shared local single-corner ngspice invocation.
+
+    A fake ``ngspice`` on PATH stands in for the simulator: it echoes its cwd
+    (proving cwd=rundir) and argv[2] (proving ``ngspice -b run.spice``), and
+    exits 3 so the returned returncode is observable.
+    """
+    rundir = tmp_path / "run"
+    rundir.mkdir()
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    fake = bin_dir / "ngspice"
+    fake.write_text(
+        "#!/bin/sh\n"
+        'echo "fosc = 4.8e7 on stdout from $PWD"\n'
+        'echo "stderr line, deck=$2" >&2\n'
+        "exit 3\n"
+    )
+    fake.chmod(0o755)
+    monkeypatch.setenv("PATH", str(bin_dir))
+
+    deck = "* synthetic deck, not evidence\n.end\n"
+    out, elapsed, returncode = pvt.run_ngspice_deck(rundir, deck)
+
+    assert (rundir / "run.spice").read_text() == deck
+    assert returncode == 3
+    assert isinstance(elapsed, float) and elapsed >= 0.0
+    assert "fosc = 4.8e7 on stdout from " + str(rundir) in out
+    assert "stderr line, deck=run.spice" in out
+
+
+def test_run_ngspice_deck_stdout_stderr_merge_order(tmp_path, monkeypatch):
+    """Merged output is stdout + '\\n' + stderr: stdout first, one newline."""
+    rundir = tmp_path / "run"
+    rundir.mkdir()
+    bin_dir = tmp_path / "bin"
+    bin_dir.mkdir()
+    fake = bin_dir / "ngspice"
+    fake.write_text("#!/bin/sh\necho A\necho B >&2\necho C\n")
+    fake.chmod(0o755)
+    monkeypatch.setenv("PATH", str(bin_dir))
+
+    out, _elapsed, returncode = pvt.run_ngspice_deck(rundir, ".end\n")
+    assert returncode == 0
+    assert out == "A\nC\n\nB\n"

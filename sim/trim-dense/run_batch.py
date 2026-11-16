@@ -24,7 +24,10 @@ and every DUT netlist copy in the bench must hash to
 after the freeze (e.g. a sizing change landing mid-campaign) therefore stops
 the run instead of silently appending jobs measured on a different design to
 the same curve.  A campaign directory with no manifest yet (the first slice)
-skips the check and says so.
+skips the check and says so.  A manifest that exists but cannot be parsed
+refuses the run instead (issue #369): "could not check" must not read as
+"nothing to check", and a manifest naming a bench variant for which no
+netlist copy is found to hash is likewise a refusal, not a silent pass.
 
     python3 -I sim/trim-dense/run_batch.py --bench-dir B --out-dir R [--limit N]
 """
@@ -74,12 +77,21 @@ def bench_netlists(bench: Path) -> dict[str, set[str]]:
 def manifest_problems(bench: Path, out: Path) -> list[str]:
     """Reasons this bench must not be appended to this campaign (empty == safe).
 
-    Returns [] when the campaign has no frozen manifest yet (first slice).
+    Returns [] only when the campaign has no frozen manifest yet (first slice).
+    A manifest that exists but cannot be read is a refusal, not a pass (#369):
+    the gate must distinguish "nothing to check" from "could not check", so it
+    keys on the file's existence, never on read_json()'s None.
     """
     mpath = out / "manifest.json"
-    man = read_json(mpath)
-    if man is None:
+    if not mpath.exists():
         return []
+    man = read_json(mpath)
+    if not isinstance(man, dict):
+        return [
+            f"manifest.json exists but could not be parsed as a JSON object ({mpath}); "
+            f"the preflight cannot verify this bench and refuses rather than checking "
+            f"nothing. Recover it from git history, e.g. "
+            f"git checkout <rev> -- sim/trim-dense/results/<campaign>/manifest.json."]
     bad = []
     want = man.get("provenance_sha256")
     prov = bench / "provenance.json"
@@ -87,7 +99,16 @@ def manifest_problems(bench: Path, out: Path) -> list[str]:
     if want and got != want:
         bad.append(f"provenance.json sha256 {got} != manifest provenance_sha256 {want}")
     netlists = man.get("netlists") or {}
-    for variant, hashes in sorted(bench_netlists(bench).items()):
+    found = bench_netlists(bench)
+    for variant in sorted(netlists):
+        if variant in found:
+            continue
+        if any((bench / variant).glob("*/request_c*.json")):
+            bad.append(
+                f"variant {variant!r} is named by the manifest and has requests in the "
+                f"bench but no rcosc_top_*.spice copy was found under <bench>/{variant}/ "
+                f"to check")
+    for variant, hashes in sorted(found.items()):
         frozen = (netlists.get(variant) or {}).get("sha256")
         if frozen is None:
             bad.append(f"variant {variant!r} is in the bench but not in manifest netlists")
@@ -139,10 +160,15 @@ def drive(bench: Path, out: Path, klt: list[str], limit: int | None = None,
             "nothing was submitted.\n  - " + "\n  - ".join(problems)
             + "\nRegenerate the bench from the manifest's netlists (recover a moved netlist from "
               "git history by its recorded sha256), or start a new campaign directory.")
-    man = read_json(out / "manifest.json")
-    if man is None:
+    mpath = out / "manifest.json"
+    if not mpath.exists():
         print("manifest preflight: no manifest.json in the campaign dir yet (first slice); not checked")
+    elif not isinstance(read_json(mpath), dict):
+        # Unreachable as the final state of a drive() call (an unreadable manifest
+        # already refused above); kept so the print stays truthful in all three states.
+        print(f"manifest preflight: could not verify ({mpath} does not parse; run refused)")
     else:
+        man = read_json(mpath)
         print(f"manifest preflight: OK (provenance_sha256 {man.get('provenance_sha256')}, "
               f"netlists {{{', '.join(f'{v}={h}' for v, hs in sorted(bench_netlists(bench).items()) for h in sorted(hs))}}})")
     (out / "reports").mkdir(parents=True, exist_ok=True)
