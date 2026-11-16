@@ -69,12 +69,12 @@ unresolved symbols, no shorted/overlapped-instance ERC flags) as of this
 issue.
 
 **Netlist toolchain pin (issue #348).** Netlisting runs on its own pinned
-klayout-tools build (`0.9.2`, declared as `KLT_NETLIST_VERSION_EXPECTED` in
-the script), invoked ephemerally via
-`uv run --no-project --with "klayout-tools==0.9.2" klt` — the same pattern
-`layout/run_checks.sh`'s ERC step uses for its 0.8.0 build. It is
-deliberately not the geometry pin `run_checks.sh` enforces (klt 0.4.0):
-0.4.0 has no `klt netlist` subcommand at all (DR-0042), and moving that pin
+klayout-tools build, declared as `KLT_NETLIST_VERSION_EXPECTED` in the
+script and invoked ephemerally through `uv run --no-project` — the same
+pattern `layout/run_checks.sh`'s ERC step uses for its own pinned build
+(`ERC_KLT` there). It is deliberately not the geometry pin `run_checks.sh`
+enforces (`KLT_VERSION_EXPECTED` there): that build has no `klt netlist`
+subcommand at all (DR-0042), and moving that pin
 is issue #204.
 
 **Verifying without writing (`--check`, issue #348).** This is the mode

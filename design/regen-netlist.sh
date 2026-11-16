@@ -20,8 +20,8 @@
 # Netlist toolchain pin (issue #348). Netlisting runs on its OWN pinned
 # klayout-tools build, KLT_NETLIST_VERSION_EXPECTED below, invoked ephemerally
 # through `uv run` the same way layout/run_checks.sh's ERC step invokes its
-# 0.8.0 build. It is deliberately NOT the geometry pin run_checks.sh enforces
-# (klt 0.4.0): 0.4.0 has no `klt netlist` subcommand at all, which is why
+# own pinned build. It is deliberately NOT the geometry pin run_checks.sh
+# enforces: that build has no `klt netlist` subcommand at all, which is why
 # run_checks.sh could not run end to end (DR-0042); moving that pin is
 # issue #204, parked on a separate decision. Every klt call in this script
 # (--version, pdk find, netlist) is routed through the pinned wrapper, and the
@@ -42,8 +42,8 @@
 # ports no longer agree with the committed netlist. --check writes nothing
 # under design/netlist/ -- not even the gitignored pdk_include.spice.
 #
-# Why run_checks.sh verifies instead of regenerating (issue #348): it pins
-# klt 0.4.0 for generator geometry, which cannot netlist, and
+# Why run_checks.sh verifies instead of regenerating (issue #348): its
+# geometry klt cannot netlist, and
 # layout/build_cells.py consumes the committed
 # design/netlist/rcosc_top.spice -- the run needs that file *current*, not
 # rewritten. Regenerating it inside a layout-evidence run would rewrite

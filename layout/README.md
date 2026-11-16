@@ -119,8 +119,8 @@ PATH="/tmp/venv-klt40/bin:$PATH" layout/run_checks.sh
 ```
 
 Verifies `design/netlist/` is current against the schematics
-(`design/regen-netlist.sh --check` — verify-only, its own klayout-tools
-0.9.2 pin; a stale committed netlist **stops the run and is reported**, it
+(`design/regen-netlist.sh --check` — verify-only, under the klt pin declared
+in that script; a stale committed netlist **stops the run and is reported**, it
 is never regenerated here: `build_cells.py` consumes the committed
 `design/netlist/rcosc_top.spice`, so the run needs it *current*, not
 rewritten — see [design/README.md](../design/README.md) for regenerating
@@ -147,9 +147,9 @@ them does the script fall back to an ephemeral `uv run --no-project --with
 "klayout-tools==0.4.0" --with "klayout==0.30.12" python3`, which is
 validated the same way. As the last step of the same read-only preflight it
 then runs `design/regen-netlist.sh --check`, which netlists every entry
-point under its own pinned klayout-tools 0.9.2 build and fails the run if
+point under the klt build that script pins and fails the run if
 any committed `design/netlist/*.spice` has drifted from its schematic (the
-0.4.0 CLI never sees a `netlist` subcommand — it has none, DR-0042). The
+geometry CLI never sees a `netlist` subcommand — it has none, DR-0042). The
 simplest way to satisfy both geometry pins is one pinned venv on `PATH`:
 
 ```bash
