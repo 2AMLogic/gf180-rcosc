@@ -13,9 +13,7 @@ is a corner grid: the 27-point confirmation is a `klt sim` corners request
 from __future__ import annotations
 
 import re
-import subprocess
 import sys
-import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
@@ -213,11 +211,7 @@ def run(text: str, point: "base.Point", logdir: Path, tag: str,
             deck = deck.replace(token, body, 1)
         rd = REPO / "sim" / "build" / "recentre" / tag
         rd.mkdir(parents=True, exist_ok=True)
-        (rd / "run.spice").write_text(deck)
-        t0 = time.time()
-        pr = subprocess.run(["ngspice", "-b", "run.spice"], cwd=rd,
-                            capture_output=True, text=True, timeout=1800)
-        out = pr.stdout + "\n" + pr.stderr
+        out, elapsed, _rc = base.run_ngspice_deck(rd, deck)
         logdir.mkdir(parents=True, exist_ok=True)
         log = logdir / f"{tag}.log"
         if log.exists() and attempt == 1:
@@ -225,7 +219,7 @@ def run(text: str, point: "base.Point", logdir: Path, tag: str,
         log.write_text(
             f"# {tag}: {point.process} {point.temp_c:g}C {point.vdd_v:g}V "
             f"code 0x{point.code:02X} tstop {tstop_ns}n, "
-            f"wall {time.time()-t0:.1f}s\n" + out)
+            f"wall {elapsed:.1f}s\n" + out)
         mf = base.FOSC_RE.search(out)
         mi = re.search(r"^\s*iavg\s*=\s*([-+0-9.eE]+)", out, re.M)
         if mf and float(mf.group(1)) > 0:
