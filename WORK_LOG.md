@@ -4,6 +4,12 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-16
 
+- **PR #406**: ci: gate build_cells.py output-neutrality in a dedicated workflow
+- **PR #402**: docs(design): collapse four superseded PVT campaign sections into a history index
+- **PR #401**: docs(proposal): date § 4 to its figures' commit, re-pin item 8 evidence
+- **Issue #387** (closed): Suggestion: no automated gate enforces layout/build_cells.py output-neutrality
+- **Issue #375** (closed): Chipalooza proposal dated-status note (AC 8 of #349) requires the characterization-envelope re-pin + pinned re-grade refresh contract
+- **Issue #365** (closed): Collapse four superseded per-campaign PVT sections in design/README.md: a third copy of sim/README.md's run table and the DRs
 - **PR #399**: sim(trim-dense): complete dense campaign, 1536/1536 batch jobs, reconcile slice 46 overlap
 - **PR #398**: docs(signoff): drop stale klt pin version from workflow comment
 - **PR #395**: fix(trim-dense): fail frozen-manifest gate closed on an unreadable manifest
