@@ -4,6 +4,21 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-15
 
+- **PR #390**: sim/trim-dense: opt-in engine_version request pin and paired ngspice 46 vs 47 A/B (verdict: immaterial)
+- **PR #388**: fix(layout): correct two stale ERC provenance claims in run_checks.sh comments
+- **PR #386**: sim(trim-dense): run slice 45, 32 sch_tt curve jobs on batch fleet (1312/1536)
+- **PR #384**: sim(trim-dense): run slice 44, 128 sch_ss curve jobs on batch fleet (1280/1536)
+- **PR #380**: sim: one shared run_ngspice_deck helper for the local ngspice invocation
+- **PR #376**: docs: refresh README status block and ladder to the graded and post-grade record
+- **PR #374**: sim(trim-dense): run slice 43, 128 sch_ss curve jobs on batch fleet (1152/1536)
+- **PR #373**: feat(sim): per-stage running-Iq attribution for row 8 (issue #347)
+- **PR #366**: refactor(sim): consolidate run-writer idioms (results.csv block, dash closure, prologue, json header) onto evidence_common
+- **Issue #378** (closed): Dense trim campaign is split across ngspice 46 and 47: analyze.py rejects the dataset and #87's verdict slice cannot close
+- **Issue #371** (closed): layout/run_checks.sh's ERC_KLT comment says the committed ERC envelope is still the 2b1e55e5 build's output — it records 0.8.0
+- **Issue #361** (closed): Collapse the triplicated local ngspice invocation in the PVT sweep drivers
+- **Issue #359** (closed): Consolidate four duplicated run-writer idioms in sim/ onto evidence_common (#260)
+- **Issue #349** (closed): README status block and maturity-ladder paragraph are stale: #66 is closed and items 5 and 6 have campaigns
+- **Issue #347** (closed): Row 8: attribute running Iq over 500 uA at the ff corners by stage and name a candidate lever
 - **PR #370**: sim: re-run row-9 startup bench on the L 0.7 um extraction at 0xA4 (63/63 pass)
 - **PR #368**: sim: trim-dense slice 42 completes sch_ff curve; run_batch frozen-manifest gate
 - **PR #362**: refactor: delete four zero-reference definitions from the cell generator and signoff suite
