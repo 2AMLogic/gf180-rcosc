@@ -2,11 +2,13 @@ name: Doc citations
 
 # Fails when a doc cites a nonexistent sim/<bench>/results/<ts>/ dir, or (in
 # the strict docs named by signoff/citations.json) cites a non-current run
-# without a superseded/historical/(was ...) marker. python3 stdlib only: no
-# PDK, no klt, no ngspice. A separate workflow from signoff.yml on purpose:
-# signoff.yml is a hashed, audited artifact (T1 item 10), so adding a step
-# there would force a re-pin/re-grade. See signoff/README.md,
-# "Doc citation currency".
+# without a superseded/historical/(was ...) marker; when a tracked test_*.py
+# is run by no workflow; or when prose restates a klt pin value
+# (signoff/verify-pin-restatements.py + signoff/pin-restatements.json,
+# issue #408). python3 stdlib only: no PDK, no klt, no ngspice. A separate
+# workflow from signoff.yml on purpose: signoff.yml is a hashed, audited
+# artifact (T1 item 10), so adding a step there would force a re-pin/re-grade.
+# See signoff/README.md, "Doc citation currency" and "Pin restatements".
 
 on:
   pull_request:
@@ -26,6 +28,16 @@ jobs:
           python-version: "3.12"
       - name: Verify doc citations of sim/ run dirs
         run: python signoff/verify-doc-citations.py
+      # Pin-restatement guard (issue #408): prose must not restate the klt
+      # pin values. The declarations (run_checks.sh, signoff.yml's grader
+      # install, regen-netlist.sh) are the only sanctioned value statements;
+      # dated history, report quotations and the canonical grader-pin
+      # statement are exempt via signoff/pin-restatements.json. signoff.yml
+      # is read as a declaration but never edited by this guard (#358).
+      - name: Verify no prose restates a klt pin value
+        run: python3 -I signoff/verify-pin-restatements.py
+      - name: Run the pin-restatement guard's own tests (stdlib unittest)
+        run: python3 -I signoff/test_verify_pin_restatements.py
       # Orphaned-test guard (issue #134): every tracked test_*.py must be run
       # by some workflow. Stdlib only, like the citation check above.
       - name: Verify every tracked test_*.py is run by a workflow

@@ -14,10 +14,11 @@
 #
 # Toolchain pins, one per job (issue #348):
 #   - geometry (klt CLI + the Python runtime running build_cells.py):
-#     klayout-tools 0.4.0 / klayout 0.30.12, enforced by the preflight below;
+#     the versions KLT_VERSION_EXPECTED / KLAYOUT_VERSION_EXPECTED declare
+#     below, enforced by the preflight;
 #   - netlist currency: design/regen-netlist.sh --check, run at the END of the
-#     read-only preflight under ITS OWN pin (klayout-tools 0.9.2, declared in
-#     design/regen-netlist.sh). The 0.4.0 geometry pin has no `klt netlist`
+#     read-only preflight under ITS OWN pin (KLT_NETLIST_VERSION_EXPECTED,
+#     declared in design/regen-netlist.sh). The geometry pin has no `klt netlist`
 #     subcommand (DR-0042: this script could not run end to end because its
 #     first step netlisted), and the schematic netlists are NOT regenerated
 #     here on purpose: build_cells.py consumes the committed
@@ -29,7 +30,7 @@
 #     netlist stops and reports here and is regenerated deliberately
 #     (design/regen-netlist.sh without --check) and committed, never silently
 #     refreshed as a side effect.
-#   - ERC envelope: klayout-tools 0.8.0 via a separate ephemeral uv run
+#   - ERC envelope: the ERC_KLT build below, via a separate ephemeral uv run
 #     (see the ERC step below).
 set -euo pipefail
 
@@ -135,9 +136,9 @@ fi
 # Netlist currency: verify-only, under design/regen-netlist.sh's own pin
 # (see the header). This is the last step of the read-only preflight -- before
 # reports/ exists -- so both geometry pins and netlist currency are proven
-# before anything is written. It re-netlists every entry point with the pinned
-# klayout-tools 0.9.2 build; the 0.4.0 CLI on PATH never sees a `netlist`
-# subcommand.
+# before anything is written. It re-netlists every entry point with the klt
+# build design/regen-netlist.sh pins; the geometry CLI on PATH never sees a
+# `netlist` subcommand.
 echo "== verifying design/netlist is current (design/regen-netlist.sh --check) =="
 "$REPO_ROOT/design/regen-netlist.sh" --check
 

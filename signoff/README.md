@@ -24,6 +24,8 @@ re-reading prose that was written against whatever the checklist said that day.
 | `verify-report.py` | the anti-rot verifier CI runs on every push and PR (see below) |
 | `verify-doc-citations.py` | stdlib-only check that docs cite existing, current `sim/<bench>/results/<ts>/` dirs (see "Doc citation currency"); CI: `.github/workflows/doc-citations.yml` |
 | `citations.json` | sidecar for the above: the current run (and listed probes) per bench, and the strict-scope docs |
+| `verify-pin-restatements.py` | stdlib-only pin-restatement guard: tracked prose must not restate a klt/klayout pin value (see "Pin restatements"); sidecar `pin-restatements.json`; CI: `.github/workflows/doc-citations.yml` |
+| `pin-restatements.json` | sidecar for the above: the dated-history / report-quotation / install-line exemptions, each with its reason |
 | `verify-test-coverage.py` | stdlib-only orphaned-test guard: every tracked `test_*.py` must be named (outside comments) in some `.github/workflows/*.yml`; tests in `test_verify_test_coverage.py`; CI: `.github/workflows/doc-citations.yml` |
 
 ## Block kind: `analog`
@@ -561,3 +563,23 @@ run passes only if the same line contains `superseded`, `historical` or
 add markers to hide a stale claim; a marker states that the cite is
 intentionally retrospective. Other docs (`design/README.md`, `sim/README.md`,
 decision records) are narrative and are checked for existence only.
+
+## Pin restatements
+
+`python3 -I signoff/verify-pin-restatements.py` (stdlib only, no PDK; CI:
+`.github/workflows/doc-citations.yml`) keeps prose from restating the klt
+pin values. The declarations are the single source of pin identity —
+`KLT_VERSION_EXPECTED` / `KLAYOUT_VERSION_EXPECTED` and the `ERC_KLT` line in
+`layout/run_checks.sh`, the grader install line in
+`.github/workflows/signoff.yml`, and `KLT_NETLIST_VERSION_EXPECTED` in
+`design/regen-netlist.sh`
+— and the guard reads them at run time. Any version mention in klt context
+in tracked prose (or in the comments of the two pin-owning scripts) fails
+unless `signoff/pin-restatements.json` exempts it with a reason; a mention
+naming a value no declaration pins fails as a stale restatement. Dated
+history, report quotations and provenance statements are the legitimate
+classes and live in the sidecar; the canonical statement this file keeps
+("The grader pin is load-bearing") and its install lines are exempt too.
+When prose names a pin, point at the declaration instead of repeating its
+value — the convention issues #363/#364 established and this guard enforces
+(issue #408).

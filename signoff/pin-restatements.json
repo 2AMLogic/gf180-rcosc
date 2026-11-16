@@ -1,0 +1,159 @@
+{
+  "_comment": "Carve-out sidecar for signoff/verify-pin-restatements.py (issue #408). A klt-context version mention in tracked prose is a restatement finding unless an exemption here covers it. Kinds: 'file' (whole file), 'prefix' (everything under a directory), 'marker' (any line containing 'marker' as a substring), 'region' (the line span from the line containing 'start' through the next line containing 'end', inclusive). Every entry carries the reason it is legitimate; the legitimate classes are dated history, provenance/report quotation, the canonical grader-pin statement, and its install lines. Live restatements of a pin value are NOT legitimate: point at the declaration instead (the convention #363/#364 ratified and this guard enforces). The guard fails on entries whose file, marker or region no longer exists, so prune them when prose changes.",
+  "exemptions": [
+    {
+      "kind": "file",
+      "path": "WORK_LOG.md",
+      "reason": "append-only dated work log: each entry is a historical record of what a PR or issue did at a point in time, not a live claim about today's pins"
+    },
+    {
+      "kind": "file",
+      "path": "WORK_PLAN.md",
+      "reason": "living planning queue: entries name pin-move tasks to execute (#204), not current-state documentation"
+    },
+    {
+      "kind": "prefix",
+      "path": "sim/",
+      "reason": "bench/campaign docs under sim/ quote the exact toolchain each committed run used (dated run records and report quotations; append-only evidence)"
+    },
+    {
+      "kind": "prefix",
+      "path": "spec/decision-records/",
+      "reason": "dated, append-only decision records: campaigns record the toolchain they ran under"
+    },
+    {
+      "kind": "marker",
+      "path": "docs/ROADMAP.md",
+      "marker": "records that the geometry pin (klt 0.4.0) lacks",
+      "reason": "roadmap item #348 restating DR-0042's recorded fact (a dated task description)"
+    },
+    {
+      "kind": "marker",
+      "path": "layout/README.md",
+      "marker": "pins klt 0.4.0**",
+      "reason": "#363 deliberately kept this correct geometry-pin statement; moving to a newer build is #204's to do"
+    },
+    {
+      "kind": "marker",
+      "path": "layout/README.md",
+      "marker": "32/0 tap marker layer",
+      "reason": "rationale for the 32/0 layer choice, naming the erc-build behavior it works around (issue #57 history)"
+    },
+    {
+      "kind": "marker",
+      "path": "layout/README.md",
+      "marker": "`klt --version` must report",
+      "reason": "preflight precondition restating what run_checks.sh itself enforces; pairs with the pinned-env install lines"
+    },
+    {
+      "kind": "marker",
+      "path": "layout/README.md",
+      "marker": "klayout==0.30.12",
+      "reason": "pinned-geometry-environment install/setup lines (the klt+klayout pair); #203's pin-locations table maintains install lines on every bump, and #363 kept them"
+    },
+    {
+      "kind": "marker",
+      "path": "layout/README.md",
+      "marker": "under exactly this",
+      "reason": "CI description of the pinned pair the workflow runs (maintained install-line class)"
+    },
+    {
+      "kind": "marker",
+      "path": "layout/README.md",
+      "marker": "that produced the committed cells",
+      "reason": "provenance pair the committed reports record (report-toolchain quotation, kept by #364)"
+    },
+    {
+      "kind": "region",
+      "path": "layout/run_checks.sh",
+      "start": "# Toolchain pin (added issue #57)",
+      "end": "KLT_VERSION_EXPECTED=\"",
+      "reason": "doc comment of the geometry declaration itself: committed-layout provenance and the measured 0.5.0 regression that motivates the pin"
+    },
+    {
+      "kind": "marker",
+      "path": "layout/run_checks.sh",
+      "marker": "klayout-tools#2115",
+      "reason": "exit-code contract note: names the >= 0.5.0 floor upstream introduced it in (klayout-tools#2115)"
+    },
+    {
+      "kind": "region",
+      "path": "layout/run_checks.sh",
+      "start": "# The ERC envelope must come from a post-0.4.0 build",
+      "end": "ERC_KLT=(uv run",
+      "reason": "doc comment of the ERC_KLT declaration itself: its history (#57, #203, klayout-tools#2822) and the provenance-field refresh contract"
+    },
+    {
+      "kind": "marker",
+      "path": "layout/run_checks.sh",
+      "marker": "emits no provenance block",
+      "reason": "documents the 0.4.0-era `klt erc` behavior the content-hash check conditionalizes on"
+    },
+    {
+      "kind": "marker",
+      "path": "signoff/README.md",
+      "marker": "pip install \"klayout-tools==",
+      "reason": "install line of the canonical grader-pin statement ('The grader pin is load-bearing'), which #363 ratified as the one maintained statement"
+    },
+    {
+      "kind": "marker",
+      "path": "signoff/README.md",
+      "marker": "PIN=\"klayout-tools==",
+      "reason": "the same canonical block's uv snippet"
+    },
+    {
+      "kind": "marker",
+      "path": "signoff/README.md",
+      "marker": "The pin is the klayout-tools",
+      "reason": "the canonical grader-pin statement itself (#363: keep exactly this one)"
+    },
+    {
+      "kind": "marker",
+      "path": "signoff/README.md",
+      "marker": "the report records `git_tag",
+      "reason": "the canonical grader-pin statement's report-provenance continuation (names what the committed report records)"
+    },
+    {
+      "kind": "marker",
+      "path": "signoff/README.md",
+      "marker": "Pin move to",
+      "reason": "dated 'Pin move to ...' history entries (#363 step 7: history legitimately names values)"
+    },
+    {
+      "kind": "marker",
+      "path": "signoff/README.md",
+      "marker": "The committed envelope was generated by klt",
+      "reason": "provenance: names which build produced the committed envelope, not what today's pin is"
+    },
+    {
+      "kind": "marker",
+      "path": "signoff/README.md",
+      "marker": "rcosc_top.pex.extract.json`, klt",
+      "reason": "report provenance: names the build that produced the committed extract"
+    },
+    {
+      "kind": "marker",
+      "path": "signoff/README.md",
+      "marker": "27-point grid was submitted",
+      "reason": "dated batch-campaign record quoting the build the grid ran under (2026-10-14)"
+    },
+    {
+      "kind": "marker",
+      "path": "signoff/README.md",
+      "marker": "the grader pin at the time",
+      "reason": "dated campaign record: explicitly time-scoped ('at the time'), not a current-pin claim"
+    },
+    {
+      "kind": "marker",
+      "path": "signoff/README.md",
+      "marker": "runner_klt_version",
+      "reason": "quotation of the batch job report's recorded fields"
+    },
+    {
+      "kind": "marker",
+      "path": "signoff/testbench-inventory.md",
+      "marker": "fleet runner klt 0.5.0 vs client 0.7.0",
+      "reason": "dated campaign-record table row quoting that run's runner/client versions"
+    }
+  ]
+}
