@@ -4,6 +4,8 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-16
 
+- **PR #416**: feat(signoff): pin-restatement guard for klt pin values
+- **Issue #408** (closed): Pin restatements are being refilled faster than they are drained: #348 added seven new ones while #363 was open
 - **PR #413**: docs: drop stale 'current basis' claim and inline campaign list from design README
 - **PR #411**: refactor: run recentre ngspice through shared run_ngspice_deck
 - **PR #405**: docs: correct offline-suite fixture contract to admit read-only evidence replay
