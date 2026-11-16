@@ -87,11 +87,13 @@ layout/
     rcosc_bias.gds
     rcosc_trim_bank.gds
     rcosc_comparator.gds
-    rcosc_top.gds          instantiates the other three as sub-cells
+    rcosc_comparator_p.gds
+    rcosc_top.gds          instantiates the other four as sub-cells
   lvs_ref/               hand-authored-but-generated LVS reference netlists
     rcosc_bias.spice     (see "LVS reference netlists" below for why these
     rcosc_trim_bank.spice are not the schematic netlist verbatim)
     rcosc_comparator.spice
+    rcosc_comparator_p.spice
     rcosc_top.spice
   reports/                committed evidence -- DRC/extract/LVS ERC JSON,
                          fresh
@@ -101,6 +103,8 @@ layout/
     rcosc_trim_bank.extracted.spice
     rcosc_comparator.{drc,extract,lvs}.json
     rcosc_comparator.extracted.spice
+    rcosc_comparator_p.{drc,extract,lvs}.json
+    rcosc_comparator_p.extracted.spice
     rcosc_top.{drc,extract,lvs}.json
     rcosc_top.extracted.spice
     rcosc_top.erc.json     T1 item 11 structural power-delivery evidence
@@ -120,8 +124,8 @@ Verifies `design/netlist/` is current against the schematics
 is never regenerated here: `build_cells.py` consumes the committed
 `design/netlist/rcosc_top.spice`, so the run needs it *current*, not
 rewritten — see [design/README.md](../design/README.md) for regenerating
-deliberately), rebuilds all four GDS from `klt gen` primitives (plus, for
-`rcosc_top`, sub-cell instantiation of the other three), and re-runs
+deliberately), rebuilds all five GDS from `klt gen` primitives (plus, for
+`rcosc_top`, sub-cell instantiation of the other four), and re-runs
 `klt drc` / `klt extract` / `klt lvs` for each cell, asserting `status ==
 "clean"` / `"match"` and failing loudly otherwise — then the block-level
 `klt erc` supply-island check of the section below. `layout/build_cells.py
@@ -496,7 +500,7 @@ the same reasons: its `P1`/`P2` pair shares a drawn n-well with a
 `XXCMPH`/`XXCMPL` subcircuit calls, reading like the schematic) but compared
 with `options.flatten_reference: true`, since `klt extract` always emits the
 layout side flat — the sub-block `.SUBCKT` bodies in
-`layout/lvs_ref/rcosc_top.spice` are byte-identical to the three per-cell
+`layout/lvs_ref/rcosc_top.spice` are byte-identical to the four per-cell
 references above, so the hierarchy is verified against exactly what each
 cell was already verified against on its own.
 
