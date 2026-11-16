@@ -2,8 +2,33 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-16
+
+- **PR #399**: sim(trim-dense): complete dense campaign, 1536/1536 batch jobs, reconcile slice 46 overlap
+- **PR #398**: docs(signoff): drop stale klt pin version from workflow comment
+- **PR #395**: fix(trim-dense): fail frozen-manifest gate closed on an unreadable manifest
+- **PR #393**: fix(layout): verify netlist currency in the preflight so run_checks.sh runs end to end
+- **PR #391**: refactor(sim): derive generator PROC tables from pvt_sweep.PROCESS_CORNERS
+- **PR #389**: docs: add required --dut/--code flags to settled_report quickstart
+- **PR #383**: docs: remove guard-confinement investigation report and harness
+- **PR #382**: refactor: collapse the duplicated comparator cell builder into one shared helper
+- **PR #364**: docs: stop restating klt pin values in signoff/ and layout/ READMEs
+- **Issue #385** (closed): Consolidate hand-copied PROC corner tables in sim generators onto pvt_sweep.PROCESS_CORNERS
+- **Issue #372** (closed): sim/startup-settled/README.md: the documented settled_report.py command omits the now-required --dut/--code
+- **Issue #369** (closed): run_batch.py frozen-manifest gate fails open when manifest.json is present but unreadable
+- **Issue #363** (closed): Stop restating the klt pin values in prose: six doc statements still name superseded pins as current
+- **Issue #360** (closed): Collapse the duplicated comparator cell builder in layout/build_cells.py: 39 of 53 body lines identical, differences are pure parameter substitution
+- **Issue #358** (closed): signoff.yml comment names klt 0.7.0 as the pinned grader; the install step pins 0.8.0
+- **Issue #348** (closed): layout/run_checks.sh cannot run end to end: the 0.4.0 geometry pin lacks the klt netlist step it calls
+- **Issue #310** (closed): Remove guard-confinement investigation docs: closed, unreferenced, upstream tooling
+- **Issue #87** (closed): Dense 256-code freq-vs-code sweep and trim-bank monotonicity verdict (DR-0021 follow-ups a, b)
+
 ### 2026-11-15
 
+- **PR #394**: sim(trim-dense): run slice 46, 14 sch_tt curve jobs on batch fleet (1326/1536)
+- **PR #379**: refactor(sim): extract pex_pvt_sweep.py report/record helpers (#353)
+- **Issue #397** (closed): signoff/README.md:411's `the grader pin` appositive still names 0.7.0 as the pin
+- **Issue #353** (closed): Split pex_pvt_sweep.py's 585-line main() into the report/record helpers its sibling campaign drivers already have
 - **PR #390**: sim/trim-dense: opt-in engine_version request pin and paired ngspice 46 vs 47 A/B (verdict: immaterial)
 - **PR #388**: fix(layout): correct two stale ERC provenance claims in run_checks.sh comments
 - **PR #386**: sim(trim-dense): run slice 45, 32 sch_tt curve jobs on batch fleet (1312/1536)
