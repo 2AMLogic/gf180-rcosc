@@ -2,10 +2,14 @@
 
 **Status: schematic capture (issue #6, T1 item 1 of the gap tracker #5) —
 design sources committed and netlist-reproducible — since carried through a
-full PVT-corner campaign and several re-sizing/re-balancing passes (issues
-#12/#16/#18/#20/#22/#24, decision records DR-0005 through DR-0009 below)
-and a comparator/bias-path PVT revision (issue #39,
-[DR-0012](../spec/decision-records/0012-comparator-bias-path-pvt-revision.md)).
+full PVT-corner campaign and several later re-sizing/re-balancing and
+comparator/bias-path revision passes. This header does not enumerate those
+campaigns: the committed runs are listed in
+[`sim/README.md`](../sim/README.md) under `## Committed runs (PVT campaign)`,
+the current PVT basis is `benches.pvt.current` in
+[`signoff/citations.json`](../signoff/citations.json), and the per-campaign
+records are the retained sections below plus the decision records under
+`spec/decision-records/`.
 The layout is **current with the post-#39 schematic**: the bias cell was
 re-drawn and the whole hierarchy re-verified (issues #13/#27/#28/#44, see
 [`layout/README.md`](../layout/README.md)),
@@ -713,8 +717,7 @@ by issue #24's running-metric re-derivation,
 and by issue #35's Iq PVT-corner factorial,
 [DR-0011](../spec/decision-records/0011-iq-pvt-corner-factorial-row-4-exceeds-off-reference.md) —
 see "Campaign history (superseded)" above for the per-campaign records
-and "Full PVT-corner re-verification (issue #43 trim-bank pass-switch
-revision)" above for the current basis):
+and the per-campaign sections below it for each later revision):
 
 - ~~No DRC/LVS claim.~~ **Resolved by issues #13/#27.** The LSB trim
   segments' DRC risk flagged above is checked and clean, and the full
