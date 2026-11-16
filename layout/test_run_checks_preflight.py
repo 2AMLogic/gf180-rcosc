@@ -2,12 +2,16 @@
 
 The preflight must validate both the `klt` CLI *and* the Python runtime that
 runs build_cells.py (which draws the committed GDS in-process) against the
-geometry pins klayout-tools 0.4.0 / klayout 0.30.12, and must do so before
-any netlist / GDS / LVS-reference / report mutation.
+geometry pins klayout-tools 0.4.0 / klayout 0.30.12, and -- since issue #348
+-- must also prove the committed schematic netlists current via
+`design/regen-netlist.sh --check` (the tool's own pinned build, stubbed here)
+before any netlist / GDS / LVS-reference / report mutation.
 
 Everything here is SYNTHETIC: run_checks.sh is copied into a temporary
 repo skeleton whose `design/regen-netlist.sh` is a sentinel stub (it records
-that it ran and exits with a distinctive code), and `klt`, `python3` and `uv`
+its argv and that it ran, then exits with a mode-configurable status: pass,
+an emulated netlist-pin mismatch, an emulated netlist-drift refusal, or the
+default distinctive sentinel code), and `klt`, `python3` and `uv`
 are fake commands on a controlled PATH. The fake `python3` is the real
 interpreter run with `-S` (no site-packages) and a PYTHONPATH holding fake
 `klayout` / `klayout_tools` packages plus `*.dist-info` metadata at the
@@ -33,6 +37,7 @@ RUN_CHECKS = Path(__file__).resolve().parent / "run_checks.sh"
 PIN_KLT = "0.4.0"
 PIN_KLAYOUT = "0.30.12"
 REGEN_SENTINEL_RC = 42  # the stub regen-netlist.sh exits with this
+BUILD_SENTINEL_RC = 43  # the stub build_cells.py exits with this
 
 
 def _write_exec(path: Path, text: str) -> None:
@@ -78,13 +83,45 @@ class Env:
         (self.repo / "design").mkdir()
         shutil.copy2(RUN_CHECKS, self.layout / "run_checks.sh")
         self.regen_marker = tmp / "regen-ran"
+        self.regen_args = tmp / "regen-args"
+        self.regen_mode = tmp / "regen-mode"
+        self.build_marker = tmp / "build-cells-ran"
         _write_exec(
             self.repo / "design" / "regen-netlist.sh",
-            f"#!/bin/sh\ntouch '{self.regen_marker}'\nexit {REGEN_SENTINEL_RC}\n",
+            "#!/bin/sh\n"
+            f"printf '%s\\n' \"$@\" > '{self.regen_args}'\n"
+            f"touch '{self.regen_marker}'\n"
+            f"mode=$(cat '{self.regen_mode}' 2>/dev/null)\n"
+            "case \"$mode\" in\n"
+            "  pass) exit 0 ;;\n"
+            "  pin-mismatch) echo 'ERROR: netlist klt 9.9.9 != pinned 0.9.2' >&2; exit 1 ;;\n"
+            "  drift) echo 'ERROR: design/netlist/rcosc_top.spice is stale against "
+            "design/rcosc_top.sch' >&2; exit 1 ;;\n"
+            f"  *) exit {REGEN_SENTINEL_RC} ;;\n"
+            "esac\n",
         )
         self.bin = tmp / "bin"
         self.bin.mkdir()
         self.uv_log = tmp / "uv-args"
+
+    def regen_refuses(self, kind: str) -> None:
+        """Make the stub regen-netlist.sh emulate a --check refusal.
+
+        kind is "pin-mismatch" or "drift" -- the two refusal modes the real
+        script's verify step can fail with.
+        """
+        self.regen_mode.write_text(kind)
+
+    def regen_passes(self) -> None:
+        """Make the stub regen-netlist.sh emulate a passing --check (exit 0)."""
+        self.regen_mode.write_text("pass")
+
+    def stub_build_cells(self) -> None:
+        """A sentinel build_cells.py that records it ran and exits distinctively."""
+        (self.layout / "build_cells.py").write_text(
+            f"import pathlib\npathlib.Path({str(self.build_marker)!r}).touch()\n"
+            f"import sys\nsys.exit({BUILD_SENTINEL_RC})\n"
+        )
 
     def klt(self, version: str) -> None:
         _write_exec(self.bin / "klt", f"#!/bin/sh\necho 'klt {version}'\n")
@@ -153,8 +190,18 @@ class Env:
             timeout=60,
         )
 
-    def assert_no_mutation(self, proc: subprocess.CompletedProcess[str]) -> None:
-        assert not self.regen_marker.exists(), "netlist regeneration ran before preflight failed"
+    def assert_no_mutation(
+        self, proc: subprocess.CompletedProcess[str], *, netlist_verify_ran: bool = False
+    ) -> None:
+        """Nothing was mutated, whatever the preflight verdict.
+
+        netlist_verify_ran=True acknowledges that the preflight's own
+        `design/regen-netlist.sh --check` step ran and refused (the stub
+        marker exists) -- that verify is read-only by design; its refusal is
+        the run stopping correctly, not a mutation.
+        """
+        if not netlist_verify_ran:
+            assert not self.regen_marker.exists(), "netlist step ran before preflight failed"
         assert not (self.layout / "reports").exists(), "reports/ created before preflight passed"
         assert sorted(p.name for p in self.layout.iterdir()) == ["run_checks.sh"], (
             "preflight wrote into layout/"
@@ -198,6 +245,64 @@ def test_import_failure_falls_back_to_exact_uv_pins_and_passes(env: Env) -> None
     args = _uv_args(env)
     assert f"klayout-tools=={PIN_KLT}" in args
     assert f"klayout=={PIN_KLAYOUT}" in args
+    assert "builder runtime: klayout-tools 0.4.0, klayout 0.30.12" in proc.stdout
+
+
+# --- netlist verify step (issue #348) -----------------------------------------
+
+
+def test_run_checks_invokes_regen_in_check_mode(env: Env, tmp_path: Path) -> None:
+    """The preflight verifies netlist currency; it never regenerates it."""
+    env.klt(PIN_KLT)
+    env.python3(_make_site(tmp_path / "site", PIN_KLT, PIN_KLAYOUT))
+    proc = env.run()
+    env.assert_reached_regen(proc)
+    assert env.regen_args.read_text().splitlines() == ["--check"], (
+        "run_checks.sh must call design/regen-netlist.sh in verify-only --check mode"
+    )
+
+
+def test_netlist_pin_mismatch_refuses_before_mutation(
+    env: Env, tmp_path: Path
+) -> None:
+    """A netlist-toolchain refusal aborts the run before anything is written."""
+    env.klt(PIN_KLT)
+    env.python3(_make_site(tmp_path / "site", PIN_KLT, PIN_KLAYOUT))
+    env.regen_refuses("pin-mismatch")
+    proc = env.run()
+    assert proc.returncode == 1, proc.stdout + proc.stderr
+    assert "netlist klt 9.9.9 != pinned 0.9.2" in proc.stderr, (
+        "the regen script's refusal must surface verbatim"
+    )
+    env.assert_no_mutation(proc, netlist_verify_ran=True)
+
+
+def test_netlist_drift_refuses_before_mutation(env: Env, tmp_path: Path) -> None:
+    """A stale committed netlist stops the run and is reported, not regenerated."""
+    env.klt(PIN_KLT)
+    env.python3(_make_site(tmp_path / "site", PIN_KLT, PIN_KLAYOUT))
+    env.regen_refuses("drift")
+    proc = env.run()
+    assert proc.returncode == 1, proc.stdout + proc.stderr
+    assert "is stale against design/rcosc_top.sch" in proc.stderr, (
+        "the regen script's drift report must surface verbatim"
+    )
+    env.assert_no_mutation(proc, netlist_verify_ran=True)
+
+
+def test_all_pinned_and_netlist_current_reaches_the_builder(
+    env: Env, tmp_path: Path
+) -> None:
+    """Pins + netlist check all pass: the preflight hands over to the builder."""
+    env.klt(PIN_KLT)
+    env.python3(_make_site(tmp_path / "site", PIN_KLT, PIN_KLAYOUT))
+    env.regen_passes()
+    env.stub_build_cells()
+    proc = env.run()
+    assert proc.returncode == BUILD_SENTINEL_RC, proc.stdout + proc.stderr
+    assert env.regen_args.read_text().splitlines() == ["--check"]
+    assert env.build_marker.exists(), "netlist check passed but build_cells never ran"
+    assert (env.layout / "reports").exists(), "mutation phase was not reached"
     assert "builder runtime: klayout-tools 0.4.0, klayout 0.30.12" in proc.stdout
 
 

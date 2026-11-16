@@ -640,6 +640,67 @@ def test_run_batch_skips_the_gate_on_a_campaign_with_no_manifest_yet(tmp_path):
     assert len(log.read_text().split()) == 3
 
 
+@pytest.mark.parametrize("body", ['{"provenance_sha256": "ab', "null", "[]", ""])
+def test_run_batch_refuses_a_manifest_that_exists_but_does_not_parse(tmp_path, body):
+    """#369: a present-but-unreadable manifest is "could not check", not a pass."""
+    import run_batch
+    bench, out = _gated_bench(tmp_path), tmp_path / "res"
+    out.mkdir(parents=True)
+    (out / "manifest.json").write_text(body)
+    klt, log = _fake_klt(tmp_path)
+    problems = run_batch.manifest_problems(bench, out)
+    assert len(problems) == 1 and "manifest.json exists but" in problems[0]
+    assert "git history" in problems[0]                       # recovery path is named
+    with pytest.raises(SystemExit) as e:
+        run_batch.drive(bench, out, klt)
+    assert "nothing was submitted" in str(e.value) and "git history" in str(e.value)
+    assert not log.exists()                                   # no submission attempted
+    assert not (out / "ledger.jsonl").exists()
+
+
+def test_run_batch_refuses_a_bench_missing_the_netlist_copy_the_manifest_names(tmp_path):
+    """#369: an empty netlist glob must not read as a passing check."""
+    import run_batch
+    out = tmp_path / "res"
+    _frozen_manifest(out)                                     # names variant 'sch'
+    bench = _gated_bench(tmp_path)                            # requests + matching provenance...
+    for p in bench.glob("sch/*/rcosc_top_*.spice"):
+        p.unlink()                                            # ...but no netlist copy at all
+    klt, log = _fake_klt(tmp_path)
+    problems = run_batch.manifest_problems(bench, out)
+    assert len(problems) == 1 and "no rcosc_top_*.spice copy" in problems[0]
+    with pytest.raises(SystemExit):
+        run_batch.drive(bench, out, klt)
+    assert not log.exists()
+
+
+def test_run_batch_refuses_a_manifest_with_an_empty_netlists_key(tmp_path):
+    """A manifest that freezes no netlists still refuses a bench that has one."""
+    import run_batch
+    bench, out = _gated_bench(tmp_path), tmp_path / "res"
+    out.mkdir(parents=True)
+    (out / "manifest.json").write_text(json.dumps({
+        "provenance_sha256": hashlib.sha256(b'{"fixture": true}').hexdigest(),
+        "netlists": {}}))
+    problems = run_batch.manifest_problems(bench, out)
+    assert len(problems) == 1 and "not in manifest netlists" in problems[0]
+
+
+def test_run_batch_preflight_print_covers_all_three_manifest_states(tmp_path, capsys):
+    """Absent keeps the #378-quoted first-slice line; a present manifest never prints it."""
+    import run_batch
+    bench, out = _gated_bench(tmp_path), tmp_path / "res"
+    klt, log = _fake_klt(tmp_path)
+    run_batch.drive(bench, out, klt)                          # absent: first slice
+    assert "no manifest.json in the campaign dir yet (first slice); not checked" \
+        in capsys.readouterr().out
+    _frozen_manifest(tmp_path / "res2")                       # present and parses
+    run_batch.drive(bench, tmp_path / "res2", klt)
+    out_text = capsys.readouterr().out
+    assert "manifest preflight: OK" in out_text and "first slice" not in out_text
+    assert len(log.read_text().split()) == 6
+
+
 def test_committed_campaign_reports_carry_the_manifest_netlist_hashes():
     """Every committed #87 campaign report was measured on a manifest netlist."""
     camp = prepare.REPO / "sim" / "trim-dense" / "results" / "20261106T1115Z-campaign"
