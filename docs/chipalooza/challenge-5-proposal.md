@@ -8,7 +8,8 @@
 > and the comparator-H fixes
 > ([DR-0028](../../spec/decision-records/0028-comparator-h-output-stage-fix.md),
 > [DR-0039](../../spec/decision-records/0039-row5-comparator-h-mirror-load-l07-landed-in-schematic-and-netlist-layout-lvs-not-rebuilt.md)–[DR-0045](../../spec/decision-records/0045-row4-w3r65-bank-candidate-measured-on-the-rebuilt-layout-extraction-ss-span-clears-but-code-0xff-running-iq-rises-20-28-percent.md))
-> are **not** reflected in them: § 4 still grades the September
+> are **not** reflected in § 4's accuracy rows (row 10 was refreshed in
+> `436dbbf3` and does discuss the DR-0028 stage): § 4 still grades the September
 > schematic-level campaigns at the fixed trim codes `0xD0`/`0xA3`, while the
 > current graded record (2026-11-06) is the re-centre's extracted-netlist
 > campaign at calibration code `0xA4`
@@ -23,13 +24,14 @@
 > [`README.md`](../../README.md) target-specification table, which merges
 > trim range and trim resolution into one row; the § 4 table below splits
 > them and numbers its eleven rows differently), the current record grades
-> item-5 row 2 (trim range and step — § 4 rows 2–3), item-5 row 4 (post-trim
-> at the calibration point — § 4 row 5), item-5 row 5 (post-trim full
-> temperature — § 4 row 6) and item-5 row 8 (quiescent current,
-> off-reference — § 4 row 9) as **not met**, and item-5 rows 6 and 9 as
-> declared gaps (§ 4 rows 7 and 10). The supply and temperature-range
-> failures on the pre-re-centre `0xA9` record (fs/−40 °C no-oscillation
-> points) are cleared at `0xA4`.
+> item-5 row 2 (trim range and step — § 4 rows 2–3), item-5 rows 4 and 5
+> (post-trim at the calibration point and across the full temperature
+> range — both reported together in § 4 row 5, the global-code row; § 4
+> row 6's per-corner-code methodology is not exercised by this record)
+> and item-5 row 8 (quiescent current, off-reference — § 4 row 9) as
+> **not met**, and item-5 rows 6 and 9 as declared gaps (§ 4 rows 7 and 10).
+> The supply and temperature-range failures on the pre-re-centre `0xA9`
+> record (fs/−40 °C no-oscillation points) are cleared at `0xA4`.
 
 **Status of this repository:** the ratified spec, a full schematic, a full
 PVT-corner simulation campaign, and a DRC-clean/LVS-matched GDS for the
