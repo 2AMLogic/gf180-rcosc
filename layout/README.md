@@ -196,7 +196,16 @@ reproduce layout GDS with the 0.4.0-era toolchain the reports record
 (filed upstream per the friction protocol as
 [klayout-tools#2246](https://github.com/2AMLogic/klayout-tools/issues/2246);
 see [DR-0013](../spec/decision-records/0013-bias-cell-respin-postlayout-pex-reverification.md)'s
-toolchain provenance note).
+toolchain provenance note). That pins' load-bearing role is now enforced
+automatically: `.github/workflows/cell-generator.yml` (added by issue #387)
+runs `build_cells.py --check` under exactly this `klayout-tools==0.4.0` +
+`klayout==0.30.12` pair on every pull request and push to `main`, so a
+builder or netlist edit that moves geometry without regenerating fails CI
+instead of waiting for the check to be hand-run. The check needs a real
+PDK install to draw against, so the job provisions the same open_pdks
+revision the committed evidence records (`c6d73a35…`, via a pinned
+volare, cached across runs) and exports `PDK_ROOT` explicitly — the
+workflow header carries the details.
 
 ## Supply ERC (T1 item 11)
 

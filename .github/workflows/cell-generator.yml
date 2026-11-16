@@ -1,0 +1,105 @@
+name: Cell generator
+
+# Runs the layout generator's own output-neutrality check (issue #387):
+# `layout/build_cells.py --check` rebuilds every CELL_ORDER cell in a temp
+# file and compares it against the committed `layout/cells/*.gds` and
+# `layout/lvs_ref/*.spice`, failing the job if any cell is stale. This is
+# the only automated thing that distinguishes a build_cells.py refactor
+# from moved geometry: the committed artifacts and their `signoff/` hashes
+# stay mutually consistent while drifting from the generator, so no other
+# gate can see that mismatch.
+#
+# Simulator-free and cloud-free, but NOT PDK-free: `--check` regenerates
+# every cell through the generator, which resolves a `gf180mcuC` install,
+# and a clean GitHub runner has none (the first version of this job died
+# on exactly that -- `PdkNotFoundError` with all search roots exhausted;
+# a worker with `~/.ciel` populated proves nothing about the runner). The
+# job therefore provisions the same open_pdks revision the committed
+# layout evidence records (`c6d73a35…`, see signoff/README.md's PDK
+# revisions section; the same pin every gf180 canary repo uses), via a
+# pinned volare, and caches `~/.volare` so only a run that misses the
+# cache pays the fetch. PDK_ROOT is exported explicitly:
+# klayout-tools' built-in search roots do not resolve volare's nested
+# `<home>/volare/gf180mcu/versions/<hash>/` store layout, and an explicit
+# root turns a layout drift into a named failure instead of a silent
+# fallthrough.
+#
+# Both wheel pins stay explicit (unchanged): klayout-tools declares only
+# `klayout>=0.30` and the resolver would otherwise float to the current
+# release and redraw the unchanged cells as stale (the geometry pins
+# `layout/README.md` records).
+#
+# No `paths:` filter on purpose (unchanged): the generator's only input,
+# `design/netlist/rcosc_top.spice`, is committed and is a geometry input
+# (device r_length/r_width/L/W/nf are parsed out of it), so editing the
+# netlist alone can stale the cells; a `layout/**`-keyed filter would
+# skip exactly that PR.
+#
+# A separate workflow from signoff.yml on purpose (unchanged): signoff.yml
+# is a hashed, audited artifact (T1 item 10), so adding a step there would
+# force refreshing its envelope and report. Also separate from
+# offline-suites.yml: that matrix shares one `pip install pytest` step and
+# is scoped to synthetic-fixture pytest suites, while this job needs the
+# two pinned geometry wheels plus the PDK.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cell-generator-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  # Pinned open_pdks revision -- the one the committed layout evidence
+  # records (signoff/README.md's PDK revisions section) and the same
+  # commit every gf180 canary repo pins. Bump together, never separately.
+  GF180_PDK_VERSION: c6d73a35f524070e85faff4a6a9eef49553ebc2b
+  # The PDK installer is pinned too, so a volare release cannot change the
+  # store layout (and with it PDK_ROOT's path shape, hardcoded in the
+  # guarded check below) without a deliberate change in this file.
+  VOLARE_VERSION: 0.20.6
+
+jobs:
+  output-neutrality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v7
+
+      - name: Cache the gf180mcu PDK
+        id: pdk-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.volare
+          key: volare-gf180mcu-${{ env.GF180_PDK_VERSION }}
+
+      - name: Provision the pinned gf180mcu PDK (volare)
+        if: steps.pdk-cache.outputs.cache-hit != 'true'
+        run: |
+          python3 -m pip install --disable-pip-version-check "volare==${VOLARE_VERSION}"
+          volare enable --pdk gf180mcu "${GF180_PDK_VERSION}"
+
+      - name: build_cells.py --check (committed GDS/LVS refs are current)
+        run: |
+          # Parent of gf180mcuC/ under volare 0.20.6's store layout
+          # (<home>/volare/gf180mcu/versions/<hash>/gf180mcuC). The guard
+          # turns a layout drift into a named failure instead of a silent
+          # fallthrough to the next search root.
+          PDK_ROOT="$HOME/.volare/volare/gf180mcu/versions/${GF180_PDK_VERSION}"
+          [ -d "$PDK_ROOT/gf180mcuC" ] || {
+            echo "gf180mcuC not found under $PDK_ROOT (volare store layout drift?)" >&2
+            exit 1
+          }
+          export PDK_ROOT
+          uv run --no-project \
+            --with "klayout-tools==0.4.0" --with "klayout==0.30.12" \
+            python3 layout/build_cells.py --check
