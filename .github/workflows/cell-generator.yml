@@ -1,0 +1,53 @@
+name: Cell generator
+
+# Runs the layout generator's own output-neutrality check (issue #387):
+# `layout/build_cells.py --check` rebuilds every CELL_ORDER cell in a temp
+# file and compares it against the committed `layout/cells/*.gds` and
+# `layout/lvs_ref/*.spice`, failing the job if any cell is stale. This is
+# the only automated thing that distinguishes a build_cells.py refactor
+# from moved geometry: the committed artifacts and their `signoff/` hashes
+# stay mutually consistent while drifting from the generator, so no other
+# gate can see that mismatch.
+#
+# PDK-free, simulator-free, cloud-free: python3 + two pinned wheels
+# (klayout-tools 0.4.0 + klayout 0.30.12, the geometry pins
+# `layout/README.md` records — `klt gen`'s drawn output is not stable
+# across klayout-tools versions, so both distributions are pinned
+# explicitly; `klayout-tools` declares only `klayout>=0.30` and the
+# resolver would otherwise float to the current release and redraw the
+# unchanged cells as stale). No `paths:` filter on purpose: the
+# generator's only input, `design/netlist/rcosc_top.spice`, is committed
+# and is a geometry input (device r_length/r_width/L/W/nf are parsed out
+# of it), so editing the netlist alone can stale the cells; a
+# `layout/**`-keyed filter would skip exactly that PR. The job runs in
+# seconds even with a cold wheel cache.
+#
+# A separate workflow from signoff.yml on purpose: signoff.yml is a
+# hashed, audited artifact (T1 item 10), so adding a step there would
+# force refreshing its envelope and report. Also separate from
+# offline-suites.yml: that matrix shares one `pip install pytest` step and
+# is scoped to synthetic-fixture pytest suites, while this job needs the
+# two pinned geometry wheels.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  output-neutrality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v7
+      - name: build_cells.py --check (committed GDS/LVS refs are current)
+        run: |
+          uv run --no-project \
+            --with "klayout-tools==0.4.0" --with "klayout==0.30.12" \
+            python3 layout/build_cells.py --check
