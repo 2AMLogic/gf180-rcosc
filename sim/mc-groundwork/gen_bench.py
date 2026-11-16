@@ -32,15 +32,13 @@ from pathlib import Path
 here = Path(__file__).parent
 sys.path.insert(0, str(here))  # also works under python -I
 from mismatch_inject import inject  # noqa: E402
+sys.path.insert(0, str(here.parent / "pvt"))
+from pvt_sweep import PROCESS_CORNERS  # noqa: E402
 SRC = here.parent.parent / "design" / "netlist" / "pvt_tb.spice"
 TARGET_HZ = 48.0e6
 VDD = 3.3
 VMID = VDD / 2
-PROC = {
-    "tt": ["typical", "res_typical", "mimcap_typical", "cap_mim"],
-    "ff": ["ff", "res_ff", "mimcap_ff", "cap_mim"],
-    "ss": ["ss", "res_ss", "mimcap_ss", "cap_mim"],
-}
+PROC = {n: [*PROCESS_CORNERS[n], "cap_mim"] for n in ("tt", "ff", "ss")}
 
 # --- DUT (same extraction as sim/pvt-postlayout/klt-pex/gen_requests.py) ----
 text = SRC.read_text().splitlines()
