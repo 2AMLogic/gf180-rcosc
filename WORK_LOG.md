@@ -4,6 +4,15 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-16
 
+- **PR #413**: docs: drop stale 'current basis' claim and inline campaign list from design README
+- **PR #411**: refactor: run recentre ngspice through shared run_ngspice_deck
+- **PR #405**: docs: correct offline-suite fixture contract to admit read-only evidence replay
+- **PR #403**: docs(layout): correct README cell set to five — counts and tree listing
+- **Issue #409** (closed): design/README.md Non-goals preamble points at the #43 section as "the current basis"; the live PVT basis is DR-0017 (#57)
+- **Issue #404** (closed): design/README.md: status block and the Non-goals pointer lag the current PVT basis (#57/DR-0017)
+- **Issue #400** (closed): layout/README.md still says four GDS cells; run_checks.sh builds five
+- **Issue #396** (closed): Doc accuracy: offline-suites.yml claims all fixtures are SYNTHETIC (3 sites) while 7 matrix entries replay committed sim/ evidence
+- **Issue #381** (closed): sim/recentre/pexlib.py carries a fourth copy of the local ngspice-run contract that #361 did not consolidate
 - **PR #406**: ci: gate build_cells.py output-neutrality in a dedicated workflow
 - **PR #402**: docs(design): collapse four superseded PVT campaign sections into a history index
 - **PR #401**: docs(proposal): date § 4 to its figures' commit, re-pin item 8 evidence
