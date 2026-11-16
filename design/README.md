@@ -507,11 +507,12 @@ All resistors use `ppolyf_u_1k` (1000 Ω/sq typ, gf180mcu §6.1A) at
   *without* real data points bracketing the target was the specific mistake
   this issue's own process caught and corrected.
 - **This sizing is not claimed to hit the ratified endpoints exactly** —
-  see "Full PVT-corner re-verification" below for what the campaign
-  against this sizing actually shows row-by-row against the ratified
-  target-spec table. Re-deriving from simulated (not `ln 3`) behavior is
-  what issue #16 commits to; whether the result meets every ratified row
-  is reported there, not asserted here.
+  see [DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md)
+  (campaign run `20260906T030219Z`, the first row of "Campaign history
+  (superseded)" below) for what the campaign against this sizing actually
+  shows row-by-row against the ratified target-spec table. Re-deriving from
+  simulated (not `ln 3`) behavior is what issue #16 commits to; whether the
+  result meets every ratified row is reported there, not asserted here.
 - **Code ↔ frequency linearity within the range is still NOT claimed or
   verified** — same caveat as the pre-#16 sizing; DR-0002/0003's "linear
   mapping" language describes trim word design intent, not a per-code DNL
@@ -544,161 +545,27 @@ All resistors use `ppolyf_u_1k` (1000 Ω/sq typ, gf180mcu §6.1A) at
   spec is unchanged; issue #22 tracks re-balancing the bias generator's
   sizing.
 
-### Full PVT-corner re-verification (issues #16 / #18)
+#### Campaign history (superseded)
 
-The full process×temperature×supply campaign methodology issue #12 used
-(`sim/pvt/run-pvt-sweep.sh`) has been re-run against this re-sized
-schematic (git sha `af1cf30c`, unchanged by this campaign), recorded as a
-new, dated evidence directory:
-`sim/pvt/results/20260906T030219Z/{results.csv,manifest.json,summary.md}`,
-raw logs under `sim/pvt/corners/20260906T030219Z/` — append-only, the
-issue #12 evidence directory (`20260905T211140Z`) is untouched. 278
-unique operating points, 0 failed measurements, 15.0 minutes wall clock
-at 14 parallel jobs (the shared-host contention that blocked this
-campaign within issue #16's own session, per the prior revision of this
-section, had cleared by the time issue #18 ran it).
+Each superseded campaign's disposition, in full, is its decision record;
+the per-run figures (operating-point counts, wall clock, parallel-job
+count, per-row met/exceeds verdicts) are tabulated per run id in
+`sim/README.md`'s
+[Committed runs (PVT campaign)](../sim/README.md#committed-runs-pvt-campaign)
+table.
 
-Disposition, in full, is [DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md).
-Summary:
-
-| Spec row | Ratified | Simulated | Verdict |
+| Run id | Campaign | Record | Outcome |
 |---|---|---|---|
-| Free-running, untrimmed, process spread | ±35% (−27.7%/+47.6% exact) | −28.73% / +46.53% | met |
-| Output frequency | 48.000 MHz | reachable, 29.5–65.9 MHz range at the reference corner | met |
-| Trim range | ±40% (28.8–67.2 MHz) | ±38.16% (29.5072–65.9204 MHz) | **not met** (close: 96% of the intended endpoint ratio) |
-| Post-trim, at calibration point | ±1.1% | −34.83%/+53.97% (global code) or −16.28%/+15.24% (per-corner code) | **exceeds**, both methodologies |
-| Post-trim, full temperature range | +8%/−9% | −42.43%/+62.77% (global code) or −25.74%/+21.18% (per-corner code) | **exceeds**, both methodologies |
+| [`20260906T030219Z`](../sim/pvt/results/20260906T030219Z/summary.md) | #16/#18 post-resize | [DR-0006](../spec/decision-records/0006-post-resize-pvt-campaign-trim-range-and-accuracy-still-unmet.md) | Trim range ±38.16% — not met, but no longer saturation-limited; both post-trim accuracy rows exceed; the comparator/bias path is isolated as the dominant residual. |
+| [`20260906T060104Z`](../sim/pvt/results/20260906T060104Z/summary.md) | #22 bias re-balance | [DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md) | Quiescent current verdict moves to met (467.18 µA `.op` / 157.27 µA running) at the price of a trim-range regression to ±32.42%. |
+| [`20260907T090653Z`](../sim/pvt/results/20260907T090653Z/summary.md) | #24 running-metric re-derivation | [DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md) | Row 4's verdict basis moves to `iq_run` (met at every code); trim range recovers to ±35.50%; the full-temperature post-trim residual widens to −19.41%/+27.85%. |
+| [`20260921T075822Z`](../sim/pvt/results/20260921T075822Z/summary.md) | #39 comparator/bias-path revision | [DR-0012](../spec/decision-records/0012-comparator-bias-path-pvt-revision.md) | Post-trim residuals improve and the per-corner ΔT spread collapses to +774…+1003 ppm/K, eliminating the device-driven excess DR-0006 isolated; trim range ±34.42%. |
 
-The trim bank is no longer saturated against the ratified target at
-almost every corner (unlike DR-0005's pre-resize finding, where every
-corner saturated at code `0xFF`), so the two "exceeds" rows above are
-**not** a saturation artifact this time: DR-0006 finds a comparable
-per-corner-calibrated residual to DR-0005's own (pre-resize, partially
-saturation-limited) figure, meaning the comparator/bias path's own
-temperature and supply sensitivity — not the timing resistor's TCR
-DR-0003's post-trim-accuracy derivation was based on — is the dominant
-remaining residual. See DR-0006's "Consequences" for the follow-up
-direction (comparator/bias-path PVT sensitivity, not further timing R/C
-retuning).
-
-The top-code non-monotonicity DR-0005 flagged (`0xF0` → `0xFF`, pre-resize)
-**does not reproduce** at the resized operating point — the realized trim
-curve is monotonically increasing end to end (see DR-0006).
-
-### Full PVT-corner re-verification (issue #22 bias re-balance)
-
-The same campaign was re-run against the issue #22 re-balanced sizing
-(`RBIAS L = 1000 µm`, 8:1 tail mirror) and recorded as
-`sim/pvt/results/20260906T060104Z/`, raw logs under
-`sim/pvt/corners/20260906T060104Z/` — append-only; both prior campaigns are
-untouched. 271 unique operating points, 0 failed measurements, 11.9 minutes
-wall clock at 14 parallel jobs.
-
-Disposition, in full, is [DR-0008](../spec/decision-records/0008-iq-metric-correction-and-bias-rebalance.md).
-Against DR-0006's post-#16 campaign:
-
-| Spec row | Ratified | DR-0006 (post-#16) | **now** (post-#22) | Verdict change |
-|---|---|---|---|---|
-| Quiescent current | `< 500 µA` (running) | 914.99 µA `.op` | **467.18 µA `.op` / 157.27 µA running** | **exceeds → met** |
-| Output frequency | 48.000 MHz | max reachable 65.9204 MHz | max reachable 51.9415 MHz | none — met both |
-| Trim range | ±40% (28.8–67.2 MHz) | ±38.16% (29.5072–65.9204 MHz) | ±32.42% (26.5059–51.9415 MHz) | none — **not met** both, margin worse |
-| Trim step | 0.314 %/code | 0.4839 %/code | 0.3763 %/code | none — met both |
-| Free-running untrimmed process spread | ±35% | −25.60% / +38.71% | −25.46% / +38.54% | none — within both |
-| Post-trim, at calibration point | ±1.1% | −11.38% / +10.56% (per-corner code) | −10.18% / +10.30% (per-corner code) | none — **exceeds** both |
-| Post-trim, full temperature range | +8% / −9% | −18.00% / +12.91% (per-corner code) | −17.38% / +13.46% (per-corner code) | none — **exceeds** both |
-
-**Row 4 (Iq) is the only verdict that moves, and the trim-range margin is
-the price paid for it**: still not met, as it already was, but the gap to
-±40% widens from 1.84 to 7.58 percentage points. The ratified 48.000 MHz
-output frequency stays reachable with 8.2% headroom, and the design remains
-far from DR-0005's pre-#16 shortfall (31.18 MHz maximum reachable at *any*
-corner or code) — but this is a real regression against DR-0006's
-trim-range finding, recorded rather than buried. Trim-curve monotonicity is
-not degraded: the `0xE0` → `0xF0` → `0xFF` region stays monotonic
-(48.5043 → 50.7721 → 51.9415 MHz) and the small LSB-region non-monotonicity
-is marginally smaller than DR-0006's (−0.09% vs. −0.11% at `0x10`).
-
-Issue #24 re-derives the sizing against the **running** Iq metric — which
-had 44% margin at the worst code at this point, where the `.op` metric
-this sizing was constrained by had only 6.6% — and determines how much of
-the lost trim range is recoverable while still meeting Row 4 as worded;
-see the next section for that campaign.
-
-### Full PVT-corner re-verification (issue #24 running-metric re-derivation)
-
-The same campaign was re-run again against the issue #24 sizing
-(`RBIAS L = 210 µm`, 8:1 tail mirror unchanged) and recorded as
-`sim/pvt/results/20260907T090653Z/`, raw logs under
-`sim/pvt/corners/20260907T090653Z/` — append-only; all three prior
-campaigns are untouched. 277 unique operating points, 206 recorded rows,
-0 failed measurements, 4.0 minutes wall clock at 8 parallel jobs.
-
-Disposition, in full, is [DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md).
-Against DR-0006 (post-#16) and DR-0008 (post-#22):
-
-| Spec row | Ratified | DR-0006 (post-#16) | DR-0008 (post-#22) | **now (post-#24)** |
-|---|---|---|---|---|
-| Quiescent current | `< 500 µA` (running) | 914.99 µA `.op` (only metric then measured) | 467.18 µA `.op` / 157.27 µA running — met both | 754.90 µA `.op` (not the verdict basis) / **468.61 µA running — met** |
-| Output frequency | 48.000 MHz | max reachable 65.9204 MHz | max reachable 51.9415 MHz | max reachable **58.9870 MHz** — met |
-| Trim range | ±40% (28.8–67.2 MHz) | ±38.16% | ±32.42% | **±35.50%** (28.0769–58.9870 MHz) — not met, narrower gap than DR-0008 |
-| Trim step | 0.314 %/code | 0.4839 %/code | 0.3763 %/code | **0.4317 %/code** — met |
-| Free-running untrimmed process spread | ±35% | −25.60% / +38.71% | −25.46% / +38.54% | **−26.34% / +42.68%** — within |
-| Post-trim, at calibration point (per-corner code) | ±1.1% | −11.38% / +10.56% | −10.18% / +10.30% | **−11.50% / +13.19%** — exceeds |
-| Post-trim, full temperature range (per-corner code) | +8% / −9% | −18.00% / +12.91% | −17.38% / +13.46% | **−19.41% / +27.85%** — exceeds, worse than both priors |
-
-**Row 4's verdict basis is now `iq_run`** (DR-0009), and Row 4 is met on
-that basis at every simulated code — the elevated `.op` figure (754.90 µA)
-is expected, not a regression, since `.op` was never the quantity being
-targeted (DR-0008 Finding 1). **Trim range recovers about 54% of what
-DR-0008 traded away** (±32.42% → ±35.50%; DR-0006's pre-#22 ±38.16% and
-the ratified ±40% both remain out of reach). **A real, not-hidden
-regression**: the post-trim, full-temperature, per-corner-code residual
-widens to −19.41%/+27.85%, worse than both DR-0006 and DR-0008 — traced to
-the `fs` process corner's own per-corner calibration code coinciding with
-its untrimmed reference code at this sizing, so its post-trim figure is
-effectively its (comparatively high, +1923 ppm/K) untrimmed temperature
-drift. The verdict ("exceeds") does not change — every post-trim row has
-been "exceeds" since DR-0005 — but the margin does, and DR-0009 records it
-rather than omitting it. The coarse (`0x10`-step) trim curve shows the
-same small LSB-region non-monotonicity dips prior campaigns flagged
-(e.g. `0x10`→`0x20`: −0.14%), not a new or worsened pattern.
-
-### Full PVT-corner re-verification (issue #39 comparator/bias-path revision)
-
-The same campaign was re-run against the issue #39 self-biased
-current-reference core (`RZ = 32 µm`, nfet SEED, sizing frozen at git sha
-`1ac4434`) and recorded as `sim/pvt/results/20260921T075822Z/`, raw logs under
-`sim/pvt/corners/20260921T075822Z/` — append-only; every prior campaign is
-untouched. 276 unique operating points, 0 failed measurements.
-
-Disposition, in full, is [DR-0012](../spec/decision-records/0012-comparator-bias-path-pvt-revision.md).
-Against DR-0009 (post-#24):
-
-| Spec row | Ratified | DR-0009 (post-#24) | **now (post-#39)** | Verdict change |
-|---|---|---|---|---|
-| Post-trim, at calibration point (per-corner code) | ±1.1% | −11.50% / +13.19% | **−11.65% / +8.32%** | none — **exceeds** both; upper excess improves by ~4.9 pt |
-| Post-trim, full temperature range (per-corner code) | +8% / −9% | −19.41% / +27.85% | **−20.15% / +13.03%** | none — **exceeds** both; upper excess improves by ~14.8 pt |
-| ΔT coefficient spread (per-corner calibrated codes) | (budget basis ≈ +1177 ppm/K) | +856 … +1923 ppm/K | **+774 … +1003 ppm/K** | — the device-driven excess DR-0006 named is eliminated |
-| Supply sensitivity, slow-corner calibrated codes (`ss`/`sf`/`rc_s`) | ~0 (ratiometric ideal) | +20.77% / +12.58% / +14.13% | +20.05% / +12.02% / +13.70% | unchanged — dominated by the trim-bank phantom-resistance path (follow-up issue) |
-| Output frequency | 48.000 MHz | max reachable 58.9870 MHz | max reachable **56.7060 MHz** | none — met both |
-| Trim range | ±40% (28.8–67.2 MHz) | ±35.50% | **±34.42%** (27.6659–56.7060 MHz, ratio 2.0497) | **not met** — small recorded regression, −1.08 pt |
-| Trim step | 0.314 %/code | 0.4317 %/code | **0.4116 %/code** | none — met both |
-| Free-running untrimmed process spread | ±35% | −26.34% / +42.68% | **−26.11% / +39.90%** | none — within both |
-
-The two post-trim rows remain **not met** — but the dominant unbudgeted
-mechanism DR-0006 isolated (the comparator/bias path's own temperature
-sensitivity, visible as the ΔT spread across identical-passive corners) is
-eliminated, and the remaining per-cell excess is now dominated by the
-trim-bank pass-switch phantom-resistance path isolated by the same
-instrumentation and filed as its own follow-up issue, together with a
-comparator/latch delay residue. The quiescent-current row is re-verified
-by the Iq PVT factorial (`sim/iq/results/`, DR-0011's methodology) — see
-DR-0012 for the disposition. The trim curve's LSB-region non-monotonicity
-dips persist (`0x00`-block cells within ±0.09%, and the same
-`0x10`-block dip pattern as prior campaigns), the same small-magnitude
-pattern as before, now with a mechanistic explanation (delay/phantom
-interplay at the low-crawl codes) rather than a new instance of the pre-#16
-anomaly.
+All four are superseded by the issue #43 trim-bank pass-switch revision
+(next section,
+[DR-0014](../spec/decision-records/0014-trim-bank-pass-switch-restructure.md)).
+The evidence directories `sim/pvt/results/<run id>/` are append-only and
+untouched by this index.
 
 ### Full PVT-corner re-verification (issue #43 trim-bank pass-switch revision)
 
@@ -845,7 +712,9 @@ by issue #24's running-metric re-derivation,
 [DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md),
 and by issue #35's Iq PVT-corner factorial,
 [DR-0011](../spec/decision-records/0011-iq-pvt-corner-factorial-row-4-exceeds-off-reference.md) —
-see the three "Full PVT-corner re-verification" sections above):
+see "Campaign history (superseded)" above for the per-campaign records
+and "Full PVT-corner re-verification (issue #43 trim-bank pass-switch
+revision)" above for the current basis):
 
 - ~~No DRC/LVS claim.~~ **Resolved by issues #13/#27.** The LSB trim
   segments' DRC risk flagged above is checked and clean, and the full
@@ -872,8 +741,9 @@ see the three "Full PVT-corner re-verification" sections above):
   back up (754.90 µA at code `0x80`, no longer the verdict basis) —
   **met on `iq_run` at every simulated code** ([DR-0009](../spec/decision-records/0009-running-iq-metric-basis-and-partial-trim-range-recovery.md),
   `sim/iq/results/20260907T090639Z/README.md`). See "Bias generator" above
-  for the sizing and "Full PVT-corner re-verification (issue #24 …)" for
-  the recovered trim range and the residual-accuracy trade-off it cost.
+  for the sizing, and "Campaign history (superseded)" above (row
+  `20260907T090653Z`, DR-0009) for the recovered trim range and the
+  residual-accuracy trade-off it cost.
 - ~~No PVT factorial for Iq.~~ **Resolved by issue #35.** `sim/iq/iq_sweep.py`
   now runs the full 7-process × 3-temperature × 3-supply factorial (63
   grid points/code, corner definitions imported from `sim/pvt/pvt_sweep.py`
