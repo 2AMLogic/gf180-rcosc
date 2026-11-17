@@ -2,6 +2,10 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-17
+
+- **PR #421**: chore(loom): resync installed Loom to v0.19.1306
+
 ### 2026-11-16
 
 - **PR #416**: feat(signoff): pin-restatement guard for klt pin values
