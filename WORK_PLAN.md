@@ -7,7 +7,7 @@ This roadmap is generated from the current GitHub label state by the Loom Guide 
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-_None._
+- **#418**: chore(loom): resync installed Loom to v0.19.1305
 
 ## Very Important
 
@@ -27,7 +27,7 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
+_None._
 
 ## In Progress
 
@@ -39,13 +39,13 @@ _None._
 
 PRs waiting on Judge (`loom:review-requested`).
 
-- **#418**: chore(loom): resync installed Loom to v0.19.1305
+_None._
 
 ## Approved (Awaiting Merge)
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#418**: chore(loom): resync installed Loom to v0.19.1305
 
 ## Proposed
 
@@ -67,13 +67,13 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 0 |
+| Operator merge-risk holds | 1 |
 | Very important | 1 |
 | Important | 3 |
-| Ready (`loom:issue`) | 1 |
+| Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
-| PRs awaiting review | 1 |
-| Approved PRs awaiting merge | 0 |
+| PRs awaiting review | 0 |
+| Approved PRs awaiting merge | 1 |
 | Curated | 3 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 1 |
