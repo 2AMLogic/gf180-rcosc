@@ -19,7 +19,7 @@ _None._
 
 `loom:important`; taken before unlabelled work.
 
-- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout *(held)*
+- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
 - **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5 *(held)*
 - **#317**: Rows 4/5: trim-bank switch supply dependence (ss) and comparator-H hot/low-V delay collapse (ff) *(held)*
 
@@ -27,7 +27,7 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout *(held)*
+- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
 
 ## In Progress
 
