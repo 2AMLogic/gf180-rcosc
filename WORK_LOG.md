@@ -4,6 +4,10 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-18
 
+- **PR #430**: signoff: assert merge_group trigger on all 7 required-check workflows
+- **Issue #429** (closed): No check asserts the merge_group trigger survives in the 7 required-check workflows
+- **Issue #426** (closed): Merge queue: add the merge_group trigger and adapt the PR-metadata gates
+- **PR #428**: ci: report the required checks on merge_group commits (merge queue readiness)
 - **Issue #425** (closed): Guide WORK_PLAN render diverges from render_plan_body(): invented *(held)* marker and operator-held issue leaked into Ready
 
 ### 2026-11-17
