@@ -29,6 +29,18 @@ new_repo
 t identical-revisions 0 g "$base" HEAD
 t missing-base nz g no-such-base HEAD
 t missing-head nz g "$base" no-such-head
+
+# Merge-group shape (issue #426): on merge_group runs the workflow invokes
+# the guard as `check-append-only.sh <merge_group.base_sha>
+# <merge_group.head_sha>` against the queue's trial-merge commit, so the
+# base is the pre-queue commit. An empty base (event payload without
+# base_sha) must fail, never silently skip.
+t merge-group-empty-base nz g "" HEAD
+new_repo; mkdir sim/blk/results/run2; echo n > sim/blk/results/run2/c.txt
+git add -A; git commit -q -m queue
+t merge-group-new-run-passes 0 g "$base" HEAD
+new_repo; echo changed > sim/blk/results/run1/a.txt; git commit -qam queue
+t merge-group-modify-fails nz g "$base" HEAD
 mkdir -p "$tmp/fakebin"
 cat > "$tmp/fakebin/git" <<FAKE
 #!/usr/bin/env bash
