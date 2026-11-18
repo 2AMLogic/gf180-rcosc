@@ -13,21 +13,21 @@ _None._
 
 `loom:very-important` (one counts per workspace); every stage takes these first.
 
-- **#337**: Row 4 ss span: adopt and verify the DR-0037 w3r65 bank candidate (needs operator ruling on one re-centred change) *(held)*
+- **#337**: Row 4 ss span: adopt and verify the DR-0037 w3r65 bank candidate (needs operator ruling on one re-centred change)
 
 ## Important
 
 `loom:important`; taken before unlabelled work.
 
 - **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
-- **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5 *(held)*
-- **#317**: Rows 4/5: trim-bank switch supply dependence (ss) and comparator-H hot/low-V delay collapse (ff) *(held)*
+- **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5
+- **#317**: Rows 4/5: trim-bank switch supply dependence (ss) and comparator-H hot/low-V delay collapse (ff)
 
 ## Ready
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
+_None._
 
 ## In Progress
 
@@ -51,9 +51,9 @@ _None._
 
 Issues carrying `loom:curated`.
 
-- **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5 *(curated)* *(held)*
-- **#204**: Move layout geometry pin klt 0.4.0 → 0.8.0 and regenerate committed cells/reports *(curated)* *(held)*
-- **#337**: Row 4 ss span: adopt and verify the DR-0037 w3r65 bank candidate (needs operator ruling on one re-centred change) *(curated)* *(held)*
+- **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5 *(curated)*
+- **#204**: Move layout geometry pin klt 0.4.0 → 0.8.0 and regenerate committed cells/reports *(curated)*
+- **#337**: Row 4 ss span: adopt and verify the DR-0037 w3r65 bank candidate (needs operator ruling on one re-centred change) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -61,7 +61,7 @@ _None._
 
 ## Epics
 
-- **#5**: Track the gap to T1 sim-validated / bronze (klayout-tools design-evidence tiers) *(held)*
+- **#5**: Track the gap to T1 sim-validated / bronze (klayout-tools design-evidence tiers)
 
 ## Backlog Balance
 
@@ -70,7 +70,7 @@ _None._
 | Operator merge-risk holds | 0 |
 | Very important | 1 |
 | Important | 3 |
-| Ready (`loom:issue`) | 1 |
+| Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
