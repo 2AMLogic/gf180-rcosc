@@ -1,12 +1,13 @@
 name: Sim append-only
 
-# Rejects PRs that modify, delete, or rename files under sim/*/results/
-# (additions of new run dirs are fine). Separate from signoff.yml on purpose:
-# signoff.yml is a hashed, audited artifact. Exceptions live in
-# sim/append-only-exceptions.txt. See sim/README.md.
+# Rejects PRs and merge-queue commits that modify, delete, or rename files
+# under sim/*/results/ (additions of new run dirs are fine). Separate from
+# signoff.yml on purpose: signoff.yml is a hashed, audited artifact.
+# Exceptions live in sim/append-only-exceptions.txt. See sim/README.md.
 
 on:
   pull_request:
+  merge_group:
 
 permissions:
   contents: read
@@ -18,11 +19,40 @@ jobs:
       - uses: actions/checkout@v7
       - name: Guard regression tests (synthetic repos)
         run: bash sim/test-check-append-only.sh
-      - name: Fetch PR base
+      # Base/head by event (issue #426): a pull_request run compares the PR
+      # base sha against HEAD; a merge_group run compares the trial merge's
+      # merge_group.base_sha / head_sha (pull_request.base.sha is absent
+      # there). The selection is a two-line shell if, sibling style
+      # (2AMLogic/sky130-comparator#332): the other event's values and
+      # arguments are unchanged. An empty base fails the job -- the fetch
+      # errors on the empty ref and the guard itself exits nonzero on one --
+      # never a silent skip.
+      - name: Fetch PR or merge-group base
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: git fetch --no-tags --depth=1 origin "$BASE_SHA"
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          MG_BASE: ${{ github.event.merge_group.base_sha }}
+        run: |
+          BASE="$PR_BASE"
+          if [ "$EVENT" = "merge_group" ]; then
+            BASE="$MG_BASE"
+          fi
+          if [ -z "$BASE" ]; then
+            echo "::error::event $EVENT has no base sha (pull_request.base.sha / merge_group.base_sha both empty)"; exit 1
+          fi
+          git fetch --no-tags --depth=1 origin "$BASE"
       - name: Check sim results are append-only
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: sim/check-append-only.sh "$BASE_SHA" HEAD
+          EVENT: ${{ github.event_name }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          MG_BASE: ${{ github.event.merge_group.base_sha }}
+          MG_HEAD: ${{ github.event.merge_group.head_sha }}
+        run: |
+          BASE="$PR_BASE"; HEAD="HEAD"
+          if [ "$EVENT" = "merge_group" ]; then
+            BASE="$MG_BASE"; HEAD="$MG_HEAD"
+          fi
+          if [ -z "$BASE" ]; then
+            echo "::error::event $EVENT has no base sha; append-only comparison not performed"; exit 1
+          fi
+          sim/check-append-only.sh "$BASE" "$HEAD"
