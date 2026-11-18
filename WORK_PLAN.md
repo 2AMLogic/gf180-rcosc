@@ -3,7 +3,7 @@
 This roadmap is generated from the current GitHub label state by the Loom Guide role.
 
 <!-- guide:plan-body:start -->
-_Generated: 2026-11-18T20:59:26Z (snapshot; compare against live labels)_
+_Generated: 2026-11-18T23:43:00Z (snapshot; compare against live labels)_
 ## Operator Attention: Merge-Risk-Hold Pileup
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
@@ -14,7 +14,7 @@ _None._
 
 `loom:very-important` (one counts per workspace); every stage takes these first.
 
-- **#337**: Row 4 ss span: adopt and verify the DR-0037 w3r65 bank candidate (needs operator ruling on one re-centred change) *(held)*
+- **#337**: Row 4 ss span: adopt and verify the DR-0037 w3r65 bank candidate (needs operator ruling on one re-centred change)
 
 ## Important
 
@@ -34,7 +34,7 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-_None._
+- **#337**: Row 4 ss span: adopt and verify the DR-0037 w3r65 bank candidate (needs operator ruling on one re-centred change)
 
 ## PRs Awaiting Review
 
@@ -54,7 +54,7 @@ Issues carrying `loom:curated`.
 
 - **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5 *(curated)* *(held)*
 - **#204**: Move layout geometry pin klt 0.4.0 → 0.8.0 and regenerate committed cells/reports *(curated)* *(held)*
-- **#337**: Row 4 ss span: adopt and verify the DR-0037 w3r65 bank candidate (needs operator ruling on one re-centred change) *(curated)* *(held)*
+- **#337**: Row 4 ss span: adopt and verify the DR-0037 w3r65 bank candidate (needs operator ruling on one re-centred change) *(curated)*
 
 ## Proposed (Architect / Hermit)
 
@@ -72,7 +72,7 @@ _None._
 | Very important | 1 |
 | Important | 3 |
 | Ready (`loom:issue`, net of holds/building/merge-pending) | 0 |
-| In Progress (`loom:building`) | 0 |
+| In Progress (`loom:building`) | 1 |
 | PRs awaiting review | 0 |
 | Approved PRs awaiting merge | 0 |
 | Curated | 3 |
