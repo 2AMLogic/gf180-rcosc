@@ -63,6 +63,8 @@ jobs:
             tests: signoff/test_verify_report_drift.py
           - name: signoff-artifacts-offline
             tests: signoff/test_verify_report_artifacts.py
+          - name: signoff-workflow-triggers-offline
+            tests: signoff/test_verify_report_workflow_triggers.py
           - name: discipline-offline
             tests: sim/discipline/test_harness.py sim/discipline/test_outage.py
           - name: legacy-analysis-offline

@@ -545,26 +545,67 @@ def verify_power_delivery_citation(evidence: dict[str, Any]) -> list[str]:
     return problems
 
 
-def verify_workflow_concurrency() -> list[str]:
-    """Configuration check on the signoff workflow (issue #153): both
-    triggers present, the ref-specific concurrency group retained, and
-    cancel-in-progress unconditionally false (no started run is cancelled).
-    Text-based on purpose: CI runs this with python3 only, no YAML parser."""
-    rel = ".github/workflows/signoff.yml"
-    path = REPO_ROOT / rel
+REQUIRED_CHECK_WORKFLOWS = (
+    "artifact-manifests",
+    "cell-generator",
+    "doc-citations",
+    "netlist-consistency",
+    "offline-suites",
+    "signoff",
+    "sim-append-only",
+)
+
+
+def _stripped_text_and_on_body(path: Path) -> tuple[str, str] | None:
+    """(comment-stripped text, ``on:``-block body) of a workflow file, or
+    None when the file is missing. Comment stripping must run before any
+    match so a trigger named only in a comment never counts."""
     if not path.is_file():
-        return [f"{rel} is missing"]
+        return None
     lines = [
         re.sub(r"(^|\s)#.*$", "", ln).rstrip()
         for ln in path.read_text().splitlines()
     ]
     lines = [ln for ln in lines if ln.strip()]
     text = "\n".join(lines)
-    problems: list[str] = []
     on = re.search(r"^on:\n((?:[ ]+.*\n|\n)*)", text + "\n", re.M)
-    on_body = on.group(1) if on else ""
-    if not re.search(r"^  pull_request:", on_body, re.M):
-        problems.append(f"{rel}: missing the pull_request trigger")
+    return text, (on.group(1) if on else "")
+
+
+def verify_workflow_concurrency() -> list[str]:
+    """Configuration check on the workflows feeding the required-check
+    ruleset (issues #153, #429): all seven keep the pull_request and
+    merge_group triggers -- merge_group is what makes each required
+    context report on the merge queue's trial-merge commit, so dropping
+    it leaves PRs green while queued PRs wait forever on a context that
+    never reports. The signoff workflow additionally keeps the
+    push-to-main trigger, its ref-specific concurrency group, and
+    cancel-in-progress unconditionally false (no started run is
+    cancelled). Text-based on purpose: CI runs this with python3 only, no
+    YAML parser."""
+    problems: list[str] = []
+    parsed_by_rel: dict[str, tuple[str, str]] = {}
+    for name in REQUIRED_CHECK_WORKFLOWS:
+        rel = f".github/workflows/{name}.yml"
+        parsed = _stripped_text_and_on_body(REPO_ROOT / rel)
+        if parsed is None:
+            problems.append(f"{rel} is missing")
+            continue
+        parsed_by_rel[rel] = parsed
+        _, on_body = parsed
+        if not re.search(r"^  pull_request:", on_body, re.M):
+            problems.append(f"{rel}: missing the pull_request trigger")
+        if not re.search(r"^  merge_group:", on_body, re.M):
+            problems.append(
+                f"{rel}: missing the merge_group trigger (without it the "
+                "required context never reports on the merge queue's "
+                "trial-merge commit and queued PRs wait indefinitely)"
+            )
+    rel = ".github/workflows/signoff.yml"
+    parsed = parsed_by_rel.get(rel)
+    if parsed is None:
+        return problems
+    text, on_body = parsed
     if not (
         re.search(r"^  push:", on_body, re.M)
         and re.search(r"^    branches: \[main\]\s*$", on_body, re.M)
