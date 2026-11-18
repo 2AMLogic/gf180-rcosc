@@ -584,11 +584,14 @@ def verify_workflow_concurrency() -> list[str]:
     push-to-main trigger, its ref-specific concurrency group, and
     cancel-in-progress unconditionally false (no started run is
     cancelled). Text-based on purpose: CI runs this with python3 only, no
-    YAML parser. The tuple set is completeness-checked too (issue #431):
-    any .github/workflows/*.yml basename in neither tuple is a problem --
-    an 8th workflow promoted to a required context would otherwise
-    inherit no merge_group assertion -- and a NON_REQUIRED_WORKFLOWS
-    entry whose file is gone is a stale exempt entry."""
+    YAML parser. The tuple set is completeness-checked too (issues
+    #431, #434): any .github/workflows/*.yml or *.yaml basename in
+    neither tuple is a problem -- an 8th workflow promoted to a required
+    context would otherwise inherit no merge_group assertion -- a
+    basename present as both foo.yml and foo.yaml is its own problem
+    (GitHub Actions honours both extensions, so both files would run),
+    and a NON_REQUIRED_WORKFLOWS entry whose file is gone is a stale
+    exempt entry."""
     problems: list[str] = []
     parsed_by_rel: dict[str, tuple[str, str]] = {}
     for name in REQUIRED_CHECK_WORKFLOWS:
@@ -607,27 +610,44 @@ def verify_workflow_concurrency() -> list[str]:
                 "required context never reports on the merge queue's "
                 "trial-merge commit and queued PRs wait indefinitely)"
             )
+    wf_dir = REPO_ROOT / ".github/workflows"
     present = sorted(
-        p.stem
-        for p in (REPO_ROOT / ".github/workflows").glob("*.yml")
+        p
+        for p in list(wf_dir.glob("*.yml")) + list(wf_dir.glob("*.yaml"))
         if p.is_file()
     )
-    for name in present:
-        if name in REQUIRED_CHECK_WORKFLOWS or name in NON_REQUIRED_WORKFLOWS:
+    by_stem: dict[str, list[Path]] = {}
+    for path in present:
+        by_stem.setdefault(path.stem, []).append(path)
+    for paths in sorted(by_stem.values()):
+        if len(paths) < 2:
             continue
+        rels = [str(p.relative_to(REPO_ROOT)) for p in paths]
         problems.append(
-            f".github/workflows/{name}.yml is in neither "
+            f"{' and '.join(rels)} share one basename -- GitHub Actions "
+            "honours both extensions, so both workflows would run; keep "
+            "the workflow in a single file"
+        )
+    for path in present:
+        if (
+            path.stem in REQUIRED_CHECK_WORKFLOWS
+            or path.stem in NON_REQUIRED_WORKFLOWS
+        ):
+            continue
+        rel = path.relative_to(REPO_ROOT)
+        problems.append(
+            f"{rel} is in neither "
             "REQUIRED_CHECK_WORKFLOWS nor NON_REQUIRED_WORKFLOWS -- if it "
             "feeds the required-check ruleset add it to "
             "REQUIRED_CHECK_WORKFLOWS, if it is deliberately out of the "
             "ruleset add it to NON_REQUIRED_WORKFLOWS"
         )
     for name in NON_REQUIRED_WORKFLOWS:
-        if name not in present:
+        if name not in by_stem:
             problems.append(
                 f"NON_REQUIRED_WORKFLOWS lists {name} but "
-                f".github/workflows/{name}.yml does not exist -- remove "
-                "the stale exempt entry"
+                f".github/workflows/{name}.yml (or .yaml) does not exist "
+                "-- remove the stale exempt entry"
             )
     rel = ".github/workflows/signoff.yml"
     parsed = parsed_by_rel.get(rel)

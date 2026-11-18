@@ -18,12 +18,15 @@ merge_group mention that is only a comment or lives outside the ``on:``
 block does not count; sim-append-only's missing push trigger is not a
 problem (only signoff.yml is push-checked).
 
-Completeness (issue #431): a ``.github/workflows/*.yml`` basename in
-neither ``REQUIRED_CHECK_WORKFLOWS`` nor ``NON_REQUIRED_WORKFLOWS`` is a
-problem (an 8th workflow promoted to a required context would otherwise
-inherit no merge_group assertion); a ``NON_REQUIRED_WORKFLOWS`` exempt
-entry is fine even without the required triggers, but an exempt entry
-whose file is gone is stale and reported.
+Completeness (issues #431, #434): a ``.github/workflows/*.yml`` or
+``*.yaml`` basename in neither ``REQUIRED_CHECK_WORKFLOWS`` nor
+``NON_REQUIRED_WORKFLOWS`` is a problem (an 8th workflow promoted to a
+required context would otherwise inherit no merge_group assertion); a
+basename present as both ``foo.yml`` and ``foo.yaml`` is its own
+problem (GitHub Actions honours both extensions, so both files would
+run); a ``NON_REQUIRED_WORKFLOWS`` exempt entry is fine even without
+the required triggers and may live in either extension, but an exempt
+entry whose file is gone in both extensions is stale and reported.
 """
 
 from __future__ import annotations
@@ -76,8 +79,8 @@ class WorkflowTriggerTests(unittest.TestCase):
         self.addCleanup(setattr, vr, "REPO_ROOT", self._saved)
         vr.REPO_ROOT = Path(self._tmp.name).resolve()
 
-    def write(self, name, text):
-        rel = f".github/workflows/{name}.yml"
+    def write(self, name, text, *, ext="yml"):
+        rel = f".github/workflows/{name}.{ext}"
         path = vr.REPO_ROOT / rel
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text)
@@ -210,6 +213,38 @@ class WorkflowTriggerTests(unittest.TestCase):
         self.assertEqual(len(problems), 1, problems)
         self.assertIn("removed-check", problems[0])
         self.assertIn("stale", problems[0])
+
+    def test_unlisted_yaml_workflow_reports_problem(self):
+        self.write_all_like_main()
+        rel = self.write("new-check", workflow_yaml(), ext="yaml")
+        problems = self.problems()
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn(rel, problems[0])
+        self.assertIn("REQUIRED_CHECK_WORKFLOWS", problems[0])
+        self.assertIn("NON_REQUIRED_WORKFLOWS", problems[0])
+
+    def test_exempt_entry_satisfied_by_yaml_file(self):
+        self.write_all_like_main()
+        self.set_non_required(("new-check",))
+        self.write(
+            "new-check", workflow_yaml(triggers=("pull_request",)), ext="yaml"
+        )
+        self.assertEqual(self.problems(), [])
+
+    def test_basename_collision_reports_its_own_problem(self):
+        self.write_all_like_main()
+        self.set_non_required(("new-check",))
+        rel_yml = self.write(
+            "new-check", workflow_yaml(triggers=("pull_request",))
+        )
+        rel_yaml = self.write(
+            "new-check", workflow_yaml(triggers=("pull_request",)), ext="yaml"
+        )
+        problems = self.problems()
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn(rel_yml, problems[0])
+        self.assertIn(rel_yaml, problems[0])
+        self.assertIn("both workflows would run", problems[0])
 
 
 if __name__ == "__main__":
