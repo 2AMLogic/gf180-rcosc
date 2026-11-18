@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Synthetic tests for the workflow-trigger checks in
-signoff/verify-report.py's ``verify_workflow_concurrency`` (issue #429).
+signoff/verify-report.py's ``verify_workflow_concurrency`` (issues #429,
+#431).
 
 Stdlib ``unittest`` only; the seven required-check workflows are written
 into a temp tree the module's ``REPO_ROOT`` is pointed at, so no klt, PDK,
@@ -16,6 +17,13 @@ required context report on the merge queue's trial-merge commit); a
 merge_group mention that is only a comment or lives outside the ``on:``
 block does not count; sim-append-only's missing push trigger is not a
 problem (only signoff.yml is push-checked).
+
+Completeness (issue #431): a ``.github/workflows/*.yml`` basename in
+neither ``REQUIRED_CHECK_WORKFLOWS`` nor ``NON_REQUIRED_WORKFLOWS`` is a
+problem (an 8th workflow promoted to a required context would otherwise
+inherit no merge_group assertion); a ``NON_REQUIRED_WORKFLOWS`` exempt
+entry is fine even without the required triggers, but an exempt entry
+whose file is gone is stale and reported.
 """
 
 from __future__ import annotations
@@ -173,6 +181,35 @@ class WorkflowTriggerTests(unittest.TestCase):
         self.assertIn("push-to-main", joined)
         self.assertIn("cancel-in-progress", joined)
         self.assertNotIn("merge_group", joined)
+
+    def set_non_required(self, names):
+        self.addCleanup(
+            setattr, vr, "NON_REQUIRED_WORKFLOWS", vr.NON_REQUIRED_WORKFLOWS
+        )
+        vr.NON_REQUIRED_WORKFLOWS = tuple(names)
+
+    def test_extra_workflow_file_without_tuple_entry_reports_problem(self):
+        self.write_all_like_main()
+        rel = self.write("new-check", workflow_yaml())
+        problems = self.problems()
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn(rel, problems[0])
+        self.assertIn("REQUIRED_CHECK_WORKFLOWS", problems[0])
+        self.assertIn("NON_REQUIRED_WORKFLOWS", problems[0])
+
+    def test_exempt_workflow_passes_without_required_triggers(self):
+        self.write_all_like_main()
+        self.set_non_required(("new-check",))
+        self.write("new-check", workflow_yaml(triggers=("pull_request",)))
+        self.assertEqual(self.problems(), [])
+
+    def test_stale_non_required_tuple_entry_reports_problem(self):
+        self.write_all_like_main()
+        self.set_non_required(("removed-check",))
+        problems = self.problems()
+        self.assertEqual(len(problems), 1, problems)
+        self.assertIn("removed-check", problems[0])
+        self.assertIn("stale", problems[0])
 
 
 if __name__ == "__main__":
