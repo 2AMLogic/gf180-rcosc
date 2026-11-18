@@ -4,6 +4,8 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-18
 
+- **PR #436**: signoff: completeness check covers *.yml and *.yaml workflows
+- **Issue #434** (closed): verify_workflow_concurrency()'s completeness check globs only *.yml; a .yaml workflow evades it
 - **PR #432**: signoff: completeness-check REQUIRED_CHECK_WORKFLOWS against .github/workflows
 - **Issue #431** (closed): REQUIRED_CHECK_WORKFLOWS is hand-maintained: an 8th workflow can join the ruleset with no merge_group assertion
 - **PR #430**: signoff: assert merge_group trigger on all 7 required-check workflows
