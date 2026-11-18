@@ -4,6 +4,8 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-18
 
+- **PR #432**: signoff: completeness-check REQUIRED_CHECK_WORKFLOWS against .github/workflows
+- **Issue #431** (closed): REQUIRED_CHECK_WORKFLOWS is hand-maintained: an 8th workflow can join the ruleset with no merge_group assertion
 - **PR #430**: signoff: assert merge_group trigger on all 7 required-check workflows
 - **Issue #429** (closed): No check asserts the merge_group trigger survives in the 7 required-check workflows
 - **Issue #426** (closed): Merge queue: add the merge_group trigger and adapt the PR-metadata gates
