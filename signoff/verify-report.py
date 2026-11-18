@@ -555,6 +555,8 @@ REQUIRED_CHECK_WORKFLOWS = (
     "sim-append-only",
 )
 
+NON_REQUIRED_WORKFLOWS: tuple[str, ...] = ()
+
 
 def _stripped_text_and_on_body(path: Path) -> tuple[str, str] | None:
     """(comment-stripped text, ``on:``-block body) of a workflow file, or
@@ -582,7 +584,11 @@ def verify_workflow_concurrency() -> list[str]:
     push-to-main trigger, its ref-specific concurrency group, and
     cancel-in-progress unconditionally false (no started run is
     cancelled). Text-based on purpose: CI runs this with python3 only, no
-    YAML parser."""
+    YAML parser. The tuple set is completeness-checked too (issue #431):
+    any .github/workflows/*.yml basename in neither tuple is a problem --
+    an 8th workflow promoted to a required context would otherwise
+    inherit no merge_group assertion -- and a NON_REQUIRED_WORKFLOWS
+    entry whose file is gone is a stale exempt entry."""
     problems: list[str] = []
     parsed_by_rel: dict[str, tuple[str, str]] = {}
     for name in REQUIRED_CHECK_WORKFLOWS:
@@ -600,6 +606,28 @@ def verify_workflow_concurrency() -> list[str]:
                 f"{rel}: missing the merge_group trigger (without it the "
                 "required context never reports on the merge queue's "
                 "trial-merge commit and queued PRs wait indefinitely)"
+            )
+    present = sorted(
+        p.stem
+        for p in (REPO_ROOT / ".github/workflows").glob("*.yml")
+        if p.is_file()
+    )
+    for name in present:
+        if name in REQUIRED_CHECK_WORKFLOWS or name in NON_REQUIRED_WORKFLOWS:
+            continue
+        problems.append(
+            f".github/workflows/{name}.yml is in neither "
+            "REQUIRED_CHECK_WORKFLOWS nor NON_REQUIRED_WORKFLOWS -- if it "
+            "feeds the required-check ruleset add it to "
+            "REQUIRED_CHECK_WORKFLOWS, if it is deliberately out of the "
+            "ruleset add it to NON_REQUIRED_WORKFLOWS"
+        )
+    for name in NON_REQUIRED_WORKFLOWS:
+        if name not in present:
+            problems.append(
+                f"NON_REQUIRED_WORKFLOWS lists {name} but "
+                f".github/workflows/{name}.yml does not exist -- remove "
+                "the stale exempt entry"
             )
     rel = ".github/workflows/signoff.yml"
     parsed = parsed_by_rel.get(rel)
