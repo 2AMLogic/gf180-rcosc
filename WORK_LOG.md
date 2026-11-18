@@ -2,6 +2,10 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-18
+
+- **Issue #425** (closed): Guide WORK_PLAN render diverges from render_plan_body(): invented *(held)* marker and operator-held issue leaked into Ready
+
 ### 2026-11-17
 
 - **PR #421**: chore(loom): resync installed Loom to v0.19.1306
