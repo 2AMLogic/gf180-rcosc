@@ -1,0 +1,28 @@
+{
+  "backend": "batch",
+  "engine": "ngspice",
+  "models": {
+    "pdk": "gf180mcuC"
+  },
+  "decks": [
+    {
+      "id": "tt_die000",
+      "deck": "tt_die000.spice",
+      "inputs": [
+        "dut_control.spice"
+      ],
+      "timeout_s": 300
+    },
+    {
+      "id": "tt_die001",
+      "deck": "tt_die001.spice",
+      "inputs": [
+        "dut_control.spice"
+      ],
+      "timeout_s": 300
+    }
+  ],
+  "batch": {
+    "capacity_wait_s": 600
+  }
+}

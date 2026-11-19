@@ -1,0 +1,124 @@
+{
+  "schema_version": 3,
+  "mode": "decks",
+  "backend": "batch",
+  "engine": "ngspice",
+  "status": "pass",
+  "unit_count": 2,
+  "passed": 2,
+  "errored": 0,
+  "timed_out": 0,
+  "units": [
+    {
+      "id": "ss_die000",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 20.895,
+      "engine_version": "47",
+      "deck": "ss_die000.spice",
+      "deck_sha256": "9d81494475329f2fdcd0b02a7416f38ea8b2635942ddab13b00f5f917791e48f",
+      "stdout": "ss_die000/stdout.bin",
+      "stderr": "ss_die000/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice",
+        "$PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice",
+        "$PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice",
+        "$PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice"
+      ],
+      "diagnostics": []
+    },
+    {
+      "id": "ss_die001",
+      "status": "pass",
+      "exit_code": 0,
+      "timed_out": false,
+      "duration_s": 20.705,
+      "engine_version": "47",
+      "deck": "ss_die001.spice",
+      "deck_sha256": "ff0ed8db88d43642a1e984c80999aa63ebfca6682315b7851ab3bdc50dd26bad",
+      "stdout": "ss_die001/stdout.bin",
+      "stderr": "ss_die001/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice",
+        "$PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice",
+        "$PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice",
+        "$PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice"
+      ],
+      "diagnostics": []
+    }
+  ],
+  "outdir": "/tmp/r4ci/fleetpilot-ctl/art_decks_ss",
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "47",
+    "ngspice_binary": "/usr/local/bin/ngspice",
+    "klt_version": "0.9.0",
+    "max_workers": 2,
+    "engine_host": "worker",
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-2a756db6787e",
+      "region": "us-east-1",
+      "instance_id": "i-0b5db4632cbb8c69b",
+      "instance_type": "m7i.4xlarge",
+      "availability_zone": "us-east-1b",
+      "ami_id": "ami-09c14f55df4958cbd",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "done",
+      "exit_code": "0",
+      "concurrency": "1",
+      "physical_cores": "8",
+      "elapsed_seconds": 28,
+      "runner_klt_version": "0.9.0",
+      "client_klt_version": "0.9.3.dev2186+g1dc6c4817fd1",
+      "runner_compatibility": "match",
+      "runner_request_features": {
+        "required": [
+          "decks"
+        ],
+        "missing": [],
+        "status": "supported"
+      },
+      "worker_environment": {
+        "capture": "ok",
+        "simulator": {
+          "requested_binary": "ngspice",
+          "binary_source": "PATH",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******\n",
+          "version_probe": "ok"
+        },
+        "pdk": {
+          "variant": "gf180mcuC",
+          "root": "/opt/pdk",
+          "stamp_scheme": "sources-sha256",
+          "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+          "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+          "models_staged": false,
+          "stamp_scope": "executed"
+        },
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+        "omp_num_threads": null,
+        "image_manifest": null,
+        "model_inputs": null,
+        "diagnostics": [],
+        "pdk_stamp_comparison": {
+          "status": "match"
+        },
+        "ngspice_init": null
+      },
+      "runner_model_inputs": null,
+      "models_lib_comparison": {
+        "status": "not_comparable",
+        "reason": "runner_hash_unavailable"
+      }
+    },
+    "client_ngspice_binary": "/home/ubuntu/.local/bin/ngspice"
+  }
+}
