@@ -4,6 +4,8 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-19
 
+- **PR #443**: docs: one 54-cell basis for DR-0047 Iq counts and the named re-centre baseline
+- **Issue #441** (closed): DR-0047 / row4-iq-variant: two evidence-presentation corrections before the operator ruling
 - **PR #440**: sim: row 4 variant search finds no bank variant clearing ss span without 0xFF Iq rise
 
 ### 2026-11-18
