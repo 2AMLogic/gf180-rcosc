@@ -2,6 +2,10 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-19
+
+- **PR #440**: sim: row 4 variant search finds no bank variant clearing ss span without 0xFF Iq rise
+
 ### 2026-11-18
 
 - **PR #436**: signoff: completeness check covers *.yml and *.yaml workflows
