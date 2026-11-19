@@ -1,0 +1,153 @@
+{
+  "netlist": "tb_w3r65_ss.spice",
+  "engine": "ngspice",
+  "netlist_source": "extracted",
+  "models": {
+    "pdk": "gf180mcuC",
+    "lib": "libs.tech/ngspice/sm141064.ngspice"
+  },
+  "corners": {
+    "process": [
+      {
+        "name": "ss",
+        "sections": [
+          "ss",
+          "res_ss",
+          "mimcap_ss",
+          "cap_mim"
+        ]
+      }
+    ],
+    "temperature_c": [
+      27
+    ]
+  },
+  "analysis": {
+    "kind": "op",
+    "args": ""
+  },
+  "measurements": [
+    {
+      "name": "code_sel",
+      "expr": "$v_code",
+      "unit": ""
+    },
+    {
+      "name": "f_cal_hz",
+      "expr": "$v_fsel",
+      "unit": "Hz"
+    },
+    {
+      "name": "e_cal_pct",
+      "expr": "$v_ecal",
+      "unit": "%"
+    },
+    {
+      "name": "hold_gap_hz",
+      "expr": "$v_gap",
+      "unit": "Hz"
+    },
+    {
+      "name": "f_n40_30_hz",
+      "expr": "$v_f_n40_30",
+      "unit": "Hz"
+    },
+    {
+      "name": "iq_n40_30_a",
+      "expr": "$v_iq_n40_30",
+      "unit": "A"
+    },
+    {
+      "name": "f_n40_33_hz",
+      "expr": "$v_f_n40_33",
+      "unit": "Hz"
+    },
+    {
+      "name": "iq_n40_33_a",
+      "expr": "$v_iq_n40_33",
+      "unit": "A"
+    },
+    {
+      "name": "f_n40_36_hz",
+      "expr": "$v_f_n40_36",
+      "unit": "Hz"
+    },
+    {
+      "name": "iq_n40_36_a",
+      "expr": "$v_iq_n40_36",
+      "unit": "A"
+    },
+    {
+      "name": "f_27_30_hz",
+      "expr": "$v_f_27_30",
+      "unit": "Hz"
+    },
+    {
+      "name": "iq_27_30_a",
+      "expr": "$v_iq_27_30",
+      "unit": "A"
+    },
+    {
+      "name": "f_27_33_hz",
+      "expr": "$v_f_27_33",
+      "unit": "Hz"
+    },
+    {
+      "name": "iq_27_33_a",
+      "expr": "$v_iq_27_33",
+      "unit": "A"
+    },
+    {
+      "name": "f_27_36_hz",
+      "expr": "$v_f_27_36",
+      "unit": "Hz"
+    },
+    {
+      "name": "iq_27_36_a",
+      "expr": "$v_iq_27_36",
+      "unit": "A"
+    },
+    {
+      "name": "f_85_30_hz",
+      "expr": "$v_f_85_30",
+      "unit": "Hz"
+    },
+    {
+      "name": "iq_85_30_a",
+      "expr": "$v_iq_85_30",
+      "unit": "A"
+    },
+    {
+      "name": "f_85_33_hz",
+      "expr": "$v_f_85_33",
+      "unit": "Hz"
+    },
+    {
+      "name": "iq_85_33_a",
+      "expr": "$v_iq_85_33",
+      "unit": "A"
+    },
+    {
+      "name": "f_85_36_hz",
+      "expr": "$v_f_85_36",
+      "unit": "Hz"
+    },
+    {
+      "name": "iq_85_36_a",
+      "expr": "$v_iq_85_36",
+      "unit": "A"
+    }
+  ],
+  "batch": {
+    "capacity_wait_s": 1200
+  },
+  "options": {
+    "timeout_s": 1800,
+    "keep_artifacts": false
+  },
+  "monte_carlo": {
+    "n": 500,
+    "seed": 20261008,
+    "vary": "mismatch"
+  }
+}

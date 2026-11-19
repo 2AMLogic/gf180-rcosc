@@ -1,0 +1,19 @@
+* ngspice-46 param-in-sigma probe (fleet): arithmetic vs single-param vs literal sigma
+.options seed=12345
+.param mm_scale=1
+.param var_b=0.0025
+.param var_e=1
+.param da='agauss(0,mm_scale*0.0025,1)'
+.param db='agauss(0,var_b,1)'
+.param dc='agauss(0,0.0025,1)'
+.param de='agauss(0,var_e*0.0025,1)'
+B1 p1 0 V='da'
+B2 p2 0 V='db'
+B3 p3 0 V='dc'
+B4 p4 0 V='de'
+.control
+op
+print v(p1) v(p2) v(p3) v(p4)
+quit
+.endc
+.end
