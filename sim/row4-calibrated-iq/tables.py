@@ -54,7 +54,7 @@ def ctl_samples(rundir: Path, proc: str) -> dict[int, dict]:
         if not m:
             continue
         vals = {}
-        for line in (Path(rundir) / "art_decks_" + proc / u["id"] / "stdout.bin").read_text().splitlines():
+        for line in (Path(rundir) / f"art_decks_{proc}" / u["id"] / "stdout.bin").read_text().splitlines():
             mm = re.fullmatch(r"(iq|f)_(n40_30|n40_33|n40_36|27_30|27_33|27_36|85_30|85_33|85_36)\[0\] = ([-0-9.e+]+)", line.strip())
             if mm:
                 vals[f"{mm.group(1)}_{mm.group(2)}"] = float(mm.group(3))
