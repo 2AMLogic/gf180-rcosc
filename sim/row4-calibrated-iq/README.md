@@ -30,12 +30,17 @@ python3 -I sim/row4-calibrated-iq/tables.py TAG CANDDIR CTLDIR OUTDIR   # distri
 Run dirs (append-only, under `results/`):
 
 - `*-pilot-*` - n=2 fleet pilots for both variants and the control deck path (seed parity, RNG equivalence,
-  `$PDK_ROOT` deck resolution).
+  `$PDK_ROOT` deck resolution). Pilot units keep their FULL `stdout.bin`; the n=500 campaign units commit a
+  trimmed `stdout.txt` (circuit banner + the 18 measurement lines) - the raw stdout is ~210 kB of transient
+  node tables per die and `strip-ctl-units.sh` trims it before commit.
 - `*-cand-w3r65`, `*-cand-w25r75` - the n=500 Monte Carlo campaigns (3 requests each).
-- `*-ctl-w3r65`, `*-ctl-w25r75` - the control deck lists (3 deck requests, 500 decks each; `codes.json` maps
-  sample_index -> seed + calibrated code). Per-unit `dut_control.spice` and deck copies are stripped from the
-  collected trees before committing (byte-identical to the request-side files; each unit's `unit.json` keeps the
-  deck sha256); `stdout.bin` / `stderr.bin` / `unit.json` are the evidence.
+- `*-ctl-w3r65`, `*-ctl-w25r75` - the control deck lists (500 decks per process). Sharded
+  `--max-units-per-job 15 --max-concurrent-jobs 10` - a 500-deck request as ONE batch job exceeds the fleet's
+  3600 s job cap (`batch_job_timeout`; the kept `attempt1` files in the w3r65 dir are that failure).
+  Capacity-refused shards (`batch_no_capacity`) resume with `--resume`; `exit-codes.txt` records the leg
+  history. Per-unit `dut_control.spice` and deck copies are stripped from the collected trees before
+  committing (byte-identical to the request-side files; each unit's `unit.json` keeps the deck sha256);
+  `stdout.txt` / `stderr.bin` / `unit.json` are the evidence.
 - `*-analysis-*` - `tables.py` output (`table_vs_control.md`, `summary.json`).
 
 Outcome: `spec/decision-records/0048-*.md`.

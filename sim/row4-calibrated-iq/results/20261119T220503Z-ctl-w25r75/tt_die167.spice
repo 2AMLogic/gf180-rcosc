@@ -1,0 +1,322 @@
+* row4-calibrated-iq control deck tt die 167 (code 166, seed 720814576)
+.options seed=720814576
+.lib $PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice typical
+.lib $PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice res_typical
+.lib $PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice mimcap_typical
+.lib $PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice cap_mim
+.param sw_stat_global=0 sw_stat_mismatch=1 mc_skew=3 res_mc_skew=3 cap_mc_skew=3 fnoicor=0 mm_scale=1
+.include "dut_control.spice"
+XXDUT vdd 0 clk t0 t1 t2 t3 t4 t5 t6 t7 rcosc_top
+VDD vdd 0 DC 3.3
+VT0 t0 0 DC 0
+VT1 t1 0 DC 0
+VT2 t2 0 DC 0
+VT3 t3 0 DC 0
+VT4 t4 0 DC 0
+VT5 t5 0 DC 0
+VT6 t6 0 DC 0
+VT7 t7 0 DC 0
+* supply-current integrator (analysis only): v(qint) = integral of -i(VDD) dt / 1 nF (DR-0044 bench)
+Bint 0 qint I=-i(VDD)
+Cint qint 0 1n
+Rint qint 0 1e15
+.ic v(qint)=0
+.control
+set noaskquit
+set measureprec=8
+set numdgt=10
+setplot new
+set sp = $curplot
+let ccode = 166
+  option temp = -40
+  alter vdd = 3
+  let vb = 3 * (floor(ccode / 1) - 2 * floor(ccode / 2))
+  alter vt0 = $&vb
+  let vb = 3 * (floor(ccode / 2) - 2 * floor(ccode / 4))
+  alter vt1 = $&vb
+  let vb = 3 * (floor(ccode / 4) - 2 * floor(ccode / 8))
+  alter vt2 = $&vb
+  let vb = 3 * (floor(ccode / 8) - 2 * floor(ccode / 16))
+  alter vt3 = $&vb
+  let vb = 3 * (floor(ccode / 16) - 2 * floor(ccode / 32))
+  alter vt4 = $&vb
+  let vb = 3 * (floor(ccode / 32) - 2 * floor(ccode / 64))
+  alter vt5 = $&vb
+  let vb = 3 * (floor(ccode / 64) - 2 * floor(ccode / 128))
+  alter vt6 = $&vb
+  let vb = 3 * (floor(ccode / 128) - 2 * floor(ccode / 256))
+  alter vt7 = $&vb
+  tran 200p 1200n
+  meas tran ta when v(clk)=1.5000 rise=5
+  meas tran tb when v(clk)=1.5000 rise=25
+  meas tran qa find v(qint) when v(clk)=1.5000 rise=5
+  meas tran qb find v(qint) when v(clk)=1.5000 rise=25
+  let fqr = 20 / (tb - ta)
+  let iqr = (qb - qa) * 1n / (tb - ta)
+  set fq_s = $&fqr
+  set iq_s = $&iqr
+  setplot $sp
+  let f_n40_30 = $fq_s
+  let iq_n40_30 = $iq_s
+  option temp = -40
+  alter vdd = 3.3
+  let vb = 3.3 * (floor(ccode / 1) - 2 * floor(ccode / 2))
+  alter vt0 = $&vb
+  let vb = 3.3 * (floor(ccode / 2) - 2 * floor(ccode / 4))
+  alter vt1 = $&vb
+  let vb = 3.3 * (floor(ccode / 4) - 2 * floor(ccode / 8))
+  alter vt2 = $&vb
+  let vb = 3.3 * (floor(ccode / 8) - 2 * floor(ccode / 16))
+  alter vt3 = $&vb
+  let vb = 3.3 * (floor(ccode / 16) - 2 * floor(ccode / 32))
+  alter vt4 = $&vb
+  let vb = 3.3 * (floor(ccode / 32) - 2 * floor(ccode / 64))
+  alter vt5 = $&vb
+  let vb = 3.3 * (floor(ccode / 64) - 2 * floor(ccode / 128))
+  alter vt6 = $&vb
+  let vb = 3.3 * (floor(ccode / 128) - 2 * floor(ccode / 256))
+  alter vt7 = $&vb
+  tran 200p 1200n
+  meas tran ta when v(clk)=1.6500 rise=5
+  meas tran tb when v(clk)=1.6500 rise=25
+  meas tran qa find v(qint) when v(clk)=1.6500 rise=5
+  meas tran qb find v(qint) when v(clk)=1.6500 rise=25
+  let fqr = 20 / (tb - ta)
+  let iqr = (qb - qa) * 1n / (tb - ta)
+  set fq_s = $&fqr
+  set iq_s = $&iqr
+  setplot $sp
+  let f_n40_33 = $fq_s
+  let iq_n40_33 = $iq_s
+  option temp = -40
+  alter vdd = 3.6
+  let vb = 3.6 * (floor(ccode / 1) - 2 * floor(ccode / 2))
+  alter vt0 = $&vb
+  let vb = 3.6 * (floor(ccode / 2) - 2 * floor(ccode / 4))
+  alter vt1 = $&vb
+  let vb = 3.6 * (floor(ccode / 4) - 2 * floor(ccode / 8))
+  alter vt2 = $&vb
+  let vb = 3.6 * (floor(ccode / 8) - 2 * floor(ccode / 16))
+  alter vt3 = $&vb
+  let vb = 3.6 * (floor(ccode / 16) - 2 * floor(ccode / 32))
+  alter vt4 = $&vb
+  let vb = 3.6 * (floor(ccode / 32) - 2 * floor(ccode / 64))
+  alter vt5 = $&vb
+  let vb = 3.6 * (floor(ccode / 64) - 2 * floor(ccode / 128))
+  alter vt6 = $&vb
+  let vb = 3.6 * (floor(ccode / 128) - 2 * floor(ccode / 256))
+  alter vt7 = $&vb
+  tran 200p 1200n
+  meas tran ta when v(clk)=1.8000 rise=5
+  meas tran tb when v(clk)=1.8000 rise=25
+  meas tran qa find v(qint) when v(clk)=1.8000 rise=5
+  meas tran qb find v(qint) when v(clk)=1.8000 rise=25
+  let fqr = 20 / (tb - ta)
+  let iqr = (qb - qa) * 1n / (tb - ta)
+  set fq_s = $&fqr
+  set iq_s = $&iqr
+  setplot $sp
+  let f_n40_36 = $fq_s
+  let iq_n40_36 = $iq_s
+  option temp = 27
+  alter vdd = 3
+  let vb = 3 * (floor(ccode / 1) - 2 * floor(ccode / 2))
+  alter vt0 = $&vb
+  let vb = 3 * (floor(ccode / 2) - 2 * floor(ccode / 4))
+  alter vt1 = $&vb
+  let vb = 3 * (floor(ccode / 4) - 2 * floor(ccode / 8))
+  alter vt2 = $&vb
+  let vb = 3 * (floor(ccode / 8) - 2 * floor(ccode / 16))
+  alter vt3 = $&vb
+  let vb = 3 * (floor(ccode / 16) - 2 * floor(ccode / 32))
+  alter vt4 = $&vb
+  let vb = 3 * (floor(ccode / 32) - 2 * floor(ccode / 64))
+  alter vt5 = $&vb
+  let vb = 3 * (floor(ccode / 64) - 2 * floor(ccode / 128))
+  alter vt6 = $&vb
+  let vb = 3 * (floor(ccode / 128) - 2 * floor(ccode / 256))
+  alter vt7 = $&vb
+  tran 200p 1200n
+  meas tran ta when v(clk)=1.5000 rise=5
+  meas tran tb when v(clk)=1.5000 rise=25
+  meas tran qa find v(qint) when v(clk)=1.5000 rise=5
+  meas tran qb find v(qint) when v(clk)=1.5000 rise=25
+  let fqr = 20 / (tb - ta)
+  let iqr = (qb - qa) * 1n / (tb - ta)
+  set fq_s = $&fqr
+  set iq_s = $&iqr
+  setplot $sp
+  let f_27_30 = $fq_s
+  let iq_27_30 = $iq_s
+  option temp = 27
+  alter vdd = 3.3
+  let vb = 3.3 * (floor(ccode / 1) - 2 * floor(ccode / 2))
+  alter vt0 = $&vb
+  let vb = 3.3 * (floor(ccode / 2) - 2 * floor(ccode / 4))
+  alter vt1 = $&vb
+  let vb = 3.3 * (floor(ccode / 4) - 2 * floor(ccode / 8))
+  alter vt2 = $&vb
+  let vb = 3.3 * (floor(ccode / 8) - 2 * floor(ccode / 16))
+  alter vt3 = $&vb
+  let vb = 3.3 * (floor(ccode / 16) - 2 * floor(ccode / 32))
+  alter vt4 = $&vb
+  let vb = 3.3 * (floor(ccode / 32) - 2 * floor(ccode / 64))
+  alter vt5 = $&vb
+  let vb = 3.3 * (floor(ccode / 64) - 2 * floor(ccode / 128))
+  alter vt6 = $&vb
+  let vb = 3.3 * (floor(ccode / 128) - 2 * floor(ccode / 256))
+  alter vt7 = $&vb
+  tran 200p 1200n
+  meas tran ta when v(clk)=1.6500 rise=5
+  meas tran tb when v(clk)=1.6500 rise=25
+  meas tran qa find v(qint) when v(clk)=1.6500 rise=5
+  meas tran qb find v(qint) when v(clk)=1.6500 rise=25
+  let fqr = 20 / (tb - ta)
+  let iqr = (qb - qa) * 1n / (tb - ta)
+  set fq_s = $&fqr
+  set iq_s = $&iqr
+  setplot $sp
+  let f_27_33 = $fq_s
+  let iq_27_33 = $iq_s
+  option temp = 27
+  alter vdd = 3.6
+  let vb = 3.6 * (floor(ccode / 1) - 2 * floor(ccode / 2))
+  alter vt0 = $&vb
+  let vb = 3.6 * (floor(ccode / 2) - 2 * floor(ccode / 4))
+  alter vt1 = $&vb
+  let vb = 3.6 * (floor(ccode / 4) - 2 * floor(ccode / 8))
+  alter vt2 = $&vb
+  let vb = 3.6 * (floor(ccode / 8) - 2 * floor(ccode / 16))
+  alter vt3 = $&vb
+  let vb = 3.6 * (floor(ccode / 16) - 2 * floor(ccode / 32))
+  alter vt4 = $&vb
+  let vb = 3.6 * (floor(ccode / 32) - 2 * floor(ccode / 64))
+  alter vt5 = $&vb
+  let vb = 3.6 * (floor(ccode / 64) - 2 * floor(ccode / 128))
+  alter vt6 = $&vb
+  let vb = 3.6 * (floor(ccode / 128) - 2 * floor(ccode / 256))
+  alter vt7 = $&vb
+  tran 200p 1200n
+  meas tran ta when v(clk)=1.8000 rise=5
+  meas tran tb when v(clk)=1.8000 rise=25
+  meas tran qa find v(qint) when v(clk)=1.8000 rise=5
+  meas tran qb find v(qint) when v(clk)=1.8000 rise=25
+  let fqr = 20 / (tb - ta)
+  let iqr = (qb - qa) * 1n / (tb - ta)
+  set fq_s = $&fqr
+  set iq_s = $&iqr
+  setplot $sp
+  let f_27_36 = $fq_s
+  let iq_27_36 = $iq_s
+  option temp = 85
+  alter vdd = 3
+  let vb = 3 * (floor(ccode / 1) - 2 * floor(ccode / 2))
+  alter vt0 = $&vb
+  let vb = 3 * (floor(ccode / 2) - 2 * floor(ccode / 4))
+  alter vt1 = $&vb
+  let vb = 3 * (floor(ccode / 4) - 2 * floor(ccode / 8))
+  alter vt2 = $&vb
+  let vb = 3 * (floor(ccode / 8) - 2 * floor(ccode / 16))
+  alter vt3 = $&vb
+  let vb = 3 * (floor(ccode / 16) - 2 * floor(ccode / 32))
+  alter vt4 = $&vb
+  let vb = 3 * (floor(ccode / 32) - 2 * floor(ccode / 64))
+  alter vt5 = $&vb
+  let vb = 3 * (floor(ccode / 64) - 2 * floor(ccode / 128))
+  alter vt6 = $&vb
+  let vb = 3 * (floor(ccode / 128) - 2 * floor(ccode / 256))
+  alter vt7 = $&vb
+  tran 200p 1200n
+  meas tran ta when v(clk)=1.5000 rise=5
+  meas tran tb when v(clk)=1.5000 rise=25
+  meas tran qa find v(qint) when v(clk)=1.5000 rise=5
+  meas tran qb find v(qint) when v(clk)=1.5000 rise=25
+  let fqr = 20 / (tb - ta)
+  let iqr = (qb - qa) * 1n / (tb - ta)
+  set fq_s = $&fqr
+  set iq_s = $&iqr
+  setplot $sp
+  let f_85_30 = $fq_s
+  let iq_85_30 = $iq_s
+  option temp = 85
+  alter vdd = 3.3
+  let vb = 3.3 * (floor(ccode / 1) - 2 * floor(ccode / 2))
+  alter vt0 = $&vb
+  let vb = 3.3 * (floor(ccode / 2) - 2 * floor(ccode / 4))
+  alter vt1 = $&vb
+  let vb = 3.3 * (floor(ccode / 4) - 2 * floor(ccode / 8))
+  alter vt2 = $&vb
+  let vb = 3.3 * (floor(ccode / 8) - 2 * floor(ccode / 16))
+  alter vt3 = $&vb
+  let vb = 3.3 * (floor(ccode / 16) - 2 * floor(ccode / 32))
+  alter vt4 = $&vb
+  let vb = 3.3 * (floor(ccode / 32) - 2 * floor(ccode / 64))
+  alter vt5 = $&vb
+  let vb = 3.3 * (floor(ccode / 64) - 2 * floor(ccode / 128))
+  alter vt6 = $&vb
+  let vb = 3.3 * (floor(ccode / 128) - 2 * floor(ccode / 256))
+  alter vt7 = $&vb
+  tran 200p 1200n
+  meas tran ta when v(clk)=1.6500 rise=5
+  meas tran tb when v(clk)=1.6500 rise=25
+  meas tran qa find v(qint) when v(clk)=1.6500 rise=5
+  meas tran qb find v(qint) when v(clk)=1.6500 rise=25
+  let fqr = 20 / (tb - ta)
+  let iqr = (qb - qa) * 1n / (tb - ta)
+  set fq_s = $&fqr
+  set iq_s = $&iqr
+  setplot $sp
+  let f_85_33 = $fq_s
+  let iq_85_33 = $iq_s
+  option temp = 85
+  alter vdd = 3.6
+  let vb = 3.6 * (floor(ccode / 1) - 2 * floor(ccode / 2))
+  alter vt0 = $&vb
+  let vb = 3.6 * (floor(ccode / 2) - 2 * floor(ccode / 4))
+  alter vt1 = $&vb
+  let vb = 3.6 * (floor(ccode / 4) - 2 * floor(ccode / 8))
+  alter vt2 = $&vb
+  let vb = 3.6 * (floor(ccode / 8) - 2 * floor(ccode / 16))
+  alter vt3 = $&vb
+  let vb = 3.6 * (floor(ccode / 16) - 2 * floor(ccode / 32))
+  alter vt4 = $&vb
+  let vb = 3.6 * (floor(ccode / 32) - 2 * floor(ccode / 64))
+  alter vt5 = $&vb
+  let vb = 3.6 * (floor(ccode / 64) - 2 * floor(ccode / 128))
+  alter vt6 = $&vb
+  let vb = 3.6 * (floor(ccode / 128) - 2 * floor(ccode / 256))
+  alter vt7 = $&vb
+  tran 200p 1200n
+  meas tran ta when v(clk)=1.8000 rise=5
+  meas tran tb when v(clk)=1.8000 rise=25
+  meas tran qa find v(qint) when v(clk)=1.8000 rise=5
+  meas tran qb find v(qint) when v(clk)=1.8000 rise=25
+  let fqr = 20 / (tb - ta)
+  let iqr = (qb - qa) * 1n / (tb - ta)
+  set fq_s = $&fqr
+  set iq_s = $&iqr
+  setplot $sp
+  let f_85_36 = $fq_s
+  let iq_85_36 = $iq_s
+set v_f_n40_30 = $&f_n40_30
+set v_iq_n40_30 = $&iq_n40_30
+set v_f_n40_33 = $&f_n40_33
+set v_iq_n40_33 = $&iq_n40_33
+set v_f_n40_36 = $&f_n40_36
+set v_iq_n40_36 = $&iq_n40_36
+set v_f_27_30 = $&f_27_30
+set v_iq_27_30 = $&iq_27_30
+set v_f_27_33 = $&f_27_33
+set v_iq_27_33 = $&iq_27_33
+set v_f_27_36 = $&f_27_36
+set v_iq_27_36 = $&iq_27_36
+set v_f_85_30 = $&f_85_30
+set v_iq_85_30 = $&iq_85_30
+set v_f_85_33 = $&f_85_33
+set v_iq_85_33 = $&iq_85_33
+set v_f_85_36 = $&f_85_36
+set v_iq_85_36 = $&iq_85_36
+print iq_n40_30[0] iq_n40_33[0] iq_n40_36[0] iq_27_30[0] iq_27_33[0] iq_27_36[0] iq_85_30[0] iq_85_33[0] iq_85_36[0]
+print f_n40_30[0] f_n40_33[0] f_n40_36[0] f_27_30[0] f_27_33[0] f_27_36[0] f_85_30[0] f_85_33[0] f_85_36[0]
+.endc
+.end
