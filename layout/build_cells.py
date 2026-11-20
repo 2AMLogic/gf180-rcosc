@@ -978,11 +978,10 @@ def _trim_bank_subckt(devices: dict, vsubs_pin: bool = False) -> list[str]:
         ".SUBCKT rcosc_trim_bank p m vss t0 t1 t2 t3 t4 t5 t6 t7 vdd"
         + (" vsubs" if vsubs_pin else "")
     ]
-    nodes = ["p"] + [f"c{i}" for i in range(1, 9)] + ["m"]
-    for i, name in enumerate(res_order):
+    for name in res_order:
         d = devices[name]
         r_ohm = _res_r_ohm(d.param_um("r_length"), d.param_um("r_width"))
-        lines.append(f"R${name[1:]} {nodes[i]} {nodes[i + 1]} vsubs {r_ohm:.6g} ppolyf_u_1k")
+        lines.append(f"R${name[1:]} {d.nodes[0]} {d.nodes[1]} vsubs {r_ohm:.6g} ppolyf_u_1k")
     lines += [_mos_ref_card(name, devices[name]) for name in mos_order]
     lines.append(".ENDS")
     return lines
