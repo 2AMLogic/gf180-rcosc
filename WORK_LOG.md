@@ -2,6 +2,11 @@
 
 Chronological record of merged pull requests and closed issues, maintained by the Loom Guide role. Newest activity appears first.
 
+### 2026-11-20
+
+- **PR #450**: feat(signoff): plan-region guard for WORK_PLAN.md's generated region (#448)
+- **Issue #448** (closed): Guard WORK_PLAN.md's generated region against hand-annotations the Guide renderer cannot emit
+
 ### 2026-11-19
 
 - **PR #443**: docs: one 54-cell basis for DR-0047 Iq counts and the named re-centre baseline
