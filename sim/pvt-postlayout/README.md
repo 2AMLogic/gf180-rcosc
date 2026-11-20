@@ -40,8 +40,9 @@ byte-identical to issue #28's flow):
   (`0x80`/`ff`/85 °C/3.6 V) on both sides vs the schematic baseline's own
   `pretrim` row at that cell, and a per-process (`tt`/`ff`/`ss`)
   single-point trim calibration at 27 °C/3.3 V against the ratified
-  48.000 MHz target on both sides (the same binary search
-  `sim/pvt/pvt_sweep.py`'s `calibrate` performs). Results land in the
+  48.000 MHz target on both sides (the very binary search
+  `sim/pvt/pvt_sweep.py`'s `calibrate` performs, shared via
+  `pvt_sweep.bisect_trim_code` since issue #462). Results land in the
   run's `guardrails.csv`, the manifest's `guardrails` key, and the
   summary's guardrail sections.
 - `--baseline-runid <runid>` selects the schematic campaign explicitly.
