@@ -31,6 +31,10 @@ design/netlist/pdk_include.spice
 flow/build/
 # local klt install, created by the setup script
 .venv/
+# fleet dispatcher's provider-namespaced token-pool ranking files
+# (.loom/docs/token-pool.md); sibling of account-health.json inside the
+# managed block below, but repo-owned so a Loom resync cannot drop it (#451)
+.loom/account-ranking.*
 # >>> loom-managed (do not edit) >>>
 # Loom runtime state (don't commit these)
 .loom-in-use
