@@ -469,29 +469,169 @@ def test_engine_pin_validation(tmp_path, no_exec):
                              {"engine_version_expected": bad})
 
 
-def test_no_measured_artifacts_in_tree():
-    # A results/ tree may hold a Step 0 fleet-gate record (issue #87 acceptance 1: one
-    # single-corner batch request, no trim-step verdict). It must never hold campaign
-    # evidence: a filled manifest, analyzer outputs, or per-code reports.
-    res = HERE / "results"
-    if not res.exists():
-        return
-    # Analyzer outputs are never allowed until the verdict PR adds them deliberately; a
-    # run directory with a frozen manifest.json is a campaign dir (#87) or a completed
-    # A/B run (#378), whose README must state its state explicitly: PARTIAL while the
-    # campaign is still landing slices, COMPLETE once the run's verdict is recorded.
-    analysis = {"results.json", "steps.csv", "summary.md"}
-    bad = [str(p.relative_to(HERE)) for p in res.rglob("*") if p.is_file() and p.name in analysis]
-    assert not bad, f"analyzer outputs present: {bad}"
+VERDICT_DIR = "20261120T2330Z-verdict"   # the one place analyzer outputs may live (#459)
+ANALYSIS_FILES = {"results.json", "steps.csv", "summary.md"}
+
+
+def check_artifact_tree(res: Path) -> list[str]:
+    """Return the violations of the results/ tree rules (empty = clean).
+
+    Analyzer outputs are allowed only as the three direct files of the exactly named
+    verdict directory, whose README must state COMPLETE and the reproduction command.
+    Elsewhere they are forbidden; manifest-bearing directories (campaign, A/B) must state
+    PARTIAL or COMPLETE; every other directory is a Step 0 gate record."""
+    bad = []
+    for p in res.rglob("*"):
+        if p.is_file() and p.name in ANALYSIS_FILES and p.parent != res / VERDICT_DIR:
+            bad.append(f"analyzer output outside the verdict directory: {p.relative_to(res)}")
     for run in (d for d in res.iterdir() if d.is_dir()):
-        if (run / "manifest.json").is_file():
-            readme = (run / "README.md").read_text()
-            assert "PARTIAL" in readme or "COMPLETE" in readme, run
+        readme = (run / "README.md").read_text() if (run / "README.md").is_file() else ""
+        if run.name == VERDICT_DIR:
+            if "COMPLETE" not in readme or "analyze.py" not in readme:
+                bad.append(f"{run.name}: README must state COMPLETE and the analyze.py command")
+            for f in sorted(ANALYSIS_FILES):
+                if not (run / f).is_file():
+                    bad.append(f"{run.name}: missing direct output file {f}")
+            if (run / "manifest.json").exists():
+                bad.append(f"{run.name}: must not carry a manifest.json")
             continue
-        readme = (run / "README.md").read_text()
-        assert "Step 0 fleet gate only" in readme and "NOT run" in readme, run
+        if (run / "manifest.json").is_file():
+            if "PARTIAL" not in readme and "COMPLETE" not in readme:
+                bad.append(f"{run.name}: README must state PARTIAL or COMPLETE")
+            continue
+        if "Step 0 fleet gate only" not in readme or "NOT run" not in readme:
+            bad.append(f"{run.name}: not a Step 0 gate record")
         extra = [d.name for d in run.iterdir() if d.is_dir() and d.name != "step0"]
-        assert not extra, f"non-gate directories in {run.name}: {extra}"
+        if extra:
+            bad.append(f"non-gate directories in {run.name}: {extra}")
+    return bad
+
+
+def test_no_measured_artifacts_in_tree():
+    res = HERE / "results"
+    if res.exists():
+        assert check_artifact_tree(res) == []
+
+
+def _tree(tmp_path, verdict_name=VERDICT_DIR, nested=False):
+    res = tmp_path / "results"
+    v = res / verdict_name
+    v.mkdir(parents=True)
+    (v / "README.md").write_text("COMPLETE\n\npython3 -I sim/trim-dense/analyze.py ...\n")
+    for f in ANALYSIS_FILES:
+        (v / f).write_text("x")
+    if nested:
+        (v / "sub").mkdir()
+        (v / "sub" / "results.json").write_text("x")
+    return res
+
+
+def test_artifact_guard_accepts_only_the_named_verdict_directory(tmp_path):
+    assert check_artifact_tree(_tree(tmp_path)) == []
+    other = _tree(tmp_path / "o", verdict_name="20261120T2330Z-verdict-copy")
+    assert any("outside the verdict directory" in b for b in check_artifact_tree(other))
+    nested = _tree(tmp_path / "n", nested=True)
+    assert any("sub/results.json" in b for b in check_artifact_tree(nested))
+    res = _tree(tmp_path / "m")
+    (res / VERDICT_DIR / "steps.csv").unlink()
+    assert any("missing direct output file steps.csv" in b for b in check_artifact_tree(res))
+    res = _tree(tmp_path / "r")
+    (res / VERDICT_DIR / "README.md").write_text("PARTIAL\n")
+    assert any("README must state COMPLETE" in b for b in check_artifact_tree(res))
+    res = _tree(tmp_path / "s")
+    (res / "20260101-step0").mkdir()
+    (res / "20260101-step0" / "summary.md").write_text("x")
+    assert any("outside the verdict directory" in b for b in check_artifact_tree(res))
+
+
+# ------------------------------------------------- engine A/B opt-in (#459) --
+
+def _ab_setup(tmp_path, bench, delta_pct=0.05):
+    """Version-mixed non-synthetic campaign: sch all engine 46; ext split 46 (codes<128) / 47."""
+    out, prov = bench
+    r = tmp_path / "r"
+    r.mkdir()
+    freq = {e["tag"]: linear()[e["code"]] for e in prov["requests"]}
+    pairs = {}
+    for e in prov["requests"]:
+        ver = "47" if e["variant"] == "ext" and e["code"] >= 128 else "46"
+        f = freq[e["tag"]]
+        write_report(r, e, f, synthetic=False, remote="job-1", engine=ver)
+        if e["variant"] == "ext" and e["code"] in (10, 200):      # sampled by the A/B
+            fb = f if ver == "47" else f * (1 + delta_pct / 100)
+            fa = f if ver == "46" else f / (1 + delta_pct / 100)
+            pairs.setdefault(f"{e['variant']}_{e['corner']}", []).append(
+                {"code": e["code"], "f_a_hz": fa, "f_b_hz": fb})
+    ab = {"kind": analyze.AB_KIND, "label_a": "ngspice-46", "label_b": "ngspice-47", "problems": [],
+          "curves": [{"curve": k, "pairs": v} for k, v in pairs.items()]}
+    abp = tmp_path / "comparison.json"
+    abp.write_text(json.dumps(ab))
+    man = tmp_path / "man.json"
+    m = {k: v for k, v in json.loads((out / "manifest.template.json").read_text()).items() if not k.startswith("_")}
+    m |= {"git_sha": "a" * 40, "git_dirty": False, "klt_version": "0.0.0-fixture", "engine_version": "46",
+          "pdk": "gf180mcuC", "pdk_revision": "unknown", "pdk_revision_reason": "fixture",
+          "executed_utc": "2000-01-01T00:00:00+00:00",
+          "provenance_sha256": hashlib.sha256((out / "provenance.json").read_bytes()).hexdigest()}
+    man.write_text(json.dumps(m))
+    return out, r, man, abp, ab
+
+
+def test_mixed_engines_fail_by_default_but_pass_with_a_valid_ab(tmp_path, bench):
+    out, r, man, abp, ab = _ab_setup(tmp_path, bench)
+    res = analyze.analyse_campaign(out, r, man)
+    assert not res["all_curves_valid"] and res["banner"] == analyze.NOPROV_BANNER
+    assert any("mixed simulator versions" in e for e in res["run_errors"])
+    res = analyze.analyse_campaign(out, r, man, engine_ab=abp)
+    assert res["run_errors"] == [] and res["all_curves_valid"]
+    sp = res["engine_split"]
+    assert sp["internally_split_curves"] == ["ext_tt_27C_3p3V"]
+    assert sp["engine_tally_by_curve"]["sch_tt_27C_3p3V"] == {"46": 256}
+    assert sp["engine_tally_by_curve"]["ext_tt_27C_3p3V"] == {"46": 128, "47": 128}
+    assert sp["ab"]["n_pairs"] == 2 and sp["ab"]["pairs_over_half_lsb"] == 0
+    analyze.write_run(tmp_path / "res", res)
+    txt = (tmp_path / "res" / "summary.md").read_text()
+    assert "Simulator-version split" in txt and "internally split" in txt
+
+
+def test_ab_refused_when_a_pair_exceeds_half_lsb_even_with_a_stale_zero_count(tmp_path, bench):
+    out, r, man, abp, ab = _ab_setup(tmp_path, bench, delta_pct=analyze.HALF_LSB_PCT * 1.5)
+    ab["overall"] = {"abs_over_half_lsb_count": 0}
+    abp.write_text(json.dumps(ab))
+    res = analyze.analyse_campaign(out, r, man, engine_ab=abp)
+    assert not res["all_curves_valid"] and res["banner"] == analyze.NOPROV_BANNER
+    assert any("exceeds half-LSB" in e for e in res["run_errors"])
+
+
+def test_ab_refused_when_comparison_is_unusable_or_does_not_match_the_campaign(tmp_path, bench):
+    out, r, man, abp, ab = _ab_setup(tmp_path, bench)
+    for mutate, needle in [
+        (lambda d: d.update(problems=["x"]), "reports problems"),
+        (lambda d: d.update(kind="other"), "not a"),
+        (lambda d: d.update(label_b="ngspice-46"), "distinct"),
+        (lambda d: d["curves"][0]["pairs"][0].update(f_a_hz=1.0, f_b_hz=1.0), "campaign f="),
+        (lambda d: d["curves"][0].update(curve="ext_zz_1C_1p0V"), "not a curve of this campaign"),
+        (lambda d: d.update(label_a="ngspice-45", label_b="ngspice-48"), "not all covered"),
+    ]:
+        d = json.loads(json.dumps(ab))
+        mutate(d)
+        abp.write_text(json.dumps(d))
+        res = analyze.analyse_campaign(out, r, man, engine_ab=abp)
+        assert not res["all_curves_valid"], needle
+        assert any(needle in e for e in res["run_errors"]), (needle, res["run_errors"])
+    abp.write_text("not json")
+    assert not analyze.analyse_campaign(out, r, man, engine_ab=abp)["all_curves_valid"]
+
+
+def test_valid_ab_does_not_excuse_an_independent_provenance_failure(tmp_path, bench):
+    out, r, man, abp, ab = _ab_setup(tmp_path, bench)
+    m = json.loads(man.read_text()) | {"provenance_sha256": "0" * 64}
+    man.write_text(json.dumps(m))
+    res = analyze.analyse_campaign(out, r, man, engine_ab=abp)
+    assert not res["all_curves_valid"]
+    assert any("provenance_sha256" in e for e in res["run_errors"])
+    man.write_text(json.dumps(m | {"provenance_sha256": hashlib.sha256((out / "provenance.json").read_bytes()).hexdigest(),
+                                   "engine_version": "42"}))
+    assert any("manifest engine_version" in e for e in analyze.analyse_campaign(out, r, man, engine_ab=abp)["run_errors"])
 
 
 def test_permuted_pin_order_is_followed(tmp_path):
