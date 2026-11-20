@@ -5,7 +5,9 @@ name: Doc citations
 # without a superseded/historical/(was ...) marker; when a tracked test_*.py
 # is run by no workflow; or when prose restates a klt pin value
 # (signoff/verify-pin-restatements.py + signoff/pin-restatements.json,
-# issue #408). python3 stdlib only: no PDK, no klt, no ngspice. A separate
+# issue #408); or when WORK_PLAN.md's generated region holds text the Guide
+# renderer cannot emit (signoff/verify-work-plan-region.py, issue #448).
+# python3 stdlib only: no PDK, no klt, no ngspice. A separate
 # workflow from signoff.yml on purpose: signoff.yml is a hashed, audited
 # artifact (T1 item 10), so adding a step there would force a re-pin/re-grade.
 # See signoff/README.md, "Doc citation currency" and "Pin restatements".
@@ -45,3 +47,13 @@ jobs:
         run: python3 -I signoff/verify-test-coverage.py
       - name: Run the orphaned-test guard's own tests (stdlib unittest)
         run: python3 -I signoff/test_verify_test_coverage.py
+      # Plan-region guard (issue #448): the text between the guide:plan-body
+      # markers is render_plan_body()'s byte-compared output, so anything in
+      # it the renderer cannot emit (a _Generated: line, a suffix other than
+      # *(curated)* / *(architect)* / *(hermit)*) is deleted on the next
+      # Guide tick; the guard fails at PR time instead. Text outside the
+      # markers is never checked.
+      - name: Verify WORK_PLAN.md's generated region is renderer-emittable
+        run: python3 -I signoff/verify-work-plan-region.py
+      - name: Run the plan-region guard's own tests (stdlib unittest)
+        run: python3 -I signoff/test_verify_work_plan_region.py

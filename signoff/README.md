@@ -27,6 +27,7 @@ re-reading prose that was written against whatever the checklist said that day.
 | `verify-pin-restatements.py` | stdlib-only pin-restatement guard: tracked prose must not restate a klt/klayout pin value (see "Pin restatements"); sidecar `pin-restatements.json`; CI: `.github/workflows/doc-citations.yml` |
 | `pin-restatements.json` | sidecar for the above: the dated-history / report-quotation / install-line exemptions, each with its reason |
 | `verify-test-coverage.py` | stdlib-only orphaned-test guard: every tracked `test_*.py` must be named (outside comments) in some `.github/workflows/*.yml`; tests in `test_verify_test_coverage.py`; CI: `.github/workflows/doc-citations.yml` |
+| `verify-work-plan-region.py` | stdlib-only plan-region guard: `WORK_PLAN.md`'s text between the `guide:plan-body` markers must be emittable by `render_plan_body()` (no `_Generated:` line, no suffix beyond `*(curated)*`/`*(architect)*`/`*(hermit)*`); tests in `test_verify_work_plan_region.py`; CI: `.github/workflows/doc-citations.yml` |
 
 ## Block kind: `analog`
 
