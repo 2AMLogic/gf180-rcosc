@@ -1,0 +1,256 @@
+{
+  "schema_version": 3,
+  "mode": "decks",
+  "backend": "batch",
+  "engine": "ngspice",
+  "status": "error",
+  "unit_count": 6,
+  "passed": 0,
+  "errored": 6,
+  "timed_out": 0,
+  "units": [
+    {
+      "id": "pdkroot_c",
+      "status": "error",
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_s": 0.383,
+      "engine_version": "47",
+      "deck": "probe_pdkroot_c.spice",
+      "deck_sha256": "310cf4c7d4d8305c7ea5b0e3dd06cd9e0d2f43a66ee520b0dcc3b9f2876c349d",
+      "stdout": "pdkroot_c/stdout.bin",
+      "stderr": "pdkroot_c/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice"
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "engine_exit",
+          "message": "ngspice exited with code 1"
+        },
+        {
+          "severity": "error",
+          "code": "ngspice_fatal",
+          "message": "Error in netlist line no. 24, new internal line no. 653:"
+        }
+      ]
+    },
+    {
+      "id": "pdkroot_d",
+      "status": "error",
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_s": 0.357,
+      "engine_version": "47",
+      "deck": "probe_pdkroot_d.spice",
+      "deck_sha256": "7e72cbae6eb904b2a67d7100e3257f4eec2ac498e0c99cbaa2e15aea7febc031",
+      "stdout": "pdkroot_d/stdout.bin",
+      "stderr": "pdkroot_d/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/gf180mcuD/libs.tech/ngspice/sm141064.ngspice"
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "engine_exit",
+          "message": "ngspice exited with code 1"
+        },
+        {
+          "severity": "error",
+          "code": "ngspice_fatal",
+          "message": "Error in netlist line no. 24, new internal line no. 653:"
+        }
+      ]
+    },
+    {
+      "id": "family_c",
+      "status": "error",
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_s": 0.003,
+      "engine_version": "47",
+      "deck": "probe_family_c.spice",
+      "deck_sha256": "532b939f8ff349ae4c38424b6a849ccbab1d58abf5c192432b70b675aa7fefd9",
+      "stdout": "family_c/stdout.bin",
+      "stderr": "family_c/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/gf180mcu/gf180mcuC/libs.tech/ngspice/sm141064.ngspice"
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "engine_exit",
+          "message": "ngspice exited with code 1"
+        },
+        {
+          "severity": "error",
+          "code": "ngspice_fatal",
+          "message": "ERROR: fatal error in ngspice, exit(1) [cause: Error: Could not find library file /opt/pdk/gf180mcu/gf180mcuC/libs.tech/ngspice/sm141064.ngspice | ERROR, library file /opt/pdk/gf180mcu/gf180mcuC/libs.tech/ngspice/sm141064.ngspice not found]"
+        }
+      ]
+    },
+    {
+      "id": "alt_ngspice_c",
+      "status": "error",
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_s": 0.003,
+      "engine_version": "47",
+      "deck": "probe_alt_ngspice_c.spice",
+      "deck_sha256": "1b6a5c219b8616837294915fe0812b0e9e764edfcf3e0b5b4f960841f763d367",
+      "stdout": "alt_ngspice_c/stdout.bin",
+      "stderr": "alt_ngspice_c/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/gf180mcuC/ngspice/sm141064.ngspice"
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "engine_exit",
+          "message": "ngspice exited with code 1"
+        },
+        {
+          "severity": "error",
+          "code": "ngspice_fatal",
+          "message": "ERROR: fatal error in ngspice, exit(1) [cause: Error: Could not find library file /opt/pdk/gf180mcuC/ngspice/sm141064.ngspice | ERROR, library file /opt/pdk/gf180mcuC/ngspice/sm141064.ngspice not found]"
+        }
+      ]
+    },
+    {
+      "id": "root_level",
+      "status": "error",
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_s": 0.003,
+      "engine_version": "47",
+      "deck": "probe_root_level.spice",
+      "deck_sha256": "7cbd8e1a4334acb3baf5307b724f61a3e30926e99cf0b80f0251009c0cf843e8",
+      "stdout": "root_level/stdout.bin",
+      "stderr": "root_level/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/sm141064.ngspice"
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "engine_exit",
+          "message": "ngspice exited with code 1"
+        },
+        {
+          "severity": "error",
+          "code": "ngspice_fatal",
+          "message": "ERROR: fatal error in ngspice, exit(1) [cause: Error: Could not find library file /opt/pdk/sm141064.ngspice | ERROR, library file /opt/pdk/sm141064.ngspice not found]"
+        }
+      ]
+    },
+    {
+      "id": "known_fail",
+      "status": "error",
+      "exit_code": 1,
+      "timed_out": false,
+      "duration_s": 0.003,
+      "engine_version": "47",
+      "deck": "probe_known_fail.spice",
+      "deck_sha256": "3ab5e633963c77a7d8d98b688c52ddf9560bf79fe725492cfb5e2e2253d3a893",
+      "stdout": "known_fail/stdout.bin",
+      "stderr": "known_fail/stderr.bin",
+      "outputs": [],
+      "missing_outputs": [],
+      "host_resolved": [
+        "$PDK_ROOT/libs.tech/ngspice/sm141064.ngspice"
+      ],
+      "diagnostics": [
+        {
+          "severity": "error",
+          "code": "engine_exit",
+          "message": "ngspice exited with code 1"
+        },
+        {
+          "severity": "error",
+          "code": "ngspice_fatal",
+          "message": "ERROR: fatal error in ngspice, exit(1) [cause: Error: Could not find library file /opt/pdk/libs.tech/ngspice/sm141064.ngspice | ERROR, library file /opt/pdk/libs.tech/ngspice/sm141064.ngspice not found]"
+        }
+      ]
+    }
+  ],
+  "outdir": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-337/sim/row4-calibrated-iq/results/20261120T034000Z-libpath/out",
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "47",
+    "ngspice_binary": "/usr/local/bin/ngspice",
+    "klt_version": "0.9.0",
+    "max_workers": 2,
+    "engine_host": "worker",
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-ed793aa7235c",
+      "region": "us-east-1",
+      "instance_id": "i-0ec6461b2e8a08bbb",
+      "instance_type": "m7i.4xlarge",
+      "availability_zone": "us-east-1b",
+      "ami_id": "ami-09c14f55df4958cbd",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "failed",
+      "exit_code": "4",
+      "concurrency": "1",
+      "physical_cores": "8",
+      "elapsed_seconds": 18,
+      "runner_klt_version": "0.9.0",
+      "client_klt_version": "0.9.3.dev2344+g0559c289869c",
+      "runner_compatibility": "match",
+      "runner_request_features": {
+        "required": [
+          "decks"
+        ],
+        "missing": [],
+        "status": "supported"
+      },
+      "worker_environment": {
+        "capture": "ok",
+        "simulator": {
+          "requested_binary": "ngspice",
+          "binary_source": "PATH",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******\n",
+          "version_probe": "ok"
+        },
+        "pdk": {
+          "variant": "gf180mcuC",
+          "root": "/opt/pdk",
+          "stamp_scheme": "sources-sha256",
+          "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+          "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+          "models_staged": false,
+          "stamp_scope": "executed"
+        },
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8488C",
+        "omp_num_threads": null,
+        "image_manifest": null,
+        "model_inputs": null,
+        "diagnostics": [],
+        "pdk_stamp_comparison": {
+          "status": "match"
+        },
+        "ngspice_init": null
+      },
+      "runner_model_inputs": null,
+      "models_lib_comparison": {
+        "status": "not_comparable",
+        "reason": "runner_hash_unavailable"
+      }
+    },
+    "client_ngspice_binary": "/home/ubuntu/.local/bin/ngspice"
+  }
+}

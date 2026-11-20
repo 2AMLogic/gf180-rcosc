@@ -2,10 +2,10 @@
 .options seed=2001330587
 * candidate die bookkeeping: sample_index=23 process_seed=1896205814 mismatch_seed=342547318
 .param sw_stat_global=0 sw_stat_mismatch=1 mc_skew=3 res_mc_skew=3 cap_mc_skew=3 fnoicor=0 mm_scale=1
-.lib $PDK_ROOT/libs.tech/ngspice/sm141064.ngspice ff
-.lib $PDK_ROOT/libs.tech/ngspice/sm141064.ngspice res_ff
-.lib $PDK_ROOT/libs.tech/ngspice/sm141064.ngspice mimcap_ff
-.lib $PDK_ROOT/libs.tech/ngspice/sm141064.ngspice cap_mim
+.lib $PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice ff
+.lib $PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice res_ff
+.lib $PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice mimcap_ff
+.lib $PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice cap_mim
 * DR-0022 section 4 injected mismatch (flagged assumption; no evidence)
 .param mm_scale=1
 .param d_ctiming='sw_stat_mismatch*agauss(0,0.0007071067811865475,1)'

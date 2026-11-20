@@ -101,10 +101,16 @@ def dut_subckt(text: str) -> tuple[str, list]:
 
 
 def header(proc: str | None = None, pdk_rel: bool = True) -> list[str]:
-    """Deck head: seed/bookkeeping cards go BEFORE the model libs (klt's own deck order); DR-0032 bench header verbatim."""
+    """Deck head: seed/bookkeeping cards go BEFORE the model libs (klt's own deck order); DR-0032 bench header verbatim.
+
+    pdk_rel names the fleet image's gf180mcuC install as `$PDK_ROOT/gf180mcuC/...`: the image's `$PDK_ROOT` is the
+    VARIANT-FAMILY root (probe `results/20261120T034000Z-libpath/`: `/opt/pdk/libs.tech/...` does not exist,
+    `/opt/pdk/gf180mcuC/libs.tech/...` and `/opt/pdk/gf180mcuD/...` both do), and klt ships deck bytes unchanged,
+    expanding only `$PDK_ROOT`.  The corner-mode requests never hit this: klt composes those decks itself and
+    resolves the image install internally."""
     out = []
     if proc is not None:
-        lib = "$PDK_ROOT/libs.tech/ngspice/sm141064.ngspice" if pdk_rel else str(_pdk_lib())
+        lib = "$PDK_ROOT/gf180mcuC/libs.tech/ngspice/sm141064.ngspice" if pdk_rel else str(_pdk_lib())
         out += [f".lib {lib} {s}" for s in gmc.PROC[proc]]
     return out
 
