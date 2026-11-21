@@ -2,6 +2,24 @@
 
 Sections moved byte-for-byte from [WORK_LOG.md](../WORK_LOG.md) by `loom-daemon work-docs archive`.
 
+### 2026-09-21
+
+- **PR #54**: docs: cite the DR-0013 post-re-spin PEX campaign in signoff item 7
+- **PR #53**: docs: refresh §4 accuracy rows 5/6/9 + post-layout note to the DR-0012/DR-0013 evidence chain
+- **PR #52**: feat(design): replace trim-bank pass switches with per-position transmission gates — trim range restored (issue #43)
+- **PR #48**: feat(layout): re-spin rcosc_bias (post-#39 core) + PEX re-verify
+- **PR #46**: feat(signoff): declare nwell supply tie and cite compound erc+lvs evidence to grade T1 item 11 met
+- **PR #45**: rcosc_bias: self-biased supply-independent current reference (comparator/bias-path PVT revision)
+- **PR #41**: feat(layout): add klt erc supply spec and report for T1 item 11
+- **PR #40**: feat: add klt signoff block manifest with CI re-grade gate
+- **Issue #49** (closed): signoff/README.md item-7 section still cites pre-re-spin PEX campaign (DR-0010) after PR #48's DR-0013 re-spin
+- **Issue #47** (closed): Characterization record (challenge-5-proposal.md) still cites the pre-#39 evidence chain: refresh its rows from DR-0012/DR-0013
+- **Issue #43** (closed): Trim-bank pass switches lose effectiveness over the top of the charge ramp (body-effect VGS collapse): dead mid-block trim steps and PVT-dependent phantom resistance
+- **Issue #44** (closed): Re-spin rcosc_bias layout + redo PEX PVT re-verification for the issue #39 self-biased current-reference core
+- **Issue #42** (closed): T1 item 11 graded flip: cite the landed erc+lvs evidence in signoff/block-manifest.json and re-grade the signoff report
+- **Issue #39** (closed): Post-trim accuracy misses the ratified rows by 15-50x — target the comparator/bias path's PVT sensitivity, not the timing R/C (DR-0006 follow-up)
+- **Issue #37** (closed): T1 item 11 (power delivery, structural): no klt erc supply spec or report in this repo
+- **Issue #38** (closed): Commit a klt signoff block manifest so this block's T1 state is graded, not hand-read
 ### 2026-09-12
 
 - **Issue #9** (closed): [Epic #542] 3A — gf180-rcosc maturation + Challenge #5 brief
