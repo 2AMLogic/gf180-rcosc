@@ -80,6 +80,7 @@ import statistics
 import subprocess
 import sys
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -460,6 +461,46 @@ def record(
 # ---------------------------------------------------------------------------
 
 
+def bisect_trim_code(
+    target_hz: float,
+    f_at: Callable[[int], float],
+) -> tuple[int, float, bool, float, float]:
+    """The trim-code search shared by the schematic calibration and the
+    post-layout guardrail (issue #462): measure the two endpoint codes,
+    clamp on equality or saturation, bisect the remaining interval, and
+    pick the lower code on a distance tie.
+
+    ``f_at(code)`` performs (and caches/logs) the calling driver's own
+    measurement and returns ``f(code)`` in Hz; the request order (the two
+    endpoints, then the bisection mids, then the final adjacent-bracket
+    reads) is part of this contract.  Binary-search validity -- ``f``
+    monotonically non-decreasing at block resolution, with the trim bank's
+    characterized local dips -- is documented on :func:`calibrate`.
+
+    Returns ``(code, f_hz, saturated, f_code0x00_hz, f_code0xff_hz)``;
+    ``saturated`` is True when the target lies outside the realized
+    ``[f(0x00), f(0xFF)]`` range and the search clamped to an endpoint.
+    """
+    f_lo, f_hi = f_at(0x00), f_at(0xFF)
+    if target_hz <= f_lo:
+        return 0x00, f_lo, True, f_lo, f_hi
+    if target_hz >= f_hi:
+        return 0xFF, f_hi, True, f_lo, f_hi
+    lo, hi = 0x00, 0xFF
+    while hi - lo > 1:
+        mid = (lo + hi) // 2
+        if f_at(mid) < target_hz:
+            lo = mid
+        else:
+            hi = mid
+    f_l, f_h = f_at(lo), f_at(hi)
+    return (
+        (lo, f_l, False, f_lo, f_hi)
+        if abs(f_l - target_hz) <= abs(f_h - target_hz)
+        else (hi, f_h, False, f_lo, f_hi)
+    )
+
+
 def calibrate(
     camp: Campaign,
     netlist_text: str,
@@ -495,24 +536,8 @@ def calibrate(
             )
         return res.f_hz
 
-    f_lo, f_hi = f_at(0x00), f_at(0xFF)
-    if target_hz <= f_lo:
-        return 0x00, f_lo, True
-    if target_hz >= f_hi:
-        return 0xFF, f_hi, True
-    lo, hi = 0x00, 0xFF
-    while hi - lo > 1:
-        mid = (lo + hi) // 2
-        if f_at(mid) < target_hz:
-            lo = mid
-        else:
-            hi = mid
-    f_l, f_h = f_at(lo), f_at(hi)
-    return (
-        (lo, f_l, False)
-        if abs(f_l - target_hz) <= abs(f_h - target_hz)
-        else (hi, f_h, False)
-    )
+    code, f_hz, saturated, _f00, _f0ff = bisect_trim_code(target_hz, f_at)
+    return code, f_hz, saturated
 
 
 # ---------------------------------------------------------------------------
