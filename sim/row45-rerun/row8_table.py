@@ -83,34 +83,37 @@ def calib_cells(vdir):
 
 
 def iq_cells(vdir):
-    """(proc, temp, vdd) -> (code, fosc or None, iq_uA or None, klt_status) over the whole iq set."""
-    cells = {}
+    """-> (held, cff): (proc, temp, vdd) -> (code, fosc or None, iq_uA or None, klt_status).
+    The held-code requests and the all-process 0xFF requests measure the same 27
+    (proc, T, VDD) keys at two different codes; they are kept as two separate maps,
+    never merged, so a partially collected set can neither alias an 0xFF cell into a
+    held-code row nor hide a collected 0xFF cell behind a held-code one."""
+    held, cff = {}, {}
     for f in sorted(glob.glob(str(vdir / "request_iq_*" / "report.json"))):
         stem = Path(f).parent.name  # request_iq_tt_cA8_v30 / request_iq_cFF_v30
         m = re.match(r"request_iq_(?:(tt|ff|ss)_)?(c[0-9A-F]+)_v(\d+)$", stem)
-        proc, code, vdd = m.group(1), int(m.group(2)[1:], 16), int(m.group(3)) / 10
+        code, vdd = int(m.group(2)[1:], 16), int(m.group(3)) / 10
         for c in json.load(open(f))["corners"]:
             mm = meas(c)
             f_ = freq_hz(mm)
             iq = mm.get("iq_run")
-            cells[(c["process"], c["temperature_c"], vdd)] = (
-                code, f_, iq * 1e6 if iq is not None else None, c["status"])
-    return cells
+            e = (code, f_, iq * 1e6 if iq is not None else None, c["status"])
+            (cff if code == 0xFF else held)[(c["process"], c["temperature_c"], vdd)] = e
+    return held, cff
 
 
-def worst(cells, held):
-    """worst iq in the held-code / 0xFF subsets -> (uA, cell, n_over, n_missing, n)."""
-    out = {}
-    for name, want_held in (("cal", True), ("ff", False)):
-        sel = {k: v for k, v in cells.items() if (v[0] == held[k[0]]) == want_held}
-        iq = {k: v[2] for k, v in sel.items() if v[2] is not None}
-        if not iq:
-            out[name] = (float("nan"), None, 0, len(sel), len(sel))
-            continue
-        k = max(iq, key=iq.get)
-        out[name] = (iq[k], k, sum(1 for v in sel.values() if v[2] is not None and v[2] >= 500.0),
-                     sum(1 for v in sel.values() if v[2] is None or v[3] != "pass"), len(sel))
-    return out
+def worst(cells):
+    """worst iq over one 27-cell map -> (uA, cell, n_over_500, n_missing, n_grid).
+
+    A cell with no measurement or a non-pass klt status counts as missing: it is a
+    failure to demonstrate the limit, not a pass (issue #458 test plan)."""
+    n = len(PROCS) * len(TEMPS) * len(VDDS)  # 27
+    got = {k: v[2] for k, v in cells.items() if v[2] is not None and v[3] == "pass"}
+    miss = n - len(got)
+    if not got:
+        return (float("nan"), None, 0, miss, n)
+    k = max(got, key=got.get)
+    return (got[k], k, sum(1 for x in got.values() if x >= 500.0), miss, n)
 
 
 def dev_pct(f, ref):
@@ -143,7 +146,7 @@ def startup_cells(root, v):
         if key in cache:
             out[vdd] = cache[key]
             continue
-        wfs = sorted((f.parent).glob("fs_novdd_n40C/waveform.raw.json"))
+        wfs = sorted(Path(f).parent.glob("fs_novdd_n40C/waveform.raw.json"))
         if not wfs:
             out[vdd] = {"status": "NO-WAVEFORM"}
             continue
@@ -179,31 +182,48 @@ def main(root):
              " fleet). Row-4/5 deviations are graded against **each die's own 3.3 V / 27 C"
              " held-code frequency** (DR-0043/DR-0045 convention); the calibration residue vs"
              " 48.000 MHz is in the calibration table. Row-4/5/10 use held-code cells only.",
-             ""]
+             "",
+             "## Variant DUTs (sha256 of `<variant>/iq/rcosc_top_variant.spice`; the delay set's"
+             " copy differs only by the three analysis probe taps, the startup set's is the same"
+             " DUT under its `rcosc_top_p3.spice` bench name)", "",
+             "| variant | sha256 |", "|---|---|"]
+    for v in HELD:
+        p = root / v / "iq" / "rcosc_top_variant.spice"
+        lines.append(f"| {LABEL[v]} | `{hashlib.sha256(p.read_bytes()).hexdigest() if p.exists() else 'missing'}` |")
+    lines += [""]
     # ---- calibration ---------------------------------------------------------------------------
     calib = {v: calib_cells(root / v / "calib") for v in HELD}
     lines += ["## Calibration (27 C / 3.3 V; nearest scanned code to 48 MHz, step 4)", "",
               "| variant | tt code | f (MHz) | ff code | f (MHz) | ss code | f (MHz) |", "|---|---|---|---|---|---|---|"]
-    fref = {}
+    fscan = {}
     for v in HELD:
-        row, fref[v] = [LABEL[v]], {}
+        row, fscan[v] = [LABEL[v]], {}
         for p in PROCS:
             f_ = calib[v].get((p, HELD[v][p]))
-            fref[v][p] = f_
-            row += [f"0x{HELD[v][p]:02X}", f"{f_/1e6:.3f}" if f_ else "missing"]
+            fscan[v][p] = f_
+            row += [f"0x{HELD[v][p]:02X}", f"{f_/1e6:.3f}" if f_ else "DR-0043"]
         lines.append("| " + " | ".join(row) + " |")
-    lines += ["", f"Calibration residue at the chosen codes (max |f-48 MHz|): "
-              + ", ".join(f"{LABEL[v]} {max(abs(fref[v][p]/1e6-48) for p in PROCS):.2f} MHz" for v in HELD) + ".", ""]
+    lines += ["", "The control's codes and scan frequencies are DR-0043's committed calibration"
+              " (`20261112T201500Z-calib-extracted-l07`, same DUT sha).  All row-4/5 references"
+              " below are each die's own 3.3 V / 27 C held-code cell of this campaign's iq grid.",
+              ""]
 
     # ---- iq ------------------------------------------------------------------------------------
-    allcells = {v: iq_cells(root / v / "iq") for v in HELD}
+    allheld, allcff = {}, {}
+    for v in HELD:
+        allheld[v], allcff[v] = iq_cells(root / v / "iq")
+    fref = {v: {p: allheld[v].get((p, 27.0, 3.3), (None, None, None, None))[1] for p in PROCS} for v in HELD}
+    res = [max(abs(fref[v][p] / 1e6 - 48) for p in PROCS) for v in HELD
+           if all(fref[v][p] for p in PROCS) and len(allheld[v]) == 27]
+    if res:
+        lines += [f"Calibration residue of the references vs 48.000 MHz (max |f-48| per variant):"
+                  f" {max(res):.2f} MHz worst across variants.", ""]
     lines += ["## Running Iq vs the strict 500 uA row-8 limit (worst cell named)", "",
               "| variant | worst Iq @ cal code (uA, cell) | n>=500 | miss | worst Iq @ 0xFF (uA, cell) | n>=500 | miss | d(worst cal) vs control (uA) |",
               "|---|---|---|---|---|---|---|---|"]
     ctl_worst = None
-    for v, cells in allcells.items():
-        w = worst(cells, HELD[v])
-        c, f_ = w["cal"], w["ff"]
+    for v in HELD:
+        c, f_ = worst(allheld[v]), worst(allcff[v])
         cs = f"{c[0]:.1f} ({c[1][0]}/{c[1][1]:g}C/{c[1][2]:g}V)" if c[1] else "pending"
         fs = f"{f_[0]:.1f} ({f_[1][0]}/{f_[1][1]:g}C/{f_[1][2]:g}V)" if f_[1] else "pending"
         if v == "control":
@@ -214,12 +234,16 @@ def main(root):
     # ---- rows 4 / 5 / 10 (held-code cells only) -------------------------------------------------
     lines += ["", "## Row 4 (supply response at 27 C, held code; window -2.9 / +2.0 % vs the die's 3.3 V / 27 C reference)", "",
               "| variant | tt low/high (%) | ff low/high (%) | ss low/high (%) | worst span (pt) | verdict |", "|---|---|---|---|---|---|"]
-    for v, cells in allcells.items():
+    for v, cells in allheld.items():
         per, spans = {}, []
+        n_held = len(cells)
+        if n_held < 27:
+            lines.append(f"| {LABEL[v]} | pending ({n_held}/27 held-code cells) | | | | |")
+            continue
         for p in PROCS:
             ref = fref[v][p]
             ds = [dev_pct(c[1], ref) for (pr, t, vd), c in cells.items()
-                  if pr == p and t == 27.0 and c[0] == HELD[v][p] and c[1] is not None]
+                  if pr == p and t == 27.0 and c[0] == HELD[v][p] and c[1] is not None] if ref else []
             per[p] = (min(ds), max(ds)) if ds else (float("nan"), float("nan"))
             if ds:
                 spans.append(per[p][1] - per[p][0])
@@ -231,9 +255,9 @@ def main(root):
 
     lines += ["", "## Row 5 (held code over the 9-cell grid; window -10.8 / +8.8 % vs the die's 3.3 V / 27 C reference)", "",
               "| variant | worst cold cell (%) | worst hot cell (%) | ff/85C/3.0V (%) | verdict |", "|---|---|---|---|---|"]
-    for v, cells in allcells.items():
-        held_cells = {k: c for k, c in cells.items() if c[0] == HELD[v][k[0]]}
-        if any(c[1] is None for c in held_cells.values()):
+    for v, cells in allheld.items():
+        held_cells = cells
+        if any(c[1] is None for c in held_cells.values()) or not all(fref[v][p] for p in PROCS):
             lines.append(f"| {LABEL[v]} | pending (missing cells) | | | |")
             continue
         colds, hots = [], []
@@ -252,8 +276,8 @@ def main(root):
 
     lines += ["", "## Row 10 (lost clock over the held-code grid)", "",
               "| variant | cells with no clock (f < 1 MHz or failed) |", "|---|---|"]
-    for v, cells in allcells.items():
-        lost = [k for k, c in cells.items() if c[0] == HELD[v][k[0]] and (c[1] is None or c[1] < 1e6 or c[3] != "pass")]
+    for v, cells in allheld.items():
+        lost = [k for k, c in cells.items() if (c[1] is None or c[1] < 1e6 or c[3] != "pass")]
         lines.append(f"| {LABEL[v]} | {len(lost)}" + (f" ({', '.join(f'{a}/{b:g}C/{c:g}V' for a, b, c in lost)})" if lost else "") + " |")
 
     # ---- delay ---------------------------------------------------------------------------------
@@ -283,8 +307,8 @@ def main(root):
     dr0044 = dr0044_control_0xff()
     diffs = []
     for (p, t, vd), uA in dr0044.items():
-        c = allcells["control"].get((p, t, vd))
-        if c and c[0] == 0xFF and c[2] is not None:
+        c = allcff["control"].get((p, t, vd))
+        if c and c[2] is not None:
             diffs.append((c[2] - uA) / uA * 100)
     if diffs:
         lines += ["", f"Control back-to-back gate: the control DUT's 27 `0xFF` cells reproduce DR-0044's"
