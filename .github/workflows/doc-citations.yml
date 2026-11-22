@@ -6,7 +6,11 @@ name: Doc citations
 # is run by no workflow; or when prose restates a klt pin value
 # (signoff/verify-pin-restatements.py + signoff/pin-restatements.json,
 # issue #408); or when WORK_PLAN.md's generated region holds text the Guide
-# renderer cannot emit (signoff/verify-work-plan-region.py, issue #448).
+# renderer cannot emit (signoff/verify-work-plan-region.py, issue #448); or
+# when the spec/README.md decision-record index drifts from
+# spec/decision-records/ — a numbered record without its row, a duplicated
+# or misdirected row, two files sharing an NNNN, or rows out of numeric
+# order (signoff/verify-decision-record-index.py, issue #469).
 # python3 stdlib only: no PDK, no klt, no ngspice. A separate
 # workflow from signoff.yml on purpose: signoff.yml is a hashed, audited
 # artifact (T1 item 10), so adding a step there would force a re-pin/re-grade.
@@ -57,3 +61,12 @@ jobs:
         run: python3 -I signoff/verify-work-plan-region.py
       - name: Run the plan-region guard's own tests (stdlib unittest)
         run: python3 -I signoff/test_verify_work_plan_region.py
+      # Decision-record index guard (issue #469): every numbered
+      # spec/decision-records/NNNN-*.md must have exactly one spec/README.md
+      # index row pointing at it, rows in numeric order, and no two record
+      # files may share an NNNN. Titles and Status cells are free text —
+      # re-adjudicating them is out of scope.
+      - name: Verify the decision-record index matches spec/decision-records/
+        run: python3 -I signoff/verify-decision-record-index.py
+      - name: Run the decision-record index guard's own tests (stdlib unittest)
+        run: python3 -I signoff/test_verify_decision_record_index.py
