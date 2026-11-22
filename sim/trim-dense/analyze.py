@@ -34,8 +34,10 @@ non-finite, non-positive or non-numeric entries make the curve INCOMPLETE
 
 Provenance: a non-synthetic run requires --manifest, an execution manifest
 filled from prepare.py's manifest.template.json (git/tool/PDK revision,
-solver, backend, provenance hash) and every report must carry
-environment.remote (batch).  Any gap fails the run explicitly.
+solver, backend, provenance hash), every report must carry
+environment.remote (batch), and every readable report must identify its
+environment.engine_version ('MAJOR' or 'MAJOR.MINOR').  Any gap fails the
+run explicitly.
 """
 from __future__ import annotations
 
@@ -63,6 +65,17 @@ BAD_REPORT_STATUS = {"refused", "rejected", "submit_failed", "error", "errored",
 MANIFEST_REQUIRED = ("git_sha", "git_dirty", "klt_version", "engine", "engine_version", "pdk",
                      "pdk_revision", "backend", "executed_utc", "provenance_sha256")
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
+ENGINE_VERSION = re.compile(r"\d+(\.\d+)?")   # 'MAJOR' or 'MAJOR.MINOR', the pin grammar prepare.py accepts
+
+
+def engine_version_or_none(v) -> str | None:
+    """A report's environment.engine_version in the project's 'MAJOR'/'MAJOR.MINOR'
+    form, or None when the value is absent, null, blank, non-string or unparseable.
+    The version a report ran on is observed, never inferred from the manifest or an
+    A/B label: an unidentified version must fail the provenance gate (#470) instead
+    of silently dropping the report out of the engine set."""
+    s = v.strip() if isinstance(v, str) else ""
+    return s if ENGINE_VERSION.fullmatch(s) else None
 
 
 class CurveError(Exception):
@@ -173,7 +186,10 @@ def entry_from_report(entry: dict, report_path: Path, allow_nonremote: bool) -> 
     """One request tag -> ({code, freq_hz, status, error}, meta)."""
     code = entry["code"]
     out = {"code": code, "freq_hz": None, "status": "pass"}
-    meta = {"tag": entry["tag"], "synthetic": False, "engine_version": None, "remote": None}
+    # "engine_version" joins the meta only once the report parses: key present means
+    # the version was observed (possibly unusable), absent means the report itself
+    # was unreadable and its curve entry already fails (#470).
+    meta = {"tag": entry["tag"], "synthetic": False, "remote": None}
 
     def fail(msg):
         out["status"] = "failed"
@@ -356,6 +372,7 @@ def analyse_campaign(bench_dir: Path, reports_dir: Path, manifest=None, syntheti
         except (OSError, ValueError, AttributeError):
             pass
     curves = []
+    version_errors: list[str] = []
     for (variant, corner), ents in groups.items():
         entries, extras = [], []
         for e in sorted(ents, key=lambda x: x["code"]):
@@ -369,9 +386,14 @@ def analyse_campaign(bench_dir: Path, reports_dir: Path, manifest=None, syntheti
             entries.append(ent)
             metas.append(meta)
             cname = f"{variant}_{corner}"
-            per_code.setdefault(cname, {})[e["code"]] = (ent["freq_hz"], meta["engine_version"])
-            ev = str(meta["engine_version"])
-            tally.setdefault(cname, {})[ev] = tally.setdefault(cname, {}).get(ev, 0) + 1
+            ev = engine_version_or_none(meta.get("engine_version"))
+            per_code.setdefault(cname, {})[e["code"]] = (ent["freq_hz"], ev)
+            if ev is not None:
+                tally.setdefault(cname, {})[ev] = tally.setdefault(cname, {}).get(ev, 0) + 1
+            elif not is_syn and "engine_version" in meta:
+                shown = "is absent or null" if meta["engine_version"] is None else repr(meta["engine_version"])
+                version_errors.append(f"report {meta['tag']}: environment.engine_version {shown} does not "
+                                      "identify the engine ('MAJOR' or 'MAJOR.MINOR' required)")
         # reports for extra files that name the same tag cannot exist (one file per tag);
         # duplicates are exercised through normalize_curve directly.
         c0 = ents[0]
@@ -383,11 +405,12 @@ def analyse_campaign(bench_dir: Path, reports_dir: Path, manifest=None, syntheti
         except CurveError as ce:
             rec |= {"status": curve_status(ce.problems), "problems": ce.problems}
         curves.append(rec)
-    engines = sorted({str(m["engine_version"]) for m in metas if m["engine_version"] is not None})
+    engines = sorted({ev for m in metas if (ev := engine_version_or_none(m.get("engine_version"))) is not None})
     run_errors = []
     split = None
     if not is_syn:
         run_errors += check_manifest(manifest, prov_path, prov)
+        run_errors += version_errors
         covered, split = None, None
         if engine_ab is not None:
             ab_errs, ab_info = check_engine_ab(engine_ab, per_code)
