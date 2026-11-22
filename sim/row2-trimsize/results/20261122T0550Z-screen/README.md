@@ -30,14 +30,27 @@ candidate is a netlist-text re-sizing of the #87 campaign `ext` DUT
 ## Verdict (see `analysis/screen.md` and DR-0048)
 
 **No sizing in the family meets the ratified row.** Every candidate misses the
-0.3137 %/code step (0.03x-0.73x nominal), keeps 3-4 negative DR-0021 carries
-plus further non-positive steps, and collapses its designed span (targets
-1.85-2.50x, measured 1.03-1.58x). The `w2` diagnostic doubles the switches and
-makes ALL four carries negative while the span falls to 1.026x — wider bank
-switches (#337's direction) do not repair the ladder, they break it. The
-one-shot ratio rule fails because the effective bit weights respond
-non-linearly to drawn re-sizing (switch Ron + ladder node caps), including
-+/-19 % anomalies at the two smallest re-sized segments (0x06->0x07).
+0.3137 %/code step (0.03x-1.20x nominal, none inside the half-LSB band),
+keeps 3-4 negative DR-0021 carries plus further non-positive steps, and
+undershoots its designed span (targets 1.85-2.50x, measured 1.03-1.96x). The
+`w2` diagnostic doubles the switches and makes ALL four carries negative while
+the span falls to 1.026x - wider bank switches (#337's direction) do not
+repair the ladder, they break it. The one-shot ratio rule fails because the
+effective bit weights respond non-linearly to drawn re-sizing (switch Ron +
+ladder node caps).
+
+## Incident: 28 cross-wired reports, quarantined and re-run
+
+The first submission mixed variants inside each `klt sim --batch-set` group;
+28 of 342 member reports came back `pass` but were measurements of ANOTHER
+variant's testbench (netlists share the basename `tb_cXX.spice`; tool gap
+2AMLogic/klayout-tools#7180). Caught by comparing every report's
+`environment.netlist_sha256` against the bench provenance; the 28 files are
+preserved under `reports-quarantined/` (with the mismatch table), re-run one
+variant per invocation, and `analyze_screen.py` now refuses any report whose
+netlist sha does not match its own request (a mismatched code is reported
+`netlist_sha_mismatch`, never silently accepted). The committed `analysis/`
+is the sha-verified regeneration.
 
 F2.50@tt, the least-bad candidate, was carried to the full 256-code x 3-corner
 curve: `../20261122T0810Z-full-s22-83/` (same stamp family), and priced on the

@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
   "netlist": {
-    "path": "sim/row2-trimsize/results/20261122T0550Z-screen/bench/s30.87078-0.15000-0.23868-0.61435-1.41375-3.01906-6.37425-13.96053-32.48512/tt_27C_3p3V/tb_c07.spice",
+    "path": "sim/row2-trimsize/results/20261122T0550Z-screen/bench/s28.37900-0.21230-0.50606-1.07899-2.28837-4.69161-9.66190-20.87300-48.84701/tt_27C_3p3V/tb_c07.spice",
     "scope": "repo"
   },
   "status": "pass",
@@ -11,9 +11,13 @@
   "errored": 0,
   "inconclusive": 0,
   "diagnostic_counts": {
-    "by_code": {},
-    "by_severity": {},
-    "corners_with_diagnostics": 0
+    "by_code": {
+      "nonconvergence": 1
+    },
+    "by_severity": {
+      "warning": 1
+    },
+    "corners_with_diagnostics": 1
   },
   "metrics": {
     "sim__corner__count": 1,
@@ -38,26 +42,26 @@
     },
     "models_lib_sha256": "f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
     "models_lib_sha256_scope": "client",
-    "netlist_sha256": "90c9b7d206d7d7faae8b48da7330526f68a8d2075d51f8d413dbe5c1780b0e96",
+    "netlist_sha256": "987f99e4118da28659d1b7db583b67ee8b6ca159a31f75e0a1f2c28303f985db",
     "netlist_closure": [
       {
-        "path": "sim/row2-trimsize/results/20261122T0550Z-screen/bench/s30.87078-0.15000-0.23868-0.61435-1.41375-3.01906-6.37425-13.96053-32.48512/tt_27C_3p3V/tb_c07.spice",
+        "path": "sim/row2-trimsize/results/20261122T0550Z-screen/bench/s28.37900-0.21230-0.50606-1.07899-2.28837-4.69161-9.66190-20.87300-48.84701/tt_27C_3p3V/tb_c07.spice",
         "scope": "repo",
-        "sha256": "90c9b7d206d7d7faae8b48da7330526f68a8d2075d51f8d413dbe5c1780b0e96"
+        "sha256": "987f99e4118da28659d1b7db583b67ee8b6ca159a31f75e0a1f2c28303f985db"
       },
       {
-        "path": "sim/row2-trimsize/results/20261122T0550Z-screen/bench/s30.87078-0.15000-0.23868-0.61435-1.41375-3.01906-6.37425-13.96053-32.48512/tt_27C_3p3V/rcosc_top_s30.87078-0.15000-0.23868-0.61435-1.41375-3.01906-6.37425-13.96053-32.48512.spice",
+        "path": "sim/row2-trimsize/results/20261122T0550Z-screen/bench/s28.37900-0.21230-0.50606-1.07899-2.28837-4.69161-9.66190-20.87300-48.84701/tt_27C_3p3V/rcosc_top_s28.37900-0.21230-0.50606-1.07899-2.28837-4.69161-9.66190-20.87300-48.84701.spice",
         "scope": "repo",
-        "sha256": "86b8cae0fc5e949f7cf95c0c2f022ec29ea76c343f19330dd3d48b9e6cfaf211"
+        "sha256": "533e22342ec1d1ba3169cbd67e286fdaa3ed192aa831bcdfd20e4bdede1c06a1"
       }
     ],
-    "netlist_identity": "sha256:bde50eb022598cbe113dde4e0ea51a31566e02fd6169e27da1175876fe6f3994",
+    "netlist_identity": "sha256:3ebf83363a6b1af08e6cf3408a9ff341128c2f5629f95d993d503874e9e45c7a",
     "netlist_source": "extracted",
     "remote": {
       "provider": "aws-batch-fleet",
-      "job_id": "klt-sim-8c376e88132c",
+      "job_id": "klt-sim-7caba8287098",
       "region": "us-east-1",
-      "instance_id": "i-0d73264b6c75e49aa",
+      "instance_id": "i-068eeca01b9360956",
       "instance_type": "m6i.4xlarge",
       "availability_zone": "us-east-1d",
       "ami_id": "ami-09c14f55df4958cbd",
@@ -67,11 +71,11 @@
       "exit_code": "0",
       "concurrency": "1",
       "physical_cores": "8",
-      "elapsed_seconds": 12,
-      "client_submitted_at": "2026-11-22T06:15:39.048257Z",
-      "client_launched_at": "2026-11-22T06:16:03.679224Z",
-      "client_status_terminal_at": "2026-11-22T06:16:35.620460Z",
-      "client_collected_at": "2026-11-22T06:16:36.654147Z",
+      "elapsed_seconds": 21,
+      "client_submitted_at": "2026-11-22T06:08:41.122000Z",
+      "client_launched_at": "2026-11-22T06:09:07.737427Z",
+      "client_status_terminal_at": "2026-11-22T06:10:10.514678Z",
+      "client_collected_at": "2026-11-22T06:10:11.290425Z",
       "runner_klt_version": "0.9.0",
       "client_klt_version": "0.9.0",
       "runner_compatibility": "match",
@@ -186,7 +190,7 @@
       "released": false
     },
     "input": {
-      "content_hash": "sha256:90c9b7d206d7d7faae8b48da7330526f68a8d2075d51f8d413dbe5c1780b0e96",
+      "content_hash": "sha256:987f99e4118da28659d1b7db583b67ee8b6ca159a31f75e0a1f2c28303f985db",
       "role": "netlist"
     }
   },
@@ -198,7 +202,7 @@
       "status": "pass",
       "worst_case": {
         "corner_id": "tt/novdd/27C",
-        "value": 1.0439224e-07,
+        "value": 1.227434e-07,
         "margin": null
       }
     },
@@ -209,7 +213,7 @@
       "status": "pass",
       "worst_case": {
         "corner_id": "tt/novdd/27C",
-        "value": 5.98524729e-07,
+        "value": 7.12584454e-07,
         "margin": null
       }
     },
@@ -220,7 +224,7 @@
       "status": "pass",
       "worst_case": {
         "corner_id": "tt/novdd/27C",
-        "value": 40474974.7,
+        "value": 33907439.8,
         "margin": null
       }
     }
@@ -232,39 +236,45 @@
       "supply_v": {},
       "temperature_c": 27.0,
       "status": "pass",
-      "runtime_s": 4.228,
-      "peak_rss_bytes": 52609024,
+      "runtime_s": 3.922,
+      "peak_rss_bytes": 52322304,
       "engine_exit_code": 0,
       "engine_killed_by_signal": null,
       "measurements": [
         {
           "name": "ta",
-          "value": 1.0439224e-07,
+          "value": 1.227434e-07,
           "unit": "s",
           "status": "pass",
           "margin": null
         },
         {
           "name": "tb",
-          "value": 5.98524729e-07,
+          "value": 7.12584454e-07,
           "unit": "s",
           "status": "pass",
           "margin": null
         },
         {
           "name": "fosc",
-          "value": 40474974.7,
+          "value": 33907439.8,
           "unit": "Hz",
           "status": "pass",
           "margin": null
         }
       ],
-      "diagnostics": [],
+      "diagnostics": [
+        {
+          "severity": "warning",
+          "code": "nonconvergence",
+          "message": "Warning: Dynamic gmin stepping failed"
+        }
+      ],
       "artifacts": {
-        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-460/sim/row2-trimsize/results/20261122T0550Z-screen/jobs/s28.37900-0.21230-0.50606-1.07899-2.28837-4.69161-9.66190-20.87300-48.84701/request_c07-57/tt_novdd_27C/ngspice.log",
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-460/sim/row2-trimsize/results/20261122T0550Z-screen/jobs/s28.37900-0.21230-0.50606-1.07899-2.28837-4.69161-9.66190-20.87300-48.84701/request_c07/tt_novdd_27C/ngspice.log",
         "raw": null,
         "waveform": null,
-        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-460/sim/row2-trimsize/results/20261122T0550Z-screen/jobs/s28.37900-0.21230-0.50606-1.07899-2.28837-4.69161-9.66190-20.87300-48.84701/request_c07-57/tt_novdd_27C/corner.cir"
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-460/sim/row2-trimsize/results/20261122T0550Z-screen/jobs/s28.37900-0.21230-0.50606-1.07899-2.28837-4.69161-9.66190-20.87300-48.84701/request_c07/tt_novdd_27C/corner.cir"
       },
       "monte_carlo": null
     }

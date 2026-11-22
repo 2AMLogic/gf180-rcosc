@@ -1,0 +1,33 @@
+{
+  "git_sha": "d69ba65b8c09181f23cc3149d1c9902cae41ffb3",
+  "git_dirty": true,
+  "klt_version": "klayout-tools 0.9.0 client via uvx (runner klt 0.9.0)",
+  "engine": "ngspice",
+  "engine_version": "47",
+  "pdk": "gf180mcuC",
+  "pdk_revision": "unknown",
+  "backend": "batch",
+  "executed_utc": "2026-11-22T08:15:00Z",
+  "provenance_sha256": "e70cda2045db2b83da305d390a7dc693382b84efe8ae27da308b3f153bab5930",
+  "issue": 460,
+  "pdk_revision_source": null,
+  "pdk_revision_reason": "runs on the batch fleet runner image; every report carries the open_pdks stamp f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7 and models_lib_sha256 f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24 (same stamp set as the #87 campaign), but not the runner's open_pdks SOURCES commit",
+  "model_dir": "libs.tech/ngspice",
+  "solver": {
+    "reltol": 0.001,
+    "abstol": 1e-12,
+    "vntol": 1e-06,
+    "tstep": "200p",
+    "tstop": "2000n"
+  },
+  "engine_version_expected": "unspecified",
+  "netlists": {
+    "ext": {
+      "path": "sim/row2-trimsize/results/20261122T0810Z-full-s22-83/bench (per-corner copy of the generated DUT)",
+      "sha256": "215c8bd36d9c32e1eeddc884919cb1a4c7eb985d6ddf894bb9ac0a8d73d01f54",
+      "sizing": "#460 F2.50 range-true ratio-rule re-sizing of the DR-0023 P3 extraction (sim/cmph-fix/rcosc_top_p3_cmphfix.spice), netlist-text edit only"
+    }
+  },
+  "driver": "sim/row2-trimsize/run_set.py --batch-set (klt sim, groups of 64, max-in-flight 8, --wait-for-capacity 600)",
+  "git_dirty_note": "benches and reports are new uncommitted files on git_sha at execution time"
+}

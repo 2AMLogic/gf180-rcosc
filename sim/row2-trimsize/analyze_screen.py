@@ -62,6 +62,7 @@ def main() -> int:
     codes = sorted(prov["codes"])
     variants = prov["variants"]
     corner = prov["corner"]["tag"]
+    want_sha = {e["tag"]: e["sha256"]["netlist"] for e in prov["requests"]}
 
     doc = {"kind": "row2-trimsize screen analysis", "issue": 460,
            "bench": str(args.bench), "reports_dir": str(args.reports),
@@ -80,6 +81,13 @@ def main() -> int:
             r = json.loads(p.read_text())
             if r.get("status") != "pass":
                 incomplete.append(f"0x{c:02X}:{r.get('status')}")
+                continue
+            # batch-set cross-wiring guard (klayout-tools#7180): a member report
+            # whose netlist sha does not match its own request's netlist is a
+            # measurement of a DIFFERENT testbench - never silently accepted.
+            got = (r.get("environment") or {}).get("netlist_sha256")
+            if got != want_sha[f"{name}_{corner}_c{c:02X}"]:
+                incomplete.append(f"0x{c:02X}:netlist_sha_mismatch")
                 continue
             for m in r.get("measurements", []):
                 if m["name"] == "fosc":
