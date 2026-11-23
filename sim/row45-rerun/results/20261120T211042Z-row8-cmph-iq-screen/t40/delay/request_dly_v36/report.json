@@ -1,0 +1,452 @@
+{
+  "schema_version": 3,
+  "netlist": {
+    "path": "sim/row45-rerun/results/20261120T211042Z-row8-cmph-iq-screen/t40/delay/tb_dly_v36.spice",
+    "scope": "repo"
+  },
+  "status": "pass",
+  "corner_count": 1,
+  "passed": 1,
+  "failed": 0,
+  "errored": 0,
+  "inconclusive": 0,
+  "diagnostic_counts": {
+    "by_code": {},
+    "by_severity": {},
+    "corners_with_diagnostics": 0
+  },
+  "metrics": {
+    "sim__corner__count": 1,
+    "sim__corner__passed_count": 1,
+    "sim__corner__failed_count": 0,
+    "sim__corner__errored_count": 0,
+    "sim__corner__inconclusive_count": 0
+  },
+  "environment": {
+    "engine": "ngspice",
+    "engine_version": "47",
+    "ngspice_binary": "/usr/local/bin/ngspice",
+    "engine_build": {
+      "version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******",
+      "binary_sha256": null,
+      "probe": "ok",
+      "reason": null
+    },
+    "ngspice_init": {
+      "source": "runner",
+      "lines": null,
+      "sha256": null
+    },
+    "models_lib": {
+      "path": null,
+      "scope": "external"
+    },
+    "models_lib_sha256": "f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+    "models_lib_sha256_scope": "client",
+    "netlist_sha256": "a21c95de49f4ee8655311c5852362ce19482cb637ccf72846270f037bb53282e",
+    "netlist_sha256_scope": "staged",
+    "corner_coverage": {
+      "pdk": "gf180mcuC",
+      "sections": [
+        {
+          "process": "ff",
+          "unmoved_devices": [
+            "06v0",
+            "06v0_nvt",
+            "fets_mm",
+            "noise_corner"
+          ]
+        }
+      ]
+    },
+    "netlist_closure": [
+      {
+        "path": "sim/row45-rerun/results/20261120T211042Z-row8-cmph-iq-screen/t40/delay/tb_dly_v36.spice",
+        "scope": "repo",
+        "sha256": "a21c95de49f4ee8655311c5852362ce19482cb637ccf72846270f037bb53282e"
+      },
+      {
+        "path": "sim/row45-rerun/results/20261120T211042Z-row8-cmph-iq-screen/t40/delay/rcosc_top_variant.spice",
+        "scope": "repo",
+        "sha256": "c49d019f8defb9eb49ddb377b9601fedd55f9675617cafff28059a4e0d57ea09"
+      }
+    ],
+    "netlist_identity": "sha256:6037878a646c1bf312e7ef7dc978f94efbb925e8d9e73e84f888511b14de030d",
+    "netlist_source": "extracted",
+    "remote": {
+      "provider": "aws-batch-fleet",
+      "job_id": "klt-sim-662341f3b938",
+      "region": "us-east-1",
+      "instance_id": "i-0db18240f8ce3a628",
+      "instance_type": "m6i.4xlarge",
+      "availability_zone": "us-east-1d",
+      "ami_id": "ami-09c14f55df4958cbd",
+      "lifecycle": "spot",
+      "spot": true,
+      "state": "done",
+      "exit_code": "0",
+      "concurrency": "1",
+      "physical_cores": "8",
+      "elapsed_seconds": 13,
+      "client_submitted_at": "2026-11-21T07:58:53.536520Z",
+      "client_launched_at": "2026-11-21T07:59:13.327123Z",
+      "client_status_terminal_at": "2026-11-21T07:59:44.912536Z",
+      "client_collected_at": "2026-11-21T07:59:45.732037Z",
+      "runner_klt_version": "0.9.0",
+      "client_klt_version": "0.9.3.dev2575+g6bd18bbc8637",
+      "runner_compatibility": "match",
+      "runner_request_features": {
+        "required": [
+          "options.ngspice_init"
+        ],
+        "missing": [],
+        "status": "supported"
+      },
+      "worker_environment": {
+        "capture": "ok",
+        "simulator": {
+          "requested_binary": "ngspice",
+          "binary_source": "PATH",
+          "selected_path": "/usr/local/bin/ngspice",
+          "version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******\n",
+          "version_probe": "ok"
+        },
+        "pdk": {
+          "variant": "gf180mcuC",
+          "root": "/opt/pdk",
+          "stamp_scheme": "sources-sha256",
+          "stamp_sha256": "4ca10280ae9f293aa1ff69f0060a52e0026929111bda881503717469b429ce67",
+          "stamp_text": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+          "models_staged": false,
+          "stamp_scope": "executed"
+        },
+        "cpu_model": "Intel(R) Xeon(R) Platinum 8375C CPU @ 2.90GHz",
+        "omp_num_threads": null,
+        "image_manifest": null,
+        "model_inputs": null,
+        "diagnostics": [],
+        "pdk_stamp_comparison": {
+          "status": "match"
+        },
+        "ngspice_init": null,
+        "threads_per_worker": null,
+        "engine_build_comparison": {
+          "status": "match"
+        }
+      },
+      "runner_model_inputs": null,
+      "runner_models_lib_sha256": "f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+      "runner_osdi_preload": null,
+      "job_ceiling": {
+        "basis": "conservative_serial_bound",
+        "unit_count": 1,
+        "per_unit_timeout_s": 1800,
+        "overhead_s": 120.0,
+        "job_bound_s": 1920.0,
+        "max_job_seconds": 3600.0,
+        "max_job_seconds_source": "fleet_config",
+        "exceeds_ceiling": false,
+        "check": "warn",
+        "max_units_per_job": 1,
+        "recommended_hosts": 1
+      },
+      "models_lib_comparison": {
+        "status": "match"
+      }
+    },
+    "engine_host": "worker",
+    "client_ngspice_binary": "/home/ubuntu/.local/bin/ngspice",
+    "client_engine_build": {
+      "version_banner": "******\n** ngspice-47 : Circuit level simulation program\n** Compiled with KLU Direct Linear Solver\n** The U. C. Berkeley CAD Group\n** Copyright 1985-1994, Regents of the University of California.\n** Copyright 2001-2026, The ngspice team.\n** Please get your ngspice manual from https://ngspice.sourceforge.io/docs.html\n** Please file your bug-reports at http://ngspice.sourceforge.net/bugrep.html\n** Creation Date: Fri Nov 13 23:19:32 UTC 2026\n******",
+      "binary_sha256": "39ca1adb826660324c3626f72bd946ec40704f0f3fc8e243c623f76e24b3eee2",
+      "probe": "ok",
+      "reason": null
+    },
+    "backend": {
+      "resolved": "batch",
+      "source": "flag",
+      "requested": "batch"
+    }
+  },
+  "coverage": {
+    "corners_simulated": 1,
+    "measurements_declared": 7,
+    "measurements_with_limits": 0,
+    "unrecognized_limit_keys": [],
+    "schema_version": 1,
+    "known": true,
+    "checked": [
+      "measurement:[0,\"ff/novdd/85C\",\"ev_clk\"]/observation",
+      "measurement:[0,\"ff/novdd/85C\",\"ev_cmph\"]/observation",
+      "measurement:[0,\"ff/novdd/85C\",\"ev_vh\"]/observation",
+      "measurement:[0,\"ff/novdd/85C\",\"f_ta\"]/observation",
+      "measurement:[0,\"ff/novdd/85C\",\"f_tb\"]/observation",
+      "measurement:[0,\"ff/novdd/85C\",\"fosc\"]/observation",
+      "measurement:[0,\"ff/novdd/85C\",\"vh_avg\"]/observation"
+    ],
+    "skipped": [],
+    "inapplicable": [
+      {
+        "id": "measurement:[0,\"ff/novdd/85C\",\"ev_clk\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ff/novdd/85C\",\"ev_cmph\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ff/novdd/85C\",\"ev_vh\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ff/novdd/85C\",\"f_ta\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ff/novdd/85C\",\"f_tb\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ff/novdd/85C\",\"fosc\"]/limits",
+        "reason": "characterization_without_limits"
+      },
+      {
+        "id": "measurement:[0,\"ff/novdd/85C\",\"vh_avg\"]/limits",
+        "reason": "characterization_without_limits"
+      }
+    ],
+    "unknown": [],
+    "nothing_checked": false,
+    "nothing_checked_reasons": []
+  },
+  "provenance": {
+    "klt_version": "0.9.3.dev2575+g6bd18bbc8637",
+    "klt_git_commit": "6bd18bbc8637f6d767b3c24e77bd5db7a39e4bbe",
+    "klt_reinstall_spec": "klayout-tools @ git+https://github.com/2AMLogic/klayout-tools@6bd18bbc8637f6d767b3c24e77bd5db7a39e4bbe",
+    "klayout_version": "0.30.12",
+    "pdk": {
+      "name": "gf180mcuC",
+      "source": "search root: ~/.ciel",
+      "version": "open_pdks f6eeac7dad085ffcc829ccfd721f7b4ce39edcf7",
+      "ambiguous_sources": [
+        "search root: ~/.volare"
+      ]
+    },
+    "deck": {
+      "name": "sm141064.ngspice",
+      "content_hash": "sha256:f6f4a96e18fc5ad11270ad3451aaecc7ac37fc81eb61e15b0d7d94c7bc594a24",
+      "released": false
+    },
+    "input": {
+      "content_hash": "sha256:a21c95de49f4ee8655311c5852362ce19482cb637ccf72846270f037bb53282e",
+      "role": "netlist"
+    }
+  },
+  "measurements": [
+    {
+      "name": "ev_vh",
+      "unit": "s",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ff/novdd/85C",
+        "value": 7.03685576e-07,
+        "margin": null
+      },
+      "min": {
+        "corner_id": "ff/novdd/85C",
+        "value": 7.03685576e-07
+      },
+      "max": {
+        "corner_id": "ff/novdd/85C",
+        "value": 7.03685576e-07
+      }
+    },
+    {
+      "name": "ev_cmph",
+      "unit": "s",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ff/novdd/85C",
+        "value": 7.0621891e-07,
+        "margin": null
+      },
+      "min": {
+        "corner_id": "ff/novdd/85C",
+        "value": 7.0621891e-07
+      },
+      "max": {
+        "corner_id": "ff/novdd/85C",
+        "value": 7.0621891e-07
+      }
+    },
+    {
+      "name": "ev_clk",
+      "unit": "s",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ff/novdd/85C",
+        "value": 7.0704914e-07,
+        "margin": null
+      },
+      "min": {
+        "corner_id": "ff/novdd/85C",
+        "value": 7.0704914e-07
+      },
+      "max": {
+        "corner_id": "ff/novdd/85C",
+        "value": 7.0704914e-07
+      }
+    },
+    {
+      "name": "vh_avg",
+      "unit": "V",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ff/novdd/85C",
+        "value": 2.39961142,
+        "margin": null
+      },
+      "min": {
+        "corner_id": "ff/novdd/85C",
+        "value": 2.39961142
+      },
+      "max": {
+        "corner_id": "ff/novdd/85C",
+        "value": 2.39961142
+      }
+    },
+    {
+      "name": "f_ta",
+      "unit": "s",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ff/novdd/85C",
+        "value": 9.58090655e-08,
+        "margin": null
+      },
+      "min": {
+        "corner_id": "ff/novdd/85C",
+        "value": 9.58090655e-08
+      },
+      "max": {
+        "corner_id": "ff/novdd/85C",
+        "value": 9.58090655e-08
+      }
+    },
+    {
+      "name": "f_tb",
+      "unit": "s",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ff/novdd/85C",
+        "value": 5.03275595e-07,
+        "margin": null
+      },
+      "min": {
+        "corner_id": "ff/novdd/85C",
+        "value": 5.03275595e-07
+      },
+      "max": {
+        "corner_id": "ff/novdd/85C",
+        "value": 5.03275595e-07
+      }
+    },
+    {
+      "name": "fosc",
+      "unit": "Hz",
+      "limits": null,
+      "status": "pass",
+      "worst_case": {
+        "corner_id": "ff/novdd/85C",
+        "value": 49083786.2,
+        "margin": null
+      },
+      "min": {
+        "corner_id": "ff/novdd/85C",
+        "value": 49083786.2
+      },
+      "max": {
+        "corner_id": "ff/novdd/85C",
+        "value": 49083786.2
+      }
+    }
+  ],
+  "corners": [
+    {
+      "corner_id": "ff/novdd/85C",
+      "process": "ff",
+      "supply_v": {},
+      "temperature_c": 85.0,
+      "status": "pass",
+      "runtime_s": 2.931,
+      "peak_rss_bytes": 50081792,
+      "engine_exit_code": 0,
+      "engine_killed_by_signal": null,
+      "measurements": [
+        {
+          "name": "ev_vh",
+          "value": 7.03685576e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "ev_cmph",
+          "value": 7.0621891e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "ev_clk",
+          "value": 7.0704914e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "vh_avg",
+          "value": 2.39961142,
+          "unit": "V",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "f_ta",
+          "value": 9.58090655e-08,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "f_tb",
+          "value": 5.03275595e-07,
+          "unit": "s",
+          "status": "pass",
+          "margin": null
+        },
+        {
+          "name": "fosc",
+          "value": 49083786.2,
+          "unit": "Hz",
+          "status": "pass",
+          "margin": null
+        }
+      ],
+      "diagnostics": [],
+      "artifacts": {
+        "log": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-458/sim/row45-rerun/results/20261120T211042Z-row8-cmph-iq-screen/t40/delay/request_dly_v36/ff_novdd_85C/ngspice.log",
+        "raw": null,
+        "waveform": null,
+        "deck": "/home/ubuntu/GitHub/gf180-rcosc/.loom/worktrees/issue-458/sim/row45-rerun/results/20261120T211042Z-row8-cmph-iq-screen/t40/delay/request_dly_v36/ff_novdd_85C/corner.cir"
+      },
+      "monte_carlo": null
+    }
+  ]
+}
