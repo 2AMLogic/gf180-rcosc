@@ -154,3 +154,143 @@ def test_build_summary_reports_failed_runs():
     assert "| failed runs | 1 |" in text
     assert "## Failed runs" in text
     assert f"- `schematic_{pt.key}`: no_damage" in text
+
+
+# --------------------------- offline guardrail calibration (issue #462)
+#
+# The guardrail's trim search is pvt_sweep's shared bisect_trim_code; these
+# drive run_guardrail_passes end-to-end with a synthetic run_point (no
+# simulator, no PDK) on both sides and hand-check the full calibration
+# record -- code, f_hz, saturation and the two endpoint fields -- against
+# linear curves. Not evidence; no ngspice, no network, nothing written
+# under sim/*/results/.
+
+class FakeRunPoint:
+    """Stands in for pex.run_point: f_hz = fn(side, code); records calls."""
+
+    def __init__(self, fn):
+        self.fn, self.calls = fn, []
+
+    def __call__(self, side, netlist_text, point, model_dir, build_dir,
+                 log_dir, runid):
+        self.calls.append((side, point))
+        return pex.Result(
+            side=side, point=point, f_hz=self.fn(side, point.code),
+            period_s=None, status="ok", log_path="log", tstop_ns=1200,
+        )
+
+
+def _guardrails(monkeypatch, tmp_path, curves, target_hz):
+    """run_guardrail_passes against synthetic per-side f(code) curves."""
+    fake = FakeRunPoint(lambda side, code: curves[side](code))
+    monkeypatch.setattr(pex, "run_point", fake)
+    monkeypatch.setitem(base.SPEC, "f_target_hz", target_hz)
+    routed = []
+    real = base.bisect_trim_code
+
+    def spy(target, f_at):
+        routed.append(target)
+        return real(target, f_at)
+
+    monkeypatch.setattr(base, "bisect_trim_code", spy)
+    guard = pex.run_guardrail_passes(
+        sides=[("schematic", "sch-text"), ("extracted", "pex-text")],
+        model_dir=tmp_path,
+        build_dir=tmp_path,
+        corner_dir=tmp_path,
+        runid="TEST",
+        jobs=2,
+        seed={},
+        baseline_dir=tmp_path,  # no results.csv -> no DR-0017 cell basis
+        baseline_manifest={
+            "calibration_spec_target": {
+                p: {"code": 1, "saturated": False} for p in pex.PEX_PROCESSES
+            }
+        },
+    )
+    return guard, fake, routed
+
+
+def _linear(code):  # 10 MHz .. 265 MHz, 1 MHz/code -- same shape as the
+    return 10e6 + code * 1e6  # legacy-analysis calibration fixture
+
+
+def test_guardrail_calibration_routes_through_the_shared_search(
+    monkeypatch, tmp_path
+):
+    guard, fake, routed = _guardrails(
+        monkeypatch, tmp_path,
+        {"schematic": _linear, "extracted": _linear}, 48e6,
+    )
+    # every (side, process) calibration went through pvt_sweep's shared
+    # search (2 sides x 3 processes), against the patched target
+    assert routed == [48e6] * 6
+    assert guard["calibration_target_hz"] == 48e6
+    # each (side, point) is measured at most once (run_cached) and every
+    # calibration point sits at 27 C / 3.3 V (the only other measured
+    # point is the Row-4 guardrail cell, checked below)
+    keys = [(side, pt.key) for side, pt in fake.calls]
+    assert len(keys) == len(set(keys))
+    cal_points = [
+        pt for _side, pt in fake.calls
+        if pt.code != pex.GUARDRAIL_CODE
+        or pt.temp_c != pex.GUARDRAIL_TEMP_C
+    ]
+    assert cal_points
+    assert all(
+        pt.temp_c == base.REF_TEMP_C and pt.vdd_v == base.REF_VDD_V
+        for pt in cal_points
+    )
+    # the guardrail cell (0x80/ff/85 C/3.6 V) was measured on both sides
+    assert guard["cell"]["schematic_f_hz"] == _linear(0x80)
+    assert guard["cell"]["extracted_f_hz"] == _linear(0x80)
+
+
+@pytest.mark.parametrize(
+    "target,code,f,sat",
+    [
+        (9e6, 0x00, 10e6, True),      # below range
+        (10e6, 0x00, 10e6, True),     # endpoint equality clamps
+        (265e6, 0xFF, 265e6, True),   # endpoint equality clamps
+        (266e6, 0xFF, 265e6, True),   # above range
+        (48e6, 38, 48e6, False),      # exact hit
+        (100.5e6, 90, 100e6, False),  # tie resolves to the lower code
+        (100.6e6, 91, 101e6, False),  # nearer to the upper code
+    ],
+)
+def test_guardrail_calibration_record_is_hand_computed(
+    monkeypatch, tmp_path, target, code, f, sat
+):
+    guard, _fake, _routed = _guardrails(
+        monkeypatch, tmp_path,
+        {"schematic": _linear, "extracted": _linear}, target,
+    )
+    # the full record, including both endpoint fields, on both sides and
+    # at every process -- hand-computed, not replayed from the code
+    for side in ("schematic", "extracted"):
+        for p in pex.PEX_PROCESSES:
+            assert guard["calibration"][p][side] == {
+                "code": code, "f_hz": f, "saturated": sat,
+                "f_code0x00_hz": 10e6, "f_code0xff_hz": 265e6,
+            }
+
+
+def test_guardrail_calibration_tracks_each_sides_own_curve(
+    monkeypatch, tmp_path
+):
+    # extracted side 1% slower than schematic: each record reports its own
+    # side's f and realized endpoint range (48 MHz lands on code 38 for
+    # both; f(38) = 0.99 * 48 MHz = 47.52 MHz on the extracted side)
+    guard, _fake, _routed = _guardrails(
+        monkeypatch, tmp_path,
+        {"schematic": _linear,
+         "extracted": lambda c: _linear(c) * 0.99},
+        48e6,
+    )
+    sch = guard["calibration"]["tt"]["schematic"]
+    ext = guard["calibration"]["tt"]["extracted"]
+    assert (sch["code"], sch["f_hz"], sch["saturated"]) == (38, 48e6, False)
+    assert ext["code"] == 38 and ext["saturated"] is False
+    assert ext["f_hz"] == pytest.approx(47.52e6)
+    assert ext["f_code0x00_hz"] == pytest.approx(9.9e6)
+    assert ext["f_code0xff_hz"] == pytest.approx(262.35e6)

@@ -34,8 +34,10 @@ non-finite, non-positive or non-numeric entries make the curve INCOMPLETE
 
 Provenance: a non-synthetic run requires --manifest, an execution manifest
 filled from prepare.py's manifest.template.json (git/tool/PDK revision,
-solver, backend, provenance hash) and every report must carry
-environment.remote (batch).  Any gap fails the run explicitly.
+solver, backend, provenance hash), every report must carry
+environment.remote (batch), and every readable report must identify its
+environment.engine_version ('MAJOR' or 'MAJOR.MINOR').  Any gap fails the
+run explicitly.
 """
 from __future__ import annotations
 
@@ -63,6 +65,17 @@ BAD_REPORT_STATUS = {"refused", "rejected", "submit_failed", "error", "errored",
 MANIFEST_REQUIRED = ("git_sha", "git_dirty", "klt_version", "engine", "engine_version", "pdk",
                      "pdk_revision", "backend", "executed_utc", "provenance_sha256")
 HEX40 = re.compile(r"^[0-9a-f]{40}$")
+ENGINE_VERSION = re.compile(r"\d+(\.\d+)?")   # 'MAJOR' or 'MAJOR.MINOR', the pin grammar prepare.py accepts
+
+
+def engine_version_or_none(v) -> str | None:
+    """A report's environment.engine_version in the project's 'MAJOR'/'MAJOR.MINOR'
+    form, or None when the value is absent, null, blank, non-string or unparseable.
+    The version a report ran on is observed, never inferred from the manifest or an
+    A/B label: an unidentified version must fail the provenance gate (#470) instead
+    of silently dropping the report out of the engine set."""
+    s = v.strip() if isinstance(v, str) else ""
+    return s if ENGINE_VERSION.fullmatch(s) else None
 
 
 class CurveError(Exception):
@@ -173,7 +186,10 @@ def entry_from_report(entry: dict, report_path: Path, allow_nonremote: bool) -> 
     """One request tag -> ({code, freq_hz, status, error}, meta)."""
     code = entry["code"]
     out = {"code": code, "freq_hz": None, "status": "pass"}
-    meta = {"tag": entry["tag"], "synthetic": False, "engine_version": None, "remote": None}
+    # "engine_version" joins the meta only once the report parses: key present means
+    # the version was observed (possibly unusable), absent means the report itself
+    # was unreadable and its curve entry already fails (#470).
+    meta = {"tag": entry["tag"], "synthetic": False, "remote": None}
 
     def fail(msg):
         out["status"] = "failed"
@@ -258,12 +274,89 @@ def check_manifest(path, prov_path: Path, prov: dict) -> list[str]:
     return errs
 
 
-def analyse_campaign(bench_dir: Path, reports_dir: Path, manifest=None, synthetic: bool = False) -> dict:
+AB_KIND = "trim-dense-paired-engine-comparison"
+AB_LABEL = re.compile(r"^ngspice-(\d+)$")
+
+
+def check_engine_ab(path, per_code: dict) -> tuple[list[str], dict | None]:
+    """Validate a committed paired engine A/B (compare_engine.py compare --out-json)
+    against the campaign it is offered for.  Returns (errors, info).
+
+    Every pair is re-derived: delta = 100*(f_b/f_a - 1) must be finite and within
+    HALF_LSB_PCT (the file's own aggregate counts are never trusted), the curve must be
+    in the campaign, and the campaign's own frequency for that code must equal the
+    pair's frequency for the engine that produced it.  per_code maps
+    curve -> {code: (freq_hz, engine_version)}."""
+    errs: list[str] = []
+    try:
+        d = json.loads(Path(path).read_text())
+    except (OSError, ValueError) as e:
+        return [f"engine A/B comparison unreadable: {e}"], None
+    if not isinstance(d, dict) or d.get("kind") != AB_KIND:
+        return [f"engine A/B comparison is not a {AB_KIND!r} document"], None
+    if d.get("problems") != []:
+        errs.append(f"engine A/B comparison reports problems: {d.get('problems')!r}")
+    ma, mb = AB_LABEL.match(str(d.get("label_a"))), AB_LABEL.match(str(d.get("label_b")))
+    if not (ma and mb) or ma.group(1) == mb.group(1):
+        return errs + [f"engine A/B labels {d.get('label_a')!r}/{d.get('label_b')!r} are not two distinct ngspice-<N> labels"], None
+    ver = {"a": ma.group(1), "b": mb.group(1)}
+    curves = d.get("curves")
+    if not isinstance(curves, list) or not curves:
+        return errs + ["engine A/B comparison has no curves"], None
+    n_pairs, over, max_abs, per_curve = 0, 0, 0.0, []
+    for cv in curves:
+        name = cv.get("curve") if isinstance(cv, dict) else None
+        if name not in per_code:
+            errs.append(f"engine A/B curve {name!r} is not a curve of this campaign")
+            continue
+        pairs = cv.get("pairs")
+        if not isinstance(pairs, list) or not pairs:
+            errs.append(f"engine A/B curve {name}: no pairs")
+            continue
+        seen = set()
+        for p in pairs:
+            try:
+                code, fa, fb = p["code"], float(p["f_a_hz"]), float(p["f_b_hz"])
+                if not (math.isfinite(fa) and math.isfinite(fb) and fa > 0 and fb > 0) or code in seen:
+                    raise ValueError
+            except (KeyError, TypeError, ValueError):
+                errs.append(f"engine A/B curve {name}: malformed or duplicate pair {p!r}")
+                continue
+            seen.add(code)
+            delta = 100.0 * (fb / fa - 1.0)
+            n_pairs += 1
+            max_abs = max(max_abs, abs(delta))
+            if abs(delta) > HALF_LSB_PCT:
+                over += 1
+                errs.append(f"engine A/B curve {name} code {code}: |delta| {abs(delta):.5f} % exceeds half-LSB {HALF_LSB_PCT:.6f} %")
+            got = per_code[name].get(code)
+            if got is None or got[0] is None:
+                errs.append(f"engine A/B curve {name} code {code}: no valid campaign frequency to cross-check")
+                continue
+            want = {ver["a"]: fa, ver["b"]: fb}.get(str(got[1]))
+            if want is None:
+                errs.append(f"engine A/B curve {name} code {code}: campaign report engine {got[1]!r} is not one of the compared engines")
+            elif not math.isclose(got[0], want, rel_tol=1e-9):
+                errs.append(f"engine A/B curve {name} code {code}: campaign f={got[0]!r} Hz (engine {got[1]}) != A/B f={want!r} Hz")
+        per_curve.append({"curve": name, "n_pairs": len(seen)})
+    if not errs and n_pairs == 0:
+        errs.append("engine A/B comparison holds no pairs")
+    info = {"comparison_sha256": evidence_common.sha256_file(Path(path)), "label_a": d["label_a"],
+            "label_b": d["label_b"], "covered_engine_versions": sorted(ver.values()),
+            "n_pairs": n_pairs, "max_abs_delta_pct": max_abs, "pairs_over_half_lsb": over,
+            "half_lsb_pct": HALF_LSB_PCT, "curves_sampled": per_curve}
+    return errs, info
+
+
+def analyse_campaign(bench_dir: Path, reports_dir: Path, manifest=None, synthetic: bool = False,
+                     engine_ab=None) -> dict:
     bench_dir, reports_dir = Path(bench_dir), Path(reports_dir)
     prov_path = bench_dir / "provenance.json"
     prov = json.loads(prov_path.read_text())
     groups: dict[tuple, list] = {}
     metas = []
+    per_code: dict[str, dict] = {}
+    tally: dict[str, dict] = {}
     for e in prov["requests"]:
         groups.setdefault((e["variant"], e["corner"]), []).append(e)
     # classify synthetic first so remote checks and the manifest rule apply uniformly
@@ -279,6 +372,7 @@ def analyse_campaign(bench_dir: Path, reports_dir: Path, manifest=None, syntheti
         except (OSError, ValueError, AttributeError):
             pass
     curves = []
+    version_errors: list[str] = []
     for (variant, corner), ents in groups.items():
         entries, extras = [], []
         for e in sorted(ents, key=lambda x: x["code"]):
@@ -291,6 +385,15 @@ def analyse_campaign(bench_dir: Path, reports_dir: Path, manifest=None, syntheti
                        "error": "synthetic report inside a non-synthetic run"}
             entries.append(ent)
             metas.append(meta)
+            cname = f"{variant}_{corner}"
+            ev = engine_version_or_none(meta.get("engine_version"))
+            per_code.setdefault(cname, {})[e["code"]] = (ent["freq_hz"], ev)
+            if ev is not None:
+                tally.setdefault(cname, {})[ev] = tally.setdefault(cname, {}).get(ev, 0) + 1
+            elif not is_syn and "engine_version" in meta:
+                shown = "is absent or null" if meta["engine_version"] is None else repr(meta["engine_version"])
+                version_errors.append(f"report {meta['tag']}: environment.engine_version {shown} does not "
+                                      "identify the engine ('MAJOR' or 'MAJOR.MINOR' required)")
         # reports for extra files that name the same tag cannot exist (one file per tag);
         # duplicates are exercised through normalize_curve directly.
         c0 = ents[0]
@@ -302,22 +405,40 @@ def analyse_campaign(bench_dir: Path, reports_dir: Path, manifest=None, syntheti
         except CurveError as ce:
             rec |= {"status": curve_status(ce.problems), "problems": ce.problems}
         curves.append(rec)
-    engines = sorted({str(m["engine_version"]) for m in metas if m["engine_version"] is not None})
+    engines = sorted({ev for m in metas if (ev := engine_version_or_none(m.get("engine_version"))) is not None})
     run_errors = []
+    split = None
     if not is_syn:
         run_errors += check_manifest(manifest, prov_path, prov)
-        if len(engines) > 1:
+        run_errors += version_errors
+        covered, split = None, None
+        if engine_ab is not None:
+            ab_errs, ab_info = check_engine_ab(engine_ab, per_code)
+            run_errors += ab_errs
+            if ab_info is not None:
+                covered = set(ab_info["covered_engine_versions"])
+                split = {"engine_tally_by_curve": {k: dict(sorted(v.items())) for k, v in sorted(tally.items())},
+                         "internally_split_curves": sorted(k for k, v in tally.items() if len(v) > 1),
+                         "ab": ab_info}
+        if len(engines) > 1 and covered is None:
             run_errors.append(f"mixed simulator versions across reports: {engines}")
+        elif covered is not None and not set(engines) <= covered:
+            run_errors.append(f"report engine versions {engines} are not all covered by the A/B ({sorted(covered)})")
         if manifest is not None:
             try:
                 me = json.loads(Path(manifest).read_text()).get("engine_version")
             except (OSError, ValueError, AttributeError):
                 me = None
-            if me and engines and engines != [str(me)]:
+            if covered is not None:
+                if me and str(me) not in covered:
+                    run_errors.append(f"manifest engine_version {me!r} is not covered by the A/B ({sorted(covered)})")
+            elif me and engines and engines != [str(me)]:
                 run_errors.append(f"report engine_version {engines} != manifest engine_version {me!r}")
     all_ok = all(c["status"] == "OK" for c in curves) and not run_errors
+    split = None if is_syn else split
     return {
         "banner": SYN_BANNER if is_syn else (NOPROV_BANNER if run_errors else "MEASURED CAMPAIGN DATA (analysis only; verdict belongs to #87)"),
+        "engine_split": split,
         "synthetic": is_syn, "all_curves_valid": all_ok, "run_errors": run_errors,
         "engine_versions_in_reports": engines,
         "bench_provenance_sha256": evidence_common.sha256_file(prov_path),
@@ -349,6 +470,19 @@ def write_run(out: Path, res: dict) -> None:
     for e in res["run_errors"]:
         L.append(f"- RUN ERROR: {e}")
     if res["run_errors"]:
+        L.append("")
+    sp = res.get("engine_split")
+    if sp:
+        ab = sp["ab"]
+        L += ["## Simulator-version split (disclosed, accepted on a paired A/B)", "",
+              f"A/B: {ab['label_a']} vs {ab['label_b']}, comparison sha256 `{ab['comparison_sha256']}`; "
+              f"{ab['n_pairs']} pairs, max |delta| {ab['max_abs_delta_pct']:.4f} %, "
+              f"{ab['pairs_over_half_lsb']} over half-LSB ({ab['half_lsb_pct']:.6f} %).", ""]
+        for k, v in sp["engine_tally_by_curve"].items():
+            smp = next((c["n_pairs"] for c in ab["curves_sampled"] if c["curve"] == k), None)
+            L.append(f"- {k}: " + ", ".join(f"{n} x ngspice-{ev}" for ev, n in v.items())
+                     + (" (internally split)" if k in sp["internally_split_curves"] else "")
+                     + (f"; A/B sampled {smp} codes" if smp else "; not sampled by the A/B"))
         L.append("")
     L += [f"Nominal step {NOMINAL_STEP_PCT:.6f} %/code, half-LSB {HALF_LSB_PCT:.6f} % (80 %/255; DR-0003). "
           "Step = 100*(f[c+1]/f[c]-1). Comparison is descriptive; verdict belongs to #87.", ""]
@@ -385,10 +519,13 @@ def main() -> int:
     ap.add_argument("--reports-dir", type=Path, required=True, help="dir of report_<tag>.json files")
     ap.add_argument("--outdir", type=Path, required=True, help="NEW results directory")
     ap.add_argument("--manifest", type=Path, default=None, help="filled execution manifest (required unless synthetic)")
+    ap.add_argument("--engine-ab", type=Path, default=None,
+                    help="committed paired engine A/B comparison.json; opt-in acceptance of a version-mixed "
+                         "campaign (still fails without it, or if any pair exceeds the half-LSB)")
     ap.add_argument("--synthetic", action="store_true", help="label the run as synthetic fixture output")
     a = ap.parse_args()
     try:
-        res = analyse_campaign(a.bench_dir, a.reports_dir, a.manifest, a.synthetic)
+        res = analyse_campaign(a.bench_dir, a.reports_dir, a.manifest, a.synthetic, a.engine_ab)
         write_run(a.outdir, res)
     except (OSError, ValueError, KeyError) as e:
         sys.exit(f"analyze.py: {e}")

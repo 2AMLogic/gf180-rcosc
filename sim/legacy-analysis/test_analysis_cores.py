@@ -192,6 +192,62 @@ def test_calibrate_exits_when_a_point_has_no_measurement(monkeypatch):
     assert "no measurement" in str(e.value)
 
 
+# ---------------------------------- pvt: bisect_trim_code (issue #462)
+#
+# The numerical search itself, shared with the post-layout guardrail's
+# calibration (sim/pvt-postlayout/pex_pvt_sweep.py) so the schematic and
+# extracted trim decisions can never drift apart.
+
+def test_bisect_trim_code_returns_the_endpoint_frequencies():
+    code, f, sat, f00, f0ff = pvt.bisect_trim_code(100.4e6, linear)
+    assert (code, f, sat) == (90, 100e6, False)
+    assert f00 == 10e6 and f0ff == 265e6
+
+
+@pytest.mark.parametrize(
+    "target,code,f,sat",
+    [
+        (1e6, 0x00, 10e6, True),     # below range clamps at 0x00
+        (10e6, 0x00, 10e6, True),    # endpoint equality clamps too (<=)
+        (265e6, 0xFF, 265e6, True),  # endpoint equality clamps too (>=)
+        (900e6, 0xFF, 265e6, True),  # above range clamps at 0xFF
+        (100.5e6, 90, 100e6, False),  # exact midpoint tie resolves lower
+        (100.6e6, 91, 101e6, False),  # nearer to the upper code
+    ],
+)
+def test_bisect_trim_code_clamps_and_ties_like_calibrate(target, code, f, sat):
+    assert pvt.bisect_trim_code(target, linear) == (code, f, sat, 10e6, 265e6)
+
+
+def test_bisect_trim_code_preserves_code_request_order():
+    calls = []
+
+    def f_at(code):
+        calls.append(code)
+        return linear(code)
+
+    pvt.bisect_trim_code(123.4e6, f_at)
+    # endpoints first, then bisection mids, then the final adjacent-bracket
+    # read -- the same order the pre-#462 inlined loops requested (caching
+    # makes repeats free, but the request order is part of the contract)
+    assert calls[0] == 0x00 and calls[1] == 0xFF
+    assert calls[-1] == calls[-2] + 1
+    assert len(calls) <= 12
+
+
+def test_calibrate_delegates_to_bisect_trim_code(monkeypatch):
+    seen = []
+    real = pvt.bisect_trim_code
+
+    def spy(target, f_at):
+        seen.append(target)
+        return real(target, f_at)
+
+    monkeypatch.setattr(pvt, "bisect_trim_code", spy)
+    assert _calibrate(monkeypatch, FakeSim(linear), 100e6) == (90, 100e6, False)
+    assert seen == [100e6]
+
+
 # ----------------------------------------------------- startup: rising_edges
 
 def test_rising_edges_interpolates_linearly():

@@ -48,13 +48,12 @@ sides (schematic + extracted, same run/host):
 - a per-process (`tt`/`ff`/`ss`) single-point trim calibration at 27 C /
   3.3 V against the ratified 48.000 MHz target, reporting each side's
   realized `f(0x00)`/`f(0xFF)` range, the calibrated code, and whether it
-  is inner-range or saturated. The search mirrors `sim/pvt/pvt_sweep.py`'s
-  own `calibrate` semantics (same endpoint-saturation rule, same
-  bisection, same closest-of-the-final-bracket pick) but is re-implemented
-  here against this driver's two-sided `run_point`, so every calibration
-  sim is logged under this run's own `corners/<runid>/` beside the PEX
-  points (`base.calibrate` itself cannot be reused verbatim: its
-  `Campaign` logs under `sim/pvt/corners/` paths).
+  is inner-range or saturated. The numerical search is `pvt_sweep`'s own
+  `bisect_trim_code` (issue #462), shared with the schematic calibration
+  so the two trim decisions can never drift apart; only the
+  frequency-at-code callback is this driver's own, running through its
+  two-sided `run_point` so every calibration sim is logged under this
+  run's own `corners/<runid>/` beside the PEX points.
 """
 
 from __future__ import annotations
@@ -361,9 +360,11 @@ def run_guardrail_passes(
 
     def calibrate_side(side: str, process: str) -> dict:
         """Single-point trim search at (process, 27 C, 3.3 V) against the
-        ratified target, mirroring `pvt_sweep.calibrate`'s search semantics
-        exactly (see this module's docstring for why it is re-implemented
-        rather than imported)."""
+        ratified target: `pvt_sweep.bisect_trim_code` (issue #462) -- the
+        very search the schematic `calibrate` uses -- decides the code,
+        with this driver's own two-sided `run_point` as the
+        frequency-at-code callback so every calibration sim is logged
+        under this run's own `corners/<runid>/` beside the PEX points."""
 
         def f_at(code: int) -> float:
             pt = base.Point(process, base.REF_TEMP_C, base.REF_VDD_V, code)
@@ -375,31 +376,11 @@ def run_guardrail_passes(
                 )
             return res.f_hz
 
-        f_lo, f_hi = f_at(0x00), f_at(0xFF)
-        if target_hz <= f_lo:
-            return {
-                "code": 0x00, "f_hz": f_lo, "saturated": True,
-                "f_code0x00_hz": f_lo, "f_code0xff_hz": f_hi,
-            }
-        if target_hz >= f_hi:
-            return {
-                "code": 0xFF, "f_hz": f_hi, "saturated": True,
-                "f_code0x00_hz": f_lo, "f_code0xff_hz": f_hi,
-            }
-        lo, hi = 0x00, 0xFF
-        while hi - lo > 1:
-            mid = (lo + hi) // 2
-            if f_at(mid) < target_hz:
-                lo = mid
-            else:
-                hi = mid
-        f_l, f_h = f_at(lo), f_at(hi)
-        if abs(f_l - target_hz) <= abs(f_h - target_hz):
-            code, f = lo, f_l
-        else:
-            code, f = hi, f_h
+        code, f_hz, saturated, f_lo, f_hi = base.bisect_trim_code(
+            target_hz, f_at
+        )
         return {
-            "code": code, "f_hz": f, "saturated": False,
+            "code": code, "f_hz": f_hz, "saturated": saturated,
             "f_code0x00_hz": f_lo, "f_code0xff_hz": f_hi,
         }
 

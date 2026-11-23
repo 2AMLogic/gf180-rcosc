@@ -52,11 +52,13 @@ and items 5 and 6 now have campaigns behind them.
 
 ## Now
 
-1. **Finish the dense 256-code trim sweep** ([#87](https://github.com/2AMLogic/gf180-rcosc/issues/87), in progress).
-   Done when `sim/trim-dense/results/20261106T1115Z-campaign/` holds all 1536
-   jobs, `analyze.py` output is committed, and a decision record states each of
-   the four DR-0021 carries confirmed or refuted. PR #312 (948 of 1536) is
-   approved and unmerged.
+1. **Dense 256-code trim sweep: data and analysis done** ([#87](https://github.com/2AMLogic/gf180-rcosc/issues/87),
+   [#459](https://github.com/2AMLogic/gf180-rcosc/issues/459)). All 1536 jobs are in
+   `sim/trim-dense/results/20261106T1115Z-campaign/`, the `analyze.py` output is
+   committed in `sim/trim-dense/results/20261120T2330Z-verdict/`, and decision
+   record 0049 (proposed) confirms the four DR-0021 carries on every curve and
+   states the row-2 step and monotonicity misses. What remains is the design
+   response (item below, sizing screen #460).
 2. **Re-run the startup bench on the current netlist** ([#346](https://github.com/2AMLogic/gf180-rcosc/issues/346), filed, `loom:triage`).
    Comparator-H caused the earlier no-start and has changed since the last
    startup run. Done when a new `sim/startup-settled/results/<stamp>/` reports
@@ -86,9 +88,10 @@ and items 5 and 6 now have campaigns behind them.
 - **Item 5 re-run and re-cite on the final netlist.** Done when
   `sim/item5/requests/` is regenerated on the adopted netlist, the 15 envelopes
   are committed, and the manifest cites them. Needs #337. No issue yet.
-- **Row 2 step-size decision.** Done when a decision record, using the #87
-  verdict, either sizes a bank change or records the measured step as the
-  design's resolution. Needs #87.
+- **Row 2 step-size decision.** Done when a decision record, using the
+  measured misses in decision record 0049 (`spec/decision-records/0049-*.md`),
+  either sizes a bank change or records the measured step as the
+  design's resolution. Sizing screen: #460.
 - **Row 8 design change.** Done when the lever from Now item 3 is in the
   schematic and the item-5 Iq limit passes at every corner. Needs Now item 3
   and the #337 outcome, since `w3r65` moves Iq.
@@ -124,7 +127,7 @@ and items 5 and 6 now have campaigns behind them.
 - **[#310](https://github.com/2AMLogic/gf180-rcosc/issues/310)** (remove the guard-confinement investigation files) was ruled
   on 2026-11-11 and still carries a blocked label.
 
-Apart from #87, in progress, nothing in the tracker is dispatchable today; Now
+Nothing in the tracker is dispatchable today; Now
 items 2 to 5 are filed as `loom:triage` (#346 to #349) and become dispatchable once
 curated and promoted.
 

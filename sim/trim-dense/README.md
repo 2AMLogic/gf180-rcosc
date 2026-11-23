@@ -1,11 +1,14 @@
 # sim/trim-dense - dense trim-step request generator and analyzer (offline)
 
-Issue #98, the offline-preparation subset of #87. **The dense campaign was not
-run and no trim-step result exists here.** This directory holds tooling and tests;
-the only `results/` content permitted is a Step 0 single-corner fleet-gate record
-(see `test_no_measured_artifacts_in_tree`), which is not campaign evidence. Every curve in
-`test_harness.py` is a labeled synthetic fixture. The campaign, its evidence
-and its decision record stay in #87; no ratified row, existing result, design
+Issue #98, the offline-preparation subset of #87. **The dense campaign ran (1536 jobs, `results/20261106T1115Z-campaign/`, #87) and
+its analysis is committed in `results/20261120T2330Z-verdict/`, read in decision
+record 0049.** This directory holds the tooling and tests; `results/` may hold the
+frozen campaign, the #378 engine A/B, a Step 0 fleet-gate record and that one verdict
+directory, the only place analyzer outputs are permitted (see
+`test_no_measured_artifacts_in_tree`). `analyze.py --engine-ab <comparison.json>` accepts a
+version-mixed campaign only against a committed paired A/B. Every curve in
+`test_harness.py` is a labeled synthetic fixture. The verdict
+is decision record 0049; no ratified row, existing result, design
 file or DR-0021 is changed by this directory.
 
 | file | role |
