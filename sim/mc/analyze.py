@@ -12,7 +12,7 @@ Control criteria (stated before the run, DR-0019 s2 / DR-0022 s3):
                   tolerance recorded in sim/mc-groundwork/README.md)
   inflated 3x     `klt yield` reports the control's degradation as detected
                   (negative_control verdict), and the control fails the claim
-  seeded defect   (issue #461, DR-0050) a known-bad deck per row set, same seed, draws, probes
+  seeded defect   (issue #461, DR-0051) a known-bad deck per row set, same seed, draws, probes
                   and grading expressions as the nominal.  Detected only on the pinned
                   grader's own per-measurement `negative_control.verdict` ("detected":
                   lower empirical yield with non-overlapping exact CIs).  A cell whose
@@ -80,7 +80,7 @@ def defect_section(grade: Path, dirs: list[Path]) -> None:
     pass fraction against 0.99, the control pass fraction, and the grader's own verdict."""
     if not any((grade / f"yield_{p}_row{r}_def.json").exists() for p in ("tt", "ff", "ss") for r in ("2", "4", "5")):
         return
-    print("## Control 4: seeded known-bad defect (issue #461, DR-0050)\n")
+    print("## Control 4: seeded known-bad defect (issue #461, DR-0051)\n")
     print("Detection is the pinned grader's per-measurement verdict only.  `nominal_fails` = the "
           "nominal's exact 95 % upper bound is below the 0.99 target: the cell cannot show a "
           "yield degradation, is deferred to #317 and is **not** counted as control evidence.\n")

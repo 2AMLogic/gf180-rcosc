@@ -9,9 +9,9 @@
 #               passes limits_pilot.json: same limits, only the sample floor is the pilot N.
 #   --zero-ref  deterministic reference for the zero-mismatch control, "tt=164:47.91,ff=79:47.97,ss=212:48.04"
 #               (code:MHz per process); default is the DR-0023 P3 grid built into analyze.py.
-#   When report_ctrlr2_<p>.json / report_ctrlr45_<p>.json exist (the --pilot campaign), each is
+#   When report_ctrlr2_<p>.json / report_ctrlr4_<p>.json / report_ctrlr5_<p>.json exist (the --pilot campaign), each is
 #   paired with the nominal through `yield-samples --negative-control` as a SEPARATE grade
-#   (sampleset_<p>_r2def.json / _r45def.json, yield_<p>_row{2,4,5}_def.json); the 3x grades keep
+#   (sampleset_<p>_ctrlr{2,4,5}.json, yield_<p>_row{2,4,5}_def.json); the 3x grades keep
 #   their existing paths.
 set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -52,22 +52,19 @@ for p in tt ff ss; do
   uvx --from "$PIN" klt yield "$OUT/sampleset_${p}.json" --limits "$LIM" \
     --measurement s3_margin_pct --format json > "$OUT/yield_${p}_row5.json" || true
   # issue #461: seeded-defect companions, each paired with the same nominal as its own grade
-  for dk in ctrlr2:r2def:ctrlr2 ctrlr45:r45def:ctrlr45; do
-    IFS=: read -r kind tag _ <<< "$dk"
+  for kind in ctrlr2 ctrlr4 ctrlr5; do
     CASE="${kind}_${p}"; f="$(find_report "$@")"; [[ -n "$f" ]] || continue
     echo "$(sha256sum "$f" | cut -d' ' -f1)  ${f#"$HERE/../../"}" >> "$OUT/sources.txt"
     uvx --from "$PIN" klt yield-samples "${!m}" --negative-control "$f" \
-      --description "seeded defect (${kind}), same seed 20261008 and draw identities, same probes and grading expressions (DR-0050)" \
-      --format json > "$OUT/sampleset_${p}_${tag}.json"
-    if [[ "$kind" == ctrlr2 ]]; then
-      uvx --from "$PIN" klt yield "$OUT/sampleset_${p}_${tag}.json" --limits "$LIM" \
-        --measurement s1_resid_abs_pct,s1_headroom --format json > "$OUT/yield_${p}_row2_def.json" || true
-    else
-      uvx --from "$PIN" klt yield "$OUT/sampleset_${p}_${tag}.json" --limits "$LIM" \
-        --measurement s2_margin_pct --format json > "$OUT/yield_${p}_row4_def.json" || true
-      uvx --from "$PIN" klt yield "$OUT/sampleset_${p}_${tag}.json" --limits "$LIM" \
-        --measurement s3_margin_pct --format json > "$OUT/yield_${p}_row5_def.json" || true
-    fi
+      --description "seeded defect (${kind}), same seed 20261008 and draw identities, same probes and grading expressions (DR-0051)" \
+      --format json > "$OUT/sampleset_${p}_${kind}.json"
+    case "$kind" in
+      ctrlr2) meas=s1_resid_abs_pct,s1_headroom; row=2 ;;
+      ctrlr4) meas=s2_margin_pct; row=4 ;;
+      ctrlr5) meas=s3_margin_pct; row=5 ;;
+    esac
+    uvx --from "$PIN" klt yield "$OUT/sampleset_${p}_${kind}.json" --limits "$LIM" \
+      --measurement "$meas" --format json > "$OUT/yield_${p}_row${row}_def.json" || true
   done
 done
 for c in zero_tt zero_ff zero_ss sens1_tt sens10_tt senszero_tt sens1fine_tt sens10fine_tt senszerofine_tt; do

@@ -86,7 +86,7 @@ POINTS = [(f"{'n40' if t < 0 else t}_{int(v * 10)}", t, v)
 S2_POINTS = [p for p in POINTS if p[1] == 27]
 
 
-# Seeded known-bad variants (issue #461; DR-0050).  Each is a deterministic physical
+# Seeded known-bad variants (issue #461; DR-0051).  Each is a deterministic physical
 # defect written into the DUT text BEFORE the injector and BEFORE the per-die
 # calibration, so the die calibrates around it exactly as it would a real fault.
 # Magnitudes are fixed in sim/mc/results/<derivation run>/ before any pilot draw.
@@ -98,12 +98,21 @@ DEFECTS = {
     # (s1_headroom).
     "trimbank": {"kind": "scale_length", "inst": "X$91", "scale": 4.0,
                  "observables": ["s1_resid_abs_pct", "s1_headroom"]},
-    # rows 4 and 5 (S2, S3): a leakage resistor from the supply pin to the timing
-    # capacitor's top plate.  A fixed-code calibration at 27 C / 3.3 V trims out its
-    # static effect; the supply / temperature dependence of the leak current does not
-    # calibrate out.
-    "leak": {"kind": "leak", "node": "\\$26__t8", "rvalue": 1.0e6,
-             "observables": ["s2_margin_pct", "s3_margin_pct"]},
+    # row 4 (S2): a parasitic conduction path from the timing capacitor's top
+    # plate to vss -- a diode-connected nfet_03v3 in series with a resistor.  Its current is
+    # (V_plate - Vgs)/R: not proportional to the supply (unlike the charging current, so a
+    # resistor to vdd or vss, tried first, left the supply span unchanged -- see the
+    # derivation run) and Vgs falls with temperature.  The 27 C / 3.3 V calibration trims
+    # out its static effect; its supply and temperature dependence survives calibration.
+    "leak": {"kind": "leak_nfet", "node": "\\$26__t8", "rvalue": 1.0e5,
+             "observables": ["s2_margin_pct"]},
+    # row 5 (S3): a reverse-biased junction leak from the timing capacitor's top plate to
+    # vss (diode cathode on the plate).  Its saturation current rises roughly two orders of
+    # magnitude between 27 C and 85 C (XTI=3, EG=1.11), so the 27 C calibration trims out
+    # its static effect and the hot corner slows the oscillator: a temperature-dependent
+    # error that survives calibration.  (The nfet leak above moved s3 by < 1 point.)
+    "diode": {"kind": "leak_diode", "node": "\\$26__t8", "is_a": 1.0e-8,
+              "observables": ["s3_margin_pct"]},
 }
 
 
@@ -122,11 +131,22 @@ def apply_defect(body: str, defect: dict | None) -> str:
             raise ValueError(f"{defect['inst']}: no r_length= in {lines[card]!r}")
         new = f"{float(m.group(1)) * defect['scale']:.5f}{m.group(2)}"
         lines[card] = lines[card].replace(m.group(0), f"r_length={new}")
-    elif defect["kind"] == "leak":
+    elif defect["kind"] == "leak_nfet":
         if defect["node"] not in body:
             raise ValueError(f"defect node {defect['node']} not in the DUT")
         end = max(i for i, l in enumerate(lines) if l.upper().startswith(".ENDS"))
-        lines.insert(end, f"RDEF_LEAK vdd {defect['node']} {defect['rvalue']:g}")
+        lines[end:end] = [
+            f"RDEF_LEAK {defect['node']} ndef_leak {defect['rvalue']:g}",
+            "XDEF_LEAK ndef_leak ndef_leak vss vsubs nfet_03v3 L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U",
+        ]
+    elif defect["kind"] == "leak_diode":
+        if defect["node"] not in body:
+            raise ValueError(f"defect node {defect['node']} not in the DUT")
+        end = max(i for i, l in enumerate(lines) if l.upper().startswith(".ENDS"))
+        lines[end:end] = [
+            f".model DDEF_LEAK D(IS={defect['is_a']:g} N=1 XTI=3 EG=1.11)",
+            f"DDEF_LEAK vss {defect['node']} DDEF_LEAK",
+        ]
     else:
         raise ValueError(f"unknown defect kind {defect['kind']!r}")
     return "\n".join(lines)
@@ -337,14 +357,20 @@ def limits(min_samples: int) -> dict:
 # rule is fixed here, ahead of the run:
 #   trimbank: the weakest scale for which every corner (tt/ff/ss) is measurable and has
 #             s1_headroom <= 0 (the calibrated code on a rail) -- row 2 fails by construction;
-#   leak:     the largest resistance (weakest leak) for which every corner that is measurable
-#             has s2_margin_pct <= -1.0 and s3_margin_pct <= -1.0 on the deterministic draw
-#             (a full point beyond the limit edge, so a die-to-die spread cannot rescue it).
+#   leak:     (row 4) the largest resistance (weakest leak) for which every corner that is
+#             measurable has s2_margin_pct <= -1.0 on the deterministic draw (a full point
+#             beyond the limit edge, so a die-to-die spread cannot rescue it); the ss value is
+#             reported but not required (ss row 4 already fails nominally, DR-0043);
+#   diode:    (row 5) the same rule on s3_margin_pct, weakest saturation current, all corners.
+# Round 1 (results/20261123T170809Z-ctrl-derivation, 2e5/1e6 ohm resistor to vdd) and round 2
+# (results/20261123T171911Z-ctrl-derivation, diode-connected nfet at 5e4/2e5/1e6 ohm) are kept
+# as rejected candidates; this grid is round 3.
 # A magnitude that leaves a corner unmeasurable is rejected: an unmeasurable die is a dropped
 # sample, not a detection.
 DERIVE_GRID = {
     "trimbank": [("scale", v) for v in (4.0, 13.0)],
-    "leak": [("rvalue", v) for v in (2.0e5, 1.0e6, 5.0e6)],
+    "leak": [("rvalue", v) for v in (7.0e4, 1.0e5)],
+    "diode": [("is_a", v) for v in (3.0e-9, 1.0e-8, 3.0e-8)],
 }
 
 
@@ -419,10 +445,9 @@ def main(argv: list[str] | None = None) -> None:
     if a.pilot:
         # seeded known-bad variants: same header, seed and draw identities as main_<p>
         for p in PROC:
-            cases[f"ctrlr2_{p}"] = (HDR.format(mm=1, sc=1, extra=""), "sw_stat_mismatch", p, n_main)
-            cases[f"ctrlr45_{p}"] = (HDR.format(mm=1, sc=1, extra=""), "sw_stat_mismatch", p, n_main)
-            extra_opts[f"ctrlr2_{p}"] = {"defect": DEFECTS["trimbank"]}
-            extra_opts[f"ctrlr45_{p}"] = {"defect": DEFECTS["leak"]}
+            for tag, dk in (("ctrlr2", "trimbank"), ("ctrlr4", "leak"), ("ctrlr5", "diode")):
+                cases[f"{tag}_{p}"] = (HDR.format(mm=1, sc=1, extra=""), "sw_stat_mismatch", p, n_main)
+                extra_opts[f"{tag}_{p}"] = {"defect": DEFECTS[dk]}
         # matched sensitivity arms at the finer timestep (same draws as sens1/sens10)
         for nm, hdr, sc in (("sens1", HDR.format(mm=0, sc=1, extra=" sw_inj=1"), 1.0),
                             ("sens10", HDR.format(mm=0, sc=10, extra=" sw_inj=1"), 10.0)):

@@ -113,7 +113,7 @@ def test_defect_cards_are_the_only_difference_from_the_nominal_deck(tmp_path):
     d = _pilot(tmp_path)
     main = (d / "tb_main_tt.spice").read_text().splitlines()
     r2 = (d / "tb_ctrlr2_tt.spice").read_text().splitlines()
-    r45 = (d / "tb_ctrlr45_tt.spice").read_text().splitlines()
+    r45 = (d / "tb_ctrlr4_tt.spice").read_text().splitlines()
     diff2 = [(a, b) for a, b in zip(main, r2) if a != b]
     # title line, the one seeded card, and that card's own matching sigma (the injector derives it
     # from the drawn W x L; the draw identity d__91 and its seed are unchanged)
@@ -122,8 +122,11 @@ def test_defect_cards_are_the_only_difference_from_the_nominal_deck(tmp_path):
     assert "r_length=12.03860U" in card[0] and "r_length=12.03860U" not in card[1]
     assert [x for x in diff2 if x[0].startswith(".param d__91=")]
     extra = [l for l in r45 if l not in main]
-    assert [l for l in extra if l.startswith("RDEF_LEAK")] == [f"RDEF_LEAK vdd {gc.DEFECTS['leak']['node']} 1e+06"]
-    assert len(r45) == len(main) + 1 and len(extra) == 2  # the title line + the one added card
+    assert [l for l in extra if l.startswith("RDEF_LEAK")] == [f"RDEF_LEAK {gc.DEFECTS['leak']['node']} ndef_leak 100000"]
+    assert [l for l in extra if l.startswith("XDEF_LEAK")]
+    assert len(r45) == len(main) + 2 and len(extra) == 3  # the title line + the two added cards
+    r5 = (d / "tb_ctrlr5_tt.spice").read_text()
+    assert ".model DDEF_LEAK D(IS=1e-08 N=1 XTI=3 EG=1.11)" in r5 and f"DDEF_LEAK vss {gc.DEFECTS['diode']['node']} DDEF_LEAK" in r5
 
 
 def test_control_probes_and_grading_expressions_match_the_nominal(tmp_path):
@@ -131,9 +134,9 @@ def test_control_probes_and_grading_expressions_match_the_nominal(tmp_path):
     # control block (probes, margins, harvested variables) is byte-identical
     d = _pilot(tmp_path)
     ctl = lambda n: (d / n).read_text().split(".control", 1)[1]
-    assert ctl("tb_main_tt.spice") == ctl("tb_ctrlr2_tt.spice") == ctl("tb_ctrlr45_tt.spice")
+    assert ctl("tb_main_tt.spice") == ctl("tb_ctrlr2_tt.spice") == ctl("tb_ctrlr4_tt.spice") == ctl("tb_ctrlr5_tt.spice")
     mm = lambda n: json.loads((d / n).read_text())["measurements"]
-    assert mm("request_main_tt.json") == mm("request_ctrlr2_tt.json") == mm("request_ctrlr45_tt.json")
+    assert mm("request_main_tt.json") == mm("request_ctrlr2_tt.json") == mm("request_ctrlr4_tt.json") == mm("request_ctrlr5_tt.json")
 
 
 def test_control_requests_reuse_the_nominal_seed_and_draw_count(tmp_path):
@@ -141,12 +144,12 @@ def test_control_requests_reuse_the_nominal_seed_and_draw_count(tmp_path):
     for p in ("tt", "ff", "ss"):
         ref = json.loads((d / f"request_main_{p}.json").read_text())
         assert ref["monte_carlo"] == {"n": 40, "seed": gc.SEED, "vary": "mismatch"}
-        for c in ("ctrlr2", "ctrlr45", "inflated"):
+        for c in ("ctrlr2", "ctrlr4", "ctrlr5", "inflated"):
             r = json.loads((d / f"request_{c}_{p}.json").read_text())
             assert r["monte_carlo"] == ref["monte_carlo"] and r["corners"] == ref["corners"]
         # header (the mismatch gate/scale parameters) of the defect decks equals main's
         hdr = lambda n: [l for l in (d / n).read_text().splitlines() if l.startswith(".param sw_stat_global")]
-        assert hdr(f"tb_main_{p}.spice") == hdr(f"tb_ctrlr2_{p}.spice") == hdr(f"tb_ctrlr45_{p}.spice")
+        assert hdr(f"tb_main_{p}.spice") == hdr(f"tb_ctrlr2_{p}.spice") == hdr(f"tb_ctrlr4_{p}.spice") == hdr(f"tb_ctrlr5_{p}.spice")
 
 
 def test_pilot_floor_is_pilot_only_and_the_production_floor_is_untouched(tmp_path):
@@ -178,7 +181,7 @@ def test_fine_timing_arms_change_only_the_transient_step(tmp_path):
 def test_defect_ledger_names_component_and_observables(tmp_path):
     led = json.loads((_pilot(tmp_path) / "defects.json").read_text())
     assert led["trimbank"]["inst"] == "X$91" and led["trimbank"]["observables"] == ["s1_resid_abs_pct", "s1_headroom"]
-    assert led["leak"]["observables"] == ["s2_margin_pct", "s3_margin_pct"]
+    assert led["leak"]["observables"] == ["s2_margin_pct"] and led["diode"]["observables"] == ["s3_margin_pct"]
 
 
 def test_apply_defect_fails_loudly_on_a_missing_target():
