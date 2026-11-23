@@ -89,3 +89,101 @@ def test_dut_option_swaps_the_netlist_and_writes_only_to_out(tmp_path):
     assert man["source_sha256"] == hashlib.sha256(dut.read_bytes()).hexdigest()
     assert "rcosc_top_p3_cmphfix.spice" in (tmp_path / "tb_main_tt.spice").read_text().splitlines()[0]
     assert (tmp_path / "tb_main_tt.spice").read_text() != (here / "tb_main_tt.spice").read_text()
+
+
+# ---- issue #461: seeded-defect controls, pilot floor, finer-timing arms -------------------
+
+PILOT_DUT = Path(gc.__file__).parent.parent / "row45-rerun" / "results" / "20261112T200335Z-extract-l07" / "rcosc_top_p3_cmphfix.spice"
+
+
+def _pilot(tmp_path, n=40):
+    gc.main(["--dut", str(PILOT_DUT), "--out", str(tmp_path), "--pilot", str(n)])
+    return tmp_path
+
+
+def test_default_campaign_is_unchanged_by_the_pilot_machinery(tmp_path):
+    # no --pilot: no control cases, no pilot limits, no defects ledger
+    gc.main(["--out", str(tmp_path)])
+    names = {f.name for f in tmp_path.iterdir()}
+    assert not any(n.startswith(("tb_ctrl", "request_ctrl")) for n in names)
+    assert "limits_pilot.json" not in names and "defects.json" not in names
+
+
+def test_defect_cards_are_the_only_difference_from_the_nominal_deck(tmp_path):
+    d = _pilot(tmp_path)
+    main = (d / "tb_main_tt.spice").read_text().splitlines()
+    r2 = (d / "tb_ctrlr2_tt.spice").read_text().splitlines()
+    r45 = (d / "tb_ctrlr45_tt.spice").read_text().splitlines()
+    diff2 = [(a, b) for a, b in zip(main, r2) if a != b]
+    # title line, the one seeded card, and that card's own matching sigma (the injector derives it
+    # from the drawn W x L; the draw identity d__91 and its seed are unchanged)
+    assert len(main) == len(r2) and len(diff2) == 3
+    card = [x for x in diff2 if x[0].startswith("X$91")][0]
+    assert "r_length=12.03860U" in card[0] and "r_length=12.03860U" not in card[1]
+    assert [x for x in diff2 if x[0].startswith(".param d__91=")]
+    extra = [l for l in r45 if l not in main]
+    assert [l for l in extra if l.startswith("RDEF_LEAK")] == [f"RDEF_LEAK vdd {gc.DEFECTS['leak']['node']} 1e+06"]
+    assert len(r45) == len(main) + 1 and len(extra) == 2  # the title line + the one added card
+
+
+def test_control_probes_and_grading_expressions_match_the_nominal(tmp_path):
+    # a measurement stuck at its nominal value must make the control miss: the
+    # control block (probes, margins, harvested variables) is byte-identical
+    d = _pilot(tmp_path)
+    ctl = lambda n: (d / n).read_text().split(".control", 1)[1]
+    assert ctl("tb_main_tt.spice") == ctl("tb_ctrlr2_tt.spice") == ctl("tb_ctrlr45_tt.spice")
+    mm = lambda n: json.loads((d / n).read_text())["measurements"]
+    assert mm("request_main_tt.json") == mm("request_ctrlr2_tt.json") == mm("request_ctrlr45_tt.json")
+
+
+def test_control_requests_reuse_the_nominal_seed_and_draw_count(tmp_path):
+    d = _pilot(tmp_path, 40)
+    for p in ("tt", "ff", "ss"):
+        ref = json.loads((d / f"request_main_{p}.json").read_text())
+        assert ref["monte_carlo"] == {"n": 40, "seed": gc.SEED, "vary": "mismatch"}
+        for c in ("ctrlr2", "ctrlr45", "inflated"):
+            r = json.loads((d / f"request_{c}_{p}.json").read_text())
+            assert r["monte_carlo"] == ref["monte_carlo"] and r["corners"] == ref["corners"]
+        # header (the mismatch gate/scale parameters) of the defect decks equals main's
+        hdr = lambda n: [l for l in (d / n).read_text().splitlines() if l.startswith(".param sw_stat_global")]
+        assert hdr(f"tb_main_{p}.spice") == hdr(f"tb_ctrlr2_{p}.spice") == hdr(f"tb_ctrlr45_{p}.spice")
+
+
+def test_pilot_floor_is_pilot_only_and_the_production_floor_is_untouched(tmp_path):
+    d = _pilot(tmp_path, 40)
+    pilot, prod = (json.loads((d / f).read_text()) for f in ("limits_pilot.json", "limits_main.json"))
+    assert pilot["min_samples"] == 40 and prod["min_samples"] == 500
+    strip = lambda x: {k: v for k, v in x.items() if k != "min_samples"}
+    assert strip(pilot) == strip(prod)  # same limits, target yield 0.99, confidence 0.95
+
+
+def test_the_3x_and_zero_controls_stay_in_the_pilot(tmp_path):
+    d = _pilot(tmp_path)
+    for p in ("tt", "ff", "ss"):
+        assert "sw_stat_mismatch=3" in (d / f"tb_inflated_{p}.spice").read_text()
+        assert "sw_stat_mismatch=0" in (d / f"tb_zero_{p}.spice").read_text()
+
+
+def test_fine_timing_arms_change_only_the_transient_step(tmp_path):
+    d = _pilot(tmp_path)
+    for nm in ("sens1", "sens10", "senszero"):
+        coarse = (d / f"tb_{nm}_tt.spice").read_text()
+        fine = (d / f"tb_{nm}fine_tt.spice").read_text()
+        assert coarse.count("tran 200p 1200n") == fine.count("tran 50p 1200n") > 0
+        assert fine.replace("tran 50p", "tran 200p").splitlines()[1:] == coarse.splitlines()[1:]
+        rf = json.loads((d / f"request_{nm}fine_tt.json").read_text())
+        assert rf["options"]["timeout_s"] * 7 + 120 <= 3600
+
+
+def test_defect_ledger_names_component_and_observables(tmp_path):
+    led = json.loads((_pilot(tmp_path) / "defects.json").read_text())
+    assert led["trimbank"]["inst"] == "X$91" and led["trimbank"]["observables"] == ["s1_resid_abs_pct", "s1_headroom"]
+    assert led["leak"]["observables"] == ["s2_margin_pct", "s3_margin_pct"]
+
+
+def test_apply_defect_fails_loudly_on_a_missing_target():
+    import pytest
+    with pytest.raises(ValueError):
+        gc.apply_defect(".SUBCKT rcosc_top vdd vss\n.ENDS rcosc_top", dict(gc.DEFECTS["trimbank"]))
+    with pytest.raises(ValueError):
+        gc.apply_defect(".SUBCKT rcosc_top vdd vss\n.ENDS rcosc_top", dict(gc.DEFECTS["leak"]))

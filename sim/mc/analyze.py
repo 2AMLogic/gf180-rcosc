@@ -12,6 +12,12 @@ Control criteria (stated before the run, DR-0019 s2 / DR-0022 s3):
                   tolerance recorded in sim/mc-groundwork/README.md)
   inflated 3x     `klt yield` reports the control's degradation as detected
                   (negative_control verdict), and the control fails the claim
+  seeded defect   (issue #461, DR-0050) a known-bad deck per row set, same seed, draws, probes
+                  and grading expressions as the nominal.  Detected only on the pinned
+                  grader's own per-measurement `negative_control.verdict` ("detected":
+                  lower empirical yield with non-overlapping exact CIs).  A cell whose
+                  nominal pass fraction is below 0.99 (exact upper bound < 0.99) is listed
+                  as `nominal_fails`, deferred to #317, and never counted as control evidence.
   sensitivity     MOS off, injected terms only: the sample sigma of the step
                   at the fixed MSB transition (0x7F->0x80) and at 0x7E->0x7F
                   scales with mm_scale; the 10x/1x ratio must be about 10
@@ -47,17 +53,103 @@ def column(report: dict, name: str) -> list[float]:
     return out
 
 
+def parse_zero_ref(text: str) -> dict:
+    """"tt=164:47.91,ff=79:47.97" -> {"tt": (164, 47.91), ...} (code:MHz per process)."""
+    out = {}
+    for part in text.strip().split(","):
+        k, v = part.split("=")
+        c, f = v.split(":")
+        out[k.strip()] = (int(c), float(f))
+    return out
+
+
+def first_value(rep: dict | None, name: str):
+    v = column(rep, name) if rep else []
+    return v[0] if v else None
+
+
 def fmt(x, nd=4):
     return "n/a" if x is None else f"{x:.{nd}g}"
 
 
+ROWS_DEF = (("2", "r2def"), ("4", "r45def"), ("5", "r45def"))
+
+
+def defect_section(grade: Path, dirs: list[Path]) -> None:
+    """Seeded-defect controls (issue #461): one line per measurement verdict, the nominal
+    pass fraction against 0.99, the control pass fraction, and the grader's own verdict."""
+    if not any((grade / f"yield_{p}_row{r}_def.json").exists() for p in ("tt", "ff", "ss") for r in ("2", "4", "5")):
+        return
+    print("## Control 4: seeded known-bad defect (issue #461, DR-0050)\n")
+    print("Detection is the pinned grader's per-measurement verdict only.  `nominal_fails` = the "
+          "nominal's exact 95 % upper bound is below the 0.99 target: the cell cannot show a "
+          "yield degradation, is deferred to #317 and is **not** counted as control evidence.\n")
+    print("| process | row | measurement | n nominal | nominal pass (95 % CI) | vs 0.99 | n control | control pass (95 % CI) | grader verdict | disposition |")
+    print("|---|---|---|---|---|---|---|---|---|---|")
+    tally = {"detected": 0, "not_detected": 0, "nominal_fails": 0, "other": 0}
+    for p in ("tt", "ff", "ss"):
+        for row, _ in ROWS_DEF:
+            f = grade / f"yield_{p}_row{row}_def.json"
+            if not f.exists():
+                print(f"| {p} | {row} | (missing) | | | | | | | |")
+                tally["other"] += 1
+                continue
+            for m in json.loads(f.read_text()).get("measurements", []):
+                e = m["yield"]["empirical"]
+                lo, hi = e["confidence_interval"]["low"], e["confidence_interval"]["high"]
+                nc = m.get("negative_control") or {}
+                ce = (nc.get("yield") or {}).get("empirical") or {}
+                cci = ce.get("confidence_interval") or {}
+                verdict = nc.get("verdict", "not_declared")
+                if hi < 0.99:
+                    rel, disp = "below (upper < 0.99)", "nominal_fails"
+                elif lo > 0.99:
+                    rel, disp = "above (lower > 0.99)", "detected" if verdict == "detected" else "not_detected"
+                else:
+                    rel, disp = "straddles", "detected" if verdict == "detected" else "not_detected"
+                tally[disp] = tally.get(disp, 0) + 1
+                print(f"| {p} | {row} | {m['name']} | {m['n']} | {e['estimate']:.3f} ({lo:.3f}-{hi:.3f}) | {rel} | "
+                      f"{nc.get('n', 'n/a')} | {fmt(ce.get('estimate'), 3)} ({fmt(cci.get('low'), 3)}-{fmt(cci.get('high'), 3)}) | "
+                      f"{verdict} | {disp} |")
+    print(f"\nTally: {tally['detected']} detected, {tally['not_detected']} not detected, "
+          f"{tally['nominal_fails']} nominal fails (deferred to #317), {tally['other']} missing "
+          "(twelve measurement verdicts expected: rows 4/5 one each and row 2 two per corner).\n")
+
+
+def sens_fine_section(dirs: list[Path]) -> None:
+    arms = {r: find(f"{r}_tt", dirs) for r in ("sens1", "sens10", "sens1fine", "sens10fine")}
+    if not (arms["sens1fine"] and arms["sens10fine"]):
+        return
+    print("\n### Timing-resolution hypothesis (issue #461): matched draws, `tran 200p` vs `tran 50p`\n")
+    print("| quantity | step | sigma at 1x | sigma at 10x | ratio | in 7..13 |")
+    print("|---|---|---|---|---|---|")
+    for step, (a, b) in (("200p", ("sens1", "sens10")), ("50p", ("sens1fine", "sens10fine"))):
+        ra, rb = json.loads(arms[a].read_text()), json.loads(arms[b].read_text())
+        for name in ("step_0x7f_0x80_hz", "step_0x7e_0x7f_hz"):
+            s1, s10 = statistics.stdev(column(ra, name)), statistics.stdev(column(rb, name))
+            ratio = s10 / s1 if s1 else float("inf")
+            print(f"| {name} | {step} | {s1:.4g} Hz | {s10:.4g} Hz | {ratio:.2f} | "
+                  f"{'yes' if SENS_BAND[0] <= ratio <= SENS_BAND[1] else 'NO'} |")
+    print("\nThe 7..13 band is unchanged.  A miss at both steps is the measured limit of the bench.")
+
+
 def main() -> None:
+    global P3_GRID
     grade = Path(sys.argv[1])
     dirs = [Path(a) for a in sys.argv[2:]]
+    if (grade / "zero_ref.txt").exists():
+        P3_GRID = parse_zero_ref((grade / "zero_ref.txt").read_text())
+        zero_label = "the recorded deterministic reference (zero_ref.txt)"
+    else:
+        zero_label = "the DR-0023 P3 grid"
+    dut_txt = next((d / "dut.txt" for d in dirs if (d / "dut.txt").exists()), None)
+    dut = dut_txt.read_text().strip() if dut_txt else "P3 extracted netlist (DR-0023, proposed)"
+    mrep = find("main_tt", dirs)
+    n_main = len(column(json.loads(mrep.read_text()), "code_sel")) if mrep else 0
     print("# Item-6 Monte Carlo campaign summary (generated by analyze.py)\n")
-    print("DUT: P3 extracted netlist (DR-0023, proposed); DR-0019 (proposed) claims S1-S3; "
+    print(f"DUT: {dut}; DR-0019 (proposed) claims S1-S3; "
           "DR-0022 matching model A_R = A_C = 1.0 %.um (flagged assumption). "
-          "Seed 20261008, 500 samples per process corner.\n")
+          f"Seed 20261008, {n_main} samples per process corner (zero-mismatch reference: {zero_label}).\n")
 
     print("## Yield (klt yield, 95 % two-sided, target yield 0.99)\n")
     print("| process | row | measurement | n | pass | yield lower bound | sample-size | negative control | status |")
@@ -122,6 +214,8 @@ def main() -> None:
               f"(main run: see per-die table), code spread sd {statistics.pstdev(column(rep, 'code_sel')):.2f}")
     print()
 
+    defect_section(grade, dirs)
+
     print("## Control 3: injected-term sensitivity (MOS off)\n")
     z = find("senszero_tt", dirs)
     a, b = find("sens1_tt", dirs), find("sens10_tt", dirs)
@@ -146,6 +240,7 @@ def main() -> None:
             print(f"zero-mismatch baseline step 0x7F->0x80: {zs[0]:.0f} Hz (3 identical draws: "
                   f"{'yes' if len(set(zs)) == 1 else 'NO'})")
         print(f"\nSensitivity control: {'PASS' if allok else 'FAIL (no verdict)'}")
+        sens_fine_section(dirs)
     else:
         print("(sensitivity reports missing)")
 
