@@ -47,13 +47,13 @@ every filename in this directory on `main`, including superseded records).
 | [0020](decision-records/0020-startup-time-trimmed-accuracy-band-definition.md) | Startup-time row — "within trimmed accuracy" band definition left ambiguous, bench reports all readings | Ratified (operator ruling 2026-10-16; ratified bound not changed) |
 | [0021](decision-records/0021-runtime-discipline-trim-resolution-sof-loop-model.md) | Runtime-discipline row: behavioural SOF-loop model on the committed freq-vs-code data - 8-bit/0.314 %/code interface does not meet +/-0.25 % per frame (realized step 0.41-0.47 %/code mean, 0.83 % max, four non-monotone carries); meets it as a 16-64 ms mean only with a fractional-code dither; post-layout `ss` saturates at -40 C/3.0 V (-0.343 %) | Proposed (evidence record; no ratified row changed, DR-0019 row 6 stays reserved) |
 | [0022](decision-records/0022-mc-matching-model-trim-ladder-resistors-and-mim-capacitor.md) | Monte Carlo matching model for the trim-ladder resistors and MIM capacitor - injected area-scaled mismatch (flagged-assumption sigmas), netlist-body multipliers, controls, claim limits | Proposed (no ratified row changed) |
-| [0023](decision-records/0023-recentre-timing-ladder-for-extracted-parasitics.md) | Re-centre the timing ladder for extracted parasitics (R x0.70, MiM unchanged) and size the trim range from the extracted spread | Proposed (re-centring proposal; no ratified row edited, pending operator ratification) |
+| [0023](decision-records/0023-recentre-timing-ladder-for-extracted-parasitics.md) | Re-centre the timing ladder for extracted parasitics (R x0.70, MiM unchanged) and size the trim range from the extracted spread | Proposed (re-centring proposal; no ratified row edited, pending operator ratification; calibration code `0xA9` amended to `0xA4` by 0029 for the DR-0028 netlist) |
 | [0024](decision-records/0024-free-running-interface-no-enable-pin.md) | `rcosc_top` stays free-running - no enable/standby pin, Iq-off is not a specified quantity (operator ruling, #131); startup origin left to #82 / 0020 | Proposed (no ratified row changed) |
 | [0025](decision-records/0025-clock-pulse-width-informational.md) | clk pulse-width / duty / rise-fall measurements are informational; no spec row changes | Proposed (informational record; ratifies nothing) |
 | [0026](decision-records/0026-live-trim-code-transition-bench-batch-result.md) | Live trim-code transition bench - batch result is partial; no runt/missing edge, but settle violations and an unsimulated lsb_first skew | Proposed (evidence record; the ratified spec is not changed) |
 | [0027](decision-records/0027-live-trim-code-transition-bench-nine-corner-result.md) | Live trim-code transition bench - all nine corners x three skews simulated; no runt or missing edge; "never settles" screen is noise-limited at fast corners | Proposed (evidence record; the ratified spec is not changed) |
 | [0028](decision-records/0028-comparator-h-output-stage-fix.md) | Comparator-H output stage: narrow the buffer pull-down (MBUFN W 2u -> 1u) so a logic high is produced at fs / -40 C | Proposed (design fix, pending operator ratification; no ratified row changed) |
-| [0029](decision-records/0029-calibration-code-after-comparator-h-fix.md) | Re-centre the calibration code from 0xA9 to 0xA4 after the comparator-H output-stage fix | Proposed (evidence record; no ratified row changed) |
+| [0029](decision-records/0029-calibration-code-after-comparator-h-fix.md) | Re-centre the calibration code from 0xA9 to 0xA4 after the comparator-H output-stage fix | Proposed (calibration re-centring; no ratified row changed; amends 0023's calibration code `0xA9` to `0xA4` for the DR-0028 netlist) |
 | [0030](decision-records/0030-item-6-monte-carlo-campaign-results-s2-ss-and-s3-ff-fail-controls-incomplete.md) | Item-6 Monte Carlo campaign results (#202): row 4 fails at `ss` (supply span wider than the ratified window), row 5 fails at `ff`, negative controls incomplete so passing cells carry no verdict; ratified spec unchanged | Proposed (records evidence; no ratified row changed) |
 | [0031](decision-records/0031-row45-cause-attribution-process-offset-dominates.md) | Rows 4/5 at the fixed code (#236): process offset (ff +28.7 %, ss -20.3 %) dominates, supply/temperature terms are a few points; ideal supply or TC levers still fail (9/21, 27/63); on the DR-0017 per-die basis both rows pass; ratified spec unchanged | Proposed (records attribution; no ratified row changed) |
 | [0032](decision-records/0032-rows-4-5-per-die-calibrated-basis-and-monte-carlo-on-dr0028.md) | Rows 4/5 on the DR-0017 per-die-calibrated basis (#236, ruling 2026-11-11): Monte Carlo on the DR-0028 netlist still fails row 4 at `ss` (0 %, span 5.5-6.7 vs 4.9 points) and row 5 at `ff` (92.6 %, 85 C / 3.0 V); design change proposed, ratified spec unchanged | Proposed (records basis and evidence; no ratified row changed) |
@@ -79,8 +79,10 @@ every filename in this directory on `main`, including superseded records).
 A record is never deleted or rewritten once ratified — a later change
 supersedes it with a new record rather than editing history in place (same
 append-only convention as `sim/`, see [`sim/README.md`](../sim/README.md)).
-A record that supersedes only *part* of an earlier one leaves that record's
-own Status field alone (0002 is still "Ratified" in its own file) and is
-annotated here in the index instead — `TEMPLATE.md`'s Status field models
+A record that supersedes only *part* of an earlier one, or that explicitly
+*amends* one of its decisions (including between two still-Proposed records),
+leaves that record's own Status field alone (0002 is still "Ratified" in its
+own file) and is annotated here in the index instead, on the earlier record's
+row (and described on the later record's row) — `TEMPLATE.md`'s Status field models
 supersession as all-or-nothing, and rewriting it would violate the
 append-only rule above.
