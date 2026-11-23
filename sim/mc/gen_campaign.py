@@ -50,6 +50,7 @@ Variants (names are the run-campaign.sh case names):
 import argparse
 import hashlib
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -65,6 +66,9 @@ N_MAIN = 500
 N_INFLATED = 500
 N_SENS = 100
 N_ZERO = 3
+TSTEP = "200p"  # the committed campaign timestep (DR-0030 sensitivity miss, issue #461)
+TSTEP_FINE = "50p"  # the finer-timing sensitivity arm
+N_PILOT = 40  # issue #461 pilot: reduced draws per corner (production claim stays N_MAIN)
 TARGET_HZ = 48.0e6
 VCAL = 3.3
 PROC = {n: [*PROCESS_CORNERS[n], "cap_mim"] for n in ("tt", "ff", "ss")}
@@ -82,11 +86,58 @@ POINTS = [(f"{'n40' if t < 0 else t}_{int(v * 10)}", t, v)
 S2_POINTS = [p for p in POINTS if p[1] == 27]
 
 
-def dut_text(mismatch_gate: str, mm_scale=None, src: Path | None = None) -> tuple[str, list]:
+# Seeded known-bad variants (issue #461; DR-0050).  Each is a deterministic physical
+# defect written into the DUT text BEFORE the injector and BEFORE the per-die
+# calibration, so the die calibrates around it exactly as it would a real fault.
+# Magnitudes are fixed in sim/mc/results/<derivation run>/ before any pilot draw.
+DEFECTS = {
+    # row 2 (S1): the fixed base segment of the trim ladder (X$91, the segment in
+    # series with the nine binary-weighted ones) drawn `scale` x too long.  The
+    # calibration bisection then runs off one end of the code range: the residual
+    # stays large (s1_resid_abs_pct) and the chosen code sits on a rail
+    # (s1_headroom).
+    "trimbank": {"kind": "scale_length", "inst": "X$91", "scale": 4.0,
+                 "observables": ["s1_resid_abs_pct", "s1_headroom"]},
+    # rows 4 and 5 (S2, S3): a leakage resistor from the supply pin to the timing
+    # capacitor's top plate.  A fixed-code calibration at 27 C / 3.3 V trims out its
+    # static effect; the supply / temperature dependence of the leak current does not
+    # calibrate out.
+    "leak": {"kind": "leak", "node": "\\$26__t8", "rvalue": 1.0e6,
+             "observables": ["s2_margin_pct", "s3_margin_pct"]},
+}
+
+
+def apply_defect(body: str, defect: dict | None) -> str:
+    """Return the DUT subcircuit text with `defect` seeded (None: unchanged)."""
+    if defect is None:
+        return body
+    lines = body.splitlines()
+    if defect["kind"] == "scale_length":
+        card = next((i for i, l in enumerate(lines)
+                     if l.split() and l.split()[0] == defect["inst"]), None)
+        if card is None:
+            raise ValueError(f"defect instance {defect['inst']} not in the DUT")
+        m = re.search(r"r_length=([0-9.]+)([uU])", lines[card])
+        if not m:
+            raise ValueError(f"{defect['inst']}: no r_length= in {lines[card]!r}")
+        new = f"{float(m.group(1)) * defect['scale']:.5f}{m.group(2)}"
+        lines[card] = lines[card].replace(m.group(0), f"r_length={new}")
+    elif defect["kind"] == "leak":
+        if defect["node"] not in body:
+            raise ValueError(f"defect node {defect['node']} not in the DUT")
+        end = max(i for i, l in enumerate(lines) if l.upper().startswith(".ENDS"))
+        lines.insert(end, f"RDEF_LEAK vdd {defect['node']} {defect['rvalue']:g}")
+    else:
+        raise ValueError(f"unknown defect kind {defect['kind']!r}")
+    return "\n".join(lines)
+
+
+def dut_text(mismatch_gate: str, mm_scale=None, src: Path | None = None,
+             defect: dict | None = None) -> tuple[str, list]:
     raw = (src or SRC).read_text().splitlines()
     start = next(i for i, l in enumerate(raw) if l.upper().startswith(".SUBCKT RCOSC_TOP"))
     end = next(i for i, l in enumerate(raw) if l.upper().startswith(".ENDS"))
-    body = "\n".join(raw[start:end + 1])
+    body = apply_defect("\n".join(raw[start:end + 1]), defect)
     return inject(body, mm_scale=mm_scale, gate=mismatch_gate)
 
 
@@ -107,14 +158,14 @@ def set_code(var: str, vexpr: str) -> list[str]:
     return out
 
 
-def probe(var: str, dest: str, temp: float, vdd: float) -> list[str]:
+def probe(var: str, dest: str, temp: float, vdd: float, tstep: str = TSTEP) -> list[str]:
     """one transient at (temp, vdd) with the trim word `var`; frequency into `dest`."""
     mid = vdd / 2
     return [
         f"  option temp = {temp:g}",
         f"  alter vdd = {vdd:g}",
     ] + set_code(var, f"{vdd:g}") + [
-        "  tran 200p 1200n",
+        f"  tran {tstep} 1200n",
         f"  meas tran ta when v(clk)={mid:.4f} rise=5",
         f"  meas tran tb when v(clk)={mid:.4f} rise=25",
         "  let fq = 20 / (tb - ta)",
@@ -125,8 +176,9 @@ def probe(var: str, dest: str, temp: float, vdd: float) -> list[str]:
 
 
 def bench(tag: str, header: str, gate: str, fixed: bool = False, mm_scale=None,
-          src: Path | None = None) -> tuple[str, list]:
-    dut, manifest = dut_text(gate, mm_scale, src)
+          src: Path | None = None, defect: dict | None = None,
+          tstep: str = TSTEP) -> tuple[str, list]:
+    dut, manifest = dut_text(gate, mm_scale, src, defect)
     dut_label = "P3, DR-0023" if src is None else f"{src.name}"
     L = [
         f"* rcosc_top item-6 Monte Carlo bench: {tag} (generated by gen_campaign.py; DUT = {dut_label})",
@@ -149,7 +201,7 @@ def bench(tag: str, header: str, gate: str, fixed: bool = False, mm_scale=None,
         "while hi - lo > 1",
         "  let mid = floor((lo + hi) / 2)",
     ]
-    L += probe("mid", "fm", 27, VCAL)
+    L += probe("mid", "fm", 27, VCAL, tstep=tstep)
     L += [
         "  if fm < tgt",
         "    let lo = mid",
@@ -171,21 +223,21 @@ def bench(tag: str, header: str, gate: str, fixed: bool = False, mm_scale=None,
         f"let cup = {pmin('255', 'cclamp + 1')}",
         f"let cdn = {pmax('0', 'cclamp - 1')}",
     ]
-    L += probe("cclamp", "fhold", 27, VCAL)
+    L += probe("cclamp", "fhold", 27, VCAL, tstep=tstep)
     for lab, t, v in POINTS:
         if (t, v) == (27, VCAL):
             L.append(f"let f_{lab} = fhold")
         else:
-            L += probe("cclamp", f"f_{lab}", t, v)
-    L += probe("cup", "fup", 27, VCAL)
-    L += probe("cdn", "fdn", 27, VCAL)
+            L += probe("cclamp", f"f_{lab}", t, v, tstep=tstep)
+    L += probe("cup", "fup", 27, VCAL, tstep=tstep)
+    L += probe("cdn", "fdn", 27, VCAL, tstep=tstep)
     if fixed:
         # DR-0022 s3 sensitivity control: step sizes at FIXED transitions (the MSB
         # transition 0x7F -> 0x80 and its neighbour), independent of the code the
         # die's calibration picked.
         for c in (126, 127, 128):
             L.append(f"let cfix{c} = {c}")
-            L += probe(f"cfix{c}", f"ffix{c}", 27, VCAL)
+            L += probe(f"cfix{c}", f"ffix{c}", 27, VCAL, tstep=tstep)
         L += ["let st127 = ffix128 - ffix127", "let st126 = ffix127 - ffix126",
               "set v_st127 = $&st127", "set v_st126 = $&st126"]
     for lab, _, _ in POINTS:
@@ -249,7 +301,7 @@ def measurements(fixed: bool = False) -> list[dict]:
     return m
 
 
-def request(netlist: str, proc: str, n: int, fixed: bool = False) -> dict:
+def request(netlist: str, proc: str, n: int, fixed: bool = False, timeout_s: int = 120) -> dict:
     return {
         "netlist": netlist,
         "engine": "ngspice",
@@ -262,7 +314,7 @@ def request(netlist: str, proc: str, n: int, fixed: bool = False) -> dict:
         "analysis": {"kind": "op", "args": ""},
         "measurements": measurements(fixed),
         "batch": {"capacity_wait_s": 1200},
-        "options": {"timeout_s": 120, "keep_artifacts": False},
+        "options": {"timeout_s": timeout_s, "keep_artifacts": False},
         "monte_carlo": {"n": n, "seed": SEED, "vary": "mismatch"},
     }
 
@@ -280,6 +332,13 @@ def limits(min_samples: int) -> dict:
     }
 
 
+def pilot_limits(n: int) -> dict:
+    """Pilot-only copy of the claim limits: identical limits, target yield and confidence;
+    only the sample floor is the pilot N, so the grader can process the reduced population.
+    The production floor (N_MAIN, limits_main.json) is untouched."""
+    return limits(n)
+
+
 HDR = ".param sw_stat_global=0 sw_stat_mismatch={mm} mc_skew=3 res_mc_skew=3 cap_mc_skew=3 fnoicor=0 mm_scale={sc}{extra}"
 
 
@@ -295,16 +354,23 @@ def main(argv: list[str] | None = None) -> None:
                     help="DUT netlist (default: the DR-0023 P3 netlist, sim/recentre/p3/rcosc_top_p3.spice)")
     ap.add_argument("--out", type=Path, default=None,
                     help="output directory (default: next to this script); created if missing")
+    ap.add_argument("--pilot", type=int, default=None, metavar="N",
+                    help="issue #461 control pilot: N draws per corner for the main, inflated and "
+                         "seeded-defect cases, plus the finer-timing sensitivity arms and "
+                         "limits_pilot.json (sample floor N).  Without it the default campaign "
+                         "output is unchanged.")
     a = ap.parse_args(argv)
     src = a.dut.resolve() if a.dut else None
     out = a.out if a.out else here
     out.mkdir(parents=True, exist_ok=True)
+    n_main = a.pilot or N_MAIN
+    n_infl = a.pilot or N_INFLATED
     cases = {}
     for p in PROC:
-        cases[f"main_{p}"] = (HDR.format(mm=1, sc=1, extra=""), "sw_stat_mismatch", p, N_MAIN)
+        cases[f"main_{p}"] = (HDR.format(mm=1, sc=1, extra=""), "sw_stat_mismatch", p, n_main)
         cases[f"zero_{p}"] = (HDR.format(mm=0, sc=1, extra=""), "sw_stat_mismatch", p, N_ZERO)
     for p in PROC:
-        cases[f"inflated_{p}"] = (HDR.format(mm=3, sc=1, extra=""), "sw_stat_mismatch", p, N_INFLATED)
+        cases[f"inflated_{p}"] = (HDR.format(mm=3, sc=1, extra=""), "sw_stat_mismatch", p, n_infl)
     # the injector's own `.param mm_scale=1` default line would override a bench-header
     # mm_scale (first sensitivity attempt ran 10x at 1x), so these cases bake the scale
     # into the sigmas as a literal
@@ -312,13 +378,30 @@ def main(argv: list[str] | None = None) -> None:
     cases["sens10_tt"] = (HDR.format(mm=0, sc=10, extra=" sw_inj=1"), "sw_inj", "tt", N_SENS, 10.0)
     # zero-mismatch baseline carrying the same fixed-code probes as the sensitivity pair
     cases["senszero_tt"] = (HDR.format(mm=0, sc=1, extra=" sw_inj=0"), "sw_inj", "tt", N_ZERO, 1.0)
+    extra_opts = {}
+    if a.pilot:
+        # seeded known-bad variants: same header, seed and draw identities as main_<p>
+        for p in PROC:
+            cases[f"ctrlr2_{p}"] = (HDR.format(mm=1, sc=1, extra=""), "sw_stat_mismatch", p, n_main)
+            cases[f"ctrlr45_{p}"] = (HDR.format(mm=1, sc=1, extra=""), "sw_stat_mismatch", p, n_main)
+            extra_opts[f"ctrlr2_{p}"] = {"defect": DEFECTS["trimbank"]}
+            extra_opts[f"ctrlr45_{p}"] = {"defect": DEFECTS["leak"]}
+        # matched sensitivity arms at the finer timestep (same draws as sens1/sens10)
+        for nm, hdr, sc in (("sens1", HDR.format(mm=0, sc=1, extra=" sw_inj=1"), 1.0),
+                            ("sens10", HDR.format(mm=0, sc=10, extra=" sw_inj=1"), 10.0)):
+            cases[f"{nm}fine_tt"] = (hdr, "sw_inj", "tt", N_SENS, sc)
+        cases["senszerofine_tt"] = (HDR.format(mm=0, sc=1, extra=" sw_inj=0"), "sw_inj", "tt", N_ZERO, 1.0)
+        for nm in ("sens1fine_tt", "sens10fine_tt", "senszerofine_tt"):
+            extra_opts[nm] = {"tstep": TSTEP_FINE}
     manifests = {}
     for name, (header, gate, proc, n, *scale) in cases.items():
         fixed = name.startswith("sens")
-        text, man = bench(name, header, gate, fixed, scale[0] if scale else None, src)
+        eo = extra_opts.get(name, {})
+        text, man = bench(name, header, gate, fixed, scale[0] if scale else None, src, **eo)
         (out / f"tb_{name}.spice").write_text(text)
+        timeout_s = 480 if eo.get("tstep") else 120  # the finer timestep costs ~4x per probe
         (out / f"request_{name}.json").write_text(
-            json.dumps(request(f"tb_{name}.spice", proc, n, fixed), indent=2) + "\n")
+            json.dumps(request(f"tb_{name}.spice", proc, n, fixed, timeout_s), indent=2) + "\n")
         manifests[name] = man
     # one manifest of injected terms: the evidence that the body injection is live (DR-0022 s4)
     manifest = {"source": "sim/recentre/p3/rcosc_top_p3.spice" if src is None else repo_rel(src),
@@ -328,6 +411,9 @@ def main(argv: list[str] | None = None) -> None:
         manifest["source_sha256"] = hashlib.sha256(src.read_bytes()).hexdigest()
     (out / "mismatch-manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
     (out / "limits_main.json").write_text(json.dumps(limits(N_MAIN), indent=2) + "\n")
+    if a.pilot:
+        (out / "limits_pilot.json").write_text(json.dumps(pilot_limits(a.pilot), indent=2) + "\n")
+        (out / "defects.json").write_text(json.dumps(DEFECTS, indent=2) + "\n")
 
 
 if __name__ == "__main__":
