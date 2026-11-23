@@ -332,6 +332,31 @@ def limits(min_samples: int) -> dict:
     }
 
 
+# Derivation sweep (issue #461): each seeded defect is probed at several magnitudes on the
+# zero-mismatch (deterministic) bench at each corner BEFORE any pilot draw.  The selection
+# rule is fixed here, ahead of the run:
+#   trimbank: the weakest scale for which every corner (tt/ff/ss) is measurable and has
+#             s1_headroom <= 0 (the calibrated code on a rail) -- row 2 fails by construction;
+#   leak:     the largest resistance (weakest leak) for which every corner that is measurable
+#             has s2_margin_pct <= -1.0 and s3_margin_pct <= -1.0 on the deterministic draw
+#             (a full point beyond the limit edge, so a die-to-die spread cannot rescue it).
+# A magnitude that leaves a corner unmeasurable is rejected: an unmeasurable die is a dropped
+# sample, not a detection.
+DERIVE_GRID = {
+    "trimbank": [("scale", v) for v in (4.0, 13.0)],
+    "leak": [("rvalue", v) for v in (2.0e5, 1.0e6, 5.0e6)],
+}
+
+
+def derive_cases() -> dict:
+    out = {}
+    for name, grid in DERIVE_GRID.items():
+        for key, val in grid:
+            for p in PROC:
+                out[f"derive_{name}_{val:g}_{p}"] = (dict(DEFECTS[name], **{key: val}), p)
+    return out
+
+
 def pilot_limits(n: int) -> dict:
     """Pilot-only copy of the claim limits: identical limits, target yield and confidence;
     only the sample floor is the pilot N, so the grader can process the reduced population.
@@ -359,10 +384,22 @@ def main(argv: list[str] | None = None) -> None:
                          "seeded-defect cases, plus the finer-timing sensitivity arms and "
                          "limits_pilot.json (sample floor N).  Without it the default campaign "
                          "output is unchanged.")
+    ap.add_argument("--derive", action="store_true",
+                    help="write only the defect-magnitude derivation sweep (zero mismatch, 2 draws "
+                         "per request); see DERIVE_GRID for the pre-fixed selection rule")
     a = ap.parse_args(argv)
     src = a.dut.resolve() if a.dut else None
     out = a.out if a.out else here
     out.mkdir(parents=True, exist_ok=True)
+    if a.derive:
+        for name, (defect, proc) in derive_cases().items():
+            text, _ = bench(name, HDR.format(mm=0, sc=1, extra=""), "sw_stat_mismatch", False,
+                            None, src, defect)
+            (out / f"tb_{name}.spice").write_text(text)
+            (out / f"request_{name}.json").write_text(
+                json.dumps(request(f"tb_{name}.spice", proc, 2), indent=2) + "\n")
+        (out / "defects.json").write_text(json.dumps(DEFECTS, indent=2) + "\n")
+        return
     n_main = a.pilot or N_MAIN
     n_infl = a.pilot or N_INFLATED
     cases = {}
