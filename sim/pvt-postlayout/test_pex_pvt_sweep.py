@@ -7,6 +7,7 @@ tmp dirs. Not evidence."""
 
 import csv
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -294,3 +295,167 @@ def test_guardrail_calibration_tracks_each_sides_own_curve(
     assert ext["f_hz"] == pytest.approx(47.52e6)
     assert ext["f_code0x00_hz"] == pytest.approx(9.9e6)
     assert ext["f_code0xff_hz"] == pytest.approx(262.35e6)
+
+
+# --------------------------- exact rcosc_top header lookup (issue #480)
+#
+# The block extractor and the extracted-header reorder used to accept any
+# subcircuit whose name *started* with `rcosc_top`, so a sibling like
+# `rcosc_top_probe` declared ahead of the real top hijacked both lookups
+# (equal pin sets let the wrong selection pass the reorder's set
+# validation). One shared exact-name lookup (find_rcosc_top_header) now
+# serves both callers; these regressions pin its selection rules and prove
+# the rewrite is output-preserving on the committed testbench + every
+# committed extracted netlist -- harness text byte-identical to the old
+# prefix scans replayed verbatim below as the differential oracle.
+
+PROBE_FIRST_DECK = """\
+.subckt rcosc_top_probe b a
+Rprobe b a 1k
+.ends
+.subckt rcosc_top b a
+Rtop b a 2k
+.ends
+"""
+
+PROBE_ONLY_DECK = """\
+.subckt rcosc_top_probe b a
+Rprobe b a 1k
+.ends
+"""
+
+
+def test_block_extractor_selects_the_exact_top_over_a_prefixed_sibling():
+    pins, block, all_lines = pex.extract_rcosc_top_block(PROBE_FIRST_DECK)
+    assert pins == ["b", "a"]
+    assert block == [".subckt rcosc_top b a", "Rtop b a 2k", ".ends"]
+    assert len(all_lines) == 6
+
+
+def test_reorder_rewrites_only_the_exact_top_header():
+    reordered = pex.reorder_extracted_header(PROBE_FIRST_DECK, ["a", "b"])
+    assert reordered == (
+        ".subckt rcosc_top_probe b a\n"
+        "Rprobe b a 1k\n"
+        ".ends\n"
+        ".SUBCKT rcosc_top a b\n"
+        "Rtop b a 2k\n"
+        ".ends\n"
+    )
+
+
+def test_prefixed_sibling_alone_reports_a_missing_top():
+    with pytest.raises(SystemExit) as ei:
+        pex.extract_rcosc_top_block(PROBE_ONLY_DECK)
+    assert str(ei.value) == "ERROR: no '.subckt rcosc_top ...' header found"
+    with pytest.raises(SystemExit) as ei:
+        pex.reorder_extracted_header(PROBE_ONLY_DECK, ["b", "a"])
+    assert str(ei.value) == (
+        "ERROR: extracted netlist has no '.SUBCKT rcosc_top ...' header"
+    )
+
+
+def test_mixed_case_top_directive_is_matched_exactly():
+    deck = (
+        ".SUBCKT RCOSC_TOP_PROBE b a\n"
+        "Rprobe b a 1k\n"
+        ".ENDS\n"
+        ".Subckt Rcosc_Top b a\n"
+        "Rtop b a 2k\n"
+        ".Ends\n"
+    )
+    pins, block, _ = pex.extract_rcosc_top_block(deck)
+    assert pins == ["b", "a"]
+    assert block[0] == ".Subckt Rcosc_Top b a"
+    reordered_lines = pex.reorder_extracted_header(deck, ["a", "b"]).splitlines()
+    assert reordered_lines[0] == ".SUBCKT RCOSC_TOP_PROBE b a"
+    assert reordered_lines[3] == ".SUBCKT Rcosc_Top a b"
+
+
+def test_committed_testbench_selects_the_expected_11_pin_top():
+    schem = pex.PVT_TB.read_text()
+    pins, block, _ = pex.extract_rcosc_top_block(schem)
+    assert pins == ["vdd", "vss", "clk"] + [f"t{i}" for i in range(8)]
+    assert block[0].split()[:2] == [".subckt", "rcosc_top"]
+
+
+def _legacy_extract(text):
+    """The pre-#480 prefix-scan block extractor, verbatim."""
+    lines = text.splitlines()
+    start = None
+    for i, line in enumerate(lines):
+        if re.match(r"^\.subckt\s+(\S+)\s+(.*)$", line.strip(), re.IGNORECASE) \
+                and line.strip().lower().startswith(".subckt rcosc_top"):
+            start = i
+            break
+    if start is None:
+        raise SystemExit("ERROR: no '.subckt rcosc_top ...' header found")
+    pins = re.match(
+        r"^\.subckt\s+(\S+)\s+(.*)$", lines[start].strip(), re.IGNORECASE
+    ).group(2).split()
+    end = None
+    for j in range(start + 1, len(lines)):
+        if re.match(r"^\.ends\b.*$", lines[j].strip(), re.IGNORECASE):
+            end = j
+            break
+    if end is None:
+        raise SystemExit("ERROR: no matching '.ends' found for '.subckt rcosc_top'")
+    return pins, lines[start : end + 1], lines
+
+
+def _legacy_reorder(extracted_text, pin_order):
+    """The pre-#480 prefix-scan header reorder, verbatim."""
+    lines = extracted_text.splitlines()
+    for i, line in enumerate(lines):
+        stripped = line.strip()
+        if stripped.lower().startswith(".subckt rcosc_top"):
+            m = re.match(r"^\.subckt\s+(\S+)\s+(.*)$", stripped, re.IGNORECASE)
+            name = m.group(1)
+            found_pins = m.group(2).split()
+            if sorted(found_pins) != sorted(pin_order):
+                raise SystemExit(
+                    "ERROR: extracted netlist pin set "
+                    f"{sorted(found_pins)} != schematic pin set {sorted(pin_order)}"
+                )
+            lines[i] = f".SUBCKT {name} " + " ".join(pin_order)
+            return "\n".join(lines) + "\n"
+    raise SystemExit("ERROR: extracted netlist has no '.SUBCKT rcosc_top ...' header")
+
+
+def _driver_harness(extract, reorder, schem, extracted):
+    """The driver's extracted-side substitution: extract the schematic top
+    block, reorder the extracted header to its pin order, swap the block."""
+    pins, block, _ = extract(schem)
+    return schem.replace("\n".join(block), reorder(extracted, pins).rstrip("\n"), 1)
+
+
+def test_committed_harness_text_is_byte_identical_to_the_prefix_scans():
+    schem = pex.PVT_TB.read_text()
+    pex_netlists = sorted(
+        (REPO_ROOT / "sim" / "pvt-postlayout" / "results").glob(
+            "**/rcosc_top.pex.spice"
+        )
+    )
+    assert pex_netlists
+    for pex_netlist in pex_netlists:
+        extracted = pex_netlist.read_text()
+        new = _driver_harness(
+            pex.extract_rcosc_top_block, pex.reorder_extracted_header,
+            schem, extracted,
+        )
+        old = _driver_harness(_legacy_extract, _legacy_reorder, schem, extracted)
+        assert new == old, pex_netlist
+
+
+def test_recentre_harness_is_byte_identical_to_the_prefix_scans(monkeypatch):
+    # sim/recentre/pexlib.py's harness() reaches the same two functions;
+    # its output on the committed PEX source must not change either.
+    sys.path.insert(0, str(REPO_ROOT / "sim" / "recentre"))
+    import pexlib  # noqa: E402  (recentre path; pulls in pex via its own shim)
+
+    cards = pexlib.load_cards()
+    new = pexlib.harness(list(cards))
+    monkeypatch.setattr(pex, "extract_rcosc_top_block", _legacy_extract)
+    monkeypatch.setattr(pex, "reorder_extracted_header", _legacy_reorder)
+    old = pexlib.harness(list(cards))
+    assert new == old
