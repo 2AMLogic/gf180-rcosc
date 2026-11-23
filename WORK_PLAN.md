@@ -7,7 +7,7 @@ This roadmap is generated from the current GitHub label state by the Loom Guide 
 
 Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
-_None._
+- **#473**: sim(row2-trimsize): row-2 trim-bank sizing screen is negative at every corner; DR-0048 names the thermometer upper bank as next option
 
 ## Very Important
 
@@ -29,7 +29,7 @@ _None._
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#461**: T1 item 6: define and prove a known-bad negative control per statistical row set (rows 2, 4, 5 x tt/ff/ss); the 3x-inflated control is detected in 2 of 12 cells
+_None._
 
 ## In Progress
 
@@ -37,6 +37,7 @@ Issues currently being built (`loom:building`).
 
 - **#452**: Plan-region guard: anchor the tag suffix match to end-of-line so an issue title cannot false-positive
 - **#460**: Row 2: name a trim-bank sizing that meets 0.314 %/code with monotonic carries (simulation only, bounded screen)
+- **#461**: T1 item 6: define and prove a known-bad negative control per statistical row set (rows 2, 4, 5 x tt/ff/ss); the 3x-inflated control is detected in 2 of 12 cells
 
 ## PRs Awaiting Review
 
@@ -44,13 +45,12 @@ PRs waiting on Judge (`loom:review-requested`).
 
 - **#449**: sim: matched-die calibrated-code Iq for w3r65/w2.5r75 - 0 of 1500 dice at 0xFF, penalties collapse at calibrated codes, row-8 code applicability returns to the operator (DR-0048)
 - **#466**: signoff: anchor plan-region suffix check to the end-of-line run
-- **#473**: sim(row2-trimsize): row-2 trim-bank sizing screen is negative at every corner; DR-0048 names the thermometer upper bank as next option
 
 ## Approved (Awaiting Merge)
 
 PRs that passed review and are queued for Champion auto-merge (`loom:pr`).
 
-_None._
+- **#473**: sim(row2-trimsize): row-2 trim-bank sizing screen is negative at every corner; DR-0048 names the thermometer upper bank as next option
 
 ## Proposed
 
@@ -75,13 +75,13 @@ _None._
 
 | Bucket | Count |
 |------|-------|
-| Operator merge-risk holds | 0 |
+| Operator merge-risk holds | 1 |
 | Very important | 1 |
 | Important | 5 |
-| Ready (`loom:issue`) | 1 |
-| In Progress (`loom:building`) | 2 |
-| PRs awaiting review | 3 |
-| Approved PRs awaiting merge | 0 |
+| Ready (`loom:issue`) | 0 |
+| In Progress (`loom:building`) | 3 |
+| PRs awaiting review | 2 |
+| Approved PRs awaiting merge | 1 |
 | Curated | 6 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 1 |
