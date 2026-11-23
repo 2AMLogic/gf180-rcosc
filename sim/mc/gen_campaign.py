@@ -98,13 +98,13 @@ DEFECTS = {
     # (s1_headroom).
     "trimbank": {"kind": "scale_length", "inst": "X$91", "scale": 4.0,
                  "observables": ["s1_resid_abs_pct", "s1_headroom"]},
-    # row 4 (S2): a parasitic conduction path from the timing capacitor's top
-    # plate to vss -- a diode-connected nfet_03v3 in series with a resistor.  Its current is
-    # (V_plate - Vgs)/R: not proportional to the supply (unlike the charging current, so a
-    # resistor to vdd or vss, tried first, left the supply span unchanged -- see the
-    # derivation run) and Vgs falls with temperature.  The 27 C / 3.3 V calibration trims
+    # row 4 (S2): a parasitic conduction path from the supply to the timing capacitor's top
+    # plate -- a resistor and a diode-connected nfet_03v3 (source follower).  Its current is
+    # square-law in (vdd - V_plate - Vt): not proportional to the supply (unlike the charging
+    # current, so a plain resistor to vdd or vss, tried first, left the supply span
+    # unchanged -- see the derivation runs).  The 27 C / 3.3 V calibration trims
     # out its static effect; its supply and temperature dependence survives calibration.
-    "leak": {"kind": "leak_nfet", "node": "\\$26__t8", "rvalue": 1.0e5,
+    "leak": {"kind": "leak_nfet", "rail": "vdd", "node": "\\$26__t8", "rvalue": 1.0e5,
              "observables": ["s2_margin_pct"]},
     # row 5 (S3): a reverse-biased junction leak from the timing capacitor's top plate to
     # vss (diode cathode on the plate).  Its saturation current rises roughly two orders of
@@ -135,10 +135,13 @@ def apply_defect(body: str, defect: dict | None) -> str:
         if defect["node"] not in body:
             raise ValueError(f"defect node {defect['node']} not in the DUT")
         end = max(i for i, l in enumerate(lines) if l.upper().startswith(".ENDS"))
-        lines[end:end] = [
-            f"RDEF_LEAK {defect['node']} ndef_leak {defect['rvalue']:g}",
-            "XDEF_LEAK ndef_leak ndef_leak vss vsubs nfet_03v3 L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U",
-        ]
+        card = "L=1U W=2U AS=0.84P AD=0.84P PS=4.84U PD=4.84U"
+        if defect.get("rail", "vss") == "vss":  # plate -> R -> diode-connected nfet -> vss
+            lines[end:end] = [f"RDEF_LEAK {defect['node']} ndef_leak {defect['rvalue']:g}",
+                              f"XDEF_LEAK ndef_leak ndef_leak vss vsubs nfet_03v3 {card}"]
+        else:  # vdd -> R -> diode-connected nfet (source follower) -> plate
+            lines[end:end] = [f"RDEF_LEAK vdd ndef_leak {defect['rvalue']:g}",
+                              f"XDEF_LEAK ndef_leak ndef_leak {defect['node']} vsubs nfet_03v3 {card}"]
     elif defect["kind"] == "leak_diode":
         if defect["node"] not in body:
             raise ValueError(f"defect node {defect['node']} not in the DUT")
@@ -364,12 +367,13 @@ def limits(min_samples: int) -> dict:
 #   diode:    (row 5) the same rule on s3_margin_pct, weakest saturation current, all corners.
 # Round 1 (results/20261123T170809Z-ctrl-derivation, 2e5/1e6 ohm resistor to vdd) and round 2
 # (results/20261123T171911Z-ctrl-derivation, diode-connected nfet at 5e4/2e5/1e6 ohm) are kept
-# as rejected candidates; this grid is round 3.
+# and round 3 (20261123T173030Z: the same nfet to vss at 7e4/1e5 ohm -- tt s2 stayed >= +0.66 -- and the
+# junction leak, which is kept for row 5) are rejected candidates for row 4; round 4 (20261123T173706Z: the same nfet from vdd at 1e5/3e5/1e6 ohm, tt s2 >= +0.01) did not reach the criterion either; this grid is round 5.
 # A magnitude that leaves a corner unmeasurable is rejected: an unmeasurable die is a dropped
 # sample, not a detection.
 DERIVE_GRID = {
     "trimbank": [("scale", v) for v in (4.0, 13.0)],
-    "leak": [("rvalue", v) for v in (7.0e4, 1.0e5)],
+    "leak": [("rvalue", v) for v in (5.0e4, 7.0e4)],
     "diode": [("is_a", v) for v in (3.0e-9, 1.0e-8, 3.0e-8)],
 }
 

@@ -122,7 +122,7 @@ def test_defect_cards_are_the_only_difference_from_the_nominal_deck(tmp_path):
     assert "r_length=12.03860U" in card[0] and "r_length=12.03860U" not in card[1]
     assert [x for x in diff2 if x[0].startswith(".param d__91=")]
     extra = [l for l in r45 if l not in main]
-    assert [l for l in extra if l.startswith("RDEF_LEAK")] == [f"RDEF_LEAK {gc.DEFECTS['leak']['node']} ndef_leak 100000"]
+    assert [l for l in extra if l.startswith("RDEF_LEAK")] == ["RDEF_LEAK vdd ndef_leak 100000"]
     assert [l for l in extra if l.startswith("XDEF_LEAK")]
     assert len(r45) == len(main) + 2 and len(extra) == 3  # the title line + the two added cards
     r5 = (d / "tb_ctrlr5_tt.spice").read_text()

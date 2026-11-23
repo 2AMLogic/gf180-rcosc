@@ -1,0 +1,27 @@
+{
+  "trimbank": {
+    "kind": "scale_length",
+    "inst": "X$91",
+    "scale": 4.0,
+    "observables": [
+      "s1_resid_abs_pct",
+      "s1_headroom"
+    ]
+  },
+  "leak": {
+    "kind": "leak_nfet",
+    "node": "\\$26__t8",
+    "rvalue": 100000.0,
+    "observables": [
+      "s2_margin_pct"
+    ]
+  },
+  "diode": {
+    "kind": "leak_diode",
+    "node": "\\$26__t8",
+    "is_a": 1e-08,
+    "observables": [
+      "s3_margin_pct"
+    ]
+  }
+}
