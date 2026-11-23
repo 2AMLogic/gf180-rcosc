@@ -24,7 +24,7 @@ A one-shot "ratio rule" re-sizing `r_b' = r_b (W' 2^b) / |beta_b|` should make t
 
 `analysis/screen.md`, sparse-code set = endpoints, +/-1 around every power-of-two and DR-0021 carry, single-bit and spread codes:
 
-| variant | f ends MHz (tt) | mean step %/code (x nominal) | non-positive steps (of 52 pairs) | DR-0021 carries % |
+| variant | f ends MHz (tt) | mean step %/code (x nominal) | non-positive steps (of 34 pairs) | DR-0021 carries % |
 |---|---|---|---|---|
 | ctrl (P3 bank) | 28.652 / 76.391 | 0.6534 (2.08x) | 4 | -9.40 -5.60 -3.64 -2.64 |
 | F1.85@tt | 34.476 / 43.625 | 0.1041 (0.33x) | 10 | -2.13 -4.53 -1.83 **+0.94** |
@@ -53,7 +53,7 @@ Three measured failure modes, none of which any drawn-length choice in this fami
 | ss -40 C 3.0 V | 20.121 / 40.401 | no / no | 0.3953 (1.26x) | 56 | 14.9 at 0xDF->0xE0 | 13 | -0.58 -3.97 -4.37 -2.46 |
 | ff 85 C 3.6 V | 37.488 / 71.626 | no / yes | 0.3571 (1.14x) | 69 | 14.4 at 0xBF->0xC0 | 19 | -0.27 -4.19 -3.72 -1.04 |
 
-The negative screen verdict holds at every dense-campaign corner, by every statistic the ratified row states: the mean step is 1.14-1.26x nominal, 56-69 of 255 steps lie outside the half-LSB band (worst 13.6-14.9 LSB at the mid carries), all four carries are negative at all three corners, 13-19 further non-positive steps exist per curve, and neither range end is met on tt or ss.
+The negative screen verdict holds at every dense-campaign corner, by every statistic the ratified row states: the mean step is 1.14-1.26x nominal, 56-69 of 255 steps lie outside the half-LSB band (worst 13.6-14.9 LSB at the mid carries), all four carries are negative at all three corners, 9-15 further non-positive steps exist per curve beyond those four (13-19 in total), and neither range end is met on tt or ss.
 
 ## Pricing (rows 4 / 5 / 8, rebuilt-layout extraction, `results/20261122T0815Z-pricing/`)
 
