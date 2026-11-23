@@ -91,14 +91,17 @@ def iq_cells(vdir):
     held, cff = {}, {}
     for f in sorted(glob.glob(str(vdir / "request_iq_*" / "report.json"))):
         stem = Path(f).parent.name  # request_iq_tt_cA8_v30 / request_iq_cFF_v30
-        m = re.match(r"request_iq_(?:(tt|ff|ss)_)?(c[0-9A-F]+)_v(\d+)$", stem)
-        code, vdd = int(m.group(2)[1:], 16), int(m.group(3)) / 10
-        for c in json.load(open(f))["corners"]:
+        m = re.fullmatch(r"request_iq_(?:(tt|ff|ss)_c([0-9A-F]{2})|cFF)_v(\d+)", stem)
+        if not m:
+            continue
+        code, vdd = int(m.group(2) or "FF", 16), int(m.group(3)) / 10
+        cells = held if m.group(1) else cff
+        for c in json.loads(Path(f).read_text())["corners"]:
             mm = meas(c)
             f_ = freq_hz(mm)
             iq = mm.get("iq_run")
             e = (code, f_, iq * 1e6 if iq is not None else None, c["status"])
-            (cff if code == 0xFF else held)[(c["process"], c["temperature_c"], vdd)] = e
+            cells[(c["process"], c["temperature_c"], vdd)] = e
     return held, cff
 
 
@@ -124,8 +127,11 @@ def delay_cells(vdir):
     """(vdd, temp) -> (t_cmp_h ns, fosc MHz) at the ff corner, held ff code."""
     out = {}
     for f in sorted(glob.glob(str(vdir / "request_dly_*" / "report.json"))):
-        vdd = int(re.search(r"_v(\d+)$", Path(f).parent.name).group(1)) / 10
-        for c in json.load(open(f))["corners"]:
+        m = re.fullmatch(r"request_dly_v(\d+)", Path(f).parent.name)
+        if not m:
+            continue
+        vdd = int(m.group(1)) / 10
+        for c in json.loads(Path(f).read_text())["corners"]:
             mm = meas(c)
             if mm.get("ev_cmph") and mm.get("ev_vh"):
                 t = (mm["ev_cmph"] - mm["ev_vh"]) % (1.0 / mm["fosc"]) if mm.get("fosc") \
@@ -141,7 +147,10 @@ def startup_cells(root, v):
     cache = json.loads(cache_p.read_text()) if cache_p.exists() else {}
     out = {}
     for f in sorted(glob.glob(str(root / v / "startup" / "request_v*" / "report.json"))):
-        vdd = int(re.search(r"_v(\d+)$", Path(f).parent.name).group(1)) / 10
+        m = re.fullmatch(r"request_v(\d+)", Path(f).parent.name)
+        if not m:
+            continue
+        vdd = int(m.group(1)) / 10
         key = f"{v}/v{vdd:g}"
         if key in cache:
             out[vdd] = cache[key]
@@ -257,7 +266,8 @@ def main(root):
               "| variant | worst cold cell (%) | worst hot cell (%) | ff/85C/3.0V (%) | verdict |", "|---|---|---|---|---|"]
     for v, cells in allheld.items():
         held_cells = cells
-        if any(c[1] is None for c in held_cells.values()) or not all(fref[v][p] for p in PROCS):
+        if (len(held_cells) < 27 or any(c[1] is None for c in held_cells.values())
+                or not all(fref[v][p] for p in PROCS)):
             lines.append(f"| {LABEL[v]} | pending (missing cells) | | | |")
             continue
         colds, hots = [], []
@@ -278,18 +288,21 @@ def main(root):
               "| variant | cells with no clock (f < 1 MHz or failed) |", "|---|---|"]
     for v, cells in allheld.items():
         lost = [k for k, c in cells.items() if (c[1] is None or c[1] < 1e6 or c[3] != "pass")]
-        lines.append(f"| {LABEL[v]} | {len(lost)}" + (f" ({', '.join(f'{a}/{b:g}C/{c:g}V' for a, b, c in lost)})" if lost else "") + " |")
+        detail = f" ({', '.join(f'{a}/{b:g}C/{c:g}V' for a, b, c in lost)})" if lost else ""
+        coverage = f" ({len(cells)}/27 held-code cells collected)" if len(cells) < 27 else ""
+        lines.append(f"| {LABEL[v]} | {len(lost)}{detail}{coverage} |")
 
     # ---- delay ---------------------------------------------------------------------------------
     dly = {v: delay_cells(root / v / "delay") for v in HELD}
     lines += ["", "## Comparator-H delay at the ff held code (vc rises through vh -> cmph_out rise)", "",
               "| variant | ff code | 3.0V/85C (ns) | 3.0V/-40C (ns) | 3.6V/85C (ns) | d(3.0V/85C) vs control (ns) |",
               "|---|---|---|---|---|---|"]
+    control_delay = dly["control"].get((3.0, 85.0))
     for v, d in dly.items():
         a, b, c = d.get((3.0, 85.0)), d.get((3.0, -40.0)), d.get((3.6, 85.0))
         if a and b and c and None not in (a[0], b[0], c[0]):
-            da = a[0] - dly["control"][(3.0, 85.0)][0]
-            lines.append(f"| {LABEL[v]} | 0x{HELD[v]['ff']:02X} | {a[0]:.2f} | {b[0]:.2f} | {c[0]:.2f} | {da:+.2f} |")
+            delta = f"{a[0] - control_delay[0]:+.2f}" if control_delay else "missing"
+            lines.append(f"| {LABEL[v]} | 0x{HELD[v]['ff']:02X} | {a[0]:.2f} | {b[0]:.2f} | {c[0]:.2f} | {delta} |")
         else:
             lines.append(f"| {LABEL[v]} | 0x{HELD[v]['ff']:02X} | missing | | | |")
 

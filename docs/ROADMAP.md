@@ -45,7 +45,7 @@ Design state, by ratified row:
   ff / 85 C / 3.6 V on the calibration code (same summary). Screened in
   [#458](https://github.com/2AMLogic/gf180-rcosc/issues/458): comparator-H
   tail W x0.85 clears 500 uA at every calibrated-code cell, not at `0xFF`
-  (DR-0049); adoption pending the #337 trim-code basis ruling.
+  (DR-0050); adoption pending the #337 trim-code basis ruling.
 
 The README status block is stale: issue #66 (re-centre) closed on 2026-11-06
 and items 5 and 6 now have campaigns behind them.

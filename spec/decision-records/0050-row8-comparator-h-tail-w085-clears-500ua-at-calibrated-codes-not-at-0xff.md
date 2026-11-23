@@ -1,4 +1,4 @@
-# 0049: Row 8: comparator-H tail W x0.85 clears 500 uA at every calibrated-code cell with near-zero collateral; no variant in the screened family clears a 0xFF basis
+# 0050: Row 8: comparator-H tail W x0.85 clears 500 uA at every calibrated-code cell with near-zero collateral; no variant in the screened family clears a 0xFF basis
 
 - **Status**: proposed - simulation-only screen. Adopts nothing: no schematic, netlist-of-record
   or layout file changes, no ratified row, window or Iq metric basis touched
@@ -34,8 +34,9 @@ candidate**: it meets the strict 500 uA limit at **every one of the 27 calibrate
 - **Comparator-H delay** at the limiting cell (ff, 3.0 V, 85 C): 1.96 ns vs 1.75 ns (+0.21 ns;
   2.16 ns at -40 C / 3.0 V, 1.96 ns at 85 C / 3.6 V).
 - **Calibration codes unchanged** from control (`tt 0xA4 / ff 0x4F / ss 0xD4`): no re-centre, no
-  trim-range shift (scan frequencies 47.594 / 47.689 / 47.655 MHz; worst calibration residue
-  across the family 0.49 MHz).
+  trim-range shift (scan frequencies 47.594 / 47.689 / 47.655 MHz). Across the screened
+  family, the largest held-code deviation from 48.000 MHz at 27 C / 3.3 V is 0.54 MHz
+  (`ss`, tail x0.70 + load L 0.6).
 
 `tail_k=0.70` also clears (worst 445.4 uA, -59.9 uA) but costs +0.59 pt of row-4 span (6.68 pt),
 +0.40 ns of delay and a one-step re-centre on every axis (`0xA8 / 0x53 / 0xD8`) for 29 uA more

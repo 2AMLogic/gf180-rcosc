@@ -11,7 +11,7 @@ startup bench reuses sim/startup-settled/gen_requests.py's testbench and request
 to fs / -40 C, the historically failing corner, at 3.3 / 3.6 V).  Launches nothing.
 
   gen_row8_screen.py dut OUTDIR NAME                 write OUTDIR/rcosc_top_variant.spice (NAME in VARIANTS)
-  gen_row8_screen.py check CONTROL OUTDIR [NAME]     diff variant DUTs against the control; assert only tail/load devices moved
+  gen_row8_screen.py check CONTROL NAME:OUTDIR [...]  verify only tail/load devices moved against the control
   gen_row8_screen.py calib OUTDIR NAME PROC:CODE[,CODE...] [...]
                                                      per-process calibration scan requests (27 C / 3.3 V)
   gen_row8_screen.py iq OUTDIR NAME tt=CODE,ff=CODE,ss=CODE
@@ -19,8 +19,8 @@ to fs / -40 C, the historically failing corner, at 3.3 / 3.6 V).  Launches nothi
   gen_row8_screen.py delay OUTDIR NAME ff=CODE       t_cmp_h probe bench (pvc/pvh/pcmph taps) at the limiting cells
   gen_row8_screen.py startup OUTDIR NAME CODE        fs / -40 C startup requests at 3.3 / 3.6 V (sim/startup-settled bench)
 """
+import hashlib
 import json
-import re
 import sys
 from pathlib import Path
 
@@ -49,13 +49,16 @@ VARIANTS = {
 
 
 def dut_text(name: str) -> str:
-    t = SRC.read_text()
+    source = SRC.read_bytes()
+    digest = hashlib.sha256(source).hexdigest()
+    if digest != SRC_SHA:
+        raise ValueError(f"{SRC}: expected DR-0044 SHA-256 {SRC_SHA}, got {digest}")
+    t = source.decode("utf-8")
     kw = VARIANTS[name]
     return variant.first_stage(t, **kw) if kw else t
 
 
 # --- DUT diff guard: only the comparator-H tail fingers and mirror loads may move -------------
-DEVLINE = re.compile(r"^X\$(\d+) \S+ \S+ \S+ \S+ (?:nfet|pfet)_03v3 L=\S+ W=\S+ ")
 TAIL, LOADS = set(range(39, 47)), {65, 66}
 ALLOWED = TAIL | LOADS
 
@@ -65,14 +68,17 @@ def dut_check(control_dir: Path, pairs) -> dict:
     report = {}
     for name, d in pairs:
         new = (d / gc.DUT).read_text().split("\n")
-        assert len(ctl) == len(new), f"{d}: line count changed"
-        moved = sorted({int(DEVLINE.match(a).group(1)) for a, b in zip(ctl, new)
-                        if a != b and DEVLINE.match(a)})
-        other = [f"{i}: {a} -> {b}" for i, (a, b) in enumerate(zip(ctl, new))
-                 if a != b and not (DEVLINE.match(a) and int(DEVLINE.match(a).group(1)) in ALLOWED)]
-        assert not other, f"{d}: non-comparator-H change:\n" + "\n".join(other)
-        assert set(moved) <= ALLOWED, f"{d}: unexpected devices moved: {moved}"
-        report[name] = moved
+        if len(ctl) != len(new):
+            raise ValueError(f"{d}: line count changed")
+        moved = set()
+        for lineno, (a, b) in enumerate(zip(ctl, new), 1):
+            if a == b:
+                continue
+            old, resized = variant.DEV.fullmatch(a), variant.DEV.fullmatch(b)
+            if not old or not resized or old.group(1) != resized.group(1) or int(old.group(2)) not in ALLOWED:
+                raise ValueError(f"{d}:{lineno}: change outside comparator-H sizing:\n{a}\n{b}")
+            moved.add(int(old.group(2)))
+        report[name] = sorted(moved)
     return report
 
 
@@ -84,7 +90,8 @@ SUBCKT = ".SUBCKT rcosc_top vdd vss clk t0 t1 t2 t3 t4 t5 t6 t7"
 
 
 def probed_dut(text: str) -> str:
-    assert text.count(SUBCKT) == 1 and text.count(".ENDS") == 1
+    if text.count(SUBCKT) != 1 or text.count(".ENDS") != 1:
+        raise ValueError("delay probes require exactly one rcosc_top subcircuit and one .ENDS")
     text = text.replace(SUBCKT, SUBCKT + " " + " ".join(p for p, _ in DELAY_PROBES))
     probes = "".join(f"R{p} {p} {net} 1m\n" for p, net in DELAY_PROBES)
     head, tail = text.split(".ENDS", 1)
