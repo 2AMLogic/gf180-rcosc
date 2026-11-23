@@ -48,9 +48,16 @@ table row and must not satisfy the index.
 """
 
 
-def _write_repo(records: dict[str, str], rows: list[str]) -> Path:
+def _tmp_root(case: unittest.TestCase) -> Path:
+    """Create a throwaway root removed after the test (also on failure)."""
+    td = tempfile.TemporaryDirectory(prefix="drix-test-")
+    case.addCleanup(td.cleanup)
+    return Path(td.name)
+
+
+def _write_repo(case: unittest.TestCase, records: dict[str, str], rows: list[str]) -> Path:
     """Build a throwaway repo: records map filename -> H1, rows are table lines."""
-    root = Path(tempfile.mkdtemp(prefix="drix-test-"))
+    root = _tmp_root(case)
     (root / "spec" / "decision-records").mkdir(parents=True)
     (root / "spec" / "decision-records" / "TEMPLATE.md").write_text(
         "# Template\n\n- **Status**: proposed\n", encoding="utf-8"
@@ -81,14 +88,14 @@ COMPLETE_ROWS = [
 
 class CompleteIndex(unittest.TestCase):
     def test_complete_table_with_template_passes(self) -> None:
-        root = _write_repo(COMPLETE_RECORDS, COMPLETE_ROWS)
+        root = _write_repo(self, COMPLETE_RECORDS, COMPLETE_ROWS)
         self.assertEqual(vdri.find_findings(root), [])
 
 
 class MissingRow(unittest.TestCase):
     def test_record_without_row_fails_even_with_prose_link(self) -> None:
         rows = [COMPLETE_ROWS[0], COMPLETE_ROWS[2]]  # 0002's row removed
-        root = _write_repo(COMPLETE_RECORDS, rows)
+        root = _write_repo(self, COMPLETE_RECORDS, rows)
         findings = vdri.find_findings(root)
         self.assertEqual(len(findings), 1)
         self.assertIn("spec/decision-records/0002-b-second.md", findings[0])
@@ -98,7 +105,7 @@ class MissingRow(unittest.TestCase):
 class DuplicateRow(unittest.TestCase):
     def test_duplicated_row_fails_naming_id_and_lines(self) -> None:
         rows = COMPLETE_ROWS[:2] + [COMPLETE_ROWS[1], COMPLETE_ROWS[2]]
-        root = _write_repo(COMPLETE_RECORDS, rows)
+        root = _write_repo(self, COMPLETE_RECORDS, rows)
         findings = vdri.find_findings(root)
         self.assertEqual(len(findings), 1)
         self.assertIn("duplicate index row for 0002", findings[0])
@@ -111,7 +118,7 @@ class WrongTarget(unittest.TestCase):
             "| [0002](decision-records/0002-wrong-name.md) | second | Proposed |",
             COMPLETE_ROWS[2],
         ]
-        root = _write_repo(COMPLETE_RECORDS, rows)
+        root = _write_repo(self, COMPLETE_RECORDS, rows)
         findings = vdri.find_findings(root)
         self.assertEqual(len(findings), 1)
         self.assertIn("0002", findings[0])
@@ -121,7 +128,7 @@ class WrongTarget(unittest.TestCase):
         rows = COMPLETE_ROWS + [
             "| [0009](decision-records/0009-x-missing.md) | ghost | Proposed |",
         ]
-        root = _write_repo(COMPLETE_RECORDS, rows)
+        root = _write_repo(self, COMPLETE_RECORDS, rows)
         findings = vdri.find_findings(root)
         self.assertEqual(len(findings), 1)
         self.assertIn("no spec/decision-records/0009-*.md exists", findings[0])
@@ -131,7 +138,7 @@ class NumberCollision(unittest.TestCase):
     def test_two_files_sharing_a_number_fail(self) -> None:
         records = dict(COMPLETE_RECORDS)
         records["0003-d-also-third.md"] = "0003: the other third"
-        root = _write_repo(records, COMPLETE_ROWS)
+        root = _write_repo(self, records, COMPLETE_ROWS)
         findings = vdri.find_findings(root)
         self.assertEqual(len(findings), 1)
         self.assertIn("share number 0003", findings[0])
@@ -142,7 +149,7 @@ class NumberCollision(unittest.TestCase):
 class NumericOrder(unittest.TestCase):
     def test_out_of_order_rows_fail(self) -> None:
         rows = [COMPLETE_ROWS[1], COMPLETE_ROWS[0], COMPLETE_ROWS[2]]
-        root = _write_repo(COMPLETE_RECORDS, rows)
+        root = _write_repo(self, COMPLETE_RECORDS, rows)
         findings = vdri.find_findings(root)
         self.assertEqual(len(findings), 1)
         self.assertIn("out of numeric order at 0001 (after 0002)", findings[0])
@@ -150,7 +157,7 @@ class NumericOrder(unittest.TestCase):
 
 class MissingInputs(unittest.TestCase):
     def test_missing_readme_fails(self) -> None:
-        root = Path(tempfile.mkdtemp(prefix="drix-test-"))
+        root = _tmp_root(self)
         (root / "spec" / "decision-records").mkdir(parents=True)
         findings = vdri.find_findings(root)
         self.assertEqual(len(findings), 1)
@@ -158,7 +165,7 @@ class MissingInputs(unittest.TestCase):
         self.assertIn("file not found", findings[0])
 
     def test_missing_records_dir_fails(self) -> None:
-        root = Path(tempfile.mkdtemp(prefix="drix-test-"))
+        root = _tmp_root(self)
         (root / "spec").mkdir(parents=True)
         (root / "spec" / "README.md").write_text(
             README_HEAD + COMPLETE_ROWS[0] + "\n", encoding="utf-8"
