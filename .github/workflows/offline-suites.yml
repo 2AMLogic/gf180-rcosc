@@ -85,6 +85,8 @@ jobs:
             tests: sim/iq-attribution/test_iq_report.py sim/iq-attribution/test_stage_map.py
           - name: pvt-postlayout-offline
             tests: sim/pvt-postlayout/test_pex_pvt_sweep.py
+          - name: row2-trimsize-offline
+            tests: sim/row2-trimsize/test_toolchain.py
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-python@v7
