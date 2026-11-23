@@ -245,14 +245,19 @@ def test_generation_rejects_bad_inputs(tmp_path):
 
 # -------------------------------------------------------- report flow ------
 
+_ENGINE_KEY_OMITTED = object()   # write_report sentinel: omit environment.engine_version entirely (#470)
+
+
 def write_report(rdir, entry, freq, synthetic=True, remote=None, status="pass", cstatus="pass",
                  process=None, temp=None, mstatus="pass", engine="46", sha=None):
     c = {"process": process or entry["process"], "temperature_c": entry["temperature_c"] if temp is None else temp,
          "status": cstatus,
          "measurements": [{"name": "fosc", "value": freq, "unit": "Hz", "status": mstatus}]}
+    env = {**({} if engine is _ENGINE_KEY_OMITTED else {"engine_version": engine}),
+           **({"remote": remote} if remote else {}),
+           **({"netlist_sha256": sha} if sha else {})}
     rep = {"schema_version": 3, "status": status, "corner_count": 1, "corners": [c],
-           "environment": {"engine_version": engine, **({"remote": remote} if remote else {}),
-                           **({"netlist_sha256": sha} if sha else {})}}
+           "environment": env}
     if synthetic:
         rep["synthetic"] = True
     (rdir / f"report_{entry['tag']}.json").write_text(json.dumps(rep))
@@ -273,6 +278,16 @@ def fill(bench, tmp_path, rdir, freqs_by_variant=None, **kw):
     for e in prov["requests"]:
         f = (freqs_by_variant or {}).get(e["variant"], linear())[e["code"]]
         write_report(rdir, e, f, **kw)
+
+
+def _filled_manifest(out):
+    """The passing manifest of test_non_synthetic_requires_provenance_and_batch."""
+    m = {k: v for k, v in json.loads((out / "manifest.template.json").read_text()).items()
+         if not k.startswith("_")}
+    return m | {"git_sha": "a" * 40, "git_dirty": False, "klt_version": "0.0.0-fixture",
+                "engine_version": "46", "pdk": "gf180mcuC", "pdk_revision": "unknown",
+                "pdk_revision_reason": "fixture", "executed_utc": "2000-01-01T00:00:00+00:00",
+                "provenance_sha256": hashlib.sha256((out / "provenance.json").read_bytes()).hexdigest()}
 
 
 def test_synthetic_campaign_ok_is_labelled_fixture(tmp_path, bench):
@@ -370,6 +385,27 @@ def test_non_synthetic_requires_provenance_and_batch(tmp_path, bench):
     res = analyze.analyse_campaign(out, r, man)
     assert not res["all_curves_valid"]
     assert any("batch fleet" in p["detail"] for c in res["curves"] for p in c["problems"])
+
+
+@pytest.mark.parametrize("bad", [_ENGINE_KEY_OMITTED, None, "", "   ", "ngspice-46", "46.0.1", 46])
+def test_non_synthetic_report_with_unidentifiable_engine_version_fails(tmp_path, bench, bad):
+    """#470: a present report whose environment.engine_version is absent, null, blank
+    or unparseable must fail the campaign's provenance even when every identified
+    version agrees with the manifest -- the report used to silently vanish from the
+    engine set and pass the mixed-version gate."""
+    out, prov = bench
+    r = tmp_path / "r"
+    r.mkdir()
+    fill(bench, tmp_path, r, synthetic=False, remote="job-1")
+    man = tmp_path / "man.json"
+    man.write_text(json.dumps(_filled_manifest(out)))
+    tgt = next(e for e in prov["requests"] if e["variant"] == "sch")
+    write_report(r, tgt, linear()[tgt["code"]], synthetic=False, remote="job-1", engine=bad)
+    res = analyze.analyse_campaign(out, r, man)
+    assert not res["all_curves_valid"] and res["banner"] == analyze.NOPROV_BANNER
+    assert len(res["run_errors"]) == 1, res["run_errors"]
+    assert res["run_errors"][0].startswith(f"report {tgt['tag']}: environment.engine_version")
+    assert res["engine_versions_in_reports"] == ["46"]      # only identified versions are listed
 
 
 def test_cli_synthetic_end_to_end(tmp_path, bench):
@@ -632,6 +668,26 @@ def test_valid_ab_does_not_excuse_an_independent_provenance_failure(tmp_path, be
     man.write_text(json.dumps(m | {"provenance_sha256": hashlib.sha256((out / "provenance.json").read_bytes()).hexdigest(),
                                    "engine_version": "42"}))
     assert any("manifest engine_version" in e for e in analyze.analyse_campaign(out, r, man, engine_ab=abp)["run_errors"])
+
+
+def test_valid_ab_does_not_excuse_an_unidentified_engine_version_on_an_unsampled_report(tmp_path, bench):
+    """#470: a paired A/B covers versions, not ignorance -- a report outside the
+    paired sample whose version is unknown still fails the campaign, the engine
+    list keeps only identified versions, and the tally can no longer count a
+    report as ngspice-None."""
+    out, r, man, abp, ab = _ab_setup(tmp_path, bench)
+    assert analyze.analyse_campaign(out, r, man, engine_ab=abp)["run_errors"] == []   # untouched control
+    prov = json.loads((out / "provenance.json").read_text())
+    tgt = next(e for e in prov["requests"] if e["variant"] == "sch" and e["code"] == 5)
+    write_report(r, tgt, linear()[5], synthetic=False, remote="job-1", engine=None)
+    res = analyze.analyse_campaign(out, r, man, engine_ab=abp)
+    assert not res["all_curves_valid"] and res["banner"] == analyze.NOPROV_BANNER
+    assert len(res["run_errors"]) == 1, res["run_errors"]
+    assert res["run_errors"][0].startswith(f"report {tgt['tag']}: environment.engine_version")
+    assert res["engine_versions_in_reports"] == ["46", "47"]
+    sp = res["engine_split"]
+    assert sp["engine_tally_by_curve"]["sch_tt_27C_3p3V"] == {"46": 255}
+    assert "None" not in json.dumps(sp)
 
 
 def test_permuted_pin_order_is_followed(tmp_path):
