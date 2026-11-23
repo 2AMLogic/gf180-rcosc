@@ -6,6 +6,24 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 
+### 2026-11-23
+
+- **PR #478**: docs: add decision-record index rule to TEMPLATE.md and CLAUDE.md
+- **PR #477**: fix: clean up temp dirs in decision-record index test fixtures
+- **PR #468**: sim(row8): comparator-H tail x0.85 clears 500 uA at calibrated codes; DR-0050 records the screen (0xFF basis fails)
+- **Issue #475** (closed): TEMPLATE.md does not tell record authors to add the spec/README.md index row, now a CI gate
+- **Issue #474** (closed): signoff/test_verify_decision_record_index.py leaks temp dirs: bare mkdtemp with no cleanup
+- **Issue #458** (closed): Row 8: screen the DR-0046 comparator-H current lever for running Iq < 500 uA at the ff corners (simulation only)
+
+### 2026-11-22
+
+- **PR #472**: fix(sim): fail trim-dense campaigns whose reports lack an identifiable engine_version
+- **PR #471**: docs(spec): backfill the decision-record index and guard it against drift
+- **PR #465**: sim: commit dense 256-code trim analysis and row-2 step/monotonicity decision record
+- **Issue #470** (closed): trim-dense analyze.py: a report with no environment.engine_version is invisible to the mixed-version gate
+- **Issue #469** (closed): spec/README.md decision-record index is 19 records behind spec/decision-records/
+- **Issue #459** (closed): Row 2: commit the dense 256-code trim analysis and write the verdict decision record (finish what #87 left open)
+
 ### 2026-11-21
 
 - **Issue #462** (closed): Share the trim-code bisection between schematic and post-layout calibration
