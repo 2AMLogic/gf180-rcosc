@@ -103,10 +103,7 @@ GUARDRAIL_VDD_V = 3.6
 DECK_OPTIONS = ["poly_res=1k", "mim_cap=cap_mim_1f0_m4m5_noshield"]
 EXTRACT_PINS = "vdd,vss,clk,t0,t1,t2,t3,t4,t5,t6,t7"
 
-RCOSC_TOP_HEADER_RE = re.compile(
-    r"^\.subckt\s+rcosc_top\s+.*$", re.IGNORECASE | re.MULTILINE
-)
-SUBCKT_LINE_RE = re.compile(r"^\.subckt\s+(\S+)\s+(.*)$", re.IGNORECASE)
+RCOSC_TOP_HEADER_RE = re.compile(r"^\.subckt\s+(rcosc_top)\s+(.*)$", re.IGNORECASE)
 ENDS_LINE_RE = re.compile(r"^\.ends\b.*$", re.IGNORECASE)
 
 # `klt extract --parasitics --pdk gf180mcuC` annotates the one *drawn*
@@ -157,6 +154,22 @@ def find_latest_schematic_baseline() -> tuple[str, Path]:
     return latest.name, latest
 
 
+def find_rcosc_top_header(lines: list[str], missing: str) -> tuple[int, str, list[str]]:
+    """Line index, subcircuit name and parsed pin list of the
+    `.subckt rcosc_top ...` header in `lines`.
+
+    The *complete* subcircuit name must match, case-insensitively -- a
+    sibling whose name merely shares the `rcosc_top` prefix (e.g.
+    `rcosc_top_probe`) is never accepted (#480). Raises
+    `SystemExit(missing)` when no such header exists.
+    """
+    for i, line in enumerate(lines):
+        m = RCOSC_TOP_HEADER_RE.match(line.strip())
+        if m:
+            return i, m.group(1), m.group(2).split()
+    raise SystemExit(missing)
+
+
 def extract_rcosc_top_block(text: str) -> tuple[str, str, list[str]]:
     """Split `text` (a `.subckt rcosc_top ... .ends` region, possibly
     followed by unrelated sibling `.subckt` blocks) into
@@ -166,18 +179,9 @@ def extract_rcosc_top_block(text: str) -> tuple[str, str, list[str]]:
     of body lines between the header and its matching `.ends`.
     """
     lines = text.splitlines()
-    start = None
-    for i, line in enumerate(lines):
-        if SUBCKT_LINE_RE.match(line.strip()) and line.strip().lower().startswith(
-            ".subckt rcosc_top"
-        ):
-            start = i
-            break
-    if start is None:
-        raise SystemExit("ERROR: no '.subckt rcosc_top ...' header found")
-    m = SUBCKT_LINE_RE.match(lines[start].strip())
-    assert m is not None
-    pins = m.group(2).split()
+    start, _name, pins = find_rcosc_top_header(
+        lines, "ERROR: no '.subckt rcosc_top ...' header found"
+    )
     end = None
     for j in range(start + 1, len(lines)):
         if ENDS_LINE_RE.match(lines[j].strip()):
@@ -205,21 +209,16 @@ def reorder_extracted_header(extracted_text: str, pin_order: list[str]) -> str:
     itself only static-checks the *count* of, not the order).
     """
     lines = extracted_text.splitlines()
-    for i, line in enumerate(lines):
-        stripped = line.strip()
-        if stripped.lower().startswith(".subckt rcosc_top"):
-            m = SUBCKT_LINE_RE.match(stripped)
-            assert m is not None
-            name = m.group(1)
-            found_pins = m.group(2).split()
-            if sorted(found_pins) != sorted(pin_order):
-                raise SystemExit(
-                    "ERROR: extracted netlist pin set "
-                    f"{sorted(found_pins)} != schematic pin set {sorted(pin_order)}"
-                )
-            lines[i] = f".SUBCKT {name} " + " ".join(pin_order)
-            return "\n".join(lines) + "\n"
-    raise SystemExit("ERROR: extracted netlist has no '.SUBCKT rcosc_top ...' header")
+    i, name, found_pins = find_rcosc_top_header(
+        lines, "ERROR: extracted netlist has no '.SUBCKT rcosc_top ...' header"
+    )
+    if sorted(found_pins) != sorted(pin_order):
+        raise SystemExit(
+            "ERROR: extracted netlist pin set "
+            f"{sorted(found_pins)} != schematic pin set {sorted(pin_order)}"
+        )
+    lines[i] = f".SUBCKT {name} " + " ".join(pin_order)
+    return "\n".join(lines) + "\n"
 
 
 def run_extract(runid: str, out_dir: Path) -> tuple[Path, dict]:
