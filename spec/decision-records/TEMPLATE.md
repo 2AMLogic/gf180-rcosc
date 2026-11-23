@@ -11,6 +11,13 @@ Numbering rule: before picking NNNN, check every filename already in this
 directory on `main` (including superseded records) and use one greater than
 the highest number found — never guess or reuse a number, and re-check if
 another record may have landed concurrently, to avoid a collision.
+
+Index rule: after copying this template to NNNN-<slug>.md, add the record's
+row to the `## Decision records` table in `spec/README.md`, in numeric order:
+`| [NNNN](decision-records/NNNN-<slug>.md) | <title> | <status> |`.
+`.github/workflows/doc-citations.yml` runs
+`signoff/verify-decision-record-index.py` on every PR and fails CI if that
+row is missing, duplicated, misdirected, or out of order.
 -->
 
 - **Status**: proposed | ratified | superseded by NNNN
