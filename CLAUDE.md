@@ -29,8 +29,10 @@ agents.
   accuracy claim requires both the PVT-corner spread *and* trim-range /
   trim-resolution evidence — an oscillator spec without its trim math is not
   a spec. `sim/` results are append-only evidence.
-- Spec changes go through `spec/` with a decision record; agents do not relax
-  the ratified spec to make results pass.
+- Spec changes go through `spec/` with a decision record (copy
+  `spec/decision-records/TEMPLATE.md` and add the matching row to
+  `spec/README.md`'s Decision records table, enforced by CI); agents do not
+  relax the ratified spec to make results pass.
 
 <!-- BEGIN LOOM ORCHESTRATION -->
 This repository uses [Loom](https://github.com/rjwalters/loom) for AI-powered development orchestration — see the Loom repository for the full guide (roles, labels, worktrees, configuration). When installed, Loom also writes a locally-substituted copy of that guide to `.loom/CLAUDE.md`.
