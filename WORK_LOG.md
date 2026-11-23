@@ -8,6 +8,8 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-23
 
+- **PR #481**: Match the exact rcosc_top subcircuit name in the post-layout driver
+- **Issue #480** (closed): Share one exact rcosc_top header lookup in the post-layout driver
 - **PR #478**: docs: add decision-record index rule to TEMPLATE.md and CLAUDE.md
 - **PR #477**: fix: clean up temp dirs in decision-record index test fixtures
 - **PR #468**: sim(row8): comparator-H tail x0.85 clears 500 uA at calibrated codes; DR-0050 records the screen (0xFF basis fails)
