@@ -60,10 +60,11 @@ def build(text: str, name: str) -> str:
         assert n == 1, n
         return text.replace("r_length=12.03860U", f"r_length={12.0386 * int(m.group(2)) / 100:.5f}U")
     if re.fullmatch(r"w\d+(?:\.\d+)?", name):  # w<K>: all 16 bank pass devices at K x W, K integer or decimal (row45-rerun/variant.py rule), code left as is
-        import importlib.util
-        spec = importlib.util.spec_from_file_location("variant317", Path(__file__).resolve().parent.parent / "row45-rerun" / "variant.py")
-        v317 = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(v317)
+        sim_dir = str(Path(__file__).resolve().parent.parent)
+        if sim_dir not in sys.path:
+            sys.path.insert(0, sim_dir)
+        from _module_loader import load_module
+        v317 = load_module("variant317", Path(__file__).resolve().parent.parent / "row45-rerun" / "variant.py", reuse=False)
         return v317.double_bank_switches(text, float(name[1:]))
     if name.startswith("ideal"):
         return _ideal(text, int(name[5:]))
