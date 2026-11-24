@@ -29,7 +29,7 @@ Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a h
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-_None._
+- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
 
 ## In Progress
 
@@ -65,7 +65,7 @@ Issues carrying `loom:curated`.
 
 ## Proposed (Architect / Hermit)
 
-_None._
+- **#487**: Call the row-4 generator directly and share its trim-bank sizing rule *(hermit)*
 
 ## Epics
 
@@ -78,11 +78,11 @@ _None._
 | Operator merge-risk holds | 1 |
 | Very important | 1 |
 | Important | 5 |
-| Ready (`loom:issue`) | 0 |
+| Ready (`loom:issue`) | 1 |
 | In Progress (`loom:building`) | 3 |
 | PRs awaiting review | 2 |
 | Approved PRs awaiting merge | 1 |
 | Curated | 6 |
-| Architect / Hermit proposals | 0 |
+| Architect / Hermit proposals | 1 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->

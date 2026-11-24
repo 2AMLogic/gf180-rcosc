@@ -8,6 +8,8 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-23
 
+- **PR #485**: docs(spec): annotate explicit amendments in the decision-record index
+- **Issue #476** (closed): Decision-record index annotates 'supersedes' but not 'amends': DR-0023's row omits DR-0029's calibration re-centring
 - **PR #481**: Match the exact rcosc_top subcircuit name in the post-layout driver
 - **Issue #480** (closed): Share one exact rcosc_top header lookup in the post-layout driver
 - **PR #478**: docs: add decision-record index rule to TEMPLATE.md and CLAUDE.md
