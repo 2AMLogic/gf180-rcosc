@@ -23,7 +23,6 @@ Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a h
 - **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5
 - **#317**: Rows 4/5: trim-bank switch supply dependence (ss) and comparator-H hot/low-V delay collapse (ff)
 - **#460**: Row 2: name a trim-bank sizing that meets 0.314 %/code with monotonic carries (simulation only, bounded screen)
-- **#461**: T1 item 6: define and prove a known-bad negative control per statistical row set (rows 2, 4, 5 x tt/ff/ss); the 3x-inflated control is detected in 2 of 12 cells
 
 ## Ready
 
@@ -37,7 +36,6 @@ Issues currently being built (`loom:building`).
 
 - **#452**: Plan-region guard: anchor the tag suffix match to end-of-line so an issue title cannot false-positive
 - **#460**: Row 2: name a trim-bank sizing that meets 0.314 %/code with monotonic carries (simulation only, bounded screen)
-- **#461**: T1 item 6: define and prove a known-bad negative control per statistical row set (rows 2, 4, 5 x tt/ff/ss); the 3x-inflated control is detected in 2 of 12 cells
 
 ## PRs Awaiting Review
 
@@ -61,11 +59,10 @@ Issues carrying `loom:curated`.
 - **#337**: Measure running Iq at per-die calibrated codes for w3r65 and w2.5r75 before row 4 adoption *(curated)*
 - **#452**: Plan-region guard: anchor the tag suffix match to end-of-line so an issue title cannot false-positive *(curated)*
 - **#460**: Row 2: name a trim-bank sizing that meets 0.314 %/code with monotonic carries (simulation only, bounded screen) *(curated)*
-- **#461**: T1 item 6: define and prove a known-bad negative control per statistical row set (rows 2, 4, 5 x tt/ff/ss); the 3x-inflated control is detected in 2 of 12 cells *(curated)*
 
 ## Proposed (Architect / Hermit)
 
-- **#487**: Call the row-4 generator directly and share its trim-bank sizing rule *(hermit)*
+_None._
 
 ## Epics
 
@@ -77,12 +74,12 @@ Issues carrying `loom:curated`.
 |------|-------|
 | Operator merge-risk holds | 1 |
 | Very important | 1 |
-| Important | 5 |
+| Important | 4 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 3 |
+| In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 2 |
 | Approved PRs awaiting merge | 1 |
-| Curated | 6 |
-| Architect / Hermit proposals | 1 |
+| Curated | 5 |
+| Architect / Hermit proposals | 0 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
