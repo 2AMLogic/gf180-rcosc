@@ -7,7 +7,7 @@ in the charge time constant tau = t_chg / ln((VDD-v0)/(VDD-vh)) versus VDD is at
   nojd    the discharge device (W=20U L=0.5U, drain on vc) gets AS=AD=PS=PD=0
   nojall  nojb + nojd
   capx    +200 fF linear capacitor on vc (dilutes any voltage-dependent parasitic C by 2x; adds nothing supply dependent)
-  w<K>    bank pass devices at K x W with the code NOT re-derived (212): isolates width from the code shift of DR-0034
+  w<K>    bank pass devices at K x W (K integer or decimal) with the code NOT re-derived (212): isolates width from the code shift of DR-0034
   w<K>r<P> w<K> and the base resistor X$91 (12.0386 um, VDD -> bank) at P % of its length so f at code 212 is re-centred
   ideal<N> all 16 bank pass devices replaced by ideal switches for trim code N (bit set: 1 mOhm between the nfet D/S, clear:
           1 GOhm; the pfet of each pair is deleted): the bank is then the poly ladder only, so what remains of the supply
@@ -53,13 +53,13 @@ def _ideal(text: str, code: int) -> str:
 
 
 def build(text: str, name: str) -> str:
-    m = re.fullmatch(r"w(\d+)r(\d+)", name)
-    if m:  # w<K>r<P>: w<K> plus the fixed base resistor X$91 (VDD -> bank) shortened to P % of its length (re-centres f at code 212)
+    m = re.fullmatch(r"w(\d+(?:\.\d+)?)r(\d+)", name)
+    if m:  # w<K>r<P>: w<K> (K integer or decimal) plus the fixed base resistor X$91 (VDD -> bank) shortened to P % of its length (re-centres f at code 212)
         text = build(text, f"w{m.group(1)}")
         n = text.count("r_length=12.03860U")
         assert n == 1, n
         return text.replace("r_length=12.03860U", f"r_length={12.0386 * int(m.group(2)) / 100:.5f}U")
-    if re.fullmatch(r"w\d+", name):  # w<K>: all 16 bank pass devices at K x W (row45-rerun/variant.py rule), code left as is
+    if re.fullmatch(r"w\d+(?:\.\d+)?", name):  # w<K>: all 16 bank pass devices at K x W, K integer or decimal (row45-rerun/variant.py rule), code left as is
         import importlib.util
         spec = importlib.util.spec_from_file_location("variant317", Path(__file__).resolve().parent.parent / "row45-rerun" / "variant.py")
         v317 = importlib.util.module_from_spec(spec)
