@@ -198,6 +198,39 @@ class WorkPlanRegionGuardTest(unittest.TestCase):
             sum(1 for f in findings if f.startswith(stacked)), 1, findings
         )
 
+    def test_mid_line_tag_in_title_passes(self):
+        # The renderer interpolates an issue title verbatim after the bullet
+        # number, so a *(tag)* inside the title is not an annotation. Only
+        # the contiguous suffix run at end of line is checked (issue #452).
+        body = (
+            "- **#5**: Track *(held)* the gap *(curated)*\n"
+            "- **#5**: Track *(held)* the gap\n"
+        )
+        plan = MINIMAL_PLAN.replace("- **#1**: A title *(curated)*\n", body)
+        root = self.make(plan)
+        self.assertEqual(vwpr.find_findings(root), [])
+
+    def test_trailing_tag_fails_in_either_order(self):
+        rows = (
+            "- **#5**: Track the gap *(curated)* *(held)*",
+            "- **#5**: Track the gap *(held)* *(curated)*",
+            "- **#5**: Track the gap *(held)*",
+            "- **#5**: Track the gap *(held)*   ",
+        )
+        for row in rows:
+            with self.subTest(row=row):
+                plan = MINIMAL_PLAN.replace("- **#1**: A title *(curated)*", row)
+                root = self.make(plan)
+                findings = vwpr.find_findings(root)
+                self.assertEqual(len(findings), 1, findings)
+                self.assertIn("'*(held)*'", findings[0])
+                self.assertTrue(
+                    findings[0].startswith(
+                        f"WORK_PLAN.md:{line_of(plan, 'Track the gap')}:"
+                    ),
+                    findings,
+                )
+
     def test_generated_line_flagged_with_line_number(self):
         plan = MINIMAL_PLAN.replace(
             "## Ready\n", "_Generated: 2026-11-20T06:21:08Z (snapshot)_\n## Ready\n"

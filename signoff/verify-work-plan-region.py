@@ -13,9 +13,12 @@ only the time-based debounce (issue #448; history: PRs #445/#446/#447).
 Inside the markers only, this guard fails on:
 
 - any ``_Generated:`` line (the renderer emits none);
-- any ``*(tag)*`` suffix other than the renderer's own
-  ``*(curated)*`` / ``*(architect)*`` / ``*(hermit)*`` (stacked suffixes are
-  caught per suffix, so ``*(curated)* *(held)*`` fails on ``*(held)*`` only);
+- any ``*(tag)*`` suffix — in the contiguous ``*(tag)*`` run at the end of
+  a line — other than the renderer's own ``*(curated)*`` /
+  ``*(architect)*`` / ``*(hermit)*`` (the run is checked per suffix, so
+  ``*(curated)* *(held)*`` fails on ``*(held)*`` only). A ``*(tag)*``
+  earlier on the line is issue-title text the renderer interpolates
+  verbatim, not an annotation, so it is never flagged (issue #452);
 
 and on missing, duplicated or out-of-order markers. Text outside the
 markers is never checked.
@@ -41,6 +44,11 @@ START_MARKER = "<!-- guide:plan-body:start -->"
 END_MARKER = "<!-- guide:plan-body:end -->"
 GENERATED_NEEDLE = "_Generated:"
 SUFFIX_RE = re.compile(r"\*\(([^)]*)\)\*")
+# render_plan_body()'s templates append the suffix after the issue title,
+# so a renderer-emittable suffix always sits in the contiguous *(tag)* run
+# at the end of the line. A *(tag)* earlier on the line is title text
+# interpolated verbatim (issue #452), so only this run is checked.
+TRAILING_RUN_RE = re.compile(r"(?:\s*\*\([^)]*\)\*)+\s*$")
 # The only bullet suffixes render_plan_body() can emit: the imp/curated/epics
 # jq templates in .loom/roles/guide.md append exactly *(curated)*,
 # *(architect)* or *(hermit)* (as of 17ba6237, 2026-11-20; re-check those
@@ -103,14 +111,16 @@ def find_findings(root: Path) -> list[str]:
                 "line, so it forces a spurious diff on every Guide tick "
                 "(issue #448)"
             )
-        for m in SUFFIX_RE.finditer(line):
-            tag = m.group(1)
-            if tag not in ALLOWED_SUFFIXES:
-                findings.append(
-                    f"{PLAN_NAME}:{line_no}: suffix '*({tag})*' inside the "
-                    "plan-body region is not one render_plan_body() can "
-                    f"emit (allowed: {allowed})"
-                )
+        run = TRAILING_RUN_RE.search(line)
+        if run:
+            for m in SUFFIX_RE.finditer(run.group(0)):
+                tag = m.group(1)
+                if tag not in ALLOWED_SUFFIXES:
+                    findings.append(
+                        f"{PLAN_NAME}:{line_no}: suffix '*({tag})*' inside the "
+                        "plan-body region is not one render_plan_body() can "
+                        f"emit (allowed: {allowed})"
+                    )
         pos += len(line) + 1
     return findings
 
