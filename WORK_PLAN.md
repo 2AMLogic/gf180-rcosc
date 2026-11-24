@@ -28,7 +28,7 @@ Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a h
 
 Human-approved issues ready for implementation (`loom:issue`).
 
-- **#70**: Item 7: produce a grader-readable klt pex report for the current rcosc_top layout
+_None._
 
 ## In Progress
 
@@ -75,7 +75,7 @@ _None._
 | Operator merge-risk holds | 1 |
 | Very important | 1 |
 | Important | 4 |
-| Ready (`loom:issue`) | 1 |
+| Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 2 |
 | PRs awaiting review | 2 |
 | Approved PRs awaiting merge | 1 |
