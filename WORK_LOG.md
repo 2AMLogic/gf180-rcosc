@@ -8,6 +8,8 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 ### 2026-11-24
 
+- **PR #466**: signoff: anchor plan-region suffix check to the end-of-line run
+- **Issue #452** (closed): Plan-region guard: anchor the tag suffix match to end-of-line so an issue title cannot false-positive
 - **PR #491**: sim: route row4/discipline path-based imports through _module_loader
 - **PR #489**: sim: drive row4-iq-variant through row4-w3r65 main(); share decimal w<K>r<P> sizing in row4-nonron
 - **PR #486**: feat(sim): seeded-defect negative controls per row set and fine-timing sensitivity pilot
