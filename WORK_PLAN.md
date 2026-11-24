@@ -34,7 +34,6 @@ _None._
 
 Issues currently being built (`loom:building`).
 
-- **#452**: Plan-region guard: anchor the tag suffix match to end-of-line so an issue title cannot false-positive
 - **#460**: Row 2: name a trim-bank sizing that meets 0.314 %/code with monotonic carries (simulation only, bounded screen)
 
 ## PRs Awaiting Review
@@ -42,7 +41,6 @@ Issues currently being built (`loom:building`).
 PRs waiting on Judge (`loom:review-requested`).
 
 - **#449**: sim: matched-die calibrated-code Iq for w3r65/w2.5r75 - 0 of 1500 dice at 0xFF, penalties collapse at calibrated codes, row-8 code applicability returns to the operator (DR-0048)
-- **#466**: signoff: anchor plan-region suffix check to the end-of-line run
 
 ## Approved (Awaiting Merge)
 
@@ -57,7 +55,6 @@ Issues carrying `loom:curated`.
 - **#202**: T1 item 6 (Monte Carlo): klt yield campaigns for DR-0019 statistical rows 2, 4 and 5 *(curated)*
 - **#204**: Move layout geometry pin klt 0.4.0 → 0.8.0 and regenerate committed cells/reports *(curated)*
 - **#337**: Measure running Iq at per-die calibrated codes for w3r65 and w2.5r75 before row 4 adoption *(curated)*
-- **#452**: Plan-region guard: anchor the tag suffix match to end-of-line so an issue title cannot false-positive *(curated)*
 - **#460**: Row 2: name a trim-bank sizing that meets 0.314 %/code with monotonic carries (simulation only, bounded screen) *(curated)*
 
 ## Proposed (Architect / Hermit)
@@ -76,10 +73,10 @@ _None._
 | Very important | 1 |
 | Important | 4 |
 | Ready (`loom:issue`) | 0 |
-| In Progress (`loom:building`) | 2 |
-| PRs awaiting review | 2 |
+| In Progress (`loom:building`) | 1 |
+| PRs awaiting review | 1 |
 | Approved PRs awaiting merge | 1 |
-| Curated | 5 |
+| Curated | 4 |
 | Architect / Hermit proposals | 0 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->
