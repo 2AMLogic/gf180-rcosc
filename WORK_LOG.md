@@ -6,6 +6,15 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 
+### 2026-11-24
+
+- **PR #491**: sim: route row4/discipline path-based imports through _module_loader
+- **PR #489**: sim: drive row4-iq-variant through row4-w3r65 main(); share decimal w<K>r<P> sizing in row4-nonron
+- **PR #486**: feat(sim): seeded-defect negative controls per row set and fine-timing sensitivity pilot
+- **Issue #490** (closed): sim: route the row4 generators' path-based imports through sim/_module_loader.py
+- **Issue #487** (closed): Call the row-4 generator directly and share its trim-bank sizing rule
+- **Issue #461** (closed): T1 item 6: define and prove a known-bad negative control per statistical row set (rows 2, 4, 5 x tt/ff/ss); the 3x-inflated control is detected in 2 of 12 cells
+
 ### 2026-11-23
 
 - **PR #485**: docs(spec): annotate explicit amendments in the decision-record index
