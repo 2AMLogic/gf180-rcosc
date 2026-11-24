@@ -25,17 +25,15 @@ hardware design decision and not a sourced reference guarantee):
 mode="naive_nominal" is a CONTRAST FIXTURE ONLY: it delivers the multi-frame span count to the
 controller as if it were a single frame.  It is not a candidate policy and is not swept.
 """
-import argparse, csv, datetime, hashlib, importlib.util, json, math, os, platform, random, sys
+import argparse, csv, datetime, hashlib, json, math, os, platform, random, sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
 def _load_base():
-    spec = importlib.util.spec_from_file_location("discipline_model_base", os.path.join(HERE, "discipline_model.py"))
-    mod = importlib.util.module_from_spec(spec)
-    sys.modules[spec.name] = mod
-    spec.loader.exec_module(mod)
-    return mod
+    sys.path.insert(0, os.path.dirname(HERE))
+    from _module_loader import load_module
+    return load_module("discipline_model_base", os.path.join(HERE, "discipline_model.py"), reuse=False)
 
 
 dm = _load_base()

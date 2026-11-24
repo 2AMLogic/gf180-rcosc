@@ -19,12 +19,11 @@ sys.path.insert(0, str(REPO / "sim" / "row45-attribution"))
 sys.path.insert(0, str(REPO / "sim" / "row45-rerun"))
 import gen_calib_requests as gc  # noqa: E402
 import gen_stage_requests as gs  # noqa: E402
-import importlib.util  # noqa: E402
+sys.path.insert(0, str(REPO / "sim"))
+from _module_loader import load_module  # noqa: E402
 
 # gen_calib_requests already imported sim/row45-rerun/variant.py as "variant"; load the row4-nonron one under its own name
-_spec = importlib.util.spec_from_file_location("variant_row4", REPO / "sim" / "row4-nonron" / "variant.py")
-variant = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(variant)
+variant = load_module("variant_row4", REPO / "sim" / "row4-nonron" / "variant.py", reuse=False)
 
 BASE = REPO / "sim" / "row45-rerun" / "results" / "20261112T200335Z-extract-l07" / "rcosc_top_p3_cmphfix.spice"
 NAME = "w3r65"

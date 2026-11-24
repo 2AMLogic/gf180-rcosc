@@ -9,15 +9,15 @@ variant name is `w<K>r<P>` with K a decimal width multiplier of the 16 bank pass
   gen.py NAME stage OUTDIR tt=CODE,ff=CODE,ss=CODE
   gen.py NAME iq OUTDIR [CODE ...]
 """
-import importlib.util
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
-spec = importlib.util.spec_from_file_location("w3gen", REPO / "sim" / "row4-w3r65" / "gen.py")
-w3 = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(w3)
+sys.path.insert(0, str(REPO / "sim"))
+from _module_loader import load_module  # noqa: E402
+
+w3 = load_module("w3gen", REPO / "sim" / "row4-w3r65" / "gen.py", reuse=False)
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
