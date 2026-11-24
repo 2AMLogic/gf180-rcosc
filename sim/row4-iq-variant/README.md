@@ -5,7 +5,7 @@ brings code-0xFF running Iq back to the DR-0044 band. Same DUT as `sim/row4-w3r6
 re-extracted); no `design/*` file touched. All SPICE `klt sim --batch-set ... --backend batch --wait-for-capacity 600`. Append-only.
 
 ```
-python3 -I sim/row4-iq-variant/gen.py NAME calib|stage|iq OUTDIR ...   # NAME = w<K>r<P>, K decimal (row4-nonron/variant.py takes only integer K)
+python3 -I sim/row4-iq-variant/gen.py NAME calib|stage|iq OUTDIR ...   # NAME = w<K>r<P>, K decimal (sizing rule shared with row4-nonron/variant.py)
 python3 -I sim/row4-iq-variant/tables.py RESULTDIR                     # ss span + Iq delta tables
 ```
 

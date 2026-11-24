@@ -65,7 +65,7 @@ Issues carrying `loom:curated`.
 
 ## Proposed (Architect / Hermit)
 
-_None._
+- **#487**: Call the row-4 generator directly and share its trim-bank sizing rule *(hermit)*
 
 ## Epics
 
@@ -83,6 +83,6 @@ _None._
 | PRs awaiting review | 2 |
 | Approved PRs awaiting merge | 1 |
 | Curated | 6 |
-| Architect / Hermit proposals | 0 |
+| Architect / Hermit proposals | 1 |
 | Active epics | 1 |
 <!-- guide:plan-body:end -->

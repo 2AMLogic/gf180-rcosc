@@ -1,7 +1,8 @@
 # sim/row4-w3r65 - DR-0037 `w3r65` bank candidate, measurement increment (issue #337, row 4 `ss` span)
 
 `gen.py` applies DR-0037's candidate (16 bank pass devices at 3x W, base resistor `X$91` at 65 % length, via `sim/row4-nonron/variant.py` `w3r65`) as
-netlist text to the **extraction of the rebuilt layout** (`sim/row45-rerun/results/20261112T200335Z-extract-l07/`, the DR-0043 / DR-0044 basis). The
+netlist text to the **extraction of the rebuilt layout** (`sim/row45-rerun/results/20261112T200335Z-extract-l07/`, the DR-0043 / DR-0044 basis); its
+`main(argv, name)` is also the callable entry point `sim/row4-iq-variant/gen.py` drives for named `w<K>r<P>` variants (K decimal). The
 layout is NOT re-extracted for the candidate; no schematic, netlist or layout file is touched (the operator ruling in DR-0045 is still open).
 All SPICE is `klt sim --batch-set request_*.json --backend batch --wait-for-capacity 600` on the batch fleet (klt 0.9.2.dev885). Append-only.
 
