@@ -104,7 +104,7 @@ DEFECTS = {
     # current, so a plain resistor to vdd or vss, tried first, left the supply span
     # unchanged -- see the derivation runs).  The 27 C / 3.3 V calibration trims
     # out its static effect; its supply and temperature dependence survives calibration.
-    "leak": {"kind": "leak_nfet", "rail": "vdd", "node": "\\$26__t8", "rvalue": 1.0e5,
+    "leak": {"kind": "leak_nfet", "rail": "vdd", "node": "\\$26__t8", "rvalue": 7.0e4,
              "observables": ["s2_margin_pct"]},
     # row 5 (S3): a reverse-biased junction leak from the timing capacitor's top plate to
     # vss (diode cathode on the plate).  Its saturation current rises roughly two orders of

@@ -109,10 +109,12 @@ trim-ladder base segment, row 4 a supply-side nfet leak (70 kohm), row 5 a rever
 nominal through `yield-samples --negative-control` as its own grade. Detection is the pinned grader's
 per-measurement verdict only; a cell whose nominal fails is listed and deferred to #317.
 
-Pilot (`results/20261123T174809Z-ctrl-pilot/`, N = 40, DR-0043 extraction, batch backend; grades in
-`results/20261123T182646Z-ctrl-pilot-grade/summary.md`): **10 of 12 measurement verdicts detected**;
-`ff` row 4 not detected (the leak is too weak there; the pre-fixed s2 <= -1.0 derivation rule was not
-met by any candidate that stays in the trim range); `ss` row 4 nominal fails, deferred. The sensitivity
+Pilot (`results/20261123T174809Z-ctrl-pilot/` plus the row-4 control re-run `results/20261124T025620Z-ctrl-pilot-r4/` at the
+frozen 70 kohm, N = 40, DR-0043 extraction, batch backend; grades in
+`results/20261124T031147Z-ctrl-pilot-r4-grade/summary.md`): **11 of 12 measurement verdicts detected**;
+`ss` row 4 nominal fails, deferred. The first pilot grade (`20261123T182646Z-ctrl-pilot-grade`) ran the
+row-4 leak at 100 kohm by mistake and is superseded (kept as history); `test_gen_campaign.py` now ties
+`DEFECTS` to the frozen derivation line. The sensitivity
 miss was timing resolution: 0x7E->0x7F is 5.59x at `tran 200p` and 9.88x at `tran 50p` (band 7-13
 unchanged). The pilot carries no design-yield claim and does not change item 6.
 

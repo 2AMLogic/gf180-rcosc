@@ -49,21 +49,30 @@ puts the 0x7E->0x7F ratio at 9.88 (200 ps: 5.59), inside the unchanged 7-13 band
 DUT `sim/row45-rerun/results/20261112T200335Z-extract-l07/rcosc_top_p3_cmphfix.spice` (sha256 `01e06dac...4d16a1`,
 the DR-0043 extraction), N = 40 per corner, seed 20261008, batch backend, pilot-only limits copy with
 `min_samples = 40` (production floor 500 unchanged in `limits_main.json`). Inputs/reports:
-`sim/mc/results/20261123T174809Z-ctrl-pilot/`; grades `.../20261123T182646Z-ctrl-pilot-grade/`. All 24
+`sim/mc/results/20261123T174809Z-ctrl-pilot/` plus the row-4 control re-run `sim/mc/results/20261124T025620Z-ctrl-pilot-r4/`
+(the three `ctrlr4_<p>` cells at the frozen 70 kohm; batch backend); grades `.../20261124T031147Z-ctrl-pilot-r4-grade/`. All 24
 yield verdicts have n = 40, 0 errored, 0 unmeasurable, 0 censored. Zero-mismatch control passes (codes 164/79/212).
 Nominal pass fraction 40/40 (exact 95 % CI 0.912-1.000) in every cell except `ss` row 4 (0/40).
 
-Twelve measurement verdicts for the seeded defect: **10 detected**; `ff` row 4 **not detected** (control
-yield 40/40: the 70 kohm leak is too weak there, as the derivation predicted); `ss` row 4 **nominal fails,
-deferred to #317** (not counted). Detected: row 2 both measurements at tt/ff/ss (control 0/40), row 4 tt
-(8/40), row 5 tt/ff/ss (0/40). The 3x grades keep their existing form in `yield_<p>_row{2,4,5}.json`: all
+Twelve measurement verdicts for the seeded defect: **11 detected**, none not detected; `ss` row 4
+**nominal fails, deferred to #317** (not counted). Detected: row 2 both measurements at tt/ff/ss
+(control 0/40), row 4 tt (0/40) and `ff` (20/40, 95 % CI 0.338-0.662, against nominal 40/40), row 5
+tt/ff/ss (0/40). The 3x grades keep their existing form in `yield_<p>_row{2,4,5}.json`: all
 12 `not_detected`.
+
+**Correction of the first pilot grade.** The first pilot run (`20261123T174809Z-ctrl-pilot`, grade
+`20261123T182646Z-ctrl-pilot-grade`) generated the row-4 leak at 100 kohm, not the 70 kohm frozen in the
+derivation record (100 kohm was the round-4 magnitude the derivation rejected). Its `ctrlr4_<p>` reports
+and that grade's row-4 control cells (`ff` "not detected" at 40/40, `tt` 8/40) therefore describe a
+different, weaker deck and are **superseded**, not evidence about the carried control; both directories
+stay as appended history. `gen_campaign.py` now carries 7e4 and `test_gen_campaign.py` asserts `DEFECTS`
+against the frozen line of the derivation README, so the generator and the record cannot drift apart
+silently. The re-run changes only the `RDEF_LEAK` card (same seed, draws, probes and expressions).
 
 ## What the full-campaign grade would be (hypothetical, not asserted)
 
 With a passing design and these controls detected at N = 500, `klt signoff` would read item 6 as
-`unratified_rows` while DR-0019 remains `proposed` (`met` once ratified). `ff` row 4 would remain
-`negative_control_not_detected` until a stronger or different row-4 control is defined. The committed
+`unratified_rows` while DR-0019 remains `proposed` (`met` once ratified). The committed
 `signoff/signoff-report.json` is not changed; the re-grade stays with #202. #317's "Negative controls"
 line needs re-curation to include these controls.
 
@@ -77,6 +86,7 @@ line needs re-curation to include these controls.
 ## Consequences
 
 - Row 2 and row 5 gain a control that is detected in every cell whose nominal passes (pilot).
-- Row 4 `ff` stays undetected; follow-up is a stronger or alternative supply-dependent defect.
+- Row 4 is detected at `tt` and `ff` at the frozen 70 kohm (the derivation's s2 <= -1.0 bench rule is
+  still unmet by any in-range candidate, as recorded; the pilot nevertheless detects it).
 - Pilot verdicts are not item-6 evidence for the design. Production campaign (#317) must re-run the
   controls at N = 500 on the then-current DUT.

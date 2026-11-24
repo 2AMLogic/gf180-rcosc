@@ -386,7 +386,7 @@ these results. `testbench-inventory.md` carries the campaign (item 9 re-pinned).
 
 Issue #461 / [DR-0051](../spec/decision-records/0051-item-6-seeded-defect-negative-controls-and-the-fine-timing-sensitivity-pilot.md)
 (proposed) adds seeded known-bad negative controls per row set, kept alongside the 3x and zero controls,
-and a pilot (N = 40, DR-0043 extraction): 10 of 12 measurement verdicts detected, `ff` row 4 not detected,
+and a pilot (N = 40, DR-0043 extraction): 11 of 12 measurement verdicts detected,
 `ss` row 4 deferred to #317. With a passing design and these controls at N = 500 the item would grade
 `unratified_rows` (`met` once DR-0019 is ratified); this committed report is unchanged and the re-grade
 stays with #202.

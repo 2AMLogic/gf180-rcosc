@@ -122,7 +122,7 @@ def test_defect_cards_are_the_only_difference_from_the_nominal_deck(tmp_path):
     assert "r_length=12.03860U" in card[0] and "r_length=12.03860U" not in card[1]
     assert [x for x in diff2 if x[0].startswith(".param d__91=")]
     extra = [l for l in r45 if l not in main]
-    assert [l for l in extra if l.startswith("RDEF_LEAK")] == ["RDEF_LEAK vdd ndef_leak 100000"]
+    assert [l for l in extra if l.startswith("RDEF_LEAK")] == ["RDEF_LEAK vdd ndef_leak 70000"]
     assert [l for l in extra if l.startswith("XDEF_LEAK")]
     assert len(r45) == len(main) + 2 and len(extra) == 3  # the title line + the two added cards
     r5 = (d / "tb_ctrlr5_tt.spice").read_text()
@@ -190,3 +190,17 @@ def test_apply_defect_fails_loudly_on_a_missing_target():
         gc.apply_defect(".SUBCKT rcosc_top vdd vss\n.ENDS rcosc_top", dict(gc.DEFECTS["trimbank"]))
     with pytest.raises(ValueError):
         gc.apply_defect(".SUBCKT rcosc_top vdd vss\n.ENDS rcosc_top", dict(gc.DEFECTS["leak"]))
+
+
+def test_defects_match_the_magnitudes_frozen_in_the_derivation_record():
+    # issue #461: the seeded magnitudes are frozen in the derivation README *before* any pilot
+    # draw; a generator constant that drifts from that line silently changes what the control is
+    # (the row-4 leak once ran at 100 kohm, a value the derivation rejected, while the record said 70 kohm)
+    readme = (Path(__file__).parent / "results" / "20261123T174327Z-ctrl-derivation" / "README.md").read_text()
+    frozen = " ".join(readme.split("Frozen for the pilot", 1)[1].split("detection =", 1)[0].split())
+    scale = float(re.search(r"scale ([0-9.]+) on X\$91", frozen).group(1))
+    rleak = float(re.search(r"nfet leak ([0-9.e+]+) ohm", frozen).group(1))
+    is_a = float(re.search(r"junction IS ([0-9.e+-]+) A", frozen).group(1))
+    assert gc.DEFECTS["trimbank"]["scale"] == scale
+    assert gc.DEFECTS["leak"]["rvalue"] == rleak
+    assert gc.DEFECTS["diode"]["is_a"] == is_a
