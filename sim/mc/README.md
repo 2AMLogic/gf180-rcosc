@@ -99,6 +99,30 @@ point estimates, not claims. The 0x7E->0x7F miss is attributed (untested
 hypothesis) to the 1x sigma, 4.5 kHz, sitting at the `tran 200p` timing
 resolution.
 
+## Seeded-defect controls and the timing-resolution pilot (issue #461, DR-0051)
+
+The DR-0019 3x and zero controls above stay in every campaign and stay reported per cell. They are
+joined by a **seeded known-bad deck per row set** (`gen_campaign.py --pilot N`; component, polarity and
+magnitude in `DEFECTS` and `results/20261123T174327Z-ctrl-derivation/README.md`): row 2 a 4x-long
+trim-ladder base segment, row 4 a supply-side nfet leak (70 kohm), row 5 a reverse junction leak
+(IS = 1e-8 A). Same seed, draws, probes and grading expressions as the nominal; each is paired with the
+nominal through `yield-samples --negative-control` as its own grade. Detection is the pinned grader's
+per-measurement verdict only; a cell whose nominal fails is listed and deferred to #317.
+
+Pilot (`results/20261123T174809Z-ctrl-pilot/` plus the row-4 control re-run `results/20261124T025620Z-ctrl-pilot-r4/` at the
+frozen 70 kohm, N = 40, DR-0043 extraction, batch backend; grades in
+`results/20261124T031147Z-ctrl-pilot-r4-grade/summary.md`): **11 of 12 measurement verdicts detected**;
+`ss` row 4 nominal fails, deferred. The first pilot grade (`20261123T182646Z-ctrl-pilot-grade`) ran the
+row-4 leak at 100 kohm by mistake and is superseded (kept as history); `test_gen_campaign.py` now ties
+`DEFECTS` to the frozen derivation line. The sensitivity
+miss was timing resolution: 0x7E->0x7F is 5.59x at `tran 200p` and 9.88x at `tran 50p` (band 7-13
+unchanged). The pilot carries no design-yield claim and does not change item 6.
+
+```
+sim/mc/run-campaign.sh --pilot 40 --dut <netlist> <new runid> [case ...]     # also --derive (magnitude sweep), --resume (parallel lanes)
+sim/mc/grade.sh --limits <run>/limits_pilot.json --zero-ref "tt=164:47.91,ff=79:47.97,ss=212:48.04" <new gradeid> <run dir>
+```
+
 ## Honest limits
 
 * The mismatch model is DR-0022's flagged assumption; `klt sim`'s

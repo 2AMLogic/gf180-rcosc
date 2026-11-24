@@ -1,0 +1,15 @@
+klt: batch job klt-sim-4e5651edd3e1 submitting to s3://<bucket>/jobs/klt-sim-4e5651edd3e1
+klt sim: batch job klt-sim-4e5651edd3e1: submitted
+klt sim: batch job klt-sim-4e5651edd3e1 launched; re-attach with `klt sim <request> --backend batch --attach klt-sim-4e5651edd3e1`
+klt sim: batch job klt-sim-4e5651edd3e1 state=no status.json yet elapsed=1s
+klt sim: batch job klt-sim-4e5651edd3e1: running
+klt sim: batch job klt-sim-4e5651edd3e1 state=running elapsed=33s
+klt sim: client terminated by SIGTERM while waiting on job klt-sim-4e5651edd3e1 (region us-east-1); the remote job is left running -- the fleet has no cancel
+{
+  "schema_version": 1,
+  "error": {
+    "command": "sim",
+    "message": "batch backend failed: client terminated by SIGTERM while waiting on job klt-sim-4e5651edd3e1 (region us-east-1); the remote job is left running -- the fleet has no cancel",
+    "code": "batch_client_interrupted"
+  }
+}
