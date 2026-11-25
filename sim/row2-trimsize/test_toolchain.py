@@ -205,6 +205,19 @@ def _install_fake_klt(monkeypatch: pytest.MonkeyPatch, meta: dict[str, dict]) ->
             sim_m = staged_tb[req_m["tb_path"].name]
             rpath = gdir / rp.stem / "report.json"
             rpath.parent.mkdir(parents=True, exist_ok=True)
+            req_doc = json.loads(rp.read_text())
+            req_with_wait = {
+                **req_doc,
+                "batch": {**(req_doc.get("batch") or {}), "capacity_wait_s": float(run_set.CAPACITY_WAIT_S)},
+            }
+            rec_sha = hashlib.sha256(
+                json.dumps(req_with_wait, sort_keys=True, default=str).encode("utf-8")
+            ).hexdigest()
+            (gdir / rp.stem / "batch-receipt.json").write_text(json.dumps({
+                "job_id": f"klt-sim-fake-{req_m['tag']}",
+                "request_sha256": rec_sha,
+                "state": "done",
+            }, indent=2, sort_keys=True) + "\n")
             rep = {
                 "synthetic": True,
                 "status": "pass",
@@ -405,6 +418,222 @@ def test_run_set_ambiguous_legacy_job_path_and_defensive_guards(tmp_path: Path, 
     ]
     with pytest.raises(ValueError, match="single"):
         run_set.run_group(run_set.DEFAULT_KLT, mixed, tmp_path / "out_err", 8)
+    same_dir_colliding = tmp_path / "bench_collide" / "A" / "tt"
+    (same_dir_colliding / "s1").mkdir(parents=True)
+    (same_dir_colliding / "s2").mkdir(parents=True)
+    (same_dir_colliding / "s1" / "tb.spice").write_text("* s1\n.end\n")
+    (same_dir_colliding / "s2" / "tb.spice").write_text("* s2\n.end\n")
+    r_s1 = same_dir_colliding / "request_s1.json"
+    r_s2 = same_dir_colliding / "request_s2.json"
+    r_s1.write_text(json.dumps({"netlist": "s1/tb.spice"}) + "\n")
+    r_s2.write_text(json.dumps({"netlist": "s2/tb.spice"}) + "\n")
+    with pytest.raises(ValueError, match="sharing basename"):
+        run_set.run_group(
+            run_set.DEFAULT_KLT,
+            [("A_tt_s1", "A", r_s1), ("A_tt_s2", "A", r_s2)],
+            tmp_path / "out_err2",
+            8,
+        )
     assert "klayout-tools==0.9.0" in run_set.DEFAULT_KLT
     assert "klayout-tools==0.9.0" in (run_set.__doc__ or "")
     assert "2AMLogic/klayout-tools#7180" in (run_set.__doc__ or "")
+
+
+def test_salvage_recovers_committed_screen_reports_with_090_receipts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    screen = fw.REPO / "sim" / "row2-trimsize" / "results" / "20261122T0550Z-screen"
+    ctrl_req = screen / "bench" / "ctrl" / "tt_27C_3p3V" / "request_c00.json"
+    ctrl_job = screen / "jobs" / "ctrl" / "request_c00"
+    raw_req_sha = hashlib.sha256(ctrl_req.read_bytes()).hexdigest()
+    receipt_sha = json.loads((ctrl_job / "batch-receipt.json").read_text())["request_sha256"]
+    assert raw_req_sha.startswith("6dcb73e2")
+    assert receipt_sha.startswith("46c6059e")
+    assert raw_req_sha != receipt_sha
+
+    # Replay committed screen jobs read-only into an empty temp output directory.
+    out_all = tmp_path / "out_screen"
+    reqs = run_set.find_requests(screen / "bench", None)
+    n_salv = run_set.salvage(screen / "jobs", out_all, reqs, screen / "bench")
+    assert n_salv == 272
+    recovered_ctrl = out_all / "reports" / "report_ctrl_tt_27C_3p3V_c00.json"
+    assert recovered_ctrl.is_file()
+    assert recovered_ctrl.read_text() == (ctrl_job / "report.json").read_text()
+    # Cross-wired straddling-batch legacy job dirs stay unrecovered.
+    assert not (
+        out_all
+        / "reports"
+        / "report_s28.37900-0.21230-0.50606-1.07899-2.28837-4.69161-9.66190-20.87300-48.84701_tt_27C_3p3V_c00.json"
+    ).exists()
+
+    # Also exercise run_set.py --dry-run with the committed ctrl c00 report + receipt.
+    out_ctrl = tmp_path / "out_ctrl_dry"
+    dst_job = out_ctrl / "jobs" / "ctrl" / "request_c00"
+    dst_job.mkdir(parents=True)
+    (dst_job / "report.json").write_text((ctrl_job / "report.json").read_text())
+    (dst_job / "batch-receipt.json").write_text((ctrl_job / "batch-receipt.json").read_text())
+    capsys.readouterr()
+    assert _run_main(
+        monkeypatch,
+        "--bench-dir", str(screen / "bench"),
+        "--out-dir", str(out_ctrl),
+        "--variant", "ctrl",
+        "--dry-run",
+    ) == 0
+    stdout = capsys.readouterr().out
+    assert "salvaged 1 finished member reports" in stdout
+    assert "57 requests, 1 already reported, 56 to run" in stdout
+    assert (out_ctrl / "reports" / "report_ctrl_tt_27C_3p3V_c00.json").read_text() == (
+        ctrl_job / "report.json"
+    ).read_text()
+
+
+def test_salvage_shared_netlist_path_requires_unique_request_match(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    repo_sim = tmp_path / "repo"
+    (repo_sim / ".git").mkdir(parents=True)
+    bench = repo_sim / "bench"
+    bench.mkdir(parents=True)
+    common_tb = bench / "common.spice"
+    common_bytes = b"* shared netlist across process corners\n.end\n"
+    common_tb.write_bytes(common_bytes)
+    common_sha = hashlib.sha256(common_bytes).hexdigest()
+
+    meta: dict[str, dict] = {}
+    for idx, (var, corner, proc, temp_c) in enumerate((
+        ("A", "ff", "ff", 85.0),
+        ("A", "tt", "tt", 27.0),
+        ("B", "tt", "tt", 27.0),
+    ), 1):
+        d = bench / var / corner
+        d.mkdir(parents=True, exist_ok=True)
+        req_path = d / "request_c00.json"
+        req_path.write_text(json.dumps({
+            "netlist": "../../common.spice",
+            "engine": "ngspice",
+            "backend": "batch",
+            "corners": {"process": [{"name": proc}], "temperature_c": [temp_c]},
+        }, indent=2) + "\n")
+        tag = f"{var}_{corner}_c00"
+        meta[tag] = {
+            "tag": tag,
+            "variant": var,
+            "corner": corner,
+            "stem": "c00",
+            "req_path": req_path,
+            "tb_path": common_tb,
+            "netlist_sha256": common_sha,
+            "fosc_hz": 45_000_000.0 + idx * 100_000.0,
+        }
+
+    for mode, net_path_str in (
+        ("abs", str(common_tb.resolve())),
+        ("rel", common_tb.relative_to(repo_sim).as_posix()),
+    ):
+        shared_report = {
+            "synthetic": True,
+            "status": "pass",
+            "measured_tag": "ambiguous_shared_path",
+            "netlist": {"path": net_path_str, "scope": "repo"},
+            "environment": {"netlist_sha256": common_sha},
+        }
+        # Full bench --dry-run (no receipt): both A/ff and A/tt stay pending.
+        out_all = tmp_path / f"out_all_{mode}"
+        leg_all = out_all / "jobs" / "A" / "request_c00" / "report.json"
+        leg_all.parent.mkdir(parents=True)
+        leg_all.write_text(json.dumps(shared_report) + "\n")
+        capsys.readouterr()
+        assert _run_main(monkeypatch, "--bench-dir", str(bench), "--out-dir", str(out_all), "--dry-run") == 0
+        out_txt = capsys.readouterr().out
+        assert "salvaged" not in out_txt
+        assert "3 requests, 0 already reported, 3 to run" in out_txt
+        assert not (out_all / "reports").exists()
+
+        # Under --variant A (--dry-run and full execution): both A corners still stay pending.
+        out_var = tmp_path / f"out_var_{mode}"
+        leg_var = out_var / "jobs" / "A" / "request_c00" / "report.json"
+        leg_var.parent.mkdir(parents=True)
+        leg_var.write_text(json.dumps(shared_report) + "\n")
+        capsys.readouterr()
+        assert _run_main(
+            monkeypatch, "--bench-dir", str(bench), "--out-dir", str(out_var), "--variant", "A", "--dry-run"
+        ) == 0
+        out_var_txt = capsys.readouterr().out
+        assert "salvaged" not in out_var_txt
+        assert "2 requests, 0 already reported, 2 to run" in out_var_txt
+        assert not (out_var / "reports").exists()
+
+        calls = _install_fake_klt(monkeypatch, meta)
+        assert _run_main(
+            monkeypatch, "--bench-dir", str(bench), "--out-dir", str(out_var), "--variant", "A"
+        ) == 0
+        assert [[p.relative_to(bench).as_posix() for p in c["requests"]] for c in calls] == [
+            ["A/ff/request_c00.json"],
+            ["A/tt/request_c00.json"],
+        ]
+        assert json.loads((out_var / "reports" / "report_A_ff_c00.json").read_text())["measured_tag"] == "A_ff_c00"
+        assert json.loads((out_var / "reports" / "report_A_tt_c00.json").read_text())["measured_tag"] == "A_tt_c00"
+
+    # Under --variant B (single corner in B, sharing ../../common.spice with A/tt and A/ff):
+    # still ambiguous across the bench without a uniquely matching receipt.
+    out_b = tmp_path / "out_var_b"
+    leg_b = out_b / "jobs" / "B" / "request_c00" / "report.json"
+    leg_b.parent.mkdir(parents=True)
+    leg_b.write_text(json.dumps({
+        "synthetic": True,
+        "status": "pass",
+        "measured_tag": "ambiguous_B",
+        "netlist": {"path": common_tb.relative_to(repo_sim).as_posix(), "scope": "repo"},
+        "environment": {"netlist_sha256": common_sha},
+    }) + "\n")
+    calls = _install_fake_klt(monkeypatch, meta)
+    assert _run_main(monkeypatch, "--bench-dir", str(bench), "--out-dir", str(out_b), "--variant", "B") == 0
+    assert [[p.relative_to(bench).as_posix() for p in c["requests"]] for c in calls] == [
+        ["B/tt/request_c00.json"],
+    ]
+    assert json.loads((out_b / "reports" / "report_B_tt_c00.json").read_text())["measured_tag"] == "B_tt_c00"
+
+    # When a 0.9.0 receipt uniquely identifies A/ff/request_c00.json across the entire bench,
+    # ONLY A_ff_c00 is salvaged and A/tt/request_c00.json remains pending for submission.
+    out_uniq = tmp_path / "out_unique_receipt"
+    leg_uniq = out_uniq / "jobs" / "A" / "request_c00"
+    leg_uniq.mkdir(parents=True)
+    (leg_uniq / "report.json").write_text(json.dumps({
+        "synthetic": True,
+        "status": "pass",
+        "measured_tag": "salvaged_shared_tb_A_ff",
+        "netlist": {"path": common_tb.relative_to(repo_sim).as_posix(), "scope": "repo"},
+        "environment": {"netlist_sha256": common_sha},
+    }) + "\n")
+    ff_doc = json.loads(meta["A_ff_c00"]["req_path"].read_text())
+    ff_with_wait = {**ff_doc, "batch": {"capacity_wait_s": float(run_set.CAPACITY_WAIT_S)}}
+    ff_rec_sha = hashlib.sha256(
+        json.dumps(ff_with_wait, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest()
+    (leg_uniq / "batch-receipt.json").write_text(json.dumps({
+        "job_id": "klt-sim-ff-only",
+        "request_sha256": ff_rec_sha,
+        "state": "done",
+    }) + "\n")
+    # Also verify a mismatched receipt on a per-corner job dir leaves A_tt_c00 pending.
+    bad_corner_dir = out_uniq / "jobs" / "A" / "tt" / "request_c00"
+    bad_corner_dir.mkdir(parents=True)
+    (bad_corner_dir / "report.json").write_text(json.dumps({
+        "synthetic": True,
+        "status": "pass",
+        "measured_tag": "stale_corner_report",
+        "environment": {"netlist_sha256": common_sha},
+    }) + "\n")
+    (bad_corner_dir / "batch-receipt.json").write_text(json.dumps({
+        "job_id": "klt-sim-wrong-req",
+        "request_sha256": ff_rec_sha,
+        "state": "done",
+    }) + "\n")
+    calls = _install_fake_klt(monkeypatch, meta)
+    assert _run_main(monkeypatch, "--bench-dir", str(bench), "--out-dir", str(out_uniq), "--variant", "A") == 0
+    assert [[p.relative_to(bench).as_posix() for p in c["requests"]] for c in calls] == [
+        ["A/tt/request_c00.json"],
+    ]
+    assert json.loads((out_uniq / "reports" / "report_A_ff_c00.json").read_text())["measured_tag"] == "salvaged_shared_tb_A_ff"
+    assert json.loads((out_uniq / "reports" / "report_A_tt_c00.json").read_text())["measured_tag"] == "A_tt_c00"

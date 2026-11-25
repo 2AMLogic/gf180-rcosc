@@ -118,6 +118,15 @@ def run_group(klt: list[str], reqs: list[tuple[str, str, Path]], out: Path,
         )
     if len({p.name for _, _, p in reqs}) != len(reqs):
         raise ValueError("run_group received duplicate request basenames")
+    by_tb_name: dict[str, Path] = {}
+    for _, _, p in reqs:
+        tb_p, _, _ = _request_netlist_info(p)
+        if tb_p is not None:
+            prev = by_tb_name.setdefault(tb_p.name, tb_p)
+            if prev != tb_p:
+                raise ValueError(
+                    f"run_group received distinct netlists sharing basename {tb_p.name!r}"
+                )
     tag0, v0, p0 = reqs[0]
     gdir = job_dir(out / "jobs", v0, p0)
     gdir.mkdir(parents=True, exist_ok=True)
@@ -170,6 +179,9 @@ def run_group(klt: list[str], reqs: list[tuple[str, str, Path]], out: Path,
     return rows
 
 
+_SUBMISSION_ONLY_BATCH_FIELDS = ("capacity_wait_s", "max_concurrent_jobs")
+
+
 def _sha256_file(p: Path) -> str | None:
     try:
         return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -177,16 +189,91 @@ def _sha256_file(p: Path) -> str | None:
         return None
 
 
-def _request_netlist_info(req_path: Path) -> tuple[Path | None, str | None, str | None]:
-    req_sha = _sha256_file(req_path)
+def _find_repo_root(start: Path) -> Path:
+    cur = start.resolve()
+    for cand in (cur, *cur.parents):
+        if (cand / ".git").exists():
+            return cand
+    return REPO
+
+
+def _klt_request_digests(doc: dict) -> frozenset[str]:
+    """Request-object SHA-256 digests emitted by pinned klayout-tools==0.9.0.
+
+    Blocking `klt sim` / `--batch-set` (`sim_batch._run_batch_job`) hashes
+    `json.dumps(request, sort_keys=True, default=str)` after folding CLI
+    `--wait-for-capacity` (`float(CAPACITY_WAIT_S)`) into `request.batch`;
+    `--submit-only` (`sim_batch_shards.request_sha256`) hashes canonical JSON
+    with submission-only `batch` fields excluded.
+    """
+    digests = set()
+    batch = doc.get("batch")
+    batch_dict = batch if isinstance(batch, dict) else {}
+    with_wait = {**doc, "batch": {**batch_dict, "capacity_wait_s": float(CAPACITY_WAIT_S)}}
+    digests.add(hashlib.sha256(
+        json.dumps(with_wait, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest())
+    digests.add(hashlib.sha256(
+        json.dumps(doc, sort_keys=True, default=str).encode("utf-8")
+    ).hexdigest())
+    digests.add(hashlib.sha256(
+        json.dumps(doc, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest())
+    if isinstance(batch, dict) and any(k in batch for k in _SUBMISSION_ONLY_BATCH_FIELDS):
+        kept = {k: v for k, v in batch.items() if k not in _SUBMISSION_ONLY_BATCH_FIELDS}
+        stripped = {**doc, "batch": kept}
+        digests.add(hashlib.sha256(
+            json.dumps(stripped, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        ).hexdigest())
+    return frozenset(digests)
+
+
+def _request_netlist_info(req_path: Path) -> tuple[Path | None, str | None, frozenset[str]]:
     try:
         doc = json.loads(req_path.read_text())
     except (OSError, ValueError):
-        return None, None, req_sha
-    if not isinstance(doc, dict) or not isinstance(doc.get("netlist"), str):
-        return None, None, req_sha
-    tb_path = (req_path.parent / doc["netlist"]).resolve()
-    return tb_path, _sha256_file(tb_path), req_sha
+        return None, None, frozenset()
+    if not isinstance(doc, dict):
+        return None, None, frozenset()
+    req_digests = _klt_request_digests(doc)
+    net = doc.get("netlist")
+    if not isinstance(net, str) or not net:
+        return None, None, req_digests
+    tb_path = (req_path.parent / net).resolve()
+    return tb_path, _sha256_file(tb_path), req_digests
+
+
+def _read_receipt_request_sha256(job_dir_path: Path) -> tuple[bool, str | None]:
+    receipt_path = job_dir_path / "batch-receipt.json"
+    if not receipt_path.is_file():
+        return True, None
+    try:
+        rec = json.loads(receipt_path.read_text())
+    except (OSError, ValueError):
+        return False, None
+    if not isinstance(rec, dict):
+        return False, None
+    if "request_sha256" in rec:
+        rsha = rec["request_sha256"]
+        if not isinstance(rsha, str) or not rsha:
+            return False, None
+        return True, rsha
+    return True, None
+
+
+def _resolve_report_netlist_path(report_doc: dict, repo_root: Path) -> tuple[bool, Path | None]:
+    if "netlist" not in report_doc or report_doc["netlist"] is None:
+        return True, None
+    net_meta = report_doc["netlist"]
+    if not isinstance(net_meta, dict):
+        return False, None
+    raw_path = net_meta.get("path")
+    if raw_path is None:
+        return True, None
+    if not isinstance(raw_path, str) or not raw_path:
+        return False, None
+    np = Path(raw_path)
+    return True, (np.resolve() if np.is_absolute() else (repo_root / np).resolve())
 
 
 def _is_passing_report(doc: object) -> bool:
@@ -199,42 +286,36 @@ def _legacy_identity_verified(
     report_doc: dict,
     legacy_dir: Path,
     req_path: Path,
-    bench_info: dict[Path, tuple[Path | None, str | None, str | None]],
+    bench_info: dict[Path, tuple[Path | None, str | None, frozenset[str]]],
+    repo_root: Path = REPO,
 ) -> bool:
     """True only when a legacy jobs/<variant>/<stem>/report.json unambiguously
     proves it measured `req_path` and no other request in the bench."""
     env = report_doc.get("environment")
     got_net_sha = env.get("netlist_sha256") if isinstance(env, dict) else None
-    tb_path, exp_net_sha, exp_req_sha = bench_info[req_path.resolve()]
-    if not isinstance(got_net_sha, str) or exp_net_sha is None or got_net_sha != exp_net_sha:
+    if not isinstance(got_net_sha, str) or not got_net_sha:
+        return False
+    ok_rec, got_req_sha = _read_receipt_request_sha256(legacy_dir)
+    if not ok_rec:
+        return False
+    ok_np, resolved_np = _resolve_report_netlist_path(report_doc, repo_root)
+    if not ok_np:
         return False
 
-    matched_req_sha = False
-    receipt_path = legacy_dir / "batch-receipt.json"
-    if receipt_path.is_file():
-        try:
-            rec = json.loads(receipt_path.read_text())
-        except (OSError, ValueError):
+    def _candidate_matches(info: tuple[Path | None, str | None, frozenset[str]]) -> bool:
+        tb_p, nsha, rdigests = info
+        if nsha is None or nsha != got_net_sha:
             return False
-        if not isinstance(rec, dict):
+        if got_req_sha is not None and got_req_sha not in rdigests:
             return False
-        if "request_sha256" in rec:
-            if exp_req_sha is None or rec["request_sha256"] != exp_req_sha:
-                return False
-            matched_req_sha = True
+        if resolved_np is not None and (tb_p is None or tb_p != resolved_np):
+            return False
+        return True
 
-    net_meta = report_doc.get("netlist")
-    if isinstance(net_meta, dict) and isinstance(net_meta.get("path"), str) and net_meta["path"]:
-        np = Path(net_meta["path"])
-        resolved_np = np.resolve() if np.is_absolute() else (REPO / np).resolve()
-        return tb_path is not None and resolved_np == tb_path
-
-    if matched_req_sha:
-        matches = sum(1 for _, nsha, rsha in bench_info.values()
-                      if nsha == exp_net_sha and rsha == exp_req_sha)
-    else:
-        matches = sum(1 for _, nsha, _ in bench_info.values() if nsha == exp_net_sha)
-    return matches == 1
+    target = bench_info.get(req_path.resolve())
+    if target is None or not _candidate_matches(target):
+        return False
+    return sum(1 for info in bench_info.values() if _candidate_matches(info)) == 1
 
 
 def salvage(jobs_root: Path, out: Path, reqs: list[tuple[str, str, Path]],
@@ -249,13 +330,16 @@ def salvage(jobs_root: Path, out: Path, reqs: list[tuple[str, str, Path]],
     their request identity can be uniquely verified against the full bench."""
     if not reqs:
         return 0
-    bench_info: dict[Path, tuple[Path | None, str | None, str | None]] | None = None
+    bench_root = bench if bench is not None else reqs[0][2].parent.parent.parent
+    repo_root = _find_repo_root(bench_root)
+    bench_info: dict[Path, tuple[Path | None, str | None, frozenset[str]]] | None = None
     n = 0
     for tag, v, p in reqs:
         dst = out / "reports" / f"report_{tag}.json"
         if dst.is_file():
             continue
-        src = job_dir(jobs_root, v, p) / p.stem / "report.json"
+        cdir = job_dir(jobs_root, v, p) / p.stem
+        src = cdir / "report.json"
         if src.is_file():
             try:
                 d = json.loads(src.read_text())
@@ -263,11 +347,17 @@ def salvage(jobs_root: Path, out: Path, reqs: list[tuple[str, str, Path]],
                 continue
             if not _is_passing_report(d):
                 continue
+            tb_path, exp_net_sha, exp_req_digests = _request_netlist_info(p)
             env = d.get("environment") if isinstance(d.get("environment"), dict) else None
-            if env is not None and "netlist_sha256" in env:
-                _, exp_net_sha, _ = _request_netlist_info(p)
+            if env is not None and env.get("netlist_sha256") is not None:
                 if exp_net_sha is not None and env.get("netlist_sha256") != exp_net_sha:
                     continue
+            ok_rec, got_req_sha = _read_receipt_request_sha256(cdir)
+            if not ok_rec or (got_req_sha is not None and exp_req_digests and got_req_sha not in exp_req_digests):
+                continue
+            ok_np, resolved_np = _resolve_report_netlist_path(d, repo_root)
+            if not ok_np or (resolved_np is not None and tb_path is not None and resolved_np != tb_path):
+                continue
             dst.parent.mkdir(parents=True, exist_ok=True)
             dst.write_text(src.read_text())
             n += 1
@@ -284,11 +374,10 @@ def salvage(jobs_root: Path, out: Path, reqs: list[tuple[str, str, Path]],
         if not _is_passing_report(d):
             continue
         if bench_info is None:
-            bench_root = bench if bench is not None else p.parent.parent.parent
             bench_info = {q.resolve(): _request_netlist_info(q)
                           for _, _, q in find_requests(bench_root, None)}
         bench_info.setdefault(p.resolve(), _request_netlist_info(p))
-        if not _legacy_identity_verified(d, legacy_dir, p, bench_info):
+        if not _legacy_identity_verified(d, legacy_dir, p, bench_info, repo_root):
             continue
         dst.parent.mkdir(parents=True, exist_ok=True)
         dst.write_text(legacy_src.read_text())
