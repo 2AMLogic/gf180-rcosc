@@ -103,10 +103,9 @@ def main() -> int:
 
     proc, temp, vdd = (lambda p, t, v: (p, float(t), float(v)))(*args.corner.split(":"))
     out = args.out
-    if out.exists() and any(out.iterdir()):
+    if not prepare.ensure_bench_dir(out):
         print(f"error: {out} exists and is not empty", file=sys.stderr)
         return 1
-    out.mkdir(parents=True)
 
     grid = prepare.grid_definition()
     corners = prepare.validate_corners([(proc, temp, vdd)], grid)

@@ -44,10 +44,9 @@ def main() -> int:
 
     names = list(dict.fromkeys(args.sizing))
     out = args.out
-    if out.exists() and any(out.iterdir()):
+    if not prepare.ensure_bench_dir(out):
         print(f"error: {out} exists and is not empty", file=sys.stderr)
         return 1
-    out.mkdir(parents=True)
 
     grid = prepare.grid_definition()
     corners = prepare.validate_corners(list(CORNERS), grid)

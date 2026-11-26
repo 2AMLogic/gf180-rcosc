@@ -241,6 +241,18 @@ def manifest_template(settings: dict) -> dict:
     return t
 
 
+def ensure_bench_dir(out: Path) -> bool:
+    """Check and create a generator output directory: absent -> created (with
+    parents), existing and empty -> accepted, existing and non-empty ->
+    refused (returns False; each caller reports that in its own voice).
+    Shared by generate() below and the sim/row2-trimsize CLI generators."""
+    out = Path(out)
+    if out.exists() and any(out.iterdir()):
+        return False
+    out.mkdir(parents=True, exist_ok=True)
+    return True
+
+
 def generate(out: Path, schematic: Path | None, extracted: Path | None,
              corners=DEFAULT_CORNERS, cfg: dict | None = None) -> dict:
     cfg = DEFAULTS | (cfg or {})
@@ -263,9 +275,8 @@ def generate(out: Path, schematic: Path | None, extracted: Path | None,
     grid = grid_definition()
     corners = validate_corners(corners, grid)
     out = Path(out)
-    if out.exists() and any(out.iterdir()):
+    if not ensure_bench_dir(out):
         raise PrepareError(f"output directory exists and is not empty: {out} (results are append-only)")
-    out.mkdir(parents=True, exist_ok=True)
 
     entries = []
     for v in inputs:

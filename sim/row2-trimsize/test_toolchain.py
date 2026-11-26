@@ -6,6 +6,7 @@ Run:  python3 -I -m pytest -p no:cacheprovider sim/row2-trimsize/test_toolchain.
 """
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -18,6 +19,22 @@ import variant  # noqa: E402
 
 SRC = fw.REPO / "sim" / "cmph-fix" / "rcosc_top_p3_cmphfix.spice"
 NAME = "s30.87078-0.18093-0.45059-0.97650-2.08666-4.29269-8.85515-19.14635-44.82498"
+
+BENCH_DIR_CLIS = [
+    ("gen_screen.py", ["--sizing", "s30.8-0.18-0.36-0.72-1.44-2.88-5.76-11.52-23.04"]),
+    ("gen_full.py", ["--sizing", "ctrl"]),
+]
+
+
+def _run_cli(script: str, out: Path, *extra: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, "-I", str(HERE / script), "--out", str(out), *extra],
+        capture_output=True, text=True)
+
+
+def _tree(root: Path) -> dict[str, bytes]:
+    return {p.relative_to(root).as_posix(): p.read_bytes()
+            for p in sorted(root.rglob("*")) if p.is_file()}
 
 
 def ladder_lines(text: str) -> dict[str, str]:
@@ -129,3 +146,27 @@ def test_sizing_from_floors_low_segments_and_keeps_ratio_rule() -> None:
         assert float(gen_screen.sizing_from(p, "P", "c").split("-")[1]) == gen_screen.L_MIN_UM
     finally:
         p.unlink()
+
+
+@pytest.mark.parametrize("script,extra", BENCH_DIR_CLIS)
+def test_cli_accepts_a_precreated_empty_bench_dir(tmp_path, script, extra) -> None:
+    # the advertised "NEW (or empty)" --out: a mktemp -d destination (issue #500)
+    fresh, empty = tmp_path / "fresh", tmp_path / "empty"
+    empty.mkdir()
+    for out in (fresh, empty):
+        r = _run_cli(script, out, *extra)
+        assert r.returncode == 0, r.stderr
+    assert _tree(fresh) == _tree(empty)
+
+
+@pytest.mark.parametrize("script,extra", BENCH_DIR_CLIS)
+def test_cli_refuses_an_occupied_bench_dir_and_preserves_its_sentinel(
+        tmp_path, script, extra) -> None:
+    out = tmp_path / "occupied"
+    out.mkdir()
+    (out / "sentinel").write_bytes(b"bench-data-do-not-touch")
+    r = _run_cli(script, out, *extra)
+    assert r.returncode != 0
+    assert "not empty" in r.stderr
+    assert [p.name for p in out.iterdir()] == ["sentinel"]
+    assert (out / "sentinel").read_bytes() == b"bench-data-do-not-touch"
