@@ -17,6 +17,7 @@ import pytest
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
+import analyze_screen  # noqa: E402
 import fit_weights as fw  # noqa: E402
 import run_set  # noqa: E402
 import variant  # noqa: E402
@@ -93,6 +94,42 @@ def test_solve_ls_recovers_an_exact_system() -> None:
     x = [0.25, -1.5, 0.75]
     y = [sum(r[i] * x[i] for i in range(3)) for r in rows]
     assert fw.solve_ls(rows, y) == pytest.approx(x)
+
+
+def test_analyze_screen_reuses_fit_weights_solve_ls_in_isolated_mode(tmp_path: Path) -> None:
+    assert analyze_screen.solve_ls is fw.solve_ls
+
+    bench = tmp_path / "bench"
+    reports = tmp_path / "reports"
+    out = tmp_path / "analysis"
+    bench.mkdir()
+    reports.mkdir()
+    codes = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x7F, 0x80, 0xBF, 0xC0, 0xFF]
+    corner = "tt_27C_3p3V"
+    W = 20.0
+    beta = [-W * (2 ** b) for b in range(8)]
+    requests = []
+    for c in codes:
+        tag = f"ctrl_{corner}_c{c:02X}"
+        sha = f"sha-{c:02X}"
+        requests.append({"tag": tag, "sha256": {"netlist": sha}})
+        f_hz = 1.0 / (20000.0 + sum(((c >> b) & 1) * beta[b] for b in range(8)))
+        (reports / f"report_{tag}.json").write_text(json.dumps({
+            "status": "pass",
+            "environment": {"netlist_sha256": sha},
+            "measurements": [{"name": "fosc", "worst_case": {"value": f_hz}}],
+        }) + "\n")
+    (bench / "provenance.json").write_text(json.dumps({
+        "codes": codes,
+        "variants": ["ctrl"],
+        "corner": {"tag": corner},
+        "requests": requests,
+    }) + "\n")
+
+    res = _run_cli("analyze_screen.py", out, "--reports", str(reports), "--bench", str(bench))
+    assert res.returncode == 0, res.stderr
+    doc = json.loads((out / "screen.json").read_text())
+    assert doc["variants"]["ctrl"]["rho"] == pytest.approx([1.0] * 8)
 
 
 def test_fit_curve_on_a_binary_exact_synthetic() -> None:

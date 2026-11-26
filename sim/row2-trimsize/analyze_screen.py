@@ -22,29 +22,13 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
+from fit_weights import solve_ls  # noqa: E402
 
 NOMINAL_STEP_PCT = 80.0 / 255.0
 HALF_LSB_PCT = 40.0 / 255.0
 CARRIES = ((0x7F, 0x80), (0xBF, 0xC0), (0xDF, 0xE0), (0xEF, 0xF0))
-
-
-def solve_ls(rows, y):
-    k = len(rows[0])
-    A = [[sum(r[i] * r[j] for r in rows) for j in range(k)] for i in range(k)]
-    b = [sum(r[i] * y[c] for c, r in enumerate(rows)) for i in range(k)]
-    for i in range(k):
-        piv = max(range(i, k), key=lambda x: abs(A[x][i]))
-        A[i], A[piv] = A[piv], A[i]
-        b[i], b[piv] = b[piv], b[i]
-        for r_ in range(i + 1, k):
-            fac = A[r_][i] / A[i][i]
-            for c_ in range(i, k):
-                A[r_][c_] -= fac * A[i][c_]
-            b[r_] -= fac * b[i]
-    x = [0.0] * k
-    for i in reversed(range(k)):
-        x[i] = (b[i] - sum(A[i][j] * x[j] for j in range(i + 1, k))) / A[i][i]
-    return x
 
 
 def main() -> int:
