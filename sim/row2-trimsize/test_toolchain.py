@@ -4,6 +4,7 @@ and no simulator or cloud operation is invoked.
 
 Run:  python3 -I -m pytest -p no:cacheprovider sim/row2-trimsize/test_toolchain.py
 """
+import errno
 import hashlib
 import json
 import re
@@ -473,6 +474,71 @@ def test_interrupted_legacy_report_copy_can_be_retried(tmp_path: Path, monkeypat
     assert not dst.exists()
     assert run_set.salvage(jobs, out, reqs, bench) == 1
     assert dst.read_bytes() == src.read_bytes()
+
+
+def test_partial_fresh_report_write_is_signalled_and_recovered_on_rerun(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    # A fresh submission whose tagged-report copy dies after the first byte
+    # must not publish the tagged filename, must record copy_error, and must
+    # exit 2; the rerun then recovers the intact job report through
+    # salvage() without resubmitting the member (issue #498).
+    bench = tmp_path / "bench"
+    meta = _write_bench(bench, {("A", "tt"): ["c00"]})
+    calls = _install_fake_klt(monkeypatch, meta)
+    out = tmp_path / "out"
+    dst = out / "reports" / "report_A_tt_c00.json"
+    src = out / "jobs" / "A" / "tt" / "request_c00" / "report.json"
+    reports_dir = out / "reports"
+    write_bytes, write_text = Path.write_bytes, Path.write_text
+    fired: list[Path] = []
+
+    def _in_reports(path: Path) -> bool:
+        return reports_dir.resolve() in path.resolve().parents
+
+    def partial_bytes(path: Path, data: bytes) -> int:
+        if not _in_reports(path):
+            return write_bytes(path, data)
+        fired.append(path)
+        write_bytes(path, data[:1])
+        raise OSError(errno.ENOSPC, "No space left on device")
+
+    def partial_text(path: Path, text: str, **kwargs) -> int:
+        if not _in_reports(path):
+            return write_text(path, text, **kwargs)
+        fired.append(path)
+        write_text(path, text[:1])
+        raise OSError(errno.ENOSPC, "No space left on device")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(Path, "write_bytes", partial_bytes)
+        patch.setattr(Path, "write_text", partial_text)
+        capsys.readouterr()
+        rc1 = _run_main(monkeypatch, "--bench-dir", str(bench), "--out-dir", str(out))
+    out1 = capsys.readouterr().out
+    assert len(calls) == 1
+    assert len(fired) == 1
+    assert rc1 == 2
+    assert "0/1 reports written" in out1
+    assert "1 requests still without a report" in out1
+    assert not dst.exists()
+    job_bytes = src.read_bytes()
+    assert json.loads(job_bytes)["measured_tag"] == "A_tt_c00"
+    rows = [json.loads(line) for line in (out / "ledger.jsonl").read_text().splitlines()]
+    assert [r["tag"] for r in rows] == ["A_tt_c00"]
+    assert "copy_error" in rows[0]
+    assert "report" not in rows[0]
+
+    capsys.readouterr()
+    rc2 = _run_main(monkeypatch, "--bench-dir", str(bench), "--out-dir", str(out))
+    out2 = capsys.readouterr().out
+    assert rc2 == 0
+    assert "salvaged 1 finished member reports" in out2
+    assert "1 requests, 1 already reported, 0 to run" in out2
+    assert dst.read_bytes() == job_bytes
+    assert len(calls) == 1
+    rows = [json.loads(line) for line in (out / "ledger.jsonl").read_text().splitlines()]
+    assert len(rows) == 1
 
 
 def test_salvage_recovers_committed_screen_reports_with_090_receipts(
