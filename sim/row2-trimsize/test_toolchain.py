@@ -6,6 +6,7 @@ Run:  python3 -I -m pytest -p no:cacheprovider sim/row2-trimsize/test_toolchain.
 """
 import errno
 import hashlib
+import importlib
 import json
 import re
 import subprocess
@@ -22,6 +23,22 @@ import variant  # noqa: E402
 
 SRC = fw.REPO / "sim" / "cmph-fix" / "rcosc_top_p3_cmphfix.spice"
 NAME = "s30.87078-0.18093-0.45059-0.97650-2.08666-4.29269-8.85515-19.14635-44.82498"
+
+BENCH_DIR_CLIS = [
+    ("gen_screen.py", ["--sizing", "s30.8-0.18-0.36-0.72-1.44-2.88-5.76-11.52-23.04"]),
+    ("gen_full.py", ["--sizing", "ctrl"]),
+]
+
+
+def _run_cli(script: str, out: Path, *extra: str) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, "-I", str(HERE / script), "--out", str(out), *extra],
+        capture_output=True, text=True, timeout=30)
+
+
+def _tree(root: Path) -> dict[str, bytes]:
+    return {p.relative_to(root).as_posix(): p.read_bytes()
+            for p in sorted(root.rglob("*")) if p.is_file()}
 
 
 def ladder_lines(text: str) -> dict[str, str]:
@@ -133,6 +150,73 @@ def test_sizing_from_floors_low_segments_and_keeps_ratio_rule() -> None:
         assert float(gen_screen.sizing_from(p, "P", "c").split("-")[1]) == gen_screen.L_MIN_UM
     finally:
         p.unlink()
+
+
+@pytest.mark.parametrize("writer,contender,extra,precreated", [
+    ("gen_full", "gen_full.py", ["--sizing", NAME], False),
+    ("gen_screen", "gen_screen.py", ["--sizing", NAME, "--corner", "ss:-40:3.0"], True),
+    ("gen_screen", "../trim-dense/prepare.py", ["--extracted-netlist", str(SRC)], False),
+])
+def test_only_one_generator_can_write_a_bench(tmp_path, monkeypatch, writer, contender,
+                                              extra, precreated) -> None:
+    out = tmp_path / "bench"
+    if precreated:
+        out.mkdir()
+    generator = importlib.import_module(writer)
+    sizing = "ctrl" if writer == "gen_full" else NAME
+    monkeypatch.setattr(sys, "argv", [writer, "--out", str(out), "--sizing", sizing])
+
+    # Run a second process after the first claimed the bench but just before
+    # its first corner directory exists. The two runs use disjoint requests.
+    mkdir = Path.mkdir
+    attempts = []
+
+    def mkdir_with_contender(path, *args, **kwargs):
+        if path == out / "ctrl" / "tt_27C_3p3V" and not attempts:
+            attempts.append(_run_cli(contender, out, *extra))
+        return mkdir(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "mkdir", mkdir_with_contender)
+    assert generator.main() == 0
+    [loser] = attempts
+    assert loser.returncode == 1, loser
+    assert "not empty" in loser.stderr
+    requests = json.loads((out / "provenance.json").read_text())["requests"]
+    assert sorted(entry["request"] for entry in requests) == sorted(
+        path.relative_to(out).as_posix() for path in out.rglob("request_*.json"))
+
+
+def test_failed_generation_releases_an_empty_bench(tmp_path) -> None:
+    out = tmp_path / "bench"
+    failed = _run_cli("gen_screen.py", out, "--sizing", NAME, "--corner", "unknown:27:3.3")
+    assert failed.returncode != 0 and "unknown process" in failed.stderr
+    assert list(out.iterdir()) == []
+    retry = _run_cli("gen_screen.py", out, "--sizing", NAME)
+    assert retry.returncode == 0, retry.stderr
+
+
+@pytest.mark.parametrize("script,extra", BENCH_DIR_CLIS)
+def test_cli_accepts_a_precreated_empty_bench_dir(tmp_path, script, extra) -> None:
+    # the advertised "NEW (or empty)" --out: a mktemp -d destination (issue #500)
+    fresh, empty = tmp_path / "fresh", tmp_path / "empty"
+    empty.mkdir()
+    for out in (fresh, empty):
+        r = _run_cli(script, out, *extra)
+        assert r.returncode == 0, r.stderr
+    assert _tree(fresh) == _tree(empty)
+
+
+@pytest.mark.parametrize("script,extra", BENCH_DIR_CLIS)
+def test_cli_refuses_an_occupied_bench_dir_and_preserves_its_sentinel(
+        tmp_path, script, extra) -> None:
+    out = tmp_path / "occupied"
+    out.mkdir()
+    (out / "sentinel").write_bytes(b"bench-data-do-not-touch")
+    r = _run_cli(script, out, *extra)
+    assert r.returncode != 0
+    assert "not empty" in r.stderr
+    assert [p.name for p in out.iterdir()] == ["sentinel"]
+    assert (out / "sentinel").read_bytes() == b"bench-data-do-not-touch"
 
 
 def _write_bench(bench: Path, tree: dict[tuple[str, str], list[str]]) -> dict[str, dict]:

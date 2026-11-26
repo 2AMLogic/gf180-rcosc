@@ -43,12 +43,15 @@ def main() -> int:
     args = ap.parse_args()
 
     names = list(dict.fromkeys(args.sizing))
-    out = args.out
-    if out.exists() and any(out.iterdir()):
-        print(f"error: {out} exists and is not empty", file=sys.stderr)
-        return 1
-    out.mkdir(parents=True)
+    with prepare.claim_bench_dir(args.out) as claimed:
+        if not claimed:
+            print(f"error: {args.out} exists and is not empty", file=sys.stderr)
+            return 1
+        return _write_bench(args, names)
 
+
+def _write_bench(args, names) -> int:
+    out = args.out
     grid = prepare.grid_definition()
     corners = prepare.validate_corners(list(CORNERS), grid)
     cfg = dict(prepare.DEFAULTS)
