@@ -6,6 +6,11 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 
+### 2026-11-25
+
+- **PR #473**: sim(row2-trimsize): row-2 trim-bank sizing screen is negative at every corner; DR-0048 names the thermometer upper bank as next option
+- **Issue #460** (closed): Row 2: name a trim-bank sizing that meets 0.314 %/code with monotonic carries (simulation only, bounded screen)
+
 ### 2026-11-24
 
 - **PR #466**: signoff: anchor plan-region suffix check to the end-of-line run
@@ -527,17 +532,3 @@ Chronological record of merged pull requests and closed issues, maintained by th
 ### 2026-10-05
 
 - **Issue #45** (closed): [Epic #24] Characterize achievable stored levels and loaded-column read separation
-
-### 2026-09-23
-
-- **PR #62**: feat(sim): post-layout PEX re-verify of DR-0017 respin + guardrails
-- **PR #60**: feat(design): re-reference the low-side comparator to a complementary PMOS-input cell — supply slope flattened, post-trim rows re-derived (DR-0017)
-- **Issue #61** (closed): Post-layout PEX PVT re-verification for the DR-0017 re-spun rcosc_comparator_p/rcosc_top hierarchy
-- **Issue #57** (closed): Flatten the low-side comparator's supply-dependent delay (near-ground common mode) to tighten the DR-0016 post-trim accuracy rows
-
-### 2026-09-22
-
-- **PR #58**: feat(spec): budget the measured comparator/latch delay residue into the post-trim rows (DR-0016)
-- **PR #56**: feat(layout): re-spin rcosc_trim_bank (post-#43 shunts) + PEX re-verify
-- **Issue #51** (closed): Comparator/latch delay residue now dominates the remaining post-trim accuracy rows (3x period weight; supply+temperature share grows as trim mass falls)
-- **Issue #50** (closed): Trim-bank + top layout re-spin for the #43 transmission-gate shunts: regenerate GDS/LVS/extract evidence and re-grade signoff

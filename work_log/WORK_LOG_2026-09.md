@@ -2,6 +2,20 @@
 
 Sections moved byte-for-byte from [WORK_LOG.md](../WORK_LOG.md) by `loom-daemon work-docs archive`.
 
+### 2026-09-23
+
+- **PR #62**: feat(sim): post-layout PEX re-verify of DR-0017 respin + guardrails
+- **PR #60**: feat(design): re-reference the low-side comparator to a complementary PMOS-input cell — supply slope flattened, post-trim rows re-derived (DR-0017)
+- **Issue #61** (closed): Post-layout PEX PVT re-verification for the DR-0017 re-spun rcosc_comparator_p/rcosc_top hierarchy
+- **Issue #57** (closed): Flatten the low-side comparator's supply-dependent delay (near-ground common mode) to tighten the DR-0016 post-trim accuracy rows
+
+### 2026-09-22
+
+- **PR #58**: feat(spec): budget the measured comparator/latch delay residue into the post-trim rows (DR-0016)
+- **PR #56**: feat(layout): re-spin rcosc_trim_bank (post-#43 shunts) + PEX re-verify
+- **Issue #51** (closed): Comparator/latch delay residue now dominates the remaining post-trim accuracy rows (3x period weight; supply+temperature share grows as trim mass falls)
+- **Issue #50** (closed): Trim-bank + top layout re-spin for the #43 transmission-gate shunts: regenerate GDS/LVS/extract evidence and re-grade signoff
+
 ### 2026-09-21
 
 - **PR #54**: docs: cite the DR-0013 post-re-spin PEX campaign in signoff item 7
