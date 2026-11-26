@@ -1,16 +1,22 @@
 """Offline tests for the pure analysis cores of the legacy sim drivers
-(issue #121): sim/pvt/pvt_sweep.py (calibrate, pct, spread),
+(issue #121): sim/pvt/pvt_sweep.py (calibrate, pct, spread, the untrimmed
+process-spread verdict and its summary row, issue #504),
 sim/startup/startup_report.py (rising_edges, analyse) and
 sim/iq/iq_sweep.py (verdict, _grab).
 
-Every input here is a SYNTHETIC FIXTURE built in memory or in pytest's tmp_path.
+Every input here is a SYNTHETIC FIXTURE built in memory or in pytest's tmp_path,
+except the read-only replay of committed sim/pvt results (issue #504): those
+runs are append-only evidence and are only ever read, never rewritten.
+
 Nothing is measured evidence; no ngspice, PDK, klt or network is used and
 nothing is written under sim/*/results/.
 
 Run:  python3 -I -m pytest -p no:cacheprovider sim/legacy-analysis/test_analysis_cores.py
 """
+import csv
 import json
 import math
+import re
 import sys
 from pathlib import Path
 
@@ -90,6 +96,212 @@ def test_spread_empty_or_no_reference_is_nan_not_error(freqs, ref):
 def test_spread_single_point_has_zero_half_span():
     s = pvt.spread(_results([100e6]), 100e6)
     assert s["half_span_pct"] == 0.0 and s["lo_pct"] == s["hi_pct"] == 0.0
+
+
+# ------------- pvt: untrimmed process-spread verdict (issue #504)
+#
+# The free-running untrimmed process-spread row compares each measured
+# endpoint with its own signed ratified limit (-27.7% / +47.6%, DR-0003),
+# inclusively -- never against the larger of the two magnitudes: a low-side
+# excursion must not borrow the high limit's magnitude.
+
+SCH_RESULTS = SIM / "pvt" / "results"
+
+_UNTRIMMED_ROW = re.compile(
+    r"^\| Free-running untrimmed process spread \|.*"
+    r"\| (within the ratified bound|\*\*exceeds the ratified bound\*\*) \|$",
+    re.MULTILINE,
+)
+
+
+def _committed_untrimmed_verdict(runid):
+    m = _UNTRIMMED_ROW.search((SCH_RESULTS / runid / "summary.md").read_text())
+    assert m, f"no untrimmed process-spread row in {runid}/summary.md"
+    return m.group(1)
+
+
+def _replay_pretrim_process_spread(runid):
+    """spread() over a committed run's pretrim rows at 0x80 / 27 C / 3.3 V,
+    referenced to that run's tt point: a read-only replay of exactly the
+    rows the summary's process-only spread row reports."""
+    with (SCH_RESULTS / runid / "results.csv").open() as fh:
+        rows = list(csv.DictReader(fh))
+    pre = {}
+    for row in rows:
+        if row["pass"] != "pretrim" or row["temp_c"] != "27" or row["vdd_v"] != "3.3":
+            continue
+        pt = pvt.Point(
+            row["process"], pvt.REF_TEMP_C, pvt.REF_VDD_V, int(row["trim_code"])
+        )
+        pre[pt] = pvt.Result(pt, float(row["f_hz"]), None, row["status"], "", 1200)
+    ref = pre[
+        pvt.Point(pvt.REF_PROCESS, pvt.REF_TEMP_C, pvt.REF_VDD_V, pvt.MIDSCALE_CODE)
+    ].f_hz
+    return pvt.spread(pre, ref)
+
+
+def test_untrimmed_verdict_low_side_breach_historical_run():
+    # 20260906T030219Z: ss -> -28.73% (past the -27.7% low limit by ~1.03
+    # points) while ff -> +46.53% stays inside +47.6%.  The committed summary
+    # said "within" only because the old verdict compared each side against
+    # the larger limit magnitude.
+    s = _replay_pretrim_process_spread("20260906T030219Z")
+    assert s["lo_pct"] == pytest.approx(-28.73, abs=0.01)
+    assert s["hi_pct"] == pytest.approx(+46.53, abs=0.01)
+    assert (
+        pvt.untrimmed_process_verdict(s["lo_pct"], s["hi_pct"])
+        == "**exceeds the ratified bound**"
+    )
+
+
+@pytest.mark.parametrize(
+    "lo,hi",
+    [
+        (-20.0, +47.61),  # high side past its own limit, low side well within
+        (-27.71, +46.0),  # low side past its own limit by a hundredth
+    ],
+)
+def test_untrimmed_verdict_breaches_either_signed_limit(lo, hi):
+    assert pvt.untrimmed_process_verdict(lo, hi) == "**exceeds the ratified bound**"
+
+
+def test_untrimmed_verdict_exactly_at_both_limits_is_within():
+    # inclusive comparisons: the endpoints themselves are inside the bounds
+    assert pvt.untrimmed_process_verdict(-27.7, +47.6) == "within the ratified bound"
+
+
+RETAINED_RUNS = (
+    "20260905T211140Z",
+    "20260906T060104Z",
+    "20260907T090653Z",
+    "20260921T065703Z",
+    "20260921T075822Z",
+    "20260921T164939Z",
+    "20260921T173529Z",
+    "20260922T010039Z",
+    "20260923T030125Z",
+)
+
+
+@pytest.mark.parametrize("runid", RETAINED_RUNS)
+def test_untrimmed_verdict_retains_committed_verdict_on_nine_runs(runid):
+    # the other nine committed schematic PVT sweeps keep their current
+    # verdicts under the signed comparison
+    s = _replay_pretrim_process_spread(runid)
+    assert pvt.untrimmed_process_verdict(s["lo_pct"], s["hi_pct"]) == (
+        _committed_untrimmed_verdict(runid)
+    )
+
+
+# 20260906T030219Z pretrim, 27 C / 3.3 V (MHz): tt is the reference; ss/ff
+# are that run's measured process-only extremes.
+_HIST_PRETRIM_MHZ = {
+    "tt": 42.06779,
+    "ff": 61.64337,
+    "ss": 29.98335,
+    "fs": 50.83702,
+    "sf": 37.29075,
+    "rc_f": 56.00392,
+    "rc_s": 32.71934,
+}
+
+
+def _fixture_summary():
+    """build_summary() over a synthetic campaign whose pretrim process-only
+    row carries the committed 20260906T030219Z measurements."""
+
+    def f_pre(p, t, v):
+        return (
+            _HIST_PRETRIM_MHZ[p]
+            * 1e6
+            * (1.0 + 2e-4 * (t - 27.0))
+            * (1.0 + 5e-3 * (v - 3.3))
+        )
+
+    def grid(f_fn):
+        return {
+            pt: pvt.Result(pt, f_fn(pt), None, "ok", "", 1200)
+            for pt in (
+                pvt.Point(p, t, v, pvt.MIDSCALE_CODE)
+                for p in pvt.PROCESS_CORNERS
+                for t in pvt.TEMPS_C
+                for v in pvt.VDDS_V
+            )
+        }
+
+    pre = grid(lambda pt: f_pre(pt.process, pt.temp_c, pt.vdd_v))
+    post_spec = grid(lambda pt: f_pre(pt.process, pt.temp_c, pt.vdd_v) * 0.999)
+    post_surr = grid(lambda pt: f_pre(pt.process, pt.temp_c, pt.vdd_v) * 1.001)
+
+    def ref_curve_pt(c):
+        return pvt.Point(pvt.REF_PROCESS, pvt.REF_TEMP_C, pvt.REF_VDD_V, c)
+
+    curve_codes = [0x00, 0x40, 0x80, 0xC0, 0xFF]
+    curve = {
+        ref_curve_pt(c): pvt.Result(
+            ref_curve_pt(c), 29.5e6 + 0.12e6 * c, None, "ok", "", 1200
+        )
+        for c in curve_codes
+    }
+    probe = {
+        pvt.Point("ss", pvt.REF_TEMP_C, v, c): pvt.Result(
+            pvt.Point("ss", pvt.REF_TEMP_C, v, c),
+            30e6 * (1.0 + 5e-3 * (v - 3.3)),
+            None,
+            "ok",
+            "",
+            1200,
+        )
+        for c in (pvt.MIDSCALE_CODE, 0xEF)
+        for v in pvt.VDDS_V
+    }
+    cal_spec = {p: (0x80, f_pre(p, 27.0, 3.3), False) for p in pvt.PROCESS_CORNERS}
+    cal_surr = {p: (0x80, f_pre(p, 27.0, 3.3), False) for p in pvt.PROCESS_CORNERS}
+    camp = pvt.Campaign("20260906T030219Z-fixture", Path("."), Path("."), Path("."), 1)
+    manifest = {
+        "git_sha": "fixture",
+        "git_dirty": False,
+        "ngspice": "fixture",
+        "pdk": "gf180mcuD",
+        "pdk_revision": "fixture",
+        "pdk_revision_source": "fixture",
+        "netlist": "design/netlist/pvt_tb.spice",
+        "unique_points_simulated": 0,
+        "rows_recorded": 0,
+        "failed_points": [],
+        "wall_clock_s": 0.0,
+        "jobs": 1,
+    }
+    return pvt.build_summary(
+        camp,
+        manifest,
+        curve,
+        curve_codes,
+        pre,
+        post_spec,
+        post_surr,
+        None,
+        probe,
+        [pvt.MIDSCALE_CODE, 0xEF],
+        cal_spec,
+        cal_surr,
+        f_pre("tt", 27.0, 3.3),
+        curve[ref_curve_pt(curve_codes[0])].f_hz,
+        curve[ref_curve_pt(curve_codes[-1])].f_hz,
+        0x80,
+    )
+
+
+def test_build_summary_untrimmed_row_reports_the_low_side_breach():
+    text = _fixture_summary()
+    row = [
+        line
+        for line in text.splitlines()
+        if line.startswith("| Free-running untrimmed process spread |")
+    ]
+    assert len(row) == 1
+    assert "-28.73% / +46.53%" in row[0]
+    assert row[0].endswith("**exceeds the ratified bound** |")
 
 
 # ----------------------------------------------------------- pvt: calibrate

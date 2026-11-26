@@ -579,6 +579,20 @@ def mhz(x: float | None) -> str:
     return f"{x / 1e6:.4f}" if x else "n/a"
 
 
+def untrimmed_process_verdict(lo_pct: float, hi_pct: float) -> str:
+    """Verdict for the free-running untrimmed process-spread row: each
+    measured endpoint is compared with its own signed ratified limit
+    (DR-0003), inclusively -- never against the larger of the two
+    magnitudes, which would let a low-side excursion borrow the high
+    limit."""
+    if (
+        lo_pct >= SPEC["untrimmed_spread_lo_pct"]
+        and hi_pct <= SPEC["untrimmed_spread_hi_pct"]
+    ):
+        return "within the ratified bound"
+    return "**exceeds the ratified bound**"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--jobs", type=int, default=DEFAULT_JOBS,
@@ -1053,15 +1067,7 @@ def build_summary(
         f"| Free-running untrimmed process spread | ±{SPEC['untrimmed_spread_pct']:.0f}% "
         f"({SPEC['untrimmed_spread_lo_pct']:+.1f}% / {SPEC['untrimmed_spread_hi_pct']:+.1f}% exact) | "
         f"{s_proc['lo_pct']:+.2f}% / {s_proc['hi_pct']:+.2f}% | "
-        + (
-            "within the ratified bound"
-            if max(abs(s_proc["lo_pct"]), abs(s_proc["hi_pct"]))
-            <= max(
-                abs(SPEC["untrimmed_spread_lo_pct"]),
-                abs(SPEC["untrimmed_spread_hi_pct"]),
-            )
-            else "**exceeds the ratified bound**"
-        )
+        + untrimmed_process_verdict(s_proc["lo_pct"], s_proc["hi_pct"])
         + " |"
     )
     add("")
