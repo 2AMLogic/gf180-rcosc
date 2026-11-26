@@ -102,11 +102,15 @@ def main() -> int:
                             for n, w in ((sizing_from(args.fit, p, c), w) for p, c, w in fam)]
 
     proc, temp, vdd = (lambda p, t, v: (p, float(t), float(v)))(*args.corner.split(":"))
-    out = args.out
-    if not prepare.ensure_bench_dir(out):
-        print(f"error: {out} exists and is not empty", file=sys.stderr)
-        return 1
+    with prepare.claim_bench_dir(args.out) as claimed:
+        if not claimed:
+            print(f"error: {args.out} exists and is not empty", file=sys.stderr)
+            return 1
+        return _write_bench(args, names, proc, temp, vdd)
 
+
+def _write_bench(args, names, proc, temp, vdd) -> int:
+    out = args.out
     grid = prepare.grid_definition()
     corners = prepare.validate_corners([(proc, temp, vdd)], grid)
     cfg = dict(prepare.DEFAULTS)

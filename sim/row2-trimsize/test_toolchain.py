@@ -4,6 +4,7 @@ and no simulator or cloud operation is invoked.
 
 Run:  python3 -I -m pytest -p no:cacheprovider sim/row2-trimsize/test_toolchain.py
 """
+import importlib
 import json
 import re
 import subprocess
@@ -29,7 +30,7 @@ BENCH_DIR_CLIS = [
 def _run_cli(script: str, out: Path, *extra: str) -> subprocess.CompletedProcess:
     return subprocess.run(
         [sys.executable, "-I", str(HERE / script), "--out", str(out), *extra],
-        capture_output=True, text=True)
+        capture_output=True, text=True, timeout=30)
 
 
 def _tree(root: Path) -> dict[str, bytes]:
@@ -146,6 +147,49 @@ def test_sizing_from_floors_low_segments_and_keeps_ratio_rule() -> None:
         assert float(gen_screen.sizing_from(p, "P", "c").split("-")[1]) == gen_screen.L_MIN_UM
     finally:
         p.unlink()
+
+
+@pytest.mark.parametrize("writer,contender,extra,precreated", [
+    ("gen_full", "gen_full.py", ["--sizing", NAME], False),
+    ("gen_screen", "gen_screen.py", ["--sizing", NAME, "--corner", "ss:-40:3.0"], True),
+    ("gen_screen", "../trim-dense/prepare.py", ["--extracted-netlist", str(SRC)], False),
+])
+def test_only_one_generator_can_write_a_bench(tmp_path, monkeypatch, writer, contender,
+                                              extra, precreated) -> None:
+    out = tmp_path / "bench"
+    if precreated:
+        out.mkdir()
+    generator = importlib.import_module(writer)
+    sizing = "ctrl" if writer == "gen_full" else NAME
+    monkeypatch.setattr(sys, "argv", [writer, "--out", str(out), "--sizing", sizing])
+
+    # Run a second process after the first claimed the bench but just before
+    # its first corner directory exists. The two runs use disjoint requests.
+    mkdir = Path.mkdir
+    attempts = []
+
+    def mkdir_with_contender(path, *args, **kwargs):
+        if path == out / "ctrl" / "tt_27C_3p3V" and not attempts:
+            attempts.append(_run_cli(contender, out, *extra))
+        return mkdir(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "mkdir", mkdir_with_contender)
+    assert generator.main() == 0
+    [loser] = attempts
+    assert loser.returncode == 1, loser
+    assert "not empty" in loser.stderr
+    requests = json.loads((out / "provenance.json").read_text())["requests"]
+    assert sorted(entry["request"] for entry in requests) == sorted(
+        path.relative_to(out).as_posix() for path in out.rglob("request_*.json"))
+
+
+def test_failed_generation_releases_an_empty_bench(tmp_path) -> None:
+    out = tmp_path / "bench"
+    failed = _run_cli("gen_screen.py", out, "--sizing", NAME, "--corner", "unknown:27:3.3")
+    assert failed.returncode != 0 and "unknown process" in failed.stderr
+    assert list(out.iterdir()) == []
+    retry = _run_cli("gen_screen.py", out, "--sizing", NAME)
+    assert retry.returncode == 0, retry.stderr
 
 
 @pytest.mark.parametrize("script,extra", BENCH_DIR_CLIS)

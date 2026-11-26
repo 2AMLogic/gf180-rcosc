@@ -46,6 +46,8 @@ import argparse
 import json
 import re
 import sys
+from collections.abc import Iterator
+from contextlib import contextmanager
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -241,16 +243,26 @@ def manifest_template(settings: dict) -> dict:
     return t
 
 
-def ensure_bench_dir(out: Path) -> bool:
-    """Check and create a generator output directory: absent -> created (with
-    parents), existing and empty -> accepted, existing and non-empty ->
-    refused (returns False; each caller reports that in its own voice).
-    Shared by generate() below and the sim/row2-trimsize CLI generators."""
-    out = Path(out)
+@contextmanager
+def claim_bench_dir(out: Path) -> Iterator[bool]:
+    """Reserve a new or empty bench for the duration of generation."""
     if out.exists() and any(out.iterdir()):
-        return False
+        yield False
+        return
+
     out.mkdir(parents=True, exist_ok=True)
-    return True
+    marker = out / ".bench-in-progress"
+    try:
+        marker.touch(exist_ok=False)
+    except FileExistsError:
+        yield False
+        return
+
+    try:
+        # A writer could have finished between our empty check and our claim.
+        yield all(entry == marker for entry in out.iterdir())
+    finally:
+        marker.unlink()
 
 
 def generate(out: Path, schematic: Path | None, extracted: Path | None,
@@ -275,67 +287,68 @@ def generate(out: Path, schematic: Path | None, extracted: Path | None,
     grid = grid_definition()
     corners = validate_corners(corners, grid)
     out = Path(out)
-    if not ensure_bench_dir(out):
-        raise PrepareError(f"output directory exists and is not empty: {out} (results are append-only)")
+    with claim_bench_dir(out) as claimed:
+        if not claimed:
+            raise PrepareError(f"output directory exists and is not empty: {out} (results are append-only)")
 
-    entries = []
-    for v in inputs:
-        dut_name = f"rcosc_top_{v}.spice"
-        for proc, temp, vdd in corners:
-            ctag = corner_tag(proc, temp, vdd)
-            d = out / v / ctag
-            d.mkdir(parents=True)
-            (d / dut_name).write_text(texts[v])
-            dut_sha = sha256_bytes(texts[v].encode())
-            for code in range(N_CODES):
-                ct = code_tag(code)
-                tb_name, req_name = f"tb_{ct}.spice", f"request_{ct}.json"
-                tb = tb_text(v, code, vdd, dut_name, cfg, pin_order[v])
-                req = json.dumps(request(v, tb_name, proc, temp, vdd, grid, cfg), indent=2) + "\n"
-                (d / tb_name).write_text(tb)
-                (d / req_name).write_text(req)
-                entries.append({
-                    "tag": f"{v}_{ctag}_{ct}", "variant": v, "corner": ctag, "process": proc,
-                    "temperature_c": temp, "vdd_v": vdd, "code": code, "code_hex": f"0x{code:02X}",
-                    "request": f"{v}/{ctag}/{req_name}", "netlist": f"{v}/{ctag}/{tb_name}",
-                    "corner_count": 1, "dut_sha256": dut_sha,
-                    "sha256": {"request": sha256_bytes(req.encode()), "netlist": sha256_bytes(tb.encode())},
-                })
-    tags = [e["tag"] for e in entries]
-    expect = len(inputs) * len(corners) * N_CODES
-    if len(entries) != expect or len(set(tags)) != expect:
-        raise PrepareError("internal: request set is not exactly 256 unique codes per corner and variant")
+        entries = []
+        for v in inputs:
+            dut_name = f"rcosc_top_{v}.spice"
+            for proc, temp, vdd in corners:
+                ctag = corner_tag(proc, temp, vdd)
+                d = out / v / ctag
+                d.mkdir(parents=True)
+                (d / dut_name).write_text(texts[v])
+                dut_sha = sha256_bytes(texts[v].encode())
+                for code in range(N_CODES):
+                    ct = code_tag(code)
+                    tb_name, req_name = f"tb_{ct}.spice", f"request_{ct}.json"
+                    tb = tb_text(v, code, vdd, dut_name, cfg, pin_order[v])
+                    req = json.dumps(request(v, tb_name, proc, temp, vdd, grid, cfg), indent=2) + "\n"
+                    (d / tb_name).write_text(tb)
+                    (d / req_name).write_text(req)
+                    entries.append({
+                        "tag": f"{v}_{ctag}_{ct}", "variant": v, "corner": ctag, "process": proc,
+                        "temperature_c": temp, "vdd_v": vdd, "code": code, "code_hex": f"0x{code:02X}",
+                        "request": f"{v}/{ctag}/{req_name}", "netlist": f"{v}/{ctag}/{tb_name}",
+                        "corner_count": 1, "dut_sha256": dut_sha,
+                        "sha256": {"request": sha256_bytes(req.encode()), "netlist": sha256_bytes(tb.encode())},
+                    })
+        tags = [e["tag"] for e in entries]
+        expect = len(inputs) * len(corners) * N_CODES
+        if len(entries) != expect or len(set(tags)) != expect:
+            raise PrepareError("internal: request set is not exactly 256 unique codes per corner and variant")
 
-    settings = {k: cfg[k] for k in DEFAULTS}
-    tmpl = manifest_template(settings)
-    (out / "manifest.template.json").write_text(json.dumps(tmpl, indent=2) + "\n")
-    prov = {
-        "kind": "trim-dense-batch-requests",
-        "evidence": "NOT EVIDENCE: offline request generation, no simulation was run",
-        "issue": 98, "parent": 87,
-        "inputs": {v: {"path": _rel(p), "sha256": sha256_file(p)} for v, p in inputs.items()},
-        "pvt_grid_source": "sim/pvt/pvt_sweep.py",
-        "pvt_grid_source_sha256": sha256_file(REPO / "sim" / "pvt" / "pvt_sweep.py"),
-        "corners": [{"tag": corner_tag(*c), "process": c[0], "temperature_c": c[1], "vdd_v": c[2],
-                     "sections": [*grid["process_corners"][c[0]], "cap_mim"]} for c in corners],
-        "models": MODELS,
-        "codes": {"first": 0, "last": N_CODES - 1, "count": N_CODES},
-        "settings": settings,
-        "units": {"time": "s", "frequency": "Hz", "temperature": "C", "voltage": "V"},
-        "manifest_template": "manifest.template.json",
-        "manifest_required_at_execution": list(MANIFEST_REQUIRED),
-        "requests": entries,
-        "execution": {
-            "backend": "batch only: `klt sim <request> --backend batch` for every request (single-corner "
-                       "requests are kept local by klt unless --backend is explicit)",
-            "preflight_required": "a successful batch preflight must precede any submission; blocked while "
-                                  "2AMLogic/klayout-tools#2851 is open",
-            "local_grid_fallback": "forbidden; report refused submissions and per-request errors",
-            "owner": "#87",
-        },
-    }
-    (out / "provenance.json").write_text(json.dumps(prov, indent=2) + "\n")
-    return prov
+        settings = {k: cfg[k] for k in DEFAULTS}
+        tmpl = manifest_template(settings)
+        (out / "manifest.template.json").write_text(json.dumps(tmpl, indent=2) + "\n")
+        prov = {
+            "kind": "trim-dense-batch-requests",
+            "evidence": "NOT EVIDENCE: offline request generation, no simulation was run",
+            "issue": 98, "parent": 87,
+            "inputs": {v: {"path": _rel(p), "sha256": sha256_file(p)} for v, p in inputs.items()},
+            "pvt_grid_source": "sim/pvt/pvt_sweep.py",
+            "pvt_grid_source_sha256": sha256_file(REPO / "sim" / "pvt" / "pvt_sweep.py"),
+            "corners": [{"tag": corner_tag(*c), "process": c[0], "temperature_c": c[1], "vdd_v": c[2],
+                         "sections": [*grid["process_corners"][c[0]], "cap_mim"]} for c in corners],
+            "models": MODELS,
+            "codes": {"first": 0, "last": N_CODES - 1, "count": N_CODES},
+            "settings": settings,
+            "units": {"time": "s", "frequency": "Hz", "temperature": "C", "voltage": "V"},
+            "manifest_template": "manifest.template.json",
+            "manifest_required_at_execution": list(MANIFEST_REQUIRED),
+            "requests": entries,
+            "execution": {
+                "backend": "batch only: `klt sim <request> --backend batch` for every request (single-corner "
+                           "requests are kept local by klt unless --backend is explicit)",
+                "preflight_required": "a successful batch preflight must precede any submission; blocked while "
+                                      "2AMLogic/klayout-tools#2851 is open",
+                "local_grid_fallback": "forbidden; report refused submissions and per-request errors",
+                "owner": "#87",
+            },
+        }
+        (out / "provenance.json").write_text(json.dumps(prov, indent=2) + "\n")
+        return prov
 
 
 def main() -> int:
