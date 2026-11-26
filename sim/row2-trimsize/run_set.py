@@ -170,9 +170,9 @@ def run_group(klt: list[str], reqs: list[tuple[str, str, Path]], out: Path,
         if rep_rel:
             src = _resolve_report_src(gdir, str(rep_rel))
             dst = out / "reports" / f"report_{tag}.json"
-            dst.parent.mkdir(parents=True, exist_ok=True)
             try:
-                dst.write_text(src.read_text())
+                data = src.read_bytes()
+                _write_recovered_report(dst, data)
                 row["report"] = str(dst.relative_to(out))
             except OSError as e:
                 row["copy_error"] = str(e)
