@@ -6,6 +6,23 @@ Chronological record of merged pull requests and closed issues, maintained by th
 
 - [2026-09](work_log/WORK_LOG_2026-09.md)
 
+### 2026-11-26
+
+- **PR #506**: refactor(sim): import solve_ls from fit_weights in analyze_screen
+- **PR #507**: fix: compare untrimmed PVT process spread against its signed limits
+- **PR #503**: fix: accept a pre-created empty bench directory in the row-2 generators
+- **PR #501**: fix(sim): publish row2-trimsize member reports atomically in run_group
+- **PR #497**: fix: batch row2-trimsize requests per (variant, corner) directory
+- **PR #496**: docs: correct the trim screen ranges and per-code step claim in DR-0048
+- **PR #502**: refactor: derive cell inventory in build_cells.py from the builder table
+- **Issue #505** (closed): Reuse the dense trim-fit solver in the sparse row-2 screen
+- **Issue #504** (closed): Compare untrimmed PVT process spread directly with its signed limits
+- **Issue #500** (closed): Share the row-2 bench directory check so both generators accept an empty output directory
+- **Issue #498** (closed): A partial tagged-report write makes the row-2 runner skip a completed job on resume
+- **Issue #482** (closed): sim/row2-trimsize/run_set.py: make the batch-set cross-wiring guard structural, not procedural
+- **Issue #483** (closed): DR-0048: two scope-inconsistent prose figures in the screen failure-mode list (measured)
+- **Issue #499** (closed): Derive layout cell order and parser inputs from the builder table
+
 ### 2026-11-25
 
 - **PR #473**: sim(row2-trimsize): row-2 trim-bank sizing screen is negative at every corner; DR-0048 names the thermometer upper bank as next option
