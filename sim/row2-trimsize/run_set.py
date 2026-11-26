@@ -27,10 +27,10 @@ is appended to `<out>/ledger.jsonl`.
 Resume: a request whose `reports/report_<tag>.json` already exists is skipped,
 and `salvage()` recovers finished member reports from
 `jobs/<variant>/<corner>/<request-stem>/report.json` before submission so an
-interrupted run continues without resubmitting finished requests.  A legacy
-variant-only `jobs/<variant>/<request-stem>/report.json` path (which can hold a
-report from a pre-#482 straddling batch) is left pending for resubmission
-unless its netlist/request identity can be uniquely verified against the bench.
+interrupted run continues without resubmitting finished requests.  Legacy
+batches could put every job under the first variant and suffix duplicate
+request stems. Recovery scans `jobs/*/*/report.json` and uses report and
+receipt identity to match a single request across the full bench.
 
     python3 -I sim/row2-trimsize/run_set.py --bench-dir B --out-dir R \
         [--variant NAME] [--group 64] [--max-in-flight 8] [--limit N] [--dry-run]
@@ -45,6 +45,7 @@ import sys
 import time
 from datetime import datetime, timezone
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parent.parent
@@ -282,40 +283,38 @@ def _is_passing_report(doc: object) -> bool:
     return not (str(doc.get("status")).lower() in ("failed", "error", "refused") or doc.get("refused"))
 
 
-def _legacy_identity_verified(
+def _legacy_report_tag(
     report_doc: dict,
     legacy_dir: Path,
-    req_path: Path,
-    bench_info: dict[Path, tuple[Path | None, str | None, frozenset[str]]],
-    repo_root: Path = REPO,
-) -> bool:
-    """True only when a legacy jobs/<variant>/<stem>/report.json unambiguously
-    proves it measured `req_path` and no other request in the bench."""
+    by_netlist_sha: dict[str, list[tuple[str, Path, frozenset[str]]]],
+    repo_root: Path,
+) -> str | None:
+    """Return the tag of the one bench request consistent with all job evidence."""
     env = report_doc.get("environment")
     got_net_sha = env.get("netlist_sha256") if isinstance(env, dict) else None
     if not isinstance(got_net_sha, str) or not got_net_sha:
-        return False
+        return None
     ok_rec, got_req_sha = _read_receipt_request_sha256(legacy_dir)
     if not ok_rec:
-        return False
+        return None
     ok_np, resolved_np = _resolve_report_netlist_path(report_doc, repo_root)
     if not ok_np:
-        return False
+        return None
+    matches = [
+        tag for tag, netlist, digests in by_netlist_sha.get(got_net_sha, ())
+        if (got_req_sha is None or got_req_sha in digests)
+        and (resolved_np is None or resolved_np == netlist)
+    ]
+    return matches[0] if len(matches) == 1 else None
 
-    def _candidate_matches(info: tuple[Path | None, str | None, frozenset[str]]) -> bool:
-        tb_p, nsha, rdigests = info
-        if nsha is None or nsha != got_net_sha:
-            return False
-        if got_req_sha is not None and got_req_sha not in rdigests:
-            return False
-        if resolved_np is not None and (tb_p is None or tb_p != resolved_np):
-            return False
-        return True
 
-    target = bench_info.get(req_path.resolve())
-    if target is None or not _candidate_matches(target):
-        return False
-    return sum(1 for info in bench_info.values() if _candidate_matches(info)) == 1
+def _write_recovered_report(dst: Path, data: bytes) -> None:
+    """Publish atomically because the tagged filename is the resume marker."""
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    with TemporaryDirectory(dir=dst.parent) as scratch:
+        staged = Path(scratch) / "report.json"
+        staged.write_bytes(data)
+        staged.replace(dst)
 
 
 def salvage(jobs_root: Path, out: Path, reqs: list[tuple[str, str, Path]],
@@ -332,17 +331,19 @@ def salvage(jobs_root: Path, out: Path, reqs: list[tuple[str, str, Path]],
         return 0
     bench_root = bench if bench is not None else reqs[0][2].parent.parent.parent
     repo_root = _find_repo_root(bench_root)
-    bench_info: dict[Path, tuple[Path | None, str | None, frozenset[str]]] | None = None
+    pending: dict[str, Path] = {}
     n = 0
     for tag, v, p in reqs:
         dst = out / "reports" / f"report_{tag}.json"
         if dst.is_file():
             continue
+        pending[tag] = dst
         cdir = job_dir(jobs_root, v, p) / p.stem
         src = cdir / "report.json"
         if src.is_file():
             try:
-                d = json.loads(src.read_text())
+                data = src.read_bytes()
+                d = json.loads(data)
             except (OSError, ValueError):
                 continue
             if not _is_passing_report(d):
@@ -358,29 +359,35 @@ def salvage(jobs_root: Path, out: Path, reqs: list[tuple[str, str, Path]],
             ok_np, resolved_np = _resolve_report_netlist_path(d, repo_root)
             if not ok_np or (resolved_np is not None and tb_path is not None and resolved_np != tb_path):
                 continue
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            dst.write_text(src.read_text())
+            _write_recovered_report(dst, data)
             n += 1
-            continue
+            del pending[tag]
 
-        legacy_dir = jobs_root / v / p.stem
-        legacy_src = legacy_dir / "report.json"
-        if not legacy_src.is_file():
-            continue
+    if not pending:
+        return n
+    legacy_reports = sorted(jobs_root.glob("*/*/report.json"))
+    if not legacy_reports:
+        return n
+
+    # Include unselected and already-reported requests when testing uniqueness.
+    by_netlist_sha: dict[str, list[tuple[str, Path, frozenset[str]]]] = {}
+    for tag, _, req_path in find_requests(bench_root, None):
+        netlist, sha, digests = _request_netlist_info(req_path)
+        if netlist is not None and sha is not None:
+            by_netlist_sha.setdefault(sha, []).append((tag, netlist, digests))
+
+    for legacy_src in legacy_reports:
         try:
-            d = json.loads(legacy_src.read_text())
+            data = legacy_src.read_bytes()
+            d = json.loads(data)
         except (OSError, ValueError):
             continue
         if not _is_passing_report(d):
             continue
-        if bench_info is None:
-            bench_info = {q.resolve(): _request_netlist_info(q)
-                          for _, _, q in find_requests(bench_root, None)}
-        bench_info.setdefault(p.resolve(), _request_netlist_info(p))
-        if not _legacy_identity_verified(d, legacy_dir, p, bench_info, repo_root):
+        tag = _legacy_report_tag(d, legacy_src.parent, by_netlist_sha, repo_root)
+        if tag is None or tag not in pending:
             continue
-        dst.parent.mkdir(parents=True, exist_ok=True)
-        dst.write_text(legacy_src.read_text())
+        _write_recovered_report(pending.pop(tag), data)
         n += 1
     return n
 

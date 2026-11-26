@@ -368,6 +368,7 @@ def test_run_set_ambiguous_legacy_job_path_and_defensive_guards(tmp_path: Path, 
         calls_single.clear()
         assert _run_main(monkeypatch, "--bench-dir", str(bench_single), "--out-dir", str(out_s), "--variant", "A") == 0
         assert len(calls_single) == 1
+        assert not (out_s / "reports" / "report_B_tt_c00.json").exists()
         assert json.loads((out_s / "reports" / "report_A_tt_c00.json").read_text())["measured_tag"] == "A_tt_c00"
 
     # Shared netlist bytes across A/tt and B/tt (e.g. .include-only benches) remain ambiguous
@@ -392,11 +393,11 @@ def test_run_set_ambiguous_legacy_job_path_and_defensive_guards(tmp_path: Path, 
     assert len(calls_single) == 1
     assert json.loads((out_shared / "reports" / "report_A_tt_c00.json").read_text())["measured_tag"] == "A_tt_c00"
 
-    # Case 3: legacy report whose netlist_sha256 uniquely identifies A/ff across the bench
-    # recovers ONLY A_ff_c00 and leaves A_tt_c00 pending for submission.
+    # A straddling batch filed A/ff under B with a suffixed stem. A second
+    # report's SHA identifies A/tt but its netlist path contradicts that SHA.
     calls = _install_fake_klt(monkeypatch, meta)
     out_verified = tmp_path / "out_verified_legacy"
-    leg_v = out_verified / "jobs" / "A" / "request_c00" / "report.json"
+    leg_v = out_verified / "jobs" / "B" / "request_c00-57" / "report.json"
     leg_v.parent.mkdir(parents=True)
     leg_v.write_text(json.dumps({
         "synthetic": True,
@@ -404,6 +405,13 @@ def test_run_set_ambiguous_legacy_job_path_and_defensive_guards(tmp_path: Path, 
         "measured_tag": "verified_legacy_A_ff_c00",
         "environment": {"netlist_sha256": meta["A_ff_c00"]["netlist_sha256"]},
     }) + "\n")
+    conflicting = out_verified / "jobs" / "B" / "request_c00" / "report.json"
+    conflicting.parent.mkdir(parents=True)
+    conflicting.write_text(json.dumps({
+        "status": "pass",
+        "environment": {"netlist_sha256": meta["A_tt_c00"]["netlist_sha256"]},
+        "netlist": {"path": str(meta["B_tt_c00"]["tb_path"])},
+    }))
     assert _run_main(monkeypatch, "--bench-dir", str(bench), "--out-dir", str(out_verified), "--variant", "A") == 0
     assert [[p.relative_to(bench).as_posix() for p in c["requests"]] for c in calls] == [
         ["A/tt/request_c00.json"],
@@ -439,6 +447,34 @@ def test_run_set_ambiguous_legacy_job_path_and_defensive_guards(tmp_path: Path, 
     assert "2AMLogic/klayout-tools#7180" in (run_set.__doc__ or "")
 
 
+def test_interrupted_legacy_report_copy_can_be_retried(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    bench = tmp_path / "bench"
+    meta = _write_bench(bench, {("A", "tt"): ["c00"]})
+    reqs = run_set.find_requests(bench, None)
+    out = tmp_path / "out"
+    jobs = out / "jobs"
+    src = jobs / "B" / "request_c00-57" / "report.json"
+    src.parent.mkdir(parents=True)
+    src.write_text(json.dumps({
+        "status": "pass",
+        "environment": {"netlist_sha256": meta["A_tt_c00"]["netlist_sha256"]},
+    }))
+    dst = out / "reports" / "report_A_tt_c00.json"
+    write_bytes = Path.write_bytes
+
+    def partial_write(path: Path, data: bytes) -> int:
+        write_bytes(path, data[:1])
+        raise OSError("interrupted copy")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(Path, "write_bytes", partial_write)
+        with pytest.raises(OSError, match="interrupted copy"):
+            run_set.salvage(jobs, out, reqs, bench)
+    assert not dst.exists()
+    assert run_set.salvage(jobs, out, reqs, bench) == 1
+    assert dst.read_bytes() == src.read_bytes()
+
+
 def test_salvage_recovers_committed_screen_reports_with_090_receipts(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
@@ -455,16 +491,10 @@ def test_salvage_recovers_committed_screen_reports_with_090_receipts(
     out_all = tmp_path / "out_screen"
     reqs = run_set.find_requests(screen / "bench", None)
     n_salv = run_set.salvage(screen / "jobs", out_all, reqs, screen / "bench")
-    assert n_salv == 272
-    recovered_ctrl = out_all / "reports" / "report_ctrl_tt_27C_3p3V_c00.json"
-    assert recovered_ctrl.is_file()
-    assert recovered_ctrl.read_text() == (ctrl_job / "report.json").read_text()
-    # Cross-wired straddling-batch legacy job dirs stay unrecovered.
-    assert not (
-        out_all
-        / "reports"
-        / "report_s28.37900-0.21230-0.50606-1.07899-2.28837-4.69161-9.66190-20.87300-48.84701_tt_27C_3p3V_c00.json"
-    ).exists()
+    assert n_salv == len(reqs) == 342
+    for tag, _, _ in reqs:
+        name = f"report_{tag}.json"
+        assert (out_all / "reports" / name).read_bytes() == (screen / "reports" / name).read_bytes(), tag
 
     # Also exercise run_set.py --dry-run with the committed ctrl c00 report + receipt.
     out_ctrl = tmp_path / "out_ctrl_dry"
