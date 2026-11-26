@@ -1158,12 +1158,20 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-#: Build order matters: `rcosc_top` instantiates the other cells as
-#: sub-cells, so they have to exist on disk (and be current) before it is
-#: built.
-CELL_ORDER = [
-    "rcosc_bias", "rcosc_trim_bank", "rcosc_comparator", "rcosc_comparator_p", "rcosc_top",
-]
+#: The builder/writer table is the single ordered inventory of cells: the
+#: CLI `--cell` choices, both netlist parses, and the build loop below all
+#: derive from its keys instead of restating the cell list. Build order
+#: matters: `rcosc_top` instantiates the other cells as sub-cells, so they
+#: have to exist on disk (and be current) before it is built -- keep the
+#: four leaves ahead of `rcosc_top`.
+BUILDERS = {
+    "rcosc_bias": (build_rcosc_bias, _write_reference_netlist_bias),
+    "rcosc_trim_bank": (build_rcosc_trim_bank, _write_reference_netlist_trim_bank),
+    "rcosc_comparator": (build_rcosc_comparator, _write_reference_netlist_comparator),
+    "rcosc_comparator_p": (build_rcosc_comparator_p, _write_reference_netlist_comparator_p),
+    "rcosc_top": (build_rcosc_top, _write_reference_netlist_top),
+}
+CELL_ORDER = list(BUILDERS)
 
 
 def main() -> int:
@@ -1177,20 +1185,7 @@ def main() -> int:
         return 1
 
     netlist_text = NETLIST_PATH.read_text()
-    devices_by_cell = {
-        "rcosc_bias": parse_subckt(netlist_text, "rcosc_bias"),
-        "rcosc_trim_bank": parse_subckt(netlist_text, "rcosc_trim_bank"),
-        "rcosc_comparator": parse_subckt(netlist_text, "rcosc_comparator"),
-        "rcosc_comparator_p": parse_subckt(netlist_text, "rcosc_comparator_p"),
-        "rcosc_top": parse_subckt(netlist_text, "rcosc_top"),
-    }
-    builders = {
-        "rcosc_bias": (build_rcosc_bias, _write_reference_netlist_bias),
-        "rcosc_trim_bank": (build_rcosc_trim_bank, _write_reference_netlist_trim_bank),
-        "rcosc_comparator": (build_rcosc_comparator, _write_reference_netlist_comparator),
-        "rcosc_comparator_p": (build_rcosc_comparator_p, _write_reference_netlist_comparator_p),
-        "rcosc_top": (build_rcosc_top, _write_reference_netlist_top),
-    }
+    devices_by_cell = {name: parse_subckt(netlist_text, name) for name in CELL_ORDER}
 
     CELLS_DIR.mkdir(exist_ok=True)
     LVS_REF_DIR.mkdir(exist_ok=True)
@@ -1203,11 +1198,7 @@ def main() -> int:
     ctx: dict = {
         "__devices_by_cell__": devices_by_cell,
         "__subckt_pins__": {
-            name: parse_subckt_pins(netlist_text, name)
-            for name in (
-                "rcosc_bias", "rcosc_trim_bank", "rcosc_comparator",
-                "rcosc_comparator_p", "rcosc_top",
-            )
+            name: parse_subckt_pins(netlist_text, name) for name in CELL_ORDER
         },
     }
 
@@ -1219,7 +1210,7 @@ def main() -> int:
     for cell_name in CELL_ORDER:
         if cell_name not in to_build:
             continue
-        build_fn, ref_writer = builders[cell_name]
+        build_fn, ref_writer = BUILDERS[cell_name]
         devices = devices_by_cell[cell_name]
         gds_path = CELLS_DIR / f"{cell_name}.gds"
         ref_path = LVS_REF_DIR / f"{cell_name}.spice"
