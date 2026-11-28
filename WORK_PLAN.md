@@ -5,7 +5,7 @@ This roadmap is generated from the current GitHub label state by the Loom Guide 
 <!-- guide:plan-body:start -->
 ## Operator Attention: Merge-Risk-Hold Pileup
 
-Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — a human merge decision, or the prerequisite shown, is missing.
+Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — only a human merge decision is missing.
 
 - **#510**: chore: resync installed Loom surfaces
 
@@ -25,13 +25,7 @@ Judge-approved PRs under a hold (`loom:blocked` or `loom:operator`) — a human 
 
 ## Ready
 
-Human-approved issues (`loom:issue`) ready for implementation — excluding held (`loom:blocked`/`loom:operator`/`loom:frozen`), `loom:building`, and issues with an open linked PR (native admission `OPEN_PR`; listed under Issues with Open PRs).
-
-_None._
-
-## Issues with Open PRs (Not Dispatchable)
-
-`loom:issue` issues an open linked PR already holds — native admission would refuse them (`OPEN_PR`); listed with the PR and its stage, not counted above.
+Human-approved issues ready for implementation (`loom:issue`).
 
 _None._
 
@@ -76,9 +70,8 @@ _None._
 | Operator merge-risk holds | 1 |
 | Very important | 1 |
 | Important | 3 |
-| Ready (`loom:issue`, net of holds/building/open-linked-PRs) | 0 |
+| Ready (`loom:issue`) | 0 |
 | In Progress (`loom:building`) | 0 |
-| Held, no other bucket | 1 |
 | PRs awaiting review | 1 |
 | Approved PRs awaiting merge | 1 |
 | Curated | 3 |
